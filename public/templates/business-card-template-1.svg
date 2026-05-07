@@ -1,0 +1,13 @@
+<svg width="400" height="240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="240" fill="#2c3e50" rx="8"/>
+  <rect x="10" y="10" width="380" height="220" fill="#34495e" rx="6"/>
+  
+  <text x="200" y="80" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" text-anchor="middle" font-weight="bold">Your Business</text>
+  <text x="200" y="115" font-family="Arial, sans-serif" font-size="16" fill="#ecf0f1" text-anchor="middle">Restaurant & Catering</text>
+  
+  <line x1="50" y1="140" x2="350" y2="140" stroke="#7f8c8d" stroke-width="1"/>
+  
+  <text x="200" y="170" font-family="Arial, sans-serif" font-size="14" fill="#ecf0f1" text-anchor="middle">+250 XXX XXX XXX</text>
+  <text x="200" y="195" font-family="Arial, sans-serif" font-size="14" fill="#ecf0f1" text-anchor="middle">info@yourbusiness.com</text>
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="12" fill="#95a5a6" text-anchor="middle">Kigali, Rwanda</text>
+</svg>

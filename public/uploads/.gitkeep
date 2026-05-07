@@ -1,0 +1,2 @@
+# This directory stores uploaded media files in local development
+# In production, use Supabase Storage or S3

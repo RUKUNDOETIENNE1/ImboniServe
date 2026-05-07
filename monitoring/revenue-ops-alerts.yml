@@ -1,0 +1,371 @@
+# Revenue Operations Monitoring & Alerting Configuration
+# Compatible with: Prometheus, Grafana, PagerDuty, Sentry
+
+version: '1.0'
+
+# Metric Collection Endpoints
+metrics:
+  - name: revenue_ops_payout_queue_size
+    type: gauge
+    description: Number of pending payouts awaiting approval
+    query: SELECT COUNT(*) FROM "MarketerPayout" WHERE status = 'PENDING'
+    interval: 60s
+    labels:
+      - service: revenue-ops
+      - component: payout
+
+  - name: revenue_ops_high_risk_payouts
+    type: gauge
+    description: Number of high/critical risk payouts in queue
+    query: |
+      SELECT COUNT(*) FROM "MarketerPayout" p
+      JOIN "MarketerRiskProfile" r ON p."marketerId" = r."marketerId"
+      WHERE p.status = 'PENDING' AND r."riskLevel" IN ('HIGH', 'CRITICAL')
+    interval: 60s
+    labels:
+      - service: revenue-ops
+      - component: risk
+
+  - name: revenue_ops_critical_alerts
+    type: gauge
+    description: Number of unacknowledged critical alerts
+    query: SELECT COUNT(*) FROM "RevenueAlert" WHERE severity = 'CRITICAL' AND acknowledged = false
+    interval: 30s
+    labels:
+      - service: revenue-ops
+      - component: alerts
+
+  - name: revenue_ops_commission_validation_lag
+    type: gauge
+    description: Number of commissions pending validation beyond 7 days
+    query: |
+      SELECT COUNT(*) FROM "MarketerCommission"
+      WHERE status = 'PENDING'
+      AND "createdAt" < NOW() - INTERVAL '7 days'
+    interval: 300s
+    labels:
+      - service: revenue-ops
+      - component: commission
+
+  - name: revenue_ops_payout_processing_time
+    type: histogram
+    description: Time taken to process payouts (request to completion)
+    query: |
+      SELECT EXTRACT(EPOCH FROM ("processedAt" - "createdAt")) as duration
+      FROM "MarketerPayout"
+      WHERE status IN ('PAID', 'FAILED')
+      AND "processedAt" > NOW() - INTERVAL '1 hour'
+    interval: 300s
+    buckets: [60, 300, 600, 1800, 3600, 7200]
+    labels:
+      - service: revenue-ops
+      - component: payout
+
+  - name: revenue_ops_wallet_balance_total
+    type: gauge
+    description: Total available balance across all marketer wallets
+    query: SELECT SUM("availableBalanceCents") FROM "MarketerWallet"
+    interval: 300s
+    labels:
+      - service: revenue-ops
+      - component: wallet
+
+  - name: revenue_ops_fraud_detection_rate
+    type: counter
+    description: Number of fraud detections by rule type
+    query: |
+      SELECT "riskLevel", COUNT(*) as count
+      FROM "MarketerRiskProfile"
+      WHERE "lastCalculatedAt" > NOW() - INTERVAL '1 hour'
+      GROUP BY "riskLevel"
+    interval: 300s
+    labels:
+      - service: revenue-ops
+      - component: fraud
+
+# Alert Rules
+alerts:
+  # CRITICAL ALERTS - Immediate Action Required
+  - name: PayoutQueueBacklog
+    severity: critical
+    condition: revenue_ops_payout_queue_size > 50
+    duration: 5m
+    message: "Payout queue has {{$value}} pending requests. Immediate admin attention required."
+    channels:
+      - pagerduty
+      - slack-critical
+      - email-admins
+    runbook: https://docs.imboni.rw/runbooks/payout-queue-backlog
+
+  - name: CriticalAlertsUnacknowledged
+    severity: critical
+    condition: revenue_ops_critical_alerts > 5
+    duration: 10m
+    message: "{{$value}} critical alerts unacknowledged for 10+ minutes"
+    channels:
+      - pagerduty
+      - slack-critical
+    runbook: https://docs.imboni.rw/runbooks/critical-alerts
+
+  - name: HighRiskPayoutsPending
+    severity: critical
+    condition: revenue_ops_high_risk_payouts > 10
+    duration: 15m
+    message: "{{$value}} high-risk payouts pending approval. Review immediately."
+    channels:
+      - slack-critical
+      - email-admins
+    runbook: https://docs.imboni.rw/runbooks/high-risk-payouts
+
+  - name: WalletBalanceAnomaly
+    severity: critical
+    condition: revenue_ops_wallet_balance_total > 100000000 OR revenue_ops_wallet_balance_total < 0
+    duration: 1m
+    message: "Wallet balance anomaly detected: {{$value}} cents"
+    channels:
+      - pagerduty
+      - slack-critical
+      - email-finance
+    runbook: https://docs.imboni.rw/runbooks/wallet-anomaly
+
+  # HIGH ALERTS - Action Required Soon
+  - name: PayoutProcessingDelayed
+    severity: high
+    condition: histogram_quantile(0.95, revenue_ops_payout_processing_time) > 3600
+    duration: 30m
+    message: "95th percentile payout processing time is {{$value}}s (>1 hour)"
+    channels:
+      - slack-ops
+      - email-admins
+    runbook: https://docs.imboni.rw/runbooks/payout-delays
+
+  - name: CommissionValidationBacklog
+    severity: high
+    condition: revenue_ops_commission_validation_lag > 100
+    duration: 1h
+    message: "{{$value}} commissions pending validation beyond 7 days"
+    channels:
+      - slack-ops
+      - email-admins
+    runbook: https://docs.imboni.rw/runbooks/commission-validation
+
+  - name: FraudDetectionSpike
+    severity: high
+    condition: rate(revenue_ops_fraud_detection_rate{riskLevel="CRITICAL"}[5m]) > 5
+    duration: 10m
+    message: "Spike in critical fraud detections: {{$value}} per minute"
+    channels:
+      - slack-security
+      - email-security
+    runbook: https://docs.imboni.rw/runbooks/fraud-spike
+
+  # MEDIUM ALERTS - Monitor Closely
+  - name: PayoutQueueGrowing
+    severity: medium
+    condition: revenue_ops_payout_queue_size > 20
+    duration: 30m
+    message: "Payout queue growing: {{$value}} pending requests"
+    channels:
+      - slack-ops
+    runbook: https://docs.imboni.rw/runbooks/payout-queue-growth
+
+  - name: HighRiskMarketerIncrease
+    severity: medium
+    condition: revenue_ops_fraud_detection_rate{riskLevel="HIGH"} > 10
+    duration: 1h
+    message: "{{$value}} marketers flagged as high risk in past hour"
+    channels:
+      - slack-ops
+    runbook: https://docs.imboni.rw/runbooks/high-risk-marketers
+
+  # LOW ALERTS - Informational
+  - name: DailyPayoutSummary
+    severity: info
+    schedule: "0 9 * * *" # Daily at 9 AM
+    message: "Daily payout summary: {{$value}} payouts processed yesterday"
+    channels:
+      - slack-finance
+      - email-daily-report
+
+# Notification Channels
+channels:
+  pagerduty:
+    type: pagerduty
+    integration_key: ${PAGERDUTY_INTEGRATION_KEY}
+    auto_resolve: true
+
+  slack-critical:
+    type: slack
+    webhook_url: ${SLACK_CRITICAL_WEBHOOK}
+    channel: "#revenue-ops-critical"
+    mention: "@channel"
+
+  slack-ops:
+    type: slack
+    webhook_url: ${SLACK_OPS_WEBHOOK}
+    channel: "#revenue-ops"
+
+  slack-security:
+    type: slack
+    webhook_url: ${SLACK_SECURITY_WEBHOOK}
+    channel: "#security-alerts"
+
+  slack-finance:
+    type: slack
+    webhook_url: ${SLACK_FINANCE_WEBHOOK}
+    channel: "#finance"
+
+  email-admins:
+    type: email
+    recipients:
+      - admin@imboni.rw
+      - ops@imboni.rw
+
+  email-finance:
+    type: email
+    recipients:
+      - finance@imboni.rw
+      - cfo@imboni.rw
+
+  email-security:
+    type: email
+    recipients:
+      - security@imboni.rw
+
+  email-daily-report:
+    type: email
+    recipients:
+      - management@imboni.rw
+
+# Dashboards
+dashboards:
+  - name: Revenue Operations Overview
+    url: /grafana/d/revenue-ops-overview
+    panels:
+      - Payout Queue Size (Last 24h)
+      - High Risk Payouts Trend
+      - Commission Validation Status
+      - Wallet Balance Total
+      - Fraud Detection Heatmap
+      - Payout Processing Time P50/P95/P99
+      - Alert Count by Severity
+
+  - name: Fraud Detection Dashboard
+    url: /grafana/d/revenue-ops-fraud
+    panels:
+      - Risk Score Distribution
+      - Fraud Rule Triggers (Last 7d)
+      - High Risk Marketers List
+      - Suspicious Activity Timeline
+      - False Positive Rate
+
+  - name: Financial Operations Dashboard
+    url: /grafana/d/revenue-ops-finance
+    panels:
+      - Total Payouts (Daily/Weekly/Monthly)
+      - Commission Earnings Trend
+      - Wallet Balance by Status
+      - Payout Success Rate
+      - Average Payout Amount
+
+# Health Checks
+healthchecks:
+  - name: revenue_ops_api_health
+    endpoint: /api/health/revenue-ops
+    interval: 30s
+    timeout: 5s
+    expected_status: 200
+    alert_on_failure: true
+
+  - name: revenue_ops_database_connection
+    type: database
+    connection_string: ${DATABASE_URL}
+    query: SELECT 1 FROM "MarketerWallet" LIMIT 1
+    interval: 60s
+    timeout: 10s
+    alert_on_failure: true
+
+  - name: revenue_ops_event_emission
+    type: custom
+    check: |
+      SELECT COUNT(*) FROM "RevenueEvent"
+      WHERE "createdAt" > NOW() - INTERVAL '5 minutes'
+    expected: > 0
+    interval: 300s
+    alert_on_failure: true
+    message: "No revenue events emitted in last 5 minutes - event system may be down"
+
+# SLOs (Service Level Objectives)
+slos:
+  - name: Payout Approval SLA
+    description: 95% of payouts approved within 24 hours
+    target: 0.95
+    window: 30d
+    metric: |
+      sum(rate(revenue_ops_payout_processing_time_bucket{le="86400"}[30d]))
+      /
+      sum(rate(revenue_ops_payout_processing_time_count[30d]))
+
+  - name: API Availability
+    description: 99.9% uptime for Revenue Ops APIs
+    target: 0.999
+    window: 30d
+    metric: |
+      sum(rate(http_requests_total{service="revenue-ops",status!~"5.."}[30d]))
+      /
+      sum(rate(http_requests_total{service="revenue-ops"}[30d]))
+
+  - name: Fraud Detection Accuracy
+    description: <5% false positive rate
+    target: 0.95
+    window: 7d
+    metric: |
+      1 - (
+        sum(revenue_ops_fraud_false_positives[7d])
+        /
+        sum(revenue_ops_fraud_detections[7d])
+      )
+
+# Runbook Links
+runbooks:
+  payout-queue-backlog: |
+    1. Check admin dashboard for pending approvals
+    2. Review high-risk payouts first
+    3. Batch approve low-risk payouts if needed
+    4. Investigate if queue > 100 (potential system issue)
+
+  critical-alerts: |
+    1. Navigate to /admin/payout-control → Alerts tab
+    2. Review each critical alert
+    3. Take action based on alert type
+    4. Acknowledge alerts after resolution
+
+  high-risk-payouts: |
+    1. Review risk scores and flags
+    2. Investigate marketer history
+    3. Reject suspicious payouts
+    4. Suspend marketers if fraud confirmed
+
+  wallet-anomaly: |
+    1. STOP all payout processing immediately
+    2. Check database for corruption
+    3. Review recent transactions
+    4. Contact engineering team
+    5. Run wallet balance reconciliation script
+
+  payout-delays: |
+    1. Check MoMo API status
+    2. Review error logs for failed payouts
+    3. Retry failed payouts manually if needed
+    4. Contact MoMo support if API issues persist
+
+  commission-validation: |
+    1. Run manual validation script: npm run validate-commissions
+    2. Review flagged commissions
+    3. Approve or void as appropriate
+
+  fraud-spike: |
+    1. Check if legitimate campaign causing spike
+    2. Review new marketer signups
+    3. Tighten fraud rules temporarily if needed
+    4. Investigate source of suspicious activity

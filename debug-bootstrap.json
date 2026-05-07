@@ -1,0 +1,147 @@
+﻿{
+    "boot":  {
+                 "data":  {
+                              "businessId":  "cmo618610000176b8bte341eb",
+                              "tableId":  "cmo643icm000376b8rqn6y7fm",
+                              "sessionId":  "cmomm7w470014194yurcy87zx",
+                              "slipId":  "cmomm7wfk0016194y2t45xdl4",
+                              "slipNumber":  "SLIP-1777621962220-2CB0T9",
+                              "runningTotalCents":  708000,
+                              "itemCount":  2
+                          }
+             },
+    "slip":  {
+                 "data":  {
+                              "id":  "cmomm7wfk0016194y2t45xdl4",
+                              "slipNumber":  "SLIP-1777621962220-2CB0T9",
+                              "sessionId":  "cmomm7w470014194yurcy87zx",
+                              "businessId":  "cmo618610000176b8bte341eb",
+                              "tableId":  "cmo643icm000376b8rqn6y7fm",
+                              "status":  "active",
+                              "runningSubtotalCents":  600000,
+                              "runningVatCents":  108000,
+                              "runningTotalCents":  708000,
+                              "finalBillCents":  null,
+                              "taxMode":  "EXCLUSIVE",
+                              "taxRate":  18,
+                              "sessionStartedAt":  "2026-05-01T07:52:42.221Z",
+                              "lastOrderAt":  "2026-05-01T07:52:50.406Z",
+                              "checkoutInitiatedAt":  null,
+                              "billFinalizedAt":  null,
+                              "paymentTriggeredAt":  null,
+                              "checkoutCompletedAt":  null,
+                              "closedAt":  null,
+                              "orderCount":  1,
+                              "itemCount":  2,
+                              "metadata":  null,
+                              "createdAt":  "2026-05-01T07:52:42.224Z",
+                              "updatedAt":  "2026-05-01T07:52:50.408Z",
+                              "items":  [
+                                            {
+                                                "id":  "cmomm82fj001h194yigld3t1e",
+                                                "slipId":  "cmomm7wfk0016194y2t45xdl4",
+                                                "saleId":  "cmomm80by001c194ysew6m5l6",
+                                                "saleItemId":  "cmomm80bz001e194y1ayw55nc",
+                                                "itemName":  "Test Nyama Brochette",
+                                                "quantity":  1,
+                                                "unitPriceCents":  500000,
+                                                "totalPriceCents":  500000,
+                                                "kitchenStatus":  "pending",
+                                                "kitchenReleasedAt":  null,
+                                                "kitchenReadyAt":  null,
+                                                "servedAt":  null,
+                                                "notes":  null,
+                                                "instructionTags":  [
+
+                                                                    ],
+                                                "createdAt":  "2026-05-01T07:52:49.999Z",
+                                                "updatedAt":  "2026-05-01T07:52:49.999Z"
+                                            },
+                                            {
+                                                "id":  "cmomm82fj001i194yscym7g8d",
+                                                "slipId":  "cmomm7wfk0016194y2t45xdl4",
+                                                "saleId":  "cmomm80by001c194ysew6m5l6",
+                                                "saleItemId":  "cmomm80bz001f194y3mmhx659",
+                                                "itemName":  "Test Soda 500ml",
+                                                "quantity":  1,
+                                                "unitPriceCents":  100000,
+                                                "totalPriceCents":  100000,
+                                                "kitchenStatus":  "pending",
+                                                "kitchenReleasedAt":  null,
+                                                "kitchenReadyAt":  null,
+                                                "servedAt":  null,
+                                                "notes":  null,
+                                                "instructionTags":  [
+
+                                                                    ],
+                                                "createdAt":  "2026-05-01T07:52:49.999Z",
+                                                "updatedAt":  "2026-05-01T07:52:49.999Z"
+                                            }
+                                        ],
+                              "session":  {
+                                              "id":  "cmomm7w470014194yurcy87zx",
+                                              "tableId":  "cmo643icm000376b8rqn6y7fm",
+                                              "businessId":  "cmo618610000176b8bte341eb",
+                                              "status":  "active",
+                                              "createdAt":  "2026-05-01T07:52:41.815Z",
+                                              "closedAt":  null,
+                                              "updatedAt":  "2026-05-01T07:52:51.790Z",
+                                              "checkoutMode":  "tap_and_leave",
+                                              "checkoutStatus":  "active",
+                                              "checkoutInitiatedAt":  null,
+                                              "checkoutCompletedAt":  null,
+                                              "finalBillCents":  null,
+                                              "runningTotalCents":  708000,
+                                              "table":  {
+                                                            "id":  "cmo643icm000376b8rqn6y7fm",
+                                                            "number":  "1",
+                                                            "capacity":  4,
+                                                            "status":  "AVAILABLE",
+                                                            "assignedWaiterId":  null,
+                                                            "createdAt":  "2026-04-19T18:41:05.443Z",
+                                                            "updatedAt":  "2026-04-19T18:41:05.443Z",
+                                                            "businessId":  "cmo618610000176b8bte341eb",
+                                                            "outletId":  null,
+                                                            "qrCode":  null
+                                                        },
+                                              "participants":  [
+
+                                                               ]
+                                          },
+                              "events":  [
+                                             {
+                                                 "id":  "cmomm849t001k194yg82twuhl",
+                                                 "sessionId":  "cmomm7w470014194yurcy87zx",
+                                                 "slipId":  "cmomm7wfk0016194y2t45xdl4",
+                                                 "businessId":  "cmo618610000176b8bte341eb",
+                                                 "eventType":  "order_added",
+                                                 "eventStatus":  "success",
+                                                 "orderId":  "cmomm80by001c194ysew6m5l6",
+                                                 "paymentId":  null,
+                                                 "userId":  null,
+                                                 "metadata":  {
+                                                                  "itemCount":  2,
+                                                                  "orderTotal":  600000,
+                                                                  "newRunningTotal":  708000
+                                                              },
+                                                 "errorMessage":  null,
+                                                 "createdAt":  "2026-05-01T07:52:52.385Z"
+                                             },
+                                             {
+                                                 "id":  "cmomm7y840018194yuywtw58r",
+                                                 "sessionId":  "cmomm7w470014194yurcy87zx",
+                                                 "slipId":  "cmomm7wfk0016194y2t45xdl4",
+                                                 "businessId":  "cmo618610000176b8bte341eb",
+                                                 "eventType":  "session_started",
+                                                 "eventStatus":  "success",
+                                                 "orderId":  null,
+                                                 "paymentId":  null,
+                                                 "userId":  null,
+                                                 "metadata":  null,
+                                                 "errorMessage":  null,
+                                                 "createdAt":  "2026-05-01T07:52:44.548Z"
+                                             }
+                                         ]
+                          }
+             }
+}

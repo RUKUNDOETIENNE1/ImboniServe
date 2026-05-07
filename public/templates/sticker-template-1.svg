@@ -1,0 +1,7 @@
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="150" cy="150" r="140" fill="#27ae60"/>
+  <circle cx="150" cy="150" r="120" fill="#ffffff"/>
+  <text x="150" y="130" font-family="Arial, sans-serif" font-size="28" fill="#2c3e50" text-anchor="middle" font-weight="bold">Your Business</text>
+  <text x="150" y="165" font-family="Arial, sans-serif" font-size="16" fill="#7f8c8d" text-anchor="middle">Fresh & Delicious</text>
+  <text x="150" y="195" font-family="Arial, sans-serif" font-size="14" fill="#27ae60" text-anchor="middle">www.yourbusiness.com</text>
+</svg>

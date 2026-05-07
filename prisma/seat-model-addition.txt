@@ -1,0 +1,32 @@
+// Add this Seat model after the TipChoice model in schema.prisma
+
+model Seat {
+  id          String   @id @default(cuid())
+  tableId     String
+  seatLabel   String   // "Seat A", "Seat B", "Window Seat 1", etc.
+  qrCode      String?  @unique // Unique QR code URL
+  qrDesign    Json?    // QR design customization (colors, logo, style)
+  position    Json?    // Placement coordinates {x, y, edge: "left"|"right"|"top"|"bottom"}
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  table       Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  sales       Sale[]   @relation("SeatSales")
+  tips        StaffTip[] @relation("SeatTips")
+  
+  @@unique([tableId, seatLabel])
+  @@index([tableId])
+  @@index([qrCode])
+  @@index([isActive])
+}
+
+// Update Sale model to add seat relation
+// Add this field to the Sale model:
+// seatId String?
+// seat   Seat?   @relation("SeatSales", fields: [seatId], references: [id])
+
+// Update StaffTip model to add seat relation  
+// Add this field to the StaffTip model:
+// seatId String?
+// seat   Seat?   @relation("SeatTips", fields: [seatId], references: [id])

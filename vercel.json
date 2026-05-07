@@ -1,0 +1,29 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/monthly-usage-reset",
+      "schedule": "0 0 1 * *"
+    },
+    {
+      "path": "/api/cron/addon-renewals",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/reconciliation",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/tap-leave-sweep",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/tap-leave-reconcile",
+      "schedule": "0 * * * *"
+    }
+  ],
+  "functions": {
+    "src/pages/api/cron/reconciliation.ts": { "maxDuration": 300 },
+    "src/pages/api/cron/tap-leave-sweep.ts": { "maxDuration": 120 },
+    "src/pages/api/cron/tap-leave-reconcile.ts": { "maxDuration": 120 }
+  }
+}

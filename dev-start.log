@@ -1,0 +1,27 @@
+======================================== 
+dev-start.bat log - 07-May-26 12:38:09.14
+Project: C:\Dev\ImboniResto
+========================================
+
+v24.15.0
+===== npm install started at 07-May-26 12:38:09.30 =====
+
+up to date in 2s
+Cleaning existing Prisma client cache...
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0, engine=binary) to .\node_modules\@prisma\client in 2.65s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "postgres", schema "public" at "aws-1-eu-west-1.pooler.supabase.com:5432"
+
+11 migrations found in prisma/migrations
+
+
+No pending migrations to apply.

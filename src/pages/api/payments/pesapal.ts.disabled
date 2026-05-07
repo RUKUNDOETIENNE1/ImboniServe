@@ -1,0 +1,52 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getPesapalService } from '@/lib/pesapal'
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  try {
+    const { amount, currency, description, type, reference, customer } = req.body
+    
+    if (!amount || !reference || !customer) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    const pesapal = getPesapalService()
+    
+    const paymentRequest = {
+      amount,
+      currency: currency || 'RWF',
+      description: description || 'ImboniResto Subscription',
+      type: type || 'MOBILE_MONEY',
+      reference,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phoneNumber: customer.phone,
+      callbackUrl: `${process.env.APP_URL}/api/payments/callback`,
+      cancellationUrl: `${process.env.APP_URL}/dashboard`
+    }
+
+    // Try mobile money first, fallback to card if fails
+    const result = await pesapal.fallbackToCardPayment(paymentRequest)
+
+    return res.status(200).json({
+      success: true,
+      orderTrackingId: result.orderTrackingId,
+      redirectUrl: result.redirectUrl,
+      fallback: result.fallback || false,
+      message: result.fallback 
+        ? 'Mobile money failed, redirected to card payment' 
+        : 'Payment initiated successfully'
+    })
+    
+  } catch (error) {
+    console.error('Payment API error:', error)
+    return res.status(500).json({ 
+      error: 'Payment processing failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}

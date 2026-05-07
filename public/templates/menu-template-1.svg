@@ -1,0 +1,30 @@
+<svg width="800" height="1200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="1200" fill="#f8f9fa"/>
+  <rect x="40" y="40" width="720" height="160" fill="#2c3e50" rx="8"/>
+  <text x="400" y="110" font-family="Arial, sans-serif" font-size="48" fill="#ffffff" text-anchor="middle" font-weight="bold">MENU</text>
+  <text x="400" y="160" font-family="Arial, sans-serif" font-size="20" fill="#ecf0f1" text-anchor="middle">Your Business Name</text>
+  
+  <rect x="40" y="240" width="720" height="80" fill="#ffffff" rx="4"/>
+  <text x="60" y="270" font-family="Arial, sans-serif" font-size="24" fill="#2c3e50" font-weight="bold">Appetizers</text>
+  
+  <rect x="40" y="340" width="720" height="100" fill="#ffffff" rx="4"/>
+  <text x="60" y="375" font-family="Arial, sans-serif" font-size="20" fill="#2c3e50" font-weight="600">Sample Dish 1</text>
+  <text x="60" y="405" font-family="Arial, sans-serif" font-size="14" fill="#7f8c8d">Delicious description of the dish</text>
+  <text x="720" y="375" font-family="Arial, sans-serif" font-size="20" fill="#27ae60" text-anchor="end" font-weight="bold">5,000 RWF</text>
+  
+  <rect x="40" y="460" width="720" height="100" fill="#ffffff" rx="4"/>
+  <text x="60" y="495" font-family="Arial, sans-serif" font-size="20" fill="#2c3e50" font-weight="600">Sample Dish 2</text>
+  <text x="60" y="525" font-family="Arial, sans-serif" font-size="14" fill="#7f8c8d">Another delicious description</text>
+  <text x="720" y="495" font-family="Arial, sans-serif" font-size="20" fill="#27ae60" text-anchor="end" font-weight="bold">7,500 RWF</text>
+  
+  <rect x="40" y="600" width="720" height="80" fill="#ffffff" rx="4"/>
+  <text x="60" y="630" font-family="Arial, sans-serif" font-size="24" fill="#2c3e50" font-weight="bold">Main Courses</text>
+  
+  <rect x="40" y="700" width="720" height="100" fill="#ffffff" rx="4"/>
+  <text x="60" y="735" font-family="Arial, sans-serif" font-size="20" fill="#2c3e50" font-weight="600">Sample Main 1</text>
+  <text x="60" y="765" font-family="Arial, sans-serif" font-size="14" fill="#7f8c8d">Hearty main course description</text>
+  <text x="720" y="735" font-family="Arial, sans-serif" font-size="20" fill="#27ae60" text-anchor="end" font-weight="bold">12,000 RWF</text>
+  
+  <rect x="40" y="1100" width="720" height="60" fill="#ecf0f1" rx="4"/>
+  <text x="400" y="1140" font-family="Arial, sans-serif" font-size="16" fill="#7f8c8d" text-anchor="middle">Contact: +250 XXX XXX XXX | Location: Kigali</text>
+</svg>

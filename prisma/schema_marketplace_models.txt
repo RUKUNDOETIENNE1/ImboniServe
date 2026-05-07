@@ -1,0 +1,144 @@
+// Add these models to the end of schema.prisma after DiningCredit model
+
+model PurchaseOrder {
+  id                String        @id @default(cuid())
+  poNumber          String        @unique
+  restaurantId      String
+  restaurant        Restaurant    @relation(fields: [restaurantId], references: [id])
+  supplierId        String
+  supplier          Supplier      @relation(fields: [supplierId], references: [id])
+  
+  status            String        @default("DRAFT")
+  
+  subtotalCents     Int
+  vatCents          Int
+  vatRate           Float         @default(18.0)
+  totalCents        Int
+  
+  deliveryAddress   String?
+  deliveryCity      String?
+  deliveryDistrict  String?
+  requestedDeliveryDate DateTime?
+  notes             String?
+  
+  createdById       String
+  approvedById      String?
+  approvedAt        DateTime?
+  rejectedById      String?
+  rejectedAt        DateTime?
+  rejectionReason   String?
+  
+  items             PurchaseOrderItem[]
+  statusHistory     PurchaseOrderStatusHistory[]
+  goodsReceivedNotes GoodsReceivedNote[]
+  document          SmartDiningSlip?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@index([restaurantId])
+  @@index([supplierId])
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id                String        @id @default(cuid())
+  purchaseOrderId   String
+  purchaseOrder     PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  
+  productName       String
+  productId         String?
+  quantity          Float
+  unit              String
+  unitPriceCents    Int
+  totalPriceCents   Int
+  notes             String?
+  
+  grnItems          GoodsReceivedNoteItem[]
+  
+  createdAt         DateTime      @default(now())
+}
+
+model PurchaseOrderStatusHistory {
+  id                String        @id @default(cuid())
+  purchaseOrderId   String
+  purchaseOrder     PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  
+  status            String
+  changedById       String
+  changedByName     String
+  notes             String?
+  
+  createdAt         DateTime      @default(now())
+}
+
+model GoodsReceivedNote {
+  id                String        @id @default(cuid())
+  grnNumber         String        @unique
+  purchaseOrderId   String
+  purchaseOrder     PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  restaurantId      String
+  supplierId        String
+  supplier          Supplier      @relation(fields: [supplierId], references: [id])
+  
+  receivedById      String
+  receivedByName    String
+  receivedAt        DateTime
+  
+  status            String        @default("PARTIAL")
+  notes             String?
+  discrepancyNotes  String?
+  
+  items             GoodsReceivedNoteItem[]
+  document          SmartDiningSlip?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@index([purchaseOrderId])
+  @@index([restaurantId])
+  @@index([supplierId])
+}
+
+model GoodsReceivedNoteItem {
+  id                String        @id @default(cuid())
+  grnId             String
+  grn               GoodsReceivedNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
+  poItemId          String
+  
+  productName       String
+  orderedQuantity   Float
+  receivedQuantity  Float
+  unit              String
+  unitPriceCents    Int
+  totalPriceCents   Int
+  
+  condition         String        @default("GOOD")
+  notes             String?
+  
+  createdAt         DateTime      @default(now())
+}
+
+model SupplierPayout {
+  id                String        @id @default(cuid())
+  supplierId        String
+  supplier          Supplier      @relation(fields: [supplierId], references: [id])
+  
+  periodStart       DateTime?
+  periodEnd         DateTime?
+  
+  grossAmountCents  Int
+  platformFeeCents  Int
+  platformFeePercent Float        @default(7.5)
+  netAmountCents    Int
+  
+  status            String        @default("pending")
+  method            String?
+  reference         String?
+  paidAt            DateTime?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@index([supplierId, status])
+}

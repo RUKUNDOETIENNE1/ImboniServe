@@ -1,0 +1,180 @@
+import axios from 'axios'
+
+export interface PesapalConfig {
+  consumerKey: string
+  consumerSecret: string
+  environment: 'sandbox' | 'live'
+}
+
+export interface PaymentRequest {
+  amount: number
+  currency: string
+  description: string
+  type: string
+  reference: string
+  firstName: string
+  lastName: string
+  email: string
+  phoneNumber: string
+  callbackUrl: string
+  cancellationUrl: string
+}
+
+export class PesapalService {
+  private config: PesapalConfig
+  private baseUrl: string
+  private token: string | null = null
+  private tokenExpiry: Date | null = null
+
+  constructor(config: PesapalConfig) {
+    this.config = config
+    this.baseUrl = config.environment === 'sandbox' 
+      ? 'https://cybqa.pesapal.com/pesapalv3' 
+      : 'https://pay.pesapal.com/v3'
+  }
+
+  private async getToken(): Promise<string> {
+    // Check if token is still valid
+    if (this.token && this.tokenExpiry && new Date() < this.tokenExpiry) {
+      return this.token
+    }
+
+    try {
+      const response = await axios.post(
+        `${this.baseUrl}/api/Auth/RequestToken`,
+        {
+          consumer_key: this.config.consumerKey,
+          consumer_secret: this.config.consumerSecret
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      )
+
+      this.token = response.data.token
+      // Token expires in 1 hour, set expiry for 50 minutes
+      this.tokenExpiry = new Date(Date.now() + 50 * 60 * 1000)
+      
+      return this.token!
+    } catch (error) {
+      console.error('Pesapal authentication failed:', error)
+      throw new Error('Failed to authenticate with Pesapal')
+    }
+  }
+
+  async submitPayment(request: PaymentRequest): Promise<{
+    orderTrackingId: string
+    redirectUrl: string
+    fallback: boolean
+  }> {
+    try {
+      const token = await this.getToken()
+
+      const payload = {
+        id: request.reference,
+        currency: request.currency,
+        amount: request.amount,
+        description: request.description,
+        callback_url: request.callbackUrl,
+        cancellation_url: request.cancellationUrl,
+        notification_id: process.env.PESAPAL_NOTIFICATION_ID,
+        billing_address: {
+          email_address: request.email,
+          phone_number: request.phoneNumber,
+          country_code: "RW",
+          first_name: request.firstName,
+          last_name: request.lastName
+        }
+      }
+
+      const response = await axios.post(
+        `${this.baseUrl}/api/Transactions/SubmitOrderRequest`,
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      )
+
+      return {
+        orderTrackingId: response.data.order_tracking_id,
+        redirectUrl: response.data.redirect_url,
+        fallback: false
+      }
+    } catch (error) {
+      console.error('Pesapal payment submission failed:', error)
+      throw new Error('Failed to submit payment to Pesapal')
+    }
+  }
+
+  async checkPaymentStatus(orderTrackingId: string): Promise<{
+    status: string
+    paymentMethod: string
+    amount: number
+    currency: string
+  }> {
+    try {
+      const token = await this.getToken()
+
+      const response = await axios.get(
+        `${this.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        }
+      )
+
+      return {
+        status: response.data.payment_status_description,
+        paymentMethod: response.data.payment_method,
+        amount: response.data.amount,
+        currency: response.data.currency
+      }
+    } catch (error) {
+      console.error('Pesapal status check failed:', error)
+      throw new Error('Failed to check payment status')
+    }
+  }
+
+  // Fallback to card payment if mobile money fails
+  async fallbackToCardPayment(request: PaymentRequest): Promise<{
+    orderTrackingId: string
+    redirectUrl: string
+    fallback: boolean
+  }> {
+    try {
+      // First try mobile money
+      const mobileRequest = { ...request, type: 'MOBILE_MONEY' }
+      return await this.submitPayment(mobileRequest)
+    } catch (mobileError) {
+      console.warn('Mobile money failed, falling back to card:', mobileError)
+      
+      // Fallback to card payment
+      const cardRequest = { ...request, type: 'CREDIT_CARD' }
+      const result = await this.submitPayment(cardRequest)
+      return { ...result, fallback: true }
+    }
+  }
+}
+
+// Singleton instance
+let pesapalInstance: PesapalService | null = null
+
+export function getPesapalService(): PesapalService {
+  if (!pesapalInstance) {
+    pesapalInstance = new PesapalService({
+      consumerKey: process.env.PESAPAL_CONSUMER_KEY || '',
+      consumerSecret: process.env.PESAPAL_CONSUMER_SECRET || '',
+      environment: (process.env.PESAPAL_ENVIRONMENT as 'sandbox' | 'live') || 'sandbox'
+    })
+  }
+  return pesapalInstance
+}

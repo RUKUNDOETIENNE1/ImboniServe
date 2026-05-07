@@ -1,0 +1,286 @@
+{
+  "app_name": "ImboniResto",
+  "welcome": "Bienvenue",
+  "login": "Connexion",
+  "logout": "Déconnexion",
+  "signup": "S'inscrire",
+  "email": "Email",
+  "password": "Mot de passe",
+  "phone": "Téléphone",
+  "name": "Nom",
+  "dashboard": "Tableau de bord",
+  "sales": "Ventes",
+  "inventory": "Inventaire",
+  "reports": "Rapports",
+  "settings": "Paramètres",
+  "menu": "Menu",
+  "suppliers": "Fournisseurs",
+  "marketplace": "Marché",
+  "store": "Magasin",
+  "admin": "Admin",
+  "profile": "Profil",
+  "restaurant": "Restaurant",
+  "total_sales": "Ventes totales",
+  "total_revenue": "Revenu total",
+  "profit": "Profit",
+  "orders": "Commandes",
+  "products": "Produits",
+  "customers": "Clients",
+  "add": "Ajouter",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "search": "Rechercher",
+  "filter": "Filtrer",
+  "export": "Exporter",
+  "import": "Importer",
+  "today": "Aujourd'hui",
+  "week": "Semaine",
+  "month": "Mois",
+  "year": "Année",
+  "daily": "Quotidien",
+  "weekly": "Hebdomadaire",
+  "monthly": "Mensuel",
+  "status": "Statut",
+  "pending": "En attente",
+  "confirmed": "Confirmé",
+  "processing": "En cours",
+  "completed": "Terminé",
+  "cancelled": "Annulé",
+  "loading": "Chargement...",
+  "success": "Succès",
+  "error": "Erreur",
+  "warning": "Avertissement",
+  "info": "Information",
+  
+  "common": {
+    "cancel": "Annuler"
+  },
+
+  "public": {
+    "footer": {
+      "cookie_prefs": "Préférences des cookies"
+    }
+  },
+
+  "cookies": {
+    "banner": {
+      "text": "Nous utilisons des cookies pour améliorer votre expérience, analyser l'utilisation et afficher du contenu pertinent.",
+      "learn_more": "En savoir plus",
+      "manage": "Gérer les préférences",
+      "reject": "Refuser les non essentiels",
+      "accept": "Tout accepter"
+    },
+    "prefs": {
+      "title": "Préférences des cookies",
+      "subtitle": "Choisissez les catégories que vous souhaitez autoriser. Vous pouvez changer plus tard.",
+      "functional": "Fonctionnels",
+      "functional_desc": "Améliorent les fonctionnalités comme la langue et le thème. Toujours activés.",
+      "analytics": "Analytique",
+      "analytics_desc": "Nous aident à comprendre l'utilisation pour améliorer le produit.",
+      "marketing": "Marketing",
+      "marketing_desc": "Offres et publicités personnalisées sur les services.",
+      "save": "Enregistrer les préférences"
+    }
+  },
+  
+  "cms": {
+    "title": "Gestion des Contacts",
+    "subtitle": "Gérez toutes vos relations d'affaires en un seul endroit",
+    "contacts": "Contacts",
+    "organizations": "Organisations",
+    "relationships": "Relations",
+    "activities": "Activités",
+    "segments": "Segments",
+    "tags": "Étiquettes",
+    
+    "contact": {
+      "add": "Ajouter un Contact",
+      "edit": "Modifier le Contact",
+      "delete": "Supprimer le Contact",
+      "view": "Voir le Contact",
+      "search": "Rechercher des contacts...",
+      "name": "Nom du Contact",
+      "type": "Type de Contact",
+      "status": "Statut",
+      "role": "Rôle",
+      "job_title": "Titre du Poste",
+      "phone": "Téléphone",
+      "email": "Email",
+      "alternate_phone": "Téléphone Alternatif",
+      "whatsapp": "Numéro WhatsApp",
+      "address": "Adresse",
+      "city": "Ville",
+      "district": "District",
+      "tags": "Étiquettes",
+      "notes": "Notes",
+      "assigned_to": "Assigné à",
+      "activity_score": "Score d'Activité",
+      "last_activity": "Dernière Activité",
+      "created": "Créé",
+      "profile": "Profil du Contact"
+    },
+    
+    "types": {
+      "CLIENT": "Client",
+      "SUPPLIER": "Fournisseur",
+      "STAFF": "Personnel",
+      "CUSTOMER": "Client",
+      "PARTNER": "Partenaire",
+      "LEAD": "Prospect"
+    },
+    
+    "status": {
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif",
+      "LEAD": "Prospect",
+      "BLOCKED": "Bloqué",
+      "ARCHIVED": "Archivé"
+    },
+    
+    "organization": {
+      "add": "Ajouter une Organisation",
+      "edit": "Modifier l'Organisation",
+      "delete": "Supprimer l'Organisation",
+      "view": "Voir l'Organisation",
+      "name": "Nom de l'Organisation",
+      "type": "Type d'Organisation",
+      "industry": "Industrie",
+      "tax_id": "Numéro Fiscal (TIN)",
+      "registration_number": "Numéro d'Enregistrement",
+      "website": "Site Web",
+      "members": "Membres",
+      "primary_contact": "Contact Principal",
+      "add_member": "Ajouter un Membre",
+      "profile": "Profil de l'Organisation"
+    },
+    
+    "org_types": {
+      "RESTAURANT": "Restaurant",
+      "HOTEL": "Hôtel",
+      "SUPPLIER": "Fournisseur",
+      "DISTRIBUTOR": "Distributeur",
+      "MANUFACTURER": "Fabricant",
+      "SERVICE_PROVIDER": "Prestataire de Services",
+      "OTHER": "Autre"
+    },
+    
+    "relationship": {
+      "add": "Ajouter une Relation",
+      "edit": "Modifier la Relation",
+      "delete": "Supprimer la Relation",
+      "type": "Type de Relation",
+      "strength": "Force de la Relation",
+      "from": "De",
+      "to": "À",
+      "start_date": "Date de Début",
+      "end_date": "Date de Fin",
+      "network": "Réseau de Relations",
+      "graph": "Graphique de Relations"
+    },
+    
+    "rel_types": {
+      "WORKS_AT": "Travaille Chez",
+      "OWNS": "Possède",
+      "MANAGES": "Gère",
+      "SUPPLIES_TO": "Fournit À",
+      "PARTNERS_WITH": "Partenaire Avec",
+      "REPORTS_TO": "Rapporte À",
+      "CONTACTS": "Contacts",
+      "REFERRED_BY": "Référé Par",
+      "CUSTOMER_OF": "Client De"
+    },
+    
+    "activity": {
+      "log": "Journal d'Activité",
+      "add": "Enregistrer une Activité",
+      "timeline": "Chronologie des Activités",
+      "type": "Type d'Activité",
+      "description": "Description",
+      "title": "Titre",
+      "performed_by": "Effectué Par",
+      "timestamp": "Date et Heure",
+      "recent": "Activités Récentes"
+    },
+    
+    "activity_types": {
+      "CALL": "Appel",
+      "EMAIL": "Email",
+      "MEETING": "Réunion",
+      "NOTE": "Note",
+      "ORDER_PLACED": "Commande Passée",
+      "ORDER_DELIVERED": "Commande Livrée",
+      "PAYMENT_RECEIVED": "Paiement Reçu",
+      "WHATSAPP_MESSAGE": "Message WhatsApp",
+      "SYSTEM_EVENT": "Événement Système",
+      "TASK_CREATED": "Tâche Créée",
+      "TASK_COMPLETED": "Tâche Terminée",
+      "CONTRACT_SIGNED": "Contrat Signé",
+      "COMPLAINT": "Plainte",
+      "FEEDBACK": "Retour d'Information"
+    },
+    
+    "segment": {
+      "create": "Créer un Segment",
+      "edit": "Modifier le Segment",
+      "delete": "Supprimer le Segment",
+      "name": "Nom du Segment",
+      "description": "Description",
+      "criteria": "Critères",
+      "members": "Membres",
+      "auto_update": "Mise à Jour Automatique",
+      "color": "Couleur",
+      "icon": "Icône"
+    },
+    
+    "stats": {
+      "total_contacts": "Total des Contacts",
+      "active_contacts": "Contacts Actifs",
+      "inactive_contacts": "Contacts Inactifs",
+      "leads": "Prospects",
+      "total_organizations": "Total des Organisations",
+      "total_relationships": "Total des Relations",
+      "recent_activities": "Activités Récentes (7 jours)",
+      "high_engagement": "Engagement Élevé",
+      "inactive_30_days": "Inactif (30+ jours)"
+    },
+    
+    "filters": {
+      "all": "Tous les Contacts",
+      "by_type": "Filtrer par Type",
+      "by_status": "Filtrer par Statut",
+      "by_city": "Filtrer par Ville",
+      "by_tags": "Filtrer par Étiquettes",
+      "by_activity": "Filtrer par Activité"
+    },
+    
+    "actions": {
+      "call": "Appeler",
+      "email": "Envoyer un Email",
+      "whatsapp": "WhatsApp",
+      "add_note": "Ajouter une Note",
+      "schedule_meeting": "Planifier une Réunion",
+      "view_network": "Voir le Réseau",
+      "merge": "Fusionner les Contacts",
+      "export": "Exporter les Contacts",
+      "import": "Importer les Contacts",
+      "bulk_action": "Action en Masse"
+    },
+    
+    "messages": {
+      "contact_created": "Contact créé avec succès",
+      "contact_updated": "Contact mis à jour avec succès",
+      "contact_deleted": "Contact supprimé avec succès",
+      "organization_created": "Organisation créée avec succès",
+      "relationship_created": "Relation créée avec succès",
+      "activity_logged": "Activité enregistrée avec succès",
+      "segment_created": "Segment créé avec succès",
+      "no_contacts": "Aucun contact trouvé",
+      "no_organizations": "Aucune organisation trouvée",
+      "no_activities": "Aucune activité pour le moment",
+      "confirm_delete_contact": "Êtes-vous sûr de vouloir supprimer ce contact?",
+      "confirm_merge": "Êtes-vous sûr de vouloir fusionner ces contacts?"
+    }
+  }
+}
