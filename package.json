@@ -1,6 +1,6 @@
 {
   "name": "imboni-serve",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_SWC_NATIVE_PATCH=1 next dev",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 NEXT_TELEMETRY_DISABLED=1 next build",
