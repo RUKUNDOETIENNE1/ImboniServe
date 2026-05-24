@@ -1,5 +1,4 @@
 import type { AppProps } from 'next/app'
-import NextApp from 'next/app'
 import dynamic from 'next/dynamic'
 import { ToastProvider } from '@/components/Toast'
 import { LocaleProvider } from '@/contexts/LocaleContext'
@@ -95,12 +94,6 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
       </LocaleProvider>
     </SessionProviderNoSSR>
   )
-}
-
-MyApp.getInitialProps = async (appContext: any) => {
-  const appProps = await NextApp.getInitialProps(appContext)
-  const initialLocale = (appContext?.router?.locale || appContext?.ctx?.locale || 'en') as Locale
-  return { ...appProps, initialLocale }
 }
 
 export default MyApp
