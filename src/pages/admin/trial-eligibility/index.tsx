@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatDateTimeRW } from '@/utils/datetimeRW'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 
 type TrialRow = {
   id: string
@@ -190,6 +188,8 @@ function AdminTrialEligibilityPage() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions as any) as any
   const user: any = session?.user
   const roles: string[] = user?.roles || (user?.role ? [user.role] : [])

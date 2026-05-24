@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { AlertTriangle, CheckCircle, RefreshCw, Play } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
   const roles: string[] = (session?.user as any)?.roles || []
   if (!session?.user || !roles.includes('ADMIN')) return { redirect: { destination: '/dashboard', permanent: false } }
