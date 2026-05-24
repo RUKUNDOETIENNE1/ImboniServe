@@ -3,12 +3,12 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { BarChart2, TrendingUp, Users, ShoppingBag, Clock, Download } from 'lucide-react'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useTranslation } from '@/lib/i18n'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
   if (!session?.user) return { redirect: { destination: '/login', permanent: false } }
   return { props: {} }
