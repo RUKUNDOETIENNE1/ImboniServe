@@ -70,6 +70,7 @@ const securityHeaders = [
 
 const isCI = process.env.BUILD_PROFILE === 'ci'
 const isDev = process.env.NODE_ENV === 'development'
+const hasSentry = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN)
 
 const nextConfig = {
   reactStrictMode: true,
@@ -77,6 +78,10 @@ const nextConfig = {
     locales: ['en', 'fr', 'rw'],
     defaultLocale: 'en',
     localeDetection: false,
+  },
+  // Ensure clean NEXTAUTH_URL is available at build/runtime even if env has stray spaces
+  env: {
+    NEXTAUTH_URL: (process.env.NEXTAUTH_URL || '').trim() || 'https://imboniserve.com',
   },
   eslint: {
     ignoreDuringBuilds: !isCI,
@@ -165,17 +170,20 @@ const nextConfig = {
   },
 }
 
-module.exports = withSentryConfig(
-  nextConfig,
-  {
-    // Sentry Webpack Plugin options
-    // org/project can be picked from env (SENTRY_ORG / SENTRY_PROJECT)
-    silent: true,
-  },
-  {
-    // Next.js Sentry build options
-    widenClientFileUpload: true,
-    transpileClientSDK: true,
-    disableLogger: true,
-  }
-)
+// Only enable Sentry wrapping when DSN is configured
+module.exports = hasSentry
+  ? withSentryConfig(
+      nextConfig,
+      {
+        // Sentry Webpack Plugin options
+        // org/project can be picked from env (SENTRY_ORG / SENTRY_PROJECT)
+        silent: true,
+      },
+      {
+        // Next.js Sentry build options
+        widenClientFileUpload: true,
+        transpileClientSDK: true,
+        disableLogger: true,
+      }
+    )
+  : nextConfig

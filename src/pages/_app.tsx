@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
 import NextApp from 'next/app'
-import { SessionProvider } from 'next-auth/react'
+import dynamic from 'next/dynamic'
 import { ToastProvider } from '@/components/Toast'
 import { LocaleProvider } from '@/contexts/LocaleContext'
 import { CartProvider } from '@/contexts/CartContext'
@@ -17,6 +17,9 @@ import SWUpdateToast from '@/components/SWUpdateToast'
 import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
+
+// Load NextAuth's SessionProvider on the client to avoid build-time URL parsing
+const SessionProviderNoSSR = dynamic(() => import('next-auth/react').then(m => m.SessionProvider), { ssr: false })
 
 type ExtendedAppProps = AppProps & { initialLocale?: Locale }
 
@@ -72,7 +75,7 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
   }, [])
 
   return (
-    <SessionProvider session={(pageProps as any).session}>
+    <SessionProviderNoSSR session={(pageProps as any).session}>
       <Head>
         <link rel="icon" href="/imgs/imboni-serve-favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/imgs/imboni-serve-favicon.png" />
@@ -90,7 +93,7 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
           </CartProvider>
         </ToastProvider>
       </LocaleProvider>
-    </SessionProvider>
+    </SessionProviderNoSSR>
   )
 }
 
