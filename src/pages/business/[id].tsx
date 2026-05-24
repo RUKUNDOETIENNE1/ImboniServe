@@ -1,5 +1,4 @@
 import type { GetServerSideProps } from 'next'
-import { prisma } from '@/lib/prisma'
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const id = params?.id as string | undefined
@@ -8,6 +7,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   }
 
   try {
+    const { prisma } = await import('@/lib/prisma')
     const profile = await prisma.businessProfile.findUnique({
       where: { businessId: id },
       select: { slug: true },
