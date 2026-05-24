@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import Link from 'next/link'
 import { Users, Trash2, Edit2, RefreshCw, Plus } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -279,6 +277,8 @@ export default function TablesPage() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
   if (!session) return { redirect: { destination: '/login', permanent: false } }
   return { props: {} }

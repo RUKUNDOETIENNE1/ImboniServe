@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
 import { AlertCircle, CheckCircle, Clock, DollarSign, TrendingUp, RefreshCw } from 'lucide-react'
@@ -237,6 +235,8 @@ export default function PaymentMonitor() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(context.req, context.res, authOptions)
 
   if (!session) {

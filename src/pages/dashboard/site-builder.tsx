@@ -3,11 +3,11 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Palette, Sparkles, Globe, Eye, Save, Wand2, Type, Layout } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
   if (!session?.user) return { redirect: { destination: '/login', permanent: false } }
   return { props: {} }

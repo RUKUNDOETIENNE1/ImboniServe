@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { CheckCircle, Package, Truck, Phone, MapPin, ArrowRight } from 'lucide-react'
-import confetti from 'canvas-confetti'
+// Note: confetti is dynamically imported client-side to avoid SSR issues
 
 interface Order {
   id: string
@@ -41,7 +41,8 @@ export default function OrderConfirmationPage() {
     }
   }, [status, orderIds, router])
 
-  const triggerConfetti = () => {
+  const triggerConfetti = async () => {
+    const confetti = (await import('canvas-confetti')).default
     confetti({
       particleCount: 100,
       spread: 70,

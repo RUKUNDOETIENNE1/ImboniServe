@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import DashboardLayout from '@/components/DashboardLayout'
 import QRCode from 'qrcode'
 import { Save, Download, ExternalLink, Copy, Trash2, Copy as CopyIcon } from 'lucide-react'
@@ -697,6 +695,8 @@ export default function QrBuilderPage() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(context.req, context.res, authOptions)
   if (!session) {
     return {

@@ -1,11 +1,11 @@
 import type { GetServerSideProps } from 'next'
-import { prisma } from '@/lib/prisma'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const token = ctx.params?.token as string | undefined
   if (!token) return { notFound: true }
 
   try {
+    const { prisma } = await import('@/lib/prisma')
     const qr = await prisma.qrCode.findUnique({
       where: { token },
       select: { targetUrl: true },

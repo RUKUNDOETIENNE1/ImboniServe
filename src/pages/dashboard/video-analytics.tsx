@@ -3,11 +3,11 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Video, Eye, TrendingUp, Clock, ChevronDown } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { useTranslation } from '@/lib/i18n'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
   if (!session?.user) return { redirect: { destination: '/login', permanent: false } }
   return { props: {} }
