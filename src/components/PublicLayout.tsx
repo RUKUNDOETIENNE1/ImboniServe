@@ -141,7 +141,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               suppressHydrationWarning
             >
               <span className="hidden sm:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
-              <span className="sm:hidden">{t('public.cta.start_trial_short', 'Free Trial')}</span>
+              <span className="sm:hidden">{t('public.cta.trial', 'Trial')}</span>
             </Link>
           </div>
         </div>
