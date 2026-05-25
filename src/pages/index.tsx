@@ -476,7 +476,8 @@ export default function HomePage() {
                 href="/signup"
                 className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap shrink-0 text-xs px-3 py-1.5 md:text-sm md:px-4 md:py-2"
               >
-                {t('public.cta.start_trial', 'Start Free Trial')}
+                <span className="hidden lg:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
+                <span className="lg:hidden">{t('public.cta.free_trial', 'Free Trial')}</span>
               </Link>
             </div>
             
