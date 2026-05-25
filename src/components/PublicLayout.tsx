@@ -114,8 +114,8 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
                     <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
                   </Link>
                   <Link href="/refer" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.referral', 'Referral Program').replace(/\p{Extended_Pictographic}/gu, '')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}</div>
+                    <div className="font-medium">{t('public.nav.referral', 'Referral Program')}</div>
+                    <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards')}</div>
                   </Link>
                 </div>
               )}
@@ -126,8 +126,8 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
               suppressHydrationWarning
             >
-              <span className="hidden xl:inline">{t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}</span>
-              <span className="xl:hidden">{t('public.nav.share_earn_short', 'Share & earn').replace(/\p{Extended_Pictographic}/gu, '')}</span>
+              <span className="hidden xl:inline">{t('public.nav.share_earn', 'Share & earn rewards')}</span>
+              <span className="xl:hidden">{t('public.nav.share_earn_short', 'Share & earn')}</span>
             </Link>
             <Link href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.contact', 'Contact')}</a>

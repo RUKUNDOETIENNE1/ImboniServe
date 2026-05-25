@@ -130,7 +130,7 @@ export function PaymentMethodSelector({
             >
               {option.badge && (
                 <div className="absolute top-3 right-3">
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${colors.badge}`}>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${(colors as any).badge || 'bg-slate-600 text-white'}`}>
                     {option.badge}
                   </span>
                 </div>

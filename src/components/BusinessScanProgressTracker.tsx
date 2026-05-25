@@ -96,7 +96,7 @@ export default function BusinessScanProgressTracker({
             {averageScore}
           </div>
           <div className="text-xs text-gray-500">
-            {t('progressTracker.over_scans', { count: allScores.length })}
+            {t('progressTracker.over_scans', 'Over scans')}: {allScores.length}
           </div>
         </div>
 
@@ -120,7 +120,7 @@ export default function BusinessScanProgressTracker({
         <p className="text-sm text-gray-700">
           {improvement > 0 && (
             <span className="font-semibold text-green-600">
-              {t('progressTracker.messages.increased', { points: improvement, days: daysSinceLastScan })}
+              {t('progressTracker.messages.increased', 'Score increased')}: +{improvement} in {daysSinceLastScan}d
             </span>
           )}
           {improvement === 0 && (
@@ -130,7 +130,7 @@ export default function BusinessScanProgressTracker({
           )}
           {improvement < 0 && (
             <span className="font-semibold text-orange-600">
-              {t('progressTracker.messages.decreased', { points: Math.abs(improvement) })}
+              {t('progressTracker.messages.decreased', 'Score decreased')}: -{Math.abs(improvement)}
             </span>
           )}
         </p>
