@@ -121,18 +121,27 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               )}
             </div>
             <Link href="/#store" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.store', 'Store')}</Link>
+            <Link
+              href="/refer"
+              className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-imboni-orange text-white px-5 py-2.5 shadow hover:bg-imboni-orange/90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+              suppressHydrationWarning
+            >
+              <span aria-hidden>💸</span>
+              {t('public.nav.share_earn', 'Share & earn rewards')}
+            </Link>
             <Link href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.contact', 'Contact')}</a>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher />
             <Link href="/login" className="text-white/80 text-sm hover:text-white transition hidden md:block" suppressHydrationWarning>{t('public.cta.sign_in', 'Sign in')}</Link>
             <Link
               href="/signup"
-              className="bg-imboni-orange text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-dark transition"
+              className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap text-xs px-3 py-1.5 sm:text-sm sm:px-4 sm:py-2"
               suppressHydrationWarning
             >
-              {t('public.cta.start_trial', 'Start Free Trial')}
+              <span className="hidden sm:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
+              <span className="sm:hidden">{t('public.cta.start_trial_short', 'Free Trial')}</span>
             </Link>
           </div>
         </div>

@@ -114,7 +114,7 @@ export default function Signup() {
           </div>
         </div>
         {/* Trial banner - only for hospitality businesses */}
-        {formData.businessType !== 'SUPPLIER' && (
+        {(['RESTAURANT','HOTEL','CAFE','BAR'] as const).includes(formData.businessType as any) && (
           <div className="bg-gradient-imboni text-white text-center text-sm font-medium px-4 py-2.5 rounded-xl mb-4">
             🎉 {t('auth.trial_banner', '14-day free trial — no credit card required. 50% OFF launch pricing.')}
           </div>
@@ -246,7 +246,7 @@ export default function Signup() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('auth.business_type', 'Business Type')}
+                {t('auth.account_type', 'Account Type (Business or Affiliate)')}
               </label>
               <select
                 name="businessType"
@@ -259,6 +259,7 @@ export default function Signup() {
                 <option value="HOTEL">{t('auth.business_type_hotel', 'Hotel')}</option>
                 <option value="CAFE">{t('auth.business_type_cafe', 'Café / Coffee Shop')}</option>
                 <option value="BAR">{t('auth.business_type_bar', 'Bar / Pub')}</option>
+                <option value="AFFILIATE">{t('auth.business_type_affiliate', 'Affiliate Marketer')}</option>
                 <option value="SUPPLIER">{t('auth.business_type_supplier', 'Supplier (No free trial)')}</option>
               </select>
               {formData.businessType === 'SUPPLIER' && (

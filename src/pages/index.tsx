@@ -387,18 +387,18 @@ export default function HomePage() {
 
       {/* ── NAV ── */}
       <nav className={navClass}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[60px] md:min-h-[68px] lg:min-h-[80px] py-1 md:py-2 flex items-center justify-between md:grid md:grid-cols-[max-content,1fr,max-content] md:items-center md:gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[56px] md:min-h-[60px] lg:min-h-[64px] py-0.5 md:py-1 flex items-center justify-between md:grid md:grid-cols-[max-content,1fr,max-content] md:items-center md:gap-6">
           <div className="flex items-center gap-3 md:justify-self-start">
             <div className="flex flex-col items-center md:items-start">
               <Image src="/imgs/logo2.png" alt="Imboni Serve" width={120} height={48} className="h-10 w-auto md:h-12" priority />
-              <span className="hidden lg:block mt-1 text-xs lg:text-sm text-white/90 font-medium tracking-wide leading-tight" suppressHydrationWarning>
+              <span className="hidden xl:block mt-1 text-xs lg:text-sm text-white/90 font-medium tracking-wide leading-tight" suppressHydrationWarning>
                 {t('homepage.nav_tagline', 'Run Smarter. Serve Better.')}
               </span>
             </div>
           </div>
           
-          {/* Desktop Navigation (moved to second row) */}
-          <div className="hidden md:hidden" aria-hidden="true">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center justify-center gap-6 text-sm text-white/80 md:justify-self-center" aria-label="Primary">
             <Link href="/#features" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
             <Link href="/#pricing" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
             <div className="relative">
@@ -438,7 +438,13 @@ export default function HomePage() {
               )}
             </div>
             <Link href="#store" className="hover:text-white transition whitespace-nowrap">{t('public.nav.store', 'Store')}</Link>
-            <Link href="/refer" className="hover:text-white transition whitespace-nowrap">{t('public.nav.share_earn', 'Share & Earn')}</Link>
+            <Link
+              href="/refer"
+              className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-imboni-orange text-white px-5 py-2.5 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+            >
+              <span aria-hidden>💸</span>
+              {t('public.nav.share_earn', 'Share & earn rewards')}
+            </Link>
             <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
           </div>
@@ -495,55 +501,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Second Row Desktop Navigation */}
-        <div className="hidden md:block border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center gap-6 lg:gap-8 h-12 text-sm text-white/80">
-              <Link href="/#features" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
-              <Link href="/#pricing" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
-              <div className="relative">
-                <button
-                  onClick={() => setSolutionsOpen(!solutionsOpen)}
-                  onBlur={() => setTimeout(() => setSolutionsOpen(false), 200)}
-                  className="flex items-center gap-1 hover:text-white transition whitespace-nowrap"
-                  suppressHydrationWarning
-                  aria-haspopup="menu"
-                  aria-expanded={solutionsOpen}
-                >
-                  {t('public.nav.solutions', 'Solutions')} <ChevronDown className="w-3 h-3" />
-                </button>
-                {solutionsOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50" role="menu">
-                    <Link href="/dashboard/site-builder" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                      <div className="font-medium">{t('public.nav.site_builder', 'Site Builder')}</div>
-                      <div className="text-xs text-slate-500">{t('public.nav.create_website', 'Create your website')}</div>
-                    </Link>
-                    <Link href="/discover" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                      <div className="font-medium">{t('public.nav.marketplace', 'Marketplace')}</div>
-                      <div className="text-xs text-slate-500">{t('public.nav.find_suppliers', 'Find suppliers & partners')}</div>
-                    </Link>
-                    <Link href="/store" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                      <div className="font-medium">{t('public.nav.store', 'Store')}</div>
-                      <div className="text-xs text-slate-500">{t('public.nav.procurement_market', 'Procurement marketplace')}</div>
-                    </Link>
-                    <Link href="/dashboard/profile" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                      <div className="font-medium">{t('public.nav.list_business', 'List Your Business')}</div>
-                      <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
-                    </Link>
-                    <Link href="/refer" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                      <div className="font-medium">{t('public.nav.referral', 'Referral Program')}</div>
-                      <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards')}</div>
-                    </Link>
-                  </div>
-                )}
-              </div>
-              <Link href="#store" className="hover:text-white transition whitespace-nowrap">{t('public.nav.store', 'Store')}</Link>
-              <Link href="/refer" className="hover:text-white transition whitespace-nowrap bg-white/10 px-3 py-1.5 rounded-md border border-white/20 hover:bg-white/20">{t('public.nav.share_earn', 'Share & Earn')}</Link>
-              <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
-              <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
-            </div>
-          </div>
-        </div>
 
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
@@ -1130,7 +1087,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {plans.map((plan) => (
               <div
                 key={plan.code}

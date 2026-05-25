@@ -79,23 +79,23 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-12">
           {plans.map((plan) => (
             <div
               key={plan.code}
-              className={`bg-white rounded-2xl shadow-xl p-8 ${
-                plan.popular ? 'ring-2 ring-imboni-orange relative' : ''
+              className={`relative bg-white rounded-2xl shadow-xl p-8 ${
+                plan.popular ? 'ring-2 ring-imboni-orange' : ''
               }`}
             >
               {plan.popular && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                   <span className="bg-imboni-orange text-white px-4 py-1 rounded-full text-sm font-medium" suppressHydrationWarning>
                     {t('pricing.most_popular', '⭐ Most Popular')}
                   </span>
                 </div>
               )}
               {plan.badge && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                   <span className="bg-imboni-blue text-white px-4 py-1 rounded-full text-sm font-medium" suppressHydrationWarning>
                     {t('pricing.multi_branch', '🏢 Multi-Branch')}
                   </span>

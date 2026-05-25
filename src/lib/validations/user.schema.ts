@@ -28,6 +28,7 @@ export const signupSchema = z.object({
   businessName: z.string().min(1).max(255),
   city: z.string().default('Kigali'),
   planCode: z.enum(['STARTER', 'ESSENTIALS', 'PROFESSIONAL', 'GROWTH', 'BUSINESS', 'ENTERPRISE']).default('ESSENTIALS'),
+  businessType: z.enum(['RESTAURANT', 'HOTEL', 'CAFE', 'BAR', 'SUPPLIER', 'AFFILIATE']).default('RESTAURANT'),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
 })

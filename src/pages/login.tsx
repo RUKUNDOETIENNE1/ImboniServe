@@ -99,9 +99,25 @@ export default function Login() {
       })
 
       if (result?.ok) {
-        const session = await fetch('/api/auth/session').then(r => r.json())
-        const roles = session?.user?.roles || []
-        await router.push(roles.includes('ADMIN') ? '/admin' : '/dashboard')
+        const session = await fetch('/api/auth/session').then(r => r.json()).catch(() => null)
+        const roles = (session?.user?.roles as string[]) || []
+        // Admins first
+        if (roles.includes('ADMIN')) {
+          await router.push('/admin')
+          return
+        }
+        // Check if the user is an affiliate; if the endpoint doesn't exist or returns non-200, fall back
+        try {
+          const affRes = await fetch('/api/affiliate/dashboard', { method: 'GET' })
+          if (affRes.ok) {
+            const data = await affRes.json().catch(() => ({}))
+            if (data && data.affiliate) {
+              await router.push('/affiliate')
+              return
+            }
+          }
+        } catch { /* ignore and fall back */ }
+        await router.push('/dashboard')
       } else {
         setError('Login could not be completed. The code may have expired — request a new one.')
       }

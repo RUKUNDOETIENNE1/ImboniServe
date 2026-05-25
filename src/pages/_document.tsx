@@ -11,6 +11,8 @@ export default class MyDocument extends Document {
     return (
       <Html lang={locale}>
         <Head>
+          {/* Viewport for responsive layouts */}
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           {/* PWA Meta Tags */}
           <meta name="application-name" content="Imboni Serve" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
