@@ -398,7 +398,7 @@ export default function HomePage() {
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center gap-6 text-sm text-white/80 md:justify-self-center" aria-label="Primary">
+          <div className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 text-[13px] xl:text-sm text-white/80 md:justify-self-center" aria-label="Primary">
             <Link href="/#features" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
             <Link href="/#pricing" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
             <div className="relative">
@@ -440,17 +440,16 @@ export default function HomePage() {
             <Link href="#store" className="hover:text-white transition whitespace-nowrap">{t('public.nav.store', 'Store')}</Link>
             <Link
               href="/refer"
-              className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-imboni-orange text-white px-5 py-2.5 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+              className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
             >
-              <span aria-hidden>💸</span>
-              {t('public.nav.share_earn', 'Share & earn rewards')}
+              {t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}
             </Link>
             <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
           </div>
           
           {/* Right side actions */}
-          <div className="flex items-center gap-2 md:gap-3 md:justify-self-end">
+          <div className="flex items-center gap-2 md:gap-3 md:justify-self-end flex-nowrap">
             {/* Theme Toggle */}
             <button
               onClick={toggleDarkMode}
@@ -475,7 +474,7 @@ export default function HomePage() {
               <Link href="/login" className="text-white/80 text-sm hover:text-white transition">{t('public.cta.sign_in', 'Sign in')}</Link>
               <Link
                 href="/signup"
-                className="bg-imboni-orange text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-dark transition"
+                className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap shrink-0 text-xs px-3 py-1.5 md:text-sm md:px-4 md:py-2"
               >
                 {t('public.cta.start_trial', 'Start Free Trial')}
               </Link>
@@ -519,7 +518,7 @@ export default function HomePage() {
                 </div>
               </div>
               <Link href="#store" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.store', 'Store')}</Link>
-              <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn')}</Link>
+              <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn').replace(/\p{Extended_Pictographic}/gu, '')}</Link>
               <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.discover', 'Discover')}</Link>
               <a href="https://wa.me/250735214496" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
               

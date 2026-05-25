@@ -83,7 +83,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
           <Link href="/" className="flex items-center gap-2">
             <img src="/imgs/logo2.png" alt="Imboni Serve" className="h-8 w-auto" />
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-white/80">
+          <div className="hidden md:flex items-center gap-5 xl:gap-7 text-[13px] xl:text-sm text-white/80 whitespace-nowrap">
             <Link href="/#features" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
             <Link href="/pricing" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
             <div className="relative">
@@ -114,8 +114,8 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
                     <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
                   </Link>
                   <Link href="/refer" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.referral', 'Referral Program')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards')}</div>
+                    <div className="font-medium">{t('public.nav.referral', 'Referral Program').replace(/\p{Extended_Pictographic}/gu, '')}</div>
+                    <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}</div>
                   </Link>
                 </div>
               )}
@@ -123,21 +123,21 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <Link href="/#store" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.store', 'Store')}</Link>
             <Link
               href="/refer"
-              className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-imboni-orange text-white px-5 py-2.5 shadow hover:bg-imboni-orange/90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+              className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
               suppressHydrationWarning
             >
-              <span aria-hidden>💸</span>
-              {t('public.nav.share_earn', 'Share & earn rewards')}
+              <span className="hidden xl:inline">{t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}</span>
+              <span className="xl:hidden">{t('public.nav.share_earn_short', 'Share & earn').replace(/\p{Extended_Pictographic}/gu, '')}</span>
             </Link>
             <Link href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.contact', 'Contact')}</a>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
             <LanguageSwitcher />
             <Link href="/login" className="text-white/80 text-sm hover:text-white transition hidden md:block" suppressHydrationWarning>{t('public.cta.sign_in', 'Sign in')}</Link>
             <Link
               href="/signup"
-              className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap text-xs px-3 py-1.5 sm:text-sm sm:px-4 sm:py-2"
+              className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap shrink-0 text-xs px-3 py-1.5 md:text-xs md:px-3.5 md:py-2 lg:text-sm lg:px-4 lg:py-2"
               suppressHydrationWarning
             >
               <span className="hidden sm:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
