@@ -1,7 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["native"]
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -61,6 +61,7 @@ model User {
   supportConversationsCreated  SupportConversation[]       @relation("SupportConversationsCreatedBy")
   supportConversationsAssigned SupportConversation[]       @relation("SupportConversationsAssignedTo")
   supportMessagesSent          SupportMessage[]            @relation("SupportMessagesSentBy")
+  ticketEvents                 TicketEvent[]
 }
 
 model Business {
@@ -217,6 +218,14 @@ model Business {
   diningSessionSlips DiningSessionSlip[] @relation("BusinessDiningSessionSlips")
   checkoutEvents     CheckoutEvent[]     @relation("BusinessCheckoutEvents")
 
+  // Operational Coordination (Phase 1)
+  stations    Station[]
+  routeRules  RouteRule[]
+  slaProfiles SLAProfile[]
+
+  // Operational Hardening (Phase 3)
+  idempotencyKeys IdempotencyKey[]
+
   @@map("Restaurant")
 }
 
@@ -273,6 +282,7 @@ model MenuItem {
   translations MenuItemTranslation[]
   sales        SaleItem[]
   abTests      ABTest[]
+  routeRules   RouteRule[]
 }
 
 model Sale {
@@ -324,6 +334,12 @@ model Sale {
   kitchenDispatchStatus String?   @default("pending") // "pending" | "dispatched" | "failed"
   kitchenDispatchError  String?
 
+  // Reality Gap Fix: Expo Finalization State (Priority 3)
+  expoStatus         ExpoStatus? @default(PENDING)
+  readyForExpoAt     DateTime?   // When all stations marked ready
+  expoConfirmedAt    DateTime?   // When expo confirmed final state
+  servedConfirmedAt  DateTime?   // When serve confirmed to customer
+
   postAttributions            PostAttribution[]
   parentOrder                 Sale?                        @relation("OrderAddons", fields: [parentOrderId], references: [id], onDelete: SetNull)
   addons                      Sale[]                       @relation("OrderAddons")
@@ -344,6 +360,7 @@ model Sale {
   splitPaymentWhatsAppTrigger SplitPaymentWhatsAppTrigger?
   diningSlipItems             DiningSessionSlipItem[] @relation("SaleDiningSlipItems")
   waiterCalls                 WaiterCall[]
+  ticketEvents                TicketEvent[]
 
   @@index([orderSource])
   @@index([scheduledAt])
@@ -374,9 +391,31 @@ model SaleItem {
   updatedAt       DateTime @updatedAt
   instructionTags String[] @default([])
   instructions    Json?
+  
+  // Operational coordination (Phase 1)
+  itemStatus      ItemStatus? @default(NEW)
+  stationId       String?
+  routedAt        DateTime?
+  prepStartedAt   DateTime?
+  readyAt         DateTime?
+  deliveredAt     DateTime?
+  
+  // Reality Gap Fix: Order Mutation Tracking (Priority 1)
+  parentItemId    String?      // Links to original item if this is a modification
+  itemVersion     Int          @default(1)
+  mutationType    MutationType @default(CREATED)
+  replacedBy      String?      // ID of item that replaced this one
+  
   menuItem        MenuItem @relation(fields: [menuItemId], references: [id])
   sale            Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
   diningSlipItems DiningSessionSlipItem[] @relation("SaleItemDiningSlipItems")
+  ticketEvents    TicketEvent[]
+  
+  @@index([itemStatus])
+  @@index([stationId])
+  @@index([saleId, itemStatus])
+  @@index([parentItemId])
+  @@index([mutationType])
 }
 
 model InventoryItem {
@@ -3656,4 +3695,187 @@ model NewsletterSubscriber {
 
   @@index([isActive, createdAt])
   @@index([createdAt])
+}
+
+// ====================================================
+// OPERATIONAL COORDINATION MODELS (Phase 1)
+// ====================================================
+
+// Station - Operational destination for order items
+model Station {
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String   // Display name: "Kitchen", "Bar", "Grill", "Pastry"
+  code        String   // Unique code: "KITCHEN", "BAR", "GRILL", "PASTRY"
+  type        StationType @default(KITCHEN)
+  isActive    Boolean  @default(true)
+  displayOrder Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  routeRules  RouteRule[]
+  slaProfiles SLAProfile[]
+  ticketEvents TicketEvent[]
+
+  @@unique([businessId, code])
+  @@index([businessId, isActive])
+  @@index([businessId, type])
+}
+
+// RouteRule - Maps menu items/categories to stations
+model RouteRule {
+  id          String   @id @default(cuid())
+  businessId  String
+  stationId   String
+  
+  // Routing criteria (one must be set)
+  menuItemId  String?  // Item-specific override
+  category    String?  // Category-level routing
+  
+  priority    Int      @default(0) // Higher priority wins
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  station     Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  menuItem    MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, isActive])
+  @@index([menuItemId])
+  @@index([category])
+  @@index([stationId])
+}
+
+// TicketEvent - Append-only operational event log
+model TicketEvent {
+  id          String   @id @default(cuid())
+  saleId      String
+  saleItemId  String?  // Optional: item-level events
+  stationId   String?  // Optional: station context
+  
+  eventType   TicketEventType
+  actorId     String?  // User who triggered event
+  actorName   String?  // Cached actor name
+  
+  // Event metadata
+  previousState String?
+  newState      String?
+  metadata      Json?   // Flexible payload for event-specific data
+  
+  // Phase 3: Deduplication and ordering
+  idempotencyKey String?  // Unique key to prevent duplicate events
+  sequenceNumber Int?     // Ordering within saleItem
+  
+  createdAt   DateTime @default(now())
+
+  sale        Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleItem    SaleItem? @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  station     Station?  @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@unique([saleItemId, idempotencyKey])
+  @@index([saleId, createdAt])
+  @@index([saleItemId, sequenceNumber])
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([stationId])
+  @@index([idempotencyKey])
+}
+
+// SLAProfile - Configurable timing thresholds
+model SLAProfile {
+  id                  String   @id @default(cuid())
+  businessId          String
+  stationId           String?  // Station-specific, or null for default
+  category            String?  // Category-specific, or null for default
+  
+  warningAfterMinutes Int      @default(8)
+  breachAfterMinutes  Int      @default(15)
+  
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  business            Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  station             Station? @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, isActive])
+  @@index([stationId])
+  @@index([category])
+}
+
+// ====================================================
+// ENUMS FOR OPERATIONAL COORDINATION
+// ====================================================
+
+enum StationType {
+  KITCHEN
+  BAR
+  GRILL
+  FRYER
+  PASTRY
+  EXPO
+  OTHER
+}
+
+enum ItemStatus {
+  NEW
+  PREPARING
+  READY
+  DELIVERED
+  CANCELED
+}
+
+enum MutationType {
+  CREATED
+  MODIFIED
+  REPLACED
+  CANCELLED
+}
+
+enum ExpoStatus {
+  PENDING
+  READY_FOR_EXPO
+  EXPO_CONFIRMED
+  SERVED_CONFIRMED
+}
+
+enum TicketEventType {
+  ORDER_CREATED
+  ORDER_UPDATED
+  ITEM_ROUTED
+  ITEM_ACCEPTED
+  ITEM_PREPARING
+  ITEM_READY
+  ITEM_DELIVERED
+  ITEM_CANCELED
+  SLA_WARNING
+  SLA_BREACH
+  ORDER_COMPLETED
+  ORDER_CANCELED
+  STATION_CHANGED
+  MANUAL_OVERRIDE
+  RECONCILIATION
+  CONFLICT_DETECTED
+  INVALID_TRANSITION
+}
+
+// Phase 3: Idempotency tracking for request deduplication
+model IdempotencyKey {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  businessId    String
+  endpoint      String
+  requestBody   Json?
+  responseBody  Json?
+  statusCode    Int?
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, endpoint])
+  @@index([expiresAt])
 }
