@@ -18,12 +18,25 @@ function createTransport() {
     return null
   }
 
-  return nodemailer.createTransport({
+  // Prefer explicit TLS/STARTTLS handling. Gmail: 465 (secure=true) or 587 (secure=false + STARTTLS).
+  const primary = {
     host,
     port,
     secure: port === 465,
     auth: { user, pass },
-  })
+  } as any
+
+  try {
+    return nodemailer.createTransport(primary)
+  } catch (e) {
+    console.error('[EmailService] Primary SMTP transport create failed, retrying with port 587 STARTTLS:', (e as any)?.message)
+    try {
+      return nodemailer.createTransport({ host, port: 587, secure: false, auth: { user, pass } })
+    } catch (e2) {
+      console.error('[EmailService] Fallback SMTP transport create failed:', (e2 as any)?.message)
+      return null
+    }
+  }
 }
 
 interface OrderItem {

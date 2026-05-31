@@ -84,7 +84,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!sendResult.success) {
-      return res.status(503).json({ error: 'Could not send verification code. Check your contact details or try again.' })
+      console.error('[pre-login] OTP send failed', { channel: sendResult.channel, email: user.email })
+      return res.status(503).json({ error: 'Could not send verification code. Please verify email/phone settings or try again.' })
     }
 
     // Mask email for display
@@ -98,8 +99,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       channel: sendResult.channel,
       message: `A 6-digit code was sent to ${masked}.`,
     })
-  } catch (err) {
-    console.error('[pre-login] Error:', err)
+  } catch (err: any) {
+    console.error('[pre-login] Error:', err?.message || err)
     return res.status(500).json({ error: 'Login service error. Please try again.' })
   }
 }
@@ -108,3 +109,7 @@ export default withRateLimit(handler, {
   windowMs: 15 * 60 * 1000, // 15 min
   maxRequests: 10,
 })
+
+export const config = {
+  runtime: 'nodejs',
+}

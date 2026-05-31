@@ -142,6 +142,11 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
   },
+  logger: {
+    error: (...args) => console.error('[next-auth][error]', ...args),
+    warn: (...args) => console.warn('[next-auth][warn]', ...args),
+    debug: (...args) => console.debug('[next-auth][debug]', ...args),
+  },
   secret: (() => {
     const secret = process.env.NEXTAUTH_SECRET
     const isProd = process.env.NODE_ENV === 'production'
@@ -160,3 +165,7 @@ export const authOptions: NextAuthOptions = {
 }
 
 export default NextAuth(authOptions)
+
+export const config = {
+  runtime: 'nodejs',
+}

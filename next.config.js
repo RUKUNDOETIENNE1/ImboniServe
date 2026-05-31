@@ -97,6 +97,14 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', 'recharts', 'date-fns'],
+    outputFileTracingIncludes: {
+      // Bundle Prisma engines + schema
+      '/api/**': [
+        './node_modules/.prisma/client/**',
+        './node_modules/@prisma/client/**',
+        './prisma/**',
+      ],
+    },
   },
   webpack: (config, { dev, isServer }) => {
     // Enable minification for production builds
