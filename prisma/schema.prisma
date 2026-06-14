@@ -4,6 +4,41 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
+/// Canonical Financial Ledger (single source of truth for finance)
+model FinancialLedgerEntry {
+  id                   String                    @id @default(cuid())
+  businessId           String
+  domain               LedgerDomain
+  eventType            BillingEventType
+  amountCents          Int
+  currency             String                    @default("RWF")
+  vatAmountCents       Int?
+  exVatAmountCents     Int?
+  gatewayFeeCents      Int?
+  platformFeeCents     Int?
+  netAmountCents       Int?
+  gateway              PaymentGateway?
+  paymentMethod        PaymentMethod?
+  status               PaymentTransactionStatus?
+  paymentTransactionId String?
+  subscriptionId       String?
+  marketplaceOrderId   String?
+  invoiceNumber        String?
+  providerReference    String?
+  idempotencyKey       String?                   @unique
+  occurredAt           DateTime                  @default(now())
+  createdAt            DateTime                  @default(now())
+
+  @@index([businessId, occurredAt])
+  @@index([eventType, occurredAt])
+  @@index([domain, occurredAt])
+  @@index([gateway, occurredAt])
+  @@index([paymentTransactionId])
+  @@index([subscriptionId])
+  @@index([marketplaceOrderId])
+  @@index([invoiceNumber])
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -62,6 +97,7 @@ model User {
   supportConversationsAssigned SupportConversation[]       @relation("SupportConversationsAssignedTo")
   supportMessagesSent          SupportMessage[]            @relation("SupportMessagesSentBy")
   ticketEvents                 TicketEvent[]
+  ScanJob                      ScanJob[]
 }
 
 model Business {
@@ -148,6 +184,7 @@ model Business {
   menuSourceDocuments               MenuSourceDocument[]
   outlets                           Outlet[]
   paymentTransactions               PaymentTransaction[]
+  billingEvents                     BillingEvent[]
   pointsLedger                      PointsLedger[]
   postAttributions                  PostAttribution[]
   promotions                        Promotion[]
@@ -225,6 +262,9 @@ model Business {
 
   // Operational Hardening (Phase 3)
   idempotencyKeys IdempotencyKey[]
+  ScanJob         ScanJob[]
+  ScannedDocument ScannedDocument[]
+  AnomalyAlert    AnomalyAlert[]
 
   @@map("Restaurant")
 }
@@ -335,10 +375,10 @@ model Sale {
   kitchenDispatchError  String?
 
   // Reality Gap Fix: Expo Finalization State (Priority 3)
-  expoStatus         ExpoStatus? @default(PENDING)
-  readyForExpoAt     DateTime?   // When all stations marked ready
-  expoConfirmedAt    DateTime?   // When expo confirmed final state
-  servedConfirmedAt  DateTime?   // When serve confirmed to customer
+  expoStatus        ExpoStatus? @default(PENDING)
+  readyForExpoAt    DateTime? // When all stations marked ready
+  expoConfirmedAt   DateTime? // When expo confirmed final state
+  servedConfirmedAt DateTime? // When serve confirmed to customer
 
   postAttributions            PostAttribution[]
   parentOrder                 Sale?                        @relation("OrderAddons", fields: [parentOrderId], references: [id], onDelete: SetNull)
@@ -358,7 +398,7 @@ model Sale {
   staffTips                   StaffTip[]
   tipChoices                  TipChoice[]
   splitPaymentWhatsAppTrigger SplitPaymentWhatsAppTrigger?
-  diningSlipItems             DiningSessionSlipItem[] @relation("SaleDiningSlipItems")
+  diningSlipItems             DiningSessionSlipItem[]      @relation("SaleDiningSlipItems")
   waiterCalls                 WaiterCall[]
   ticketEvents                TicketEvent[]
 
@@ -391,26 +431,26 @@ model SaleItem {
   updatedAt       DateTime @updatedAt
   instructionTags String[] @default([])
   instructions    Json?
-  
+
   // Operational coordination (Phase 1)
-  itemStatus      ItemStatus? @default(NEW)
-  stationId       String?
-  routedAt        DateTime?
-  prepStartedAt   DateTime?
-  readyAt         DateTime?
-  deliveredAt     DateTime?
-  
+  itemStatus    ItemStatus? @default(NEW)
+  stationId     String?
+  routedAt      DateTime?
+  prepStartedAt DateTime?
+  readyAt       DateTime?
+  deliveredAt   DateTime?
+
   // Reality Gap Fix: Order Mutation Tracking (Priority 1)
-  parentItemId    String?      // Links to original item if this is a modification
-  itemVersion     Int          @default(1)
-  mutationType    MutationType @default(CREATED)
-  replacedBy      String?      // ID of item that replaced this one
-  
-  menuItem        MenuItem @relation(fields: [menuItemId], references: [id])
-  sale            Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  parentItemId String? // Links to original item if this is a modification
+  itemVersion  Int          @default(1)
+  mutationType MutationType @default(CREATED)
+  replacedBy   String? // ID of item that replaced this one
+
+  menuItem        MenuItem                @relation(fields: [menuItemId], references: [id])
+  sale            Sale                    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   diningSlipItems DiningSessionSlipItem[] @relation("SaleItemDiningSlipItems")
   ticketEvents    TicketEvent[]
-  
+
   @@index([itemStatus])
   @@index([stationId])
   @@index([saleId, itemStatus])
@@ -419,20 +459,22 @@ model SaleItem {
 }
 
 model InventoryItem {
-  id            String            @id @default(cuid())
-  name          String
-  description   String?
-  category      String?
-  unit          String
-  currentStock  Float             @default(0)
-  minStockLevel Float             @default(10)
-  unitCostCents Int
-  isActive      Boolean           @default(true)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  businessId    String
-  business      Business          @relation(fields: [businessId], references: [id])
-  updates       InventoryUpdate[]
+  id                  String                @id @default(cuid())
+  name                String
+  description         String?
+  category            String?
+  unit                String
+  currentStock        Float                 @default(0)
+  minStockLevel       Float                 @default(10)
+  unitCostCents       Int
+  isActive            Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  businessId          String
+  business            Business              @relation(fields: [businessId], references: [id])
+  updates             InventoryUpdate[]
+  ScannedDocumentItem ScannedDocumentItem[]
+  ProductAlias        ProductAlias[]
 }
 
 model InventoryUpdate {
@@ -453,7 +495,7 @@ model InventoryUpdate {
 model Subscription {
   id                      String                   @id @default(cuid())
   planId                  String
-  status                  String                   @default("ACTIVE")
+  status                  SubscriptionStatus       @default(ACTIVE)
   amountCents             Int
   currency                String                   @default("RWF")
   paymentMethod           PaymentMethod
@@ -468,6 +510,7 @@ model Subscription {
   affiliateCommissionsNew AffiliateCommissionNew[]
   invoices                Invoice[]
   paymentTransactions     PaymentTransaction[]
+  billingEvents           BillingEvent[]
   business                Business                 @relation(fields: [businessId], references: [id])
   plan                    Plan                     @relation(fields: [planId], references: [id])
 }
@@ -577,22 +620,27 @@ model Supplier {
   insightsSubscription   SupplierInsightsSubscription?
   recommendationLogs     SupplierRecommendationLog[]
   performanceCache       SupplierPerformanceCache?
+  ScannedDocument        ScannedDocument[]
+  SupplierAlias          SupplierAlias[]
+  AnomalyAlert           AnomalyAlert[]
 }
 
 model SupplierProduct {
-  id               String              @id @default(cuid())
-  supplierId       String
-  name             String
-  description      String?
-  category         String?
-  unit             String
-  unitPriceCents   Int
-  minOrderQuantity Float               @default(1)
-  isAvailable      Boolean             @default(true)
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  orderItems       SupplierOrderItem[]
-  supplier         Supplier            @relation(fields: [supplierId], references: [id])
+  id                  String                @id @default(cuid())
+  supplierId          String
+  name                String
+  description         String?
+  category            String?
+  unit                String
+  unitPriceCents      Int
+  minOrderQuantity    Float                 @default(1)
+  isAvailable         Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  orderItems          SupplierOrderItem[]
+  supplier            Supplier              @relation(fields: [supplierId], references: [id])
+  ScannedDocumentItem ScannedDocumentItem[]
+  ProductAlias        ProductAlias[]
 }
 
 model SupplierOrder {
@@ -725,26 +773,27 @@ model MarketplaceProduct {
 }
 
 model MarketplaceOrder {
-  id                 String                 @id @default(cuid())
-  orderNumber        String                 @unique
-  userId             String
-  status             String                 @default("PENDING")
-  totalAmountCents   Int
-  paymentMethod      PaymentMethod
-  paymentStatus      PaymentStatus          @default(PENDING)
-  paymentReference   String?
-  deliveryAddress    String?
-  deliveryCity       String?
-  deliveryDistrict   String?
-  deliveryNotes      String?
-  notes              String?
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @updatedAt
-  businessId         String
-  commissionInvoices CommissionInvoice[]
-  business           Business               @relation(fields: [businessId], references: [id])
-  user               User                   @relation(fields: [userId], references: [id])
-  items              MarketplaceOrderItem[]
+  id                  String                 @id @default(cuid())
+  orderNumber         String                 @unique
+  userId              String
+  status              String                 @default("PENDING")
+  totalAmountCents    Int
+  paymentMethod       PaymentMethod
+  paymentStatus       PaymentStatus          @default(PENDING)
+  paymentReference    String?
+  deliveryAddress     String?
+  deliveryCity        String?
+  deliveryDistrict    String?
+  deliveryNotes       String?
+  notes               String?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  businessId          String
+  commissionInvoices  CommissionInvoice[]
+  business            Business               @relation(fields: [businessId], references: [id])
+  user                User                   @relation(fields: [userId], references: [id])
+  items               MarketplaceOrderItem[]
+  paymentTransactions PaymentTransaction[]
 }
 
 model MarketplaceOrderItem {
@@ -760,16 +809,16 @@ model MarketplaceOrderItem {
 }
 
 model Table {
-  id               String         @id @default(cuid())
-  number           String
-  capacity         Int            @default(4)
-  status           String         @default("AVAILABLE")
-  assignedWaiterId String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  businessId       String
-  outletId         String?
-  qrCode           String?        @unique
+  id                 String              @id @default(cuid())
+  number             String
+  capacity           Int                 @default(4)
+  status             String              @default("AVAILABLE")
+  assignedWaiterId   String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  businessId         String
+  outletId           String?
+  qrCode             String?             @unique
   reservations       Reservation[]
   sales              Sale[]
   seats              Seat[]
@@ -786,31 +835,31 @@ model Table {
 
 // Table Session for Group Ordering + Tap & Leave™
 model TableSession {
-  id           String               @id @default(cuid())
-  tableId      String
-  businessId   String
-  status       String               @default("active") // "active" | "closed"
-  createdAt    DateTime             @default(now())
-  closedAt     DateTime?
-  updatedAt    DateTime             @updatedAt
-  
+  id         String    @id @default(cuid())
+  tableId    String
+  businessId String
+  status     String    @default("active") // "active" | "closed"
+  createdAt  DateTime  @default(now())
+  closedAt   DateTime?
+  updatedAt  DateTime  @updatedAt
+
   // Tap & Leave™ Checkout Extensions
-  checkoutMode         String    @default("standard") // "standard" | "tap_and_leave"
-  checkoutStatus       String    @default("active") // "active" | "checkout_initiated" | "bill_finalized" | "payment_triggered" | "awaiting_confirmation" | "checkout_completed"
-  checkoutInitiatedAt  DateTime?
-  checkoutCompletedAt  DateTime?
-  finalBillCents       Int?
-  runningTotalCents    Int       @default(0)
-  
-  table               Table                @relation(fields: [tableId], references: [id])
-  business            Business             @relation(fields: [businessId], references: [id])
-  participants        SessionParticipant[]
-  orders              Sale[]
-  waiterCalls         WaiterCall[]
-  invites             TableSessionInvite[]
-  diningSessionSlip   DiningSessionSlip?
-  checkoutEvents      CheckoutEvent[]
-  seatSessions        SeatSession[]
+  checkoutMode        String    @default("standard") // "standard" | "tap_and_leave"
+  checkoutStatus      String    @default("active") // "active" | "checkout_initiated" | "bill_finalized" | "payment_triggered" | "awaiting_confirmation" | "checkout_completed"
+  checkoutInitiatedAt DateTime?
+  checkoutCompletedAt DateTime?
+  finalBillCents      Int?
+  runningTotalCents   Int       @default(0)
+
+  table             Table                @relation(fields: [tableId], references: [id])
+  business          Business             @relation(fields: [businessId], references: [id])
+  participants      SessionParticipant[]
+  orders            Sale[]
+  waiterCalls       WaiterCall[]
+  invites           TableSessionInvite[]
+  diningSessionSlip DiningSessionSlip?
+  checkoutEvents    CheckoutEvent[]
+  seatSessions      SeatSession[]
 
   @@index([tableId, status])
   @@index([businessId, status])
@@ -1083,34 +1132,36 @@ model DiningCredit {
 }
 
 model PurchaseOrder {
-  id                    String                       @id @default(cuid())
-  poNumber              String                       @unique
-  supplierId            String
-  status                String                       @default("DRAFT")
-  subtotalCents         Int
-  vatCents              Int
-  vatRate               Float                        @default(18.0)
-  totalCents            Int
-  deliveryAddress       String?
-  deliveryCity          String?
-  deliveryDistrict      String?
-  requestedDeliveryDate DateTime?
-  notes                 String?
-  createdById           String
-  approvedById          String?
-  approvedAt            DateTime?
-  rejectedById          String?
-  rejectedAt            DateTime?
-  rejectionReason       String?
-  createdAt             DateTime                     @default(now())
-  updatedAt             DateTime                     @updatedAt
-  businessId            String
-  goodsReceivedNotes    GoodsReceivedNote[]
-  business              Business                     @relation(fields: [businessId], references: [id])
-  supplier              Supplier                     @relation(fields: [supplierId], references: [id])
-  items                 PurchaseOrderItem[]
-  statusHistory         PurchaseOrderStatusHistory[]
-  document              SmartDiningSlip?
+  id                        String                       @id @default(cuid())
+  poNumber                  String                       @unique
+  supplierId                String
+  status                    String                       @default("DRAFT")
+  subtotalCents             Int
+  vatCents                  Int
+  vatRate                   Float                        @default(18.0)
+  totalCents                Int
+  deliveryAddress           String?
+  deliveryCity              String?
+  deliveryDistrict          String?
+  requestedDeliveryDate     DateTime?
+  notes                     String?
+  createdById               String
+  approvedById              String?
+  approvedAt                DateTime?
+  rejectedById              String?
+  rejectedAt                DateTime?
+  rejectionReason           String?
+  createdAt                 DateTime                     @default(now())
+  updatedAt                 DateTime                     @updatedAt
+  businessId                String
+  goodsReceivedNotes        GoodsReceivedNote[]
+  business                  Business                     @relation(fields: [businessId], references: [id])
+  supplier                  Supplier                     @relation(fields: [supplierId], references: [id])
+  items                     PurchaseOrderItem[]
+  statusHistory             PurchaseOrderStatusHistory[]
+  document                  SmartDiningSlip?
+  ScannedDocument           ScannedDocument[]
+  ProcurementReconciliation ProcurementReconciliation[]
 
   @@index([businessId])
   @@index([supplierId])
@@ -1144,24 +1195,26 @@ model PurchaseOrderStatusHistory {
 }
 
 model GoodsReceivedNote {
-  id               String                  @id @default(cuid())
-  grnNumber        String                  @unique
-  purchaseOrderId  String
-  supplierId       String
-  receivedById     String
-  receivedByName   String
-  receivedAt       DateTime
-  status           String                  @default("PARTIAL")
-  notes            String?
-  discrepancyNotes String?
-  createdAt        DateTime                @default(now())
-  updatedAt        DateTime                @updatedAt
-  businessId       String
-  business         Business                @relation(fields: [businessId], references: [id])
-  purchaseOrder    PurchaseOrder           @relation(fields: [purchaseOrderId], references: [id])
-  supplier         Supplier                @relation(fields: [supplierId], references: [id])
-  items            GoodsReceivedNoteItem[]
-  document         SmartDiningSlip?
+  id                        String                      @id @default(cuid())
+  grnNumber                 String                      @unique
+  purchaseOrderId           String
+  supplierId                String
+  receivedById              String
+  receivedByName            String
+  receivedAt                DateTime
+  status                    String                      @default("PARTIAL")
+  notes                     String?
+  discrepancyNotes          String?
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+  businessId                String
+  business                  Business                    @relation(fields: [businessId], references: [id])
+  purchaseOrder             PurchaseOrder               @relation(fields: [purchaseOrderId], references: [id])
+  supplier                  Supplier                    @relation(fields: [supplierId], references: [id])
+  items                     GoodsReceivedNoteItem[]
+  document                  SmartDiningSlip?
+  ScannedDocument           ScannedDocument[]
+  ProcurementReconciliation ProcurementReconciliation[]
 
   @@index([purchaseOrderId])
   @@index([businessId])
@@ -1235,13 +1288,16 @@ model PaymentTransaction {
   rawCallback              Json?
   rawStatus                Json?
   subscriptionId           String?
+  marketplaceOrderId       String?
   gateway                  PaymentGateway
   paymentMethod            PaymentMethod
   paymentProvider          PaymentProvider?
-  status                   PaymentStatus
+  status                   PaymentTransactionStatus
   affiliateCommissionsNew  AffiliateCommissionNew[]
+  billingEvents            BillingEvent[]
   business                 Business                 @relation(fields: [businessId], references: [id], onDelete: Cascade)
   subscription             Subscription?            @relation(fields: [subscriptionId], references: [id])
+  marketplaceOrder         MarketplaceOrder?        @relation(fields: [marketplaceOrderId], references: [id])
   sale                     Sale?
   salePayment              SalePayment?
   staffTip                 StaffTip?
@@ -1526,21 +1582,21 @@ model Seat {
 }
 
 model SeatSession {
-  id             String    @id @default(cuid())
+  id             String              @id @default(cuid())
   seatId         String
   tableSessionId String?
-  participantId  String?   @unique
-  state          String    @default("locked") // "locked" | "occupied" | "released"
-  lockedAt       DateTime  @default(now())
+  participantId  String?             @unique
+  state          String              @default("locked") // "locked" | "occupied" | "released"
+  lockedAt       DateTime            @default(now())
   lockExpiresAt  DateTime
   lockedByTempId String
-  sessionToken   String    @unique
+  sessionToken   String              @unique
   occupiedAt     DateTime?
   releasedAt     DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  seat           Seat              @relation(fields: [seatId], references: [id], onDelete: Cascade)
-  tableSession   TableSession?     @relation(fields: [tableSessionId], references: [id])
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  seat           Seat                @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  tableSession   TableSession?       @relation(fields: [tableSessionId], references: [id])
   participant    SessionParticipant? @relation(fields: [participantId], references: [id])
 
   @@index([seatId, state])
@@ -2020,6 +2076,7 @@ enum PaymentMethod {
   CASH
   MTN_MOBILE_MONEY
   AIRTEL_MONEY
+  CARD
   PESAPAL_CARD
   BANK_TRANSFER
   OTHER
@@ -2038,6 +2095,39 @@ enum PaymentStatus {
   CANCELLED
 }
 
+enum PaymentTransactionStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  GRACE_PERIOD
+  EXPIRED
+  SUSPENDED
+  CANCELLED
+}
+
+/// Billing event types for chronological billing ledger
+enum BillingEventType {
+  PAYMENT_INITIATED
+  PAYMENT_PROCESSING
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  PAYMENT_CANCELLED
+  PAYMENT_REFUNDED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_RENEWED
+  SUBSCRIPTION_EXPIRED
+  SUBSCRIPTION_CANCELLED
+  REMINDER_SENT
+}
+
 enum PaymentGateway {
   IREMBO_PAY
   PESAPAL
@@ -2046,6 +2136,36 @@ enum PaymentGateway {
   MOBILE_MONEY
   CARD
   BANK_TRANSFER
+}
+
+/// Domain for unified financial ledger entries
+enum LedgerDomain {
+  SUBSCRIPTION
+  MARKETPLACE
+  PLATFORM
+  OTHER
+}
+
+/// Chronological billing ledger independent of transactions/subscriptions
+model BillingEvent {
+  id                   String           @id @default(cuid())
+  businessId           String
+  subscriptionId       String?
+  paymentTransactionId String?
+  eventType            BillingEventType
+  message              String?
+  metadata             Json?
+  occurredAt           DateTime         @default(now())
+  createdAt            DateTime         @default(now())
+
+  business           Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  subscription       Subscription?       @relation(fields: [subscriptionId], references: [id])
+  paymentTransaction PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
+
+  @@index([businessId, occurredAt])
+  @@index([subscriptionId])
+  @@index([paymentTransactionId])
+  @@index([eventType, occurredAt])
 }
 
 enum PaymentProvider {
@@ -3228,9 +3348,9 @@ model SupportCannedReply {
 
 // DiningSessionSlip - Live order tracking during dining session
 model DiningSessionSlip {
-  id         String   @id @default(cuid())
-  slipNumber String   @unique
-  sessionId  String   @unique
+  id         String  @id @default(cuid())
+  slipNumber String  @unique
+  sessionId  String  @unique
   businessId String
   tableId    String?
 
@@ -3238,9 +3358,9 @@ model DiningSessionSlip {
   status String @default("active") // "active" | "checkout_initiated" | "bill_finalized" | "payment_triggered" | "awaiting_confirmation" | "checkout_completed" | "closed"
 
   // Financial Tracking (Live)
-  runningSubtotalCents Int @default(0)
-  runningVatCents      Int @default(0)
-  runningTotalCents    Int @default(0)
+  runningSubtotalCents Int  @default(0)
+  runningVatCents      Int  @default(0)
+  runningTotalCents    Int  @default(0)
   finalBillCents       Int?
 
   // Tax Configuration
@@ -3248,13 +3368,13 @@ model DiningSessionSlip {
   taxRate Float  @default(18.0)
 
   // Timestamps
-  sessionStartedAt     DateTime  @default(now())
-  lastOrderAt          DateTime?
-  checkoutInitiatedAt  DateTime?
-  billFinalizedAt      DateTime?
-  paymentTriggeredAt   DateTime?
-  checkoutCompletedAt  DateTime?
-  closedAt             DateTime?
+  sessionStartedAt    DateTime  @default(now())
+  lastOrderAt         DateTime?
+  checkoutInitiatedAt DateTime?
+  billFinalizedAt     DateTime?
+  paymentTriggeredAt  DateTime?
+  checkoutCompletedAt DateTime?
+  closedAt            DateTime?
 
   // Metadata
   orderCount Int   @default(0)
@@ -3264,11 +3384,11 @@ model DiningSessionSlip {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  session TableSession            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  business Business               @relation("BusinessDiningSessionSlips", fields: [businessId], references: [id], onDelete: Cascade)
-  table   Table?                  @relation("TableDiningSessionSlips", fields: [tableId], references: [id], onDelete: SetNull)
-  items   DiningSessionSlipItem[]
-  events  CheckoutEvent[]
+  session  TableSession            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  business Business                @relation("BusinessDiningSessionSlips", fields: [businessId], references: [id], onDelete: Cascade)
+  table    Table?                  @relation("TableDiningSessionSlips", fields: [tableId], references: [id], onDelete: SetNull)
+  items    DiningSessionSlipItem[]
+  events   CheckoutEvent[]
 
   @@index([businessId])
   @@index([status])
@@ -3313,7 +3433,7 @@ model DiningSessionSlipItem {
 
 // CheckoutEvent - Audit trail for checkout and payment events
 model CheckoutEvent {
-  id         String @id @default(cuid())
+  id         String  @id @default(cuid())
   sessionId  String
   slipId     String?
   businessId String
@@ -3451,13 +3571,13 @@ model MarketerCommission {
   marketerId String
   marketer   ProfessionalMarketer @relation(fields: [marketerId], references: [id], onDelete: Cascade)
 
-  businessId String  // Which business generated this (read-only reference)
+  businessId String // Which business generated this (read-only reference)
   invoiceId  String? // Optional link to Invoice (read-only reference)
 
   // Commission details
   type        MarketerCommissionType
   amountCents Int
-  currency    String         @default("RWF")
+  currency    String                 @default("RWF")
 
   // Lifecycle
   status      MarketerCommissionStatus @default(PENDING)
@@ -3466,7 +3586,7 @@ model MarketerCommission {
   paidAt      DateTime?
 
   // Metadata
-  periodMonth Int?    // For recurring (1-12)
+  periodMonth Int? // For recurring (1-12)
   description String?
 
   @@index([marketerId, status])
@@ -3498,7 +3618,7 @@ model MarketerPayout {
 
   // Payout details
   amountCents Int
-  currency    String @default("RWF")
+  currency    String       @default("RWF")
   method      PayoutMethod
 
   // Status
@@ -3560,8 +3680,8 @@ model MarketerRiskProfile {
   flags String[] // ["velocity_high", "spike_detected", "new_account"]
 
   // Stats
-  totalPayouts   Int      @default(0)
-  avgPayoutCents Int      @default(0)
+  totalPayouts   Int       @default(0)
+  avgPayoutCents Int       @default(0)
   lastPayoutAt   DateTime?
 
   @@index([riskLevel])
@@ -3652,15 +3772,15 @@ enum AlertSeverity {
 
 // Demo Request - Book a demo system
 model DemoRequest {
-  id          String            @id @default(cuid())
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Contact info
-  name        String
+  name         String
   businessName String
-  contact     String // Phone or email
-  message     String?
+  contact      String // Phone or email
+  message      String?
 
   // Status
   status      DemoRequestStatus @default(PENDING)
@@ -3682,15 +3802,15 @@ enum DemoRequestStatus {
 
 // Newsletter Subscriber
 model NewsletterSubscriber {
-  id             String   @id @default(cuid())
-  createdAt      DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
 
   // Contact
-  emailOrPhone   String   @unique
-  sourcePage     String? // Where they subscribed from
-  
+  emailOrPhone String  @unique
+  sourcePage   String? // Where they subscribed from
+
   // Status
-  isActive       Boolean  @default(true)
+  isActive       Boolean   @default(true)
   unsubscribedAt DateTime?
 
   @@index([isActive, createdAt])
@@ -3703,19 +3823,19 @@ model NewsletterSubscriber {
 
 // Station - Operational destination for order items
 model Station {
-  id          String   @id @default(cuid())
-  businessId  String
-  name        String   // Display name: "Kitchen", "Bar", "Grill", "Pastry"
-  code        String   // Unique code: "KITCHEN", "BAR", "GRILL", "PASTRY"
-  type        StationType @default(KITCHEN)
-  isActive    Boolean  @default(true)
-  displayOrder Int     @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String      @id @default(cuid())
+  businessId   String
+  name         String // Display name: "Kitchen", "Bar", "Grill", "Pastry"
+  code         String // Unique code: "KITCHEN", "BAR", "GRILL", "PASTRY"
+  type         StationType @default(KITCHEN)
+  isActive     Boolean     @default(true)
+  displayOrder Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  routeRules  RouteRule[]
-  slaProfiles SLAProfile[]
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  routeRules   RouteRule[]
+  slaProfiles  SLAProfile[]
   ticketEvents TicketEvent[]
 
   @@unique([businessId, code])
@@ -3725,22 +3845,22 @@ model Station {
 
 // RouteRule - Maps menu items/categories to stations
 model RouteRule {
-  id          String   @id @default(cuid())
-  businessId  String
-  stationId   String
-  
-  // Routing criteria (one must be set)
-  menuItemId  String?  // Item-specific override
-  category    String?  // Category-level routing
-  
-  priority    Int      @default(0) // Higher priority wins
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String @id @default(cuid())
+  businessId String
+  stationId  String
 
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  station     Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
-  menuItem    MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  // Routing criteria (one must be set)
+  menuItemId String? // Item-specific override
+  category   String? // Category-level routing
+
+  priority  Int      @default(0) // Higher priority wins
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  station  Station   @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 
   @@index([businessId, isActive])
   @@index([menuItemId])
@@ -3750,30 +3870,30 @@ model RouteRule {
 
 // TicketEvent - Append-only operational event log
 model TicketEvent {
-  id          String   @id @default(cuid())
-  saleId      String
-  saleItemId  String?  // Optional: item-level events
-  stationId   String?  // Optional: station context
-  
-  eventType   TicketEventType
-  actorId     String?  // User who triggered event
-  actorName   String?  // Cached actor name
-  
+  id         String  @id @default(cuid())
+  saleId     String
+  saleItemId String? // Optional: item-level events
+  stationId  String? // Optional: station context
+
+  eventType TicketEventType
+  actorId   String? // User who triggered event
+  actorName String? // Cached actor name
+
   // Event metadata
   previousState String?
   newState      String?
-  metadata      Json?   // Flexible payload for event-specific data
-  
-  // Phase 3: Deduplication and ordering
-  idempotencyKey String?  // Unique key to prevent duplicate events
-  sequenceNumber Int?     // Ordering within saleItem
-  
-  createdAt   DateTime @default(now())
+  metadata      Json? // Flexible payload for event-specific data
 
-  sale        Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  saleItem    SaleItem? @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
-  station     Station?  @relation(fields: [stationId], references: [id], onDelete: SetNull)
-  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  // Phase 3: Deduplication and ordering
+  idempotencyKey String? // Unique key to prevent duplicate events
+  sequenceNumber Int? // Ordering within saleItem
+
+  createdAt DateTime @default(now())
+
+  sale     Sale      @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleItem SaleItem? @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  station  Station?  @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  actor    User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@unique([saleItemId, idempotencyKey])
   @@index([saleId, createdAt])
@@ -3786,20 +3906,20 @@ model TicketEvent {
 
 // SLAProfile - Configurable timing thresholds
 model SLAProfile {
-  id                  String   @id @default(cuid())
-  businessId          String
-  stationId           String?  // Station-specific, or null for default
-  category            String?  // Category-specific, or null for default
-  
-  warningAfterMinutes Int      @default(8)
-  breachAfterMinutes  Int      @default(15)
-  
-  isActive            Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id         String  @id @default(cuid())
+  businessId String
+  stationId  String? // Station-specific, or null for default
+  category   String? // Category-specific, or null for default
 
-  business            Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  station             Station? @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  warningAfterMinutes Int @default(8)
+  breachAfterMinutes  Int @default(15)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  station  Station? @relation(fields: [stationId], references: [id], onDelete: Cascade)
 
   @@index([businessId, isActive])
   @@index([stationId])
@@ -3864,18 +3984,358 @@ enum TicketEventType {
 
 // Phase 3: Idempotency tracking for request deduplication
 model IdempotencyKey {
-  id            String   @id @default(cuid())
-  key           String   @unique
-  businessId    String
-  endpoint      String
-  requestBody   Json?
-  responseBody  Json?
-  statusCode    Int?
-  createdAt     DateTime @default(now())
-  expiresAt     DateTime
+  id           String   @id @default(cuid())
+  key          String   @unique
+  businessId   String
+  endpoint     String
+  requestBody  Json?
+  responseBody Json?
+  statusCode   Int?
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId, endpoint])
   @@index([expiresAt])
+}
+
+// ====================================================
+// DOCUMENT INTELLIGENCE ENGINE (DIE) - PR01
+// ====================================================
+
+// Core ingestion tracker - tracks document upload and processing lifecycle
+model ScanJob {
+  id              String         @id @default(cuid())
+  businessId      String
+  createdByUserId String
+  documentType    DocumentType
+  sourceFileKey   String // Storage key for uploaded file
+  sourceMime      String // MIME type (image/jpeg, application/pdf, etc.)
+  sourceHash      String // SHA-256 hash for deduplication
+  pageCount       Int? // Number of pages (for PDFs)
+  provider        String? // OCR provider used (openai, azure, etc.)
+  status          DocumentStatus @default(UPLOADED)
+  errorMessage    String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  business          Business                @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdBy         User                    @relation(fields: [createdByUserId], references: [id])
+  scannedDocument   ScannedDocument?
+  processingLogs    DocumentProcessingLog[]
+  ExtractionPayload ExtractionPayload?
+
+  @@unique([sourceHash, businessId])
+  @@index([businessId, createdAt])
+  @@index([status])
+  @@index([documentType])
+}
+
+// Normalized document container - stores extracted structured data
+model ScannedDocument {
+  id                         String       @id @default(cuid())
+  scanJobId                  String       @unique
+  businessId                 String
+  documentType               DocumentType
+  supplierId                 String?
+  matchedPurchaseOrderId     String?
+  matchedGoodsReceivedNoteId String?
+
+  // Header fields
+  invoiceNumber       String?
+  purchaseOrderNumber String?
+  deliveryReference   String?
+  documentDate        DateTime?
+
+  // Financial fields
+  currency      String? @default("RWF")
+  subtotalCents Int?
+  taxCents      Int?
+  totalCents    Int?
+
+  // AI metadata
+  providerPayload   Json? // Raw provider response
+  normalizedVersion String @default("1.0")
+  confidenceOverall Float? // 0.0 - 1.0
+  validationScore   Float? // 0.0 - 1.0
+
+  // Status
+  status DocumentStatus @default(UPLOADED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scanJob                  ScanJob            @relation(fields: [scanJobId], references: [id], onDelete: Cascade)
+  business                 Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  supplier                 Supplier?          @relation(fields: [supplierId], references: [id])
+  matchedPurchaseOrder     PurchaseOrder?     @relation(fields: [matchedPurchaseOrderId], references: [id])
+  matchedGoodsReceivedNote GoodsReceivedNote? @relation(fields: [matchedGoodsReceivedNoteId], references: [id])
+
+  items                        ScannedDocumentItem[]
+  reconciliation               ProcurementReconciliation?
+  entityLinks                  DocumentEntityLink[]
+  anomalyAlerts                AnomalyAlert[]
+  ExtractedDocumentHeaderField ExtractedDocumentHeaderField[]
+
+  @@index([invoiceNumber])
+  @@index([documentType])
+  @@index([matchedPurchaseOrderId])
+  @@index([matchedGoodsReceivedNoteId])
+  @@index([businessId, status])
+  @@index([supplierId])
+}
+
+// Line items extracted from documents
+model ScannedDocumentItem {
+  id                String @id @default(cuid())
+  scannedDocumentId String
+  lineNo            Int // Line number in document
+
+  // Product fields
+  productName       String
+  productId         String? // FK to InventoryItem if matched
+  supplierProductId String? // FK to SupplierProduct if matched
+
+  // Quantity & pricing
+  quantity        Float
+  unit            String
+  unitPriceCents  Int?
+  totalPriceCents Int?
+
+  // Confidence per field (JSON object: { productName: 0.95, quantity: 0.88, ... })
+  confidences Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scannedDocument            ScannedDocument              @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+  inventoryItem              InventoryItem?               @relation(fields: [productId], references: [id])
+  supplierProduct            SupplierProduct?             @relation(fields: [supplierProductId], references: [id])
+  anomalyAlerts              AnomalyAlert[]
+  ExtractedDocumentLineField ExtractedDocumentLineField[]
+
+  @@unique([scannedDocumentId, lineNo])
+  @@index([scannedDocumentId])
+  @@index([productId])
+  @@index([supplierProductId])
+}
+
+// Debug and observability foundation - processing event log
+model DocumentProcessingLog {
+  id        String   @id @default(cuid())
+  scanJobId String
+  stage     String // e.g., "upload", "ocr", "structuring", "validation"
+  level     String // "info" | "warn" | "error"
+  message   String
+  payload   Json? // Additional context
+  createdAt DateTime @default(now())
+
+  scanJob ScanJob @relation(fields: [scanJobId], references: [id], onDelete: Cascade)
+
+  @@index([scanJobId, createdAt])
+  @@index([level])
+}
+
+// Procurement reconciliation tracker - links documents to operational records
+model ProcurementReconciliation {
+  id                String @id @default(cuid())
+  scannedDocumentId String @unique
+
+  // Matching fields
+  matchedPurchaseOrderId     String?
+  matchedGoodsReceivedNoteId String?
+
+  // Fingerprint for idempotency (business-scoped unique identifier)
+  fingerprint String @unique
+
+  // State
+  state ReconciliationState @default(UNMATCHED)
+
+  // Confidence
+  confidence Float? // 0.0 - 1.0
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scannedDocument          ScannedDocument    @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+  matchedPurchaseOrder     PurchaseOrder?     @relation(fields: [matchedPurchaseOrderId], references: [id])
+  matchedGoodsReceivedNote GoodsReceivedNote? @relation(fields: [matchedGoodsReceivedNoteId], references: [id])
+
+  @@index([state])
+  @@index([matchedPurchaseOrderId])
+  @@index([matchedGoodsReceivedNoteId])
+}
+
+// Future intelligence support - flexible entity linking
+model DocumentEntityLink {
+  id                String         @id @default(cuid())
+  scannedDocumentId String
+  entityType        EntityLinkType // SUPPLIER | PO | GRN | INVENTORY_ITEM
+  entityId          String // ID of the linked entity
+  linkType          LinkType // AUTO_MATCH | USER_CONFIRMED | REVIEW_SUGGESTION
+  confidence        Float? // 0.0 - 1.0
+  createdAt         DateTime       @default(now())
+
+  scannedDocument ScannedDocument @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+
+  @@index([scannedDocumentId, entityType])
+  @@index([entityType, entityId])
+}
+
+// Supplier alias mapping for fuzzy matching
+model SupplierAlias {
+  id         String   @id @default(cuid())
+  supplierId String
+  alias      String // Original name variant
+  normalized String // Normalized form (lowercase, trimmed, etc.)
+  createdAt  DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, normalized])
+  @@index([normalized])
+}
+
+// Product alias mapping for fuzzy matching
+model ProductAlias {
+  id                String   @id @default(cuid())
+  inventoryItemId   String?
+  supplierProductId String?
+  alias             String // Original name variant
+  normalized        String // Normalized form
+  createdAt         DateTime @default(now())
+
+  inventoryItem   InventoryItem?   @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  supplierProduct SupplierProduct? @relation(fields: [supplierProductId], references: [id], onDelete: Cascade)
+
+  @@unique([inventoryItemId, normalized])
+  @@unique([supplierProductId, normalized])
+  @@index([normalized])
+}
+
+// Anomaly detection and alerts (placeholder for future intelligence)
+model AnomalyAlert {
+  id                    String  @id @default(cuid())
+  businessId            String
+  supplierId            String?
+  scannedDocumentId     String?
+  scannedDocumentItemId String?
+
+  // Alert metadata
+  type     String // e.g., "PRICE_SPIKE", "DUPLICATE_INVOICE", "QUANTITY_ANOMALY"
+  severity AnomalySeverity
+  title    String
+  details  Json? // Additional context
+
+  // Status
+  status AnomalyStatus @default(OPEN)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+
+  business            Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  supplier            Supplier?            @relation(fields: [supplierId], references: [id])
+  scannedDocument     ScannedDocument?     @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+  scannedDocumentItem ScannedDocumentItem? @relation(fields: [scannedDocumentItemId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, type])
+  @@index([status])
+  @@index([severity])
+  @@index([scannedDocumentId])
+}
+
+model ExtractedDocumentHeaderField {
+  id                String   @id @default(cuid())
+  scannedDocumentId String
+  fieldName         String
+  fieldValue        String
+  confidence        Float?
+  source            String?
+  createdAt         DateTime @default(now())
+
+  scannedDocument ScannedDocument @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+
+  @@index([scannedDocumentId])
+  @@index([fieldName])
+}
+
+model ExtractedDocumentLineField {
+  id                    String   @id @default(cuid())
+  scannedDocumentItemId String
+  fieldName             String
+  fieldValue            String
+  confidence            Float?
+  createdAt             DateTime @default(now())
+
+  scannedDocumentItem ScannedDocumentItem @relation(fields: [scannedDocumentItemId], references: [id], onDelete: Cascade)
+
+  @@index([scannedDocumentItemId])
+}
+
+model ExtractionPayload {
+  id            String   @id @default(cuid())
+  scanJobId     String   @unique
+  provider      String
+  rawPayload    Json
+  pageStructure Json?
+  extractedAt   DateTime
+
+  scanJob ScanJob @relation(fields: [scanJobId], references: [id], onDelete: Cascade)
+}
+
+// ====================================================
+// DIE ENUMS
+// ====================================================
+
+enum DocumentType {
+  SUPPLIER_INVOICE
+  DELIVERY_NOTE
+  GENERIC
+}
+
+enum DocumentStatus {
+  UPLOADED
+  OCR_PROCESSING
+  EXTRACTED
+  INTELLIGENCE_DONE
+  REVIEW
+  APPROVED
+  APPLIED
+  FAILED
+}
+
+enum ReconciliationState {
+  UNMATCHED
+  MATCHED_PO
+  MATCHED_GRN
+  CONFLICT
+}
+
+enum EntityLinkType {
+  SUPPLIER
+  PO
+  GRN
+  INVENTORY_ITEM
+}
+
+enum LinkType {
+  AUTO_MATCH
+  USER_CONFIRMED
+  REVIEW_SUGGESTION
+}
+
+enum AnomalyStatus {
+  OPEN
+  ACKNOWLEDGED
+  DISMISSED
+  RESOLVED
+}
+
+enum AnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
