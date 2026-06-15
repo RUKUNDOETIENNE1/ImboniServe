@@ -31,6 +31,45 @@ prisma.$connect()
 
 const providerChain = buildProviderChain()
 
+// ---------------------------------------------------------------------------
+// resolveProductName
+//
+// Different providers use different field names for the item description.
+// Azure DI prebuilt-invoice returns "Description"; OpenAI may return "name",
+// "description", "item", "product", or any free-form key. We probe in a
+// fixed priority order so both providers produce a meaningful productName
+// without any schema changes.
+//
+// Priority:
+//   1. name        (OpenAI default, human-readable)
+//   2. description (Azure DI prebuilt-invoice / prebuilt-receipt)
+//   3. item        (some custom / third-party models)
+//   4. product     (alternative naming convention)
+//   5. first non-empty text field in the line (universal fallback)
+//   6. "Line N"    (always safe: no data is better than wrong data)
+// ---------------------------------------------------------------------------
+function resolveProductName(
+  fields: Array<{ name: string; value: string }> | undefined,
+  lineNo: number
+): string {
+  if (!fields || fields.length === 0) return `Line ${lineNo}`
+
+  const PRIORITY_KEYS = ['name', 'description', 'item', 'product']
+
+  for (const key of PRIORITY_KEYS) {
+    const match = fields.find((f) => f.name?.toLowerCase() === key)
+    if (match?.value && String(match.value).trim() !== '') {
+      return String(match.value).trim()
+    }
+  }
+
+  // Fall through: return the value of the first non-empty field
+  const firstNonEmpty = fields.find((f) => f.value && String(f.value).trim() !== '')
+  if (firstNonEmpty) return String(firstNonEmpty.value).trim()
+
+  return `Line ${lineNo}`
+}
+
 export const extractWorker = new Worker<ExtractJobData>(
   'die_extract',
   async (job: Job<ExtractJobData>) => {
@@ -110,8 +149,7 @@ export const extractWorker = new Worker<ExtractJobData>(
         let lineNo = 0
         for (const line of result.lines) {
           lineNo += 1
-          const nameField = line.fields?.find((x: any) => x.name?.toLowerCase() === 'name')
-          const productName = String(nameField?.value ?? `Line ${lineNo}`)
+          const productName = resolveProductName(line.fields, lineNo)
           const item = await tx.scannedDocumentItem.create({
             data: {
               scannedDocumentId: scannedDoc.id,
