@@ -4235,7 +4235,8 @@ model AnomalyAlert {
   type     String // e.g., "PRICE_SPIKE", "DUPLICATE_INVOICE", "QUANTITY_ANOMALY"
   severity AnomalySeverity
   title    String
-  details  Json? // Additional context
+  details    Json? // Additional context
+  confidence Float? // 0.0 - 1.0
 
   // Status
   status AnomalyStatus @default(OPEN)
@@ -4253,6 +4254,8 @@ model AnomalyAlert {
   @@index([status])
   @@index([severity])
   @@index([scannedDocumentId])
+  @@index([confidence])
+  @@index([type, status])
 }
 
 model ExtractedDocumentHeaderField {

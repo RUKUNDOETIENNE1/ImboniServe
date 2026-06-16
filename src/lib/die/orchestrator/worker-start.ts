@@ -30,6 +30,7 @@ import { buildProviderChain } from '../provider/index'
 import { SupplierMatchingService } from '../services/supplier-matching.service'
 import { ProductMatchingService } from '../services/product-matching.service'
 import { ProcurementReconciliationService } from '../services/procurement-reconciliation.service'
+import { DocumentAnomalyService } from '../services/document-anomaly.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -749,6 +750,33 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       })
     } catch (reconErr) {
       console.error(`[DIE-Intel] Procurement reconciliation failed for ${scannedDocumentId}:`, reconErr)
+    }
+
+    // Stage 8: Anomaly Detection (Block 4E) - deterministic, idempotent, never blocks reconciliation
+    let anomalyResult: Awaited<ReturnType<typeof DocumentAnomalyService.detectAnomalies>> | undefined
+    try {
+      anomalyResult = await DocumentAnomalyService.detectAnomalies(scannedDocumentId)
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'anomaly_detection',
+          level: anomalyResult.success ? 'info' : 'warn',
+          message: anomalyResult.success
+            ? `Anomaly detection: ${anomalyResult.alertsCreated} alerts created [${anomalyResult.alertTypes.join(', ')}]`
+            : `Anomaly detection failed: ${anomalyResult.error || 'unknown error'}`,
+        },
+      })
+    } catch (anomalyErr) {
+      console.error(`[DIE-Intel] Anomaly detection failed for ${scannedDocumentId}:`, anomalyErr)
+      // Anomaly detection failures must never block the pipeline
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'anomaly_detection',
+          level: 'error',
+          message: `Anomaly detection error: ${anomalyErr instanceof Error ? anomalyErr.message : 'Unknown'}`,
+        },
+      }).catch(() => {})
     }
 
     const durationMs = Date.now() - started
