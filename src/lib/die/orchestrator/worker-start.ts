@@ -27,6 +27,8 @@ import {
 import { prisma } from '../../prisma'
 import { StorageService } from '../../services/storage.service'
 import { buildProviderChain } from '../provider/index'
+import { SupplierMatchingService } from '../services/supplier-matching.service'
+import { ProductMatchingService } from '../services/product-matching.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -546,6 +548,18 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       return { skipped: true, reason: `status=${doc.status}` }
     }
 
+    // Get document data needed for matching
+    const docDetails = await p.scannedDocument.findUnique({
+      where: { id: scannedDocumentId },
+      select: {
+        businessId: true,
+        supplierId: true,
+        status: true,
+      },
+    })
+
+    if (!docDetails) throw new Error(`ScannedDocument not found: ${scannedDocumentId}`)
+
     // Single unified transaction for all intelligence operations
     // This ensures atomicity: either all promotions happen + status updates, or nothing does
     const result = await p.$transaction(async (tx: any) => {
@@ -617,10 +631,127 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       }
     }, { timeout: 30000 })
 
-    const durationMs = Date.now() - started
-    console.log(`[DIE-Intel] Completed ${scannedDocumentId} in ${durationMs}ms: ${result.headerFieldsPromoted} headers, ${result.lineItemsEnriched} lines`)
+    // Stage 5: Supplier Matching (Block 4C) — outside main transaction due to service architecture
+    // Services have internal idempotency guards
+    let supplierMatchResult: Awaited<ReturnType<typeof SupplierMatchingService.resolveSupplier>> | undefined
+    try {
+      // Try to find supplier name in extracted header fields (look for common field names)
+      const supplierHeaderFields = await p.extractedDocumentHeaderField.findMany({
+        where: {
+          scannedDocumentId,
+          fieldName: {
+            in: ['supplier', 'vendor', 'seller', 'from', 'supplierName', 'vendorName', 'supplier_name', 'vendor_name'],
+            mode: 'insensitive',
+          },
+        },
+        select: { fieldName: true, fieldValue: true, confidence: true },
+        orderBy: { confidence: 'desc' },
+        take: 1,
+      })
 
-    return result
+      const rawSupplierName = supplierHeaderFields[0]?.fieldValue
+
+      if (rawSupplierName && rawSupplierName.trim().length > 0) {
+        supplierMatchResult = await SupplierMatchingService.resolveSupplier(
+          scannedDocumentId,
+          rawSupplierName,
+          docDetails.businessId,
+          {
+            autoMatchThreshold: 0.85,
+            reviewSuggestionThreshold: 0.60,
+            learnNewAliases: true,
+          }
+        )
+
+        // Log supplier match result
+        await p.documentProcessingLog.create({
+          data: {
+            scanJobId,
+            stage: 'matching',
+            level: supplierMatchResult.match.matchType === 'AUTO_MATCH' ? 'info' : 'warn',
+            message: `Supplier match: ${supplierMatchResult.match.matchType} ` +
+              `(conf: ${(supplierMatchResult.match.confidence * 100).toFixed(1)}%) ` +
+              `${supplierMatchResult.match.supplierName || 'NO MATCH'} ` +
+              `${supplierMatchResult.aliasLearned ? '[alias learned]' : ''}`,
+          },
+        })
+      }
+    } catch (matchErr) {
+      console.error(`[DIE-Intel] Supplier matching failed for ${scannedDocumentId}:`, matchErr)
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'matching',
+          level: 'error',
+          message: `Supplier matching error: ${matchErr instanceof Error ? matchErr.message : 'Unknown'}`,
+        },
+      })
+    }
+
+    // Stage 6: Product Matching (Block 4C) — outside main transaction
+    let productMatchResult: Awaited<ReturnType<typeof ProductMatchingService.resolveAllProducts>> | undefined
+    try {
+      // Use the supplier ID from the document (may have been set by supplier matching above)
+      const currentDoc = await p.scannedDocument.findUnique({
+        where: { id: scannedDocumentId },
+        select: { supplierId: true },
+      })
+
+      productMatchResult = await ProductMatchingService.resolveAllProducts(
+        scannedDocumentId,
+        docDetails.businessId,
+        currentDoc?.supplierId ?? null,
+        {
+          autoMatchThreshold: 0.85,
+          reviewSuggestionThreshold: 0.60,
+          learnNewAliases: true,
+        }
+      )
+
+      // Log product match results
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'matching',
+          level: 'info',
+          message: `Product matching: ${productMatchResult.matched} auto, ` +
+            `${productMatchResult.suggestions} suggestions, ` +
+            `${productMatchResult.unmatched} unmatched ` +
+            `${productMatchResult.aliasesLearned > 0 ? `[${productMatchResult.aliasesLearned} aliases learned]` : ''}`,
+        },
+      })
+    } catch (matchErr) {
+      console.error(`[DIE-Intel] Product matching failed for ${scannedDocumentId}:`, matchErr)
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'matching',
+          level: 'error',
+          message: `Product matching error: ${matchErr instanceof Error ? matchErr.message : 'Unknown'}`,
+        },
+      })
+    }
+
+    const durationMs = Date.now() - started
+    console.log(
+      `[DIE-Intel] Completed ${scannedDocumentId} in ${durationMs}ms: ` +
+      `${result.headerFieldsPromoted} headers, ${result.lineItemsEnriched} lines, ` +
+      `supplier: ${supplierMatchResult?.match?.matchType || 'N/A'}, ` +
+      `products: ${productMatchResult?.matched || 0}/${productMatchResult?.totalItems || 0} matched`
+    )
+
+    return {
+      ...result,
+      supplierMatch: supplierMatchResult?.match ?? null,
+      productMatchSummary: productMatchResult ? {
+        total: productMatchResult.totalItems,
+        matched: productMatchResult.matched,
+        suggestions: productMatchResult.suggestions,
+        unmatched: productMatchResult.unmatched,
+        aliasesLearned: productMatchResult.aliasesLearned,
+      } : null,
+      durationMs,
+    }
   },
   { connection, concurrency: 3, limiter: { max: 5, duration: 1000 } }
 )
