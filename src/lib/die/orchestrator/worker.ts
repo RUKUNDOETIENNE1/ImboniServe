@@ -1,7 +1,14 @@
 import 'dotenv/config'
 import { Worker, type Job, QueueEvents } from 'bullmq'
 import IORedis from 'ioredis'
-import { ExtractJobData, extractDLQ, markJobActive, markJobCompleted, markJobFailed } from '../queue/queues'
+import {
+  ExtractJobData,
+  extractDLQ,
+  markJobActive,
+  markJobCompleted,
+  markJobFailed,
+  intelligenceQueue,
+} from '../queue/queues'
 import { prisma } from '../../prisma'
 import { StorageService } from '../../services/storage.service'
 import { buildProviderChain } from '../provider/index'
@@ -190,8 +197,37 @@ extractWorker.on('ready', () => {
 extractWorker.on('active', () => {
   void markJobActive()
 })
-extractWorker.on('completed', () => {
+extractWorker.on('completed', (job: Job<ExtractJobData>) => {
   void markJobCompleted()
+
+  // If the job was skipped (already EXTRACTED) there is nothing to enqueue
+  if ((job.returnvalue as any)?.skipped) return
+
+  const { scanJobId } = job.data
+
+  // Enqueue the intelligence pass using scannedDocumentId as jobId for deduplication.
+  // We look up the ScannedDocument asynchronously; if the lookup or enqueue fails we
+  // log and continue — the intelligence worker can also be triggered manually.
+  ;(async () => {
+    try {
+      const p = prisma as any
+      const doc = await p.scannedDocument.findFirst({ where: { scanJobId }, select: { id: true } })
+      if (!doc) {
+        console.warn(`[DIE] extract completed but no ScannedDocument found for scanJobId=${scanJobId}`)
+        return
+      }
+      // jobId = scannedDocumentId ensures BullMQ deduplicates if the extract worker
+      // retries and completes again before the intelligence worker has started.
+      await intelligenceQueue.add(
+        'intelligence',
+        { scannedDocumentId: doc.id, scanJobId },
+        { jobId: doc.id },
+      )
+      console.log(`[DIE] intelligence job enqueued for scannedDocumentId=${doc.id}`)
+    } catch (e) {
+      console.error('[DIE] failed to enqueue intelligence job', e)
+    }
+  })()
 })
 extractWorker.on('failed', async (job, err) => {
   void markJobFailed()
