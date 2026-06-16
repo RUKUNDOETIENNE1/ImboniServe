@@ -129,19 +129,17 @@ export const extractWorker = new Worker<ExtractJobData>(
         })
       }
 
-      // Store extracted header fields
-      if (Array.isArray(result.fields)) {
-        for (const f of result.fields) {
-          await tx.extractedDocumentHeaderField.create({
-            data: {
-              scannedDocumentId: scannedDoc.id,
-              fieldName: f.name,
-              fieldValue: String(f.value ?? ''),
-              confidence: typeof f.confidence === 'number' ? f.confidence : undefined,
-              source: providerUsed,
-            },
-          })
-        }
+      // Store extracted header fields — batch with createMany to reduce round-trips
+      if (Array.isArray(result.fields) && result.fields.length > 0) {
+        await tx.extractedDocumentHeaderField.createMany({
+          data: result.fields.map((f: any) => ({
+            scannedDocumentId: scannedDoc.id,
+            fieldName: f.name,
+            fieldValue: String(f.value ?? ''),
+            confidence: typeof f.confidence === 'number' ? f.confidence : undefined,
+            source: providerUsed,
+          })),
+        })
       }
 
       // Lightweight line-item candidates: create placeholder ScannedDocumentItem to attach line fields
@@ -159,19 +157,20 @@ export const extractWorker = new Worker<ExtractJobData>(
               unit: 'UNIT',
             },
           })
-          for (const lf of line.fields || []) {
-            await tx.extractedDocumentLineField.create({
-              data: {
+          // Batch line fields with createMany to reduce round-trips
+          if (line.fields && line.fields.length > 0) {
+            await tx.extractedDocumentLineField.createMany({
+              data: line.fields.map((lf: any) => ({
                 scannedDocumentItemId: item.id,
                 fieldName: lf.name,
                 fieldValue: String(lf.value ?? ''),
                 confidence: typeof lf.confidence === 'number' ? lf.confidence : undefined,
-              },
+              })),
             })
           }
         }
       }
-    })
+    }, { timeout: 30000 })
 
     await p.documentProcessingLog.create({
       data: { scanJobId, stage: 'ocr', level: 'info', message: 'OCR processing completed' },
