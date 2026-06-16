@@ -28,8 +28,7 @@ function clearEnv() {
 
 async function withMockFetch(handler: FetchHandler, fn: () => Promise<void>) {
   const original = globalThis.fetch
-  // @ts-expect-error test shim
-  globalThis.fetch = handler
+  globalThis.fetch = handler as typeof globalThis.fetch
   try {
     await fn()
   } finally {
