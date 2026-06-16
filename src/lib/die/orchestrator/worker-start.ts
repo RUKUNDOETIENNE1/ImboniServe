@@ -29,6 +29,7 @@ import { StorageService } from '../../services/storage.service'
 import { buildProviderChain } from '../provider/index'
 import { SupplierMatchingService } from '../services/supplier-matching.service'
 import { ProductMatchingService } from '../services/product-matching.service'
+import { ProcurementReconciliationService } from '../services/procurement-reconciliation.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -732,12 +733,31 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       })
     }
 
+    // Stage 7: Procurement Reconciliation (Block 4D) — deterministic, idempotent, no N+1
+    let reconciliationResult: Awaited<ReturnType<typeof ProcurementReconciliationService.reconcileDocument>> | undefined
+    try {
+      reconciliationResult = await ProcurementReconciliationService.reconcileDocument(scannedDocumentId)
+      await p.documentProcessingLog.create({
+        data: {
+          scanJobId,
+          stage: 'reconciliation',
+          level: reconciliationResult.success ? 'info' : 'warn',
+          message: reconciliationResult.success
+            ? `Reconciliation: ${reconciliationResult.matchType} (${(reconciliationResult.confidence * 100).toFixed(1)}%)`
+            : `Reconciliation failed: ${reconciliationResult.error || 'unknown error'}`,
+        },
+      })
+    } catch (reconErr) {
+      console.error(`[DIE-Intel] Procurement reconciliation failed for ${scannedDocumentId}:`, reconErr)
+    }
+
     const durationMs = Date.now() - started
     console.log(
       `[DIE-Intel] Completed ${scannedDocumentId} in ${durationMs}ms: ` +
       `${result.headerFieldsPromoted} headers, ${result.lineItemsEnriched} lines, ` +
       `supplier: ${supplierMatchResult?.match?.matchType || 'N/A'}, ` +
-      `products: ${productMatchResult?.matched || 0}/${productMatchResult?.totalItems || 0} matched`
+      `products: ${productMatchResult?.matched || 0}/${productMatchResult?.totalItems || 0} matched, ` +
+      `reconciliation: ${reconciliationResult?.matchType || 'N/A'}`
     )
 
     return {
@@ -749,6 +769,15 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
         suggestions: productMatchResult.suggestions,
         unmatched: productMatchResult.unmatched,
         aliasesLearned: productMatchResult.aliasesLearned,
+      } : null,
+      reconciliation: reconciliationResult ? {
+        success: reconciliationResult.success,
+        matchType: reconciliationResult.matchType,
+        confidence: reconciliationResult.confidence,
+        purchaseOrderId: reconciliationResult.purchaseOrderId,
+        goodsReceivedNoteId: reconciliationResult.goodsReceivedNoteId,
+        duplicateInvoice: reconciliationResult.duplicateInvoice,
+        conflictReason: reconciliationResult.conflictReason,
       } : null,
       durationMs,
     }

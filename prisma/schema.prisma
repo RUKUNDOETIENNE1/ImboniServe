@@ -189,6 +189,7 @@ model Business {
   postAttributions                  PostAttribution[]
   promotions                        Promotion[]
   purchaseOrders                    PurchaseOrder[]
+  procurementReconciliations        ProcurementReconciliation[]
   reconciliationLogs                ReconciliationLog[]
   reservations                      Reservation[]
   owner                             User                      @relation("BusinessOwner", fields: [ownerId], references: [id])
@@ -4059,6 +4060,8 @@ model ScannedDocument {
   normalizedVersion String @default("1.0")
   confidenceOverall Float? // 0.0 - 1.0
   validationScore   Float? // 0.0 - 1.0
+  reconciliationStatus String?
+  confidenceScore      Float? // 0.0 - 1.0
 
   // Status
   status DocumentStatus @default(UPLOADED)
@@ -4141,10 +4144,12 @@ model DocumentProcessingLog {
 model ProcurementReconciliation {
   id                String @id @default(cuid())
   scannedDocumentId String @unique
+  businessId        String
 
   // Matching fields
-  matchedPurchaseOrderId     String?
-  matchedGoodsReceivedNoteId String?
+  purchaseOrderId      String? @map("matchedPurchaseOrderId")
+  goodsReceivedNoteId   String? @map("matchedGoodsReceivedNoteId")
+  matchType             String
 
   // Fingerprint for idempotency (business-scoped unique identifier)
   fingerprint String @unique
@@ -4159,12 +4164,15 @@ model ProcurementReconciliation {
   updatedAt DateTime @updatedAt
 
   scannedDocument          ScannedDocument    @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
-  matchedPurchaseOrder     PurchaseOrder?     @relation(fields: [matchedPurchaseOrderId], references: [id])
-  matchedGoodsReceivedNote GoodsReceivedNote? @relation(fields: [matchedGoodsReceivedNoteId], references: [id])
+  business                 Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  purchaseOrder           PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id])
+  goodsReceivedNote       GoodsReceivedNote? @relation(fields: [goodsReceivedNoteId], references: [id])
 
+  @@index([businessId])
+  @@index([businessId, matchType])
   @@index([state])
-  @@index([matchedPurchaseOrderId])
-  @@index([matchedGoodsReceivedNoteId])
+  @@index([purchaseOrderId])
+  @@index([goodsReceivedNoteId])
 }
 
 // Future intelligence support - flexible entity linking
@@ -4179,6 +4187,7 @@ model DocumentEntityLink {
 
   scannedDocument ScannedDocument @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
 
+  @@unique([scannedDocumentId, entityType, entityId])
   @@index([scannedDocumentId, entityType])
   @@index([entityType, entityId])
 }
