@@ -454,7 +454,11 @@ export class SupplierMatchingService {
     options?: Partial<SupplierMatchOptions>
   ): Promise<Array<{
     scannedDocumentId: string
-    result: Awaited<ReturnType<typeof this.resolveSupplier>>
+    result: {
+      match: SupplierMatchResult
+      link?: EntityLinkResult
+      aliasLearned?: boolean
+    }
   }>> {
     const results = []
 
@@ -476,8 +480,8 @@ export class SupplierMatchingService {
               supplierId: null,
               supplierName: null,
               confidence: 0,
-              matchType: 'NO_MATCH',
-              matchSource: 'none',
+              matchType: 'NO_MATCH' as 'NO_MATCH',
+              matchSource: 'none' as 'none',
               reason: `Error: ${e instanceof Error ? e.message : 'Unknown error'}`,
             },
           },

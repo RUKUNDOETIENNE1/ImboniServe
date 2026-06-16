@@ -674,7 +674,12 @@ export class ProductMatchingService {
     results: Array<{
       itemId: string
       lineNo: number
-      result: Awaited<ReturnType<typeof this.resolveProduct>>
+      result: {
+        match: ProductMatchResult
+        link?: ProductEntityLinkResult
+        aliasLearned?: boolean
+        itemUpdated: boolean
+      }
     }>
   }> {
     const p: any = prisma
@@ -722,8 +727,8 @@ export class ProductMatchingService {
               productName: null,
               productType: null,
               confidence: 0,
-              matchType: 'NO_MATCH',
-              matchSource: 'none',
+              matchType: 'NO_MATCH' as 'NO_MATCH',
+              matchSource: 'none' as 'none',
               reason: `Error: ${e instanceof Error ? e.message : 'Unknown error'}`,
             },
             itemUpdated: false,

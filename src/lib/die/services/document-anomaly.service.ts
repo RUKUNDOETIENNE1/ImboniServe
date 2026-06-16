@@ -247,7 +247,7 @@ export class DocumentAnomalyService {
       details: {
         invoiceNumber: doc.invoiceNumber,
         supplierId: doc.supplierId,
-        duplicateDocumentIds: duplicates.map(d => d.id),
+        duplicateDocumentIds: duplicates.map((d: { id: string }) => d.id),
         duplicateCount: duplicates.length,
       },
     })
@@ -387,7 +387,7 @@ export class DocumentAnomalyService {
     for (const docItem of doc.items) {
       // Find matching GRN item by product name (normalized)
       const normalizedDocName = docItem.productName.toLowerCase().trim()
-      const grnItem = grn.items.find(gi => 
+      const grnItem = grn.items.find((gi: { productName: string; orderedQuantity: number; receivedQuantity: number; unit: string; id: string }) => 
         gi.productName.toLowerCase().trim() === normalizedDocName
       )
 
