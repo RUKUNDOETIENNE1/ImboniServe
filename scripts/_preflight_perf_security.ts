@@ -225,8 +225,8 @@ async function phase9() {
     check(`DIE API routes found (${apiFiles.length})`, apiFiles.length > 0)
     for (const file of apiFiles.slice(0, 10)) {
       const src = fs.readFileSync(path.join(dieApiDir, file as string), 'utf-8')
-      // Routes should require authentication (check for session/auth check)
-      const hasAuthCheck = /getServerSession|getSession|auth\(|requireAuth|session\s*=/.test(src)
+      // Routes should require authentication (check for session/auth check or business context resolution)
+      const hasAuthCheck = /getServerSession|getSession|auth\(|requireAuth|session\s*=|resolveBusinessContext/.test(src)
       check(`api/die/${file} — auth guard present`, hasAuthCheck)
     }
   } else {

@@ -1,17 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 import { prisma } from '@/lib/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
-  const session = await getServerSession(req, res, authOptions)
-  if (!session?.user) return res.status(401).json({ error: 'Unauthorized' })
-
-  const user = session.user as any
-  const businessId = user.businessId as string | undefined
-  if (!businessId) return res.status(400).json({ error: 'No business' })
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+  const { businessId } = ctx
 
   // SSE headers
   res.setHeader('Content-Type', 'text/event-stream')
