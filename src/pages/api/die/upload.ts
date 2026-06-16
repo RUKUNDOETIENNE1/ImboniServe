@@ -7,6 +7,10 @@ import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { StorageService } from '@/lib/services/storage.service'
 import { extractQueue } from '@/lib/die/queue/queues'
+import {
+  DocumentLifecycleService,
+  DocumentLifecycleState,
+} from '@/lib/die/services/document-lifecycle.service'
 
 export const config = {
   api: { bodyParser: false },
@@ -68,28 +72,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const existing = await p.scanJob.findFirst({ where: { businessId, sourceHash } })
     if (existing) {
       fs.unlinkSync(file.filepath)
-      return res.status(200).json({ scanJobId: existing.id, status: existing.status })
+      const existingDoc = await p.scannedDocument.findUnique({ where: { scanJobId: existing.id }, select: { id: true } })
+      return res.status(200).json({ scanJobId: existing.id, scannedDocumentId: existingDoc?.id, status: existing.status })
     }
 
     // Store privately
     const uploaded = await StorageService.uploadPrivateDocument(fileBuffer, filename, mimeType, businessId)
 
-    // Create ScanJob in UPLOADED
-    const scanJob = await p.scanJob.create({
-      data: {
-        businessId,
-        createdByUserId: user.id,
-        documentType: documentType as any,
-        sourceFileKey: uploaded.storageKey,
-        sourceMime: mimeType,
-        sourceHash,
-        status: 'UPLOADED' as any,
-      },
-    })
+    // Create ScanJob + canonical document skeleton in a single transaction
+    const { scanJob, scannedDocument } = await p.$transaction(async (tx: any) => {
+      const createdScanJob = await tx.scanJob.create({
+        data: {
+          businessId,
+          createdByUserId: user.id,
+          documentType: documentType as any,
+          sourceFileKey: uploaded.storageKey,
+          sourceMime: mimeType,
+          sourceHash,
+          status: 'UPLOADED' as any,
+        },
+      })
 
-    // Log upload stage
-    await p.documentProcessingLog.create({
-      data: { scanJobId: scanJob.id, stage: 'upload', level: 'info', message: 'File uploaded' },
+      const createdDocument = await tx.scannedDocument.create({
+        data: {
+          scanJobId: createdScanJob.id,
+          businessId,
+          documentType: documentType as any,
+          status: 'UPLOADED' as any,
+          lifecycleState: DocumentLifecycleState.UPLOADED,
+        },
+      })
+
+      await tx.documentEventTimeline.create({
+        data: {
+          scannedDocumentId: createdDocument.id,
+          stage: DocumentLifecycleService.stageForState(DocumentLifecycleState.UPLOADED),
+          status: DocumentLifecycleState.UPLOADED,
+          metadata: {
+            documentType,
+            priority,
+            mimeType,
+            sourceHash,
+            uploadedAt: new Date().toISOString(),
+          },
+        },
+      })
+
+      await tx.documentProcessingLog.create({
+        data: { scanJobId: createdScanJob.id, stage: 'upload', level: 'info', message: 'File uploaded' },
+      })
+
+      return { scanJob: createdScanJob, scannedDocument: createdDocument }
     })
 
     // Enqueue extraction (idempotent by jobId)
@@ -101,7 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     fs.unlinkSync(file.filepath)
 
-    return res.status(201).json({ scanJobId: scanJob.id, status: 'UPLOADED' })
+    return res.status(201).json({ scanJobId: scanJob.id, scannedDocumentId: scannedDocument.id, status: 'UPLOADED' })
   } catch (error: any) {
     console.error('[DIE] upload error', error)
     return res.status(500).json({ error: error.message || 'Upload failed' })

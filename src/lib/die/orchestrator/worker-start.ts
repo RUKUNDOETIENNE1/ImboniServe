@@ -31,6 +31,11 @@ import { SupplierMatchingService } from '../services/supplier-matching.service'
 import { ProductMatchingService } from '../services/product-matching.service'
 import { ProcurementReconciliationService } from '../services/procurement-reconciliation.service'
 import { DocumentAnomalyService } from '../services/document-anomaly.service'
+import {
+  DocumentLifecycleService,
+  DocumentLifecycleState,
+} from '../services/document-lifecycle.service'
+import { SystemRepairService } from '../services/system-repair.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -60,6 +65,11 @@ prisma.$connect()
   })
 
 const providerChain = buildProviderChain()
+const repairScheduler = SystemRepairService.scheduledRepairJob({
+  thresholdMinutes: 30,
+  batchSize: 100,
+  intervalMs: 5 * 60_000,
+})
 
 // ============================================================================
 // Helper: Resolve product name from line fields (priority: name > description > item > product)
@@ -193,6 +203,22 @@ const extractWorker = new Worker<ExtractJobData>(
       await tx.documentProcessingLog.create({
         data: { scanJobId, stage: 'ocr', level: 'info', message: 'OCR processing completed' },
       })
+
+      // Canonical lifecycle transition: UPLOADED -> EXTRACTED
+      await DocumentLifecycleService.transitionDocumentLifecycleOnTransaction(
+        tx,
+        scannedDoc.id,
+        DocumentLifecycleState.EXTRACTED,
+        {
+          provider: providerUsed,
+          extractedHeaderFields: Array.isArray(result.fields) ? result.fields.length : 0,
+          extractedLines: Array.isArray(result.lines) ? result.lines.length : 0,
+        },
+        {
+          expectedCurrentState: DocumentLifecycleState.UPLOADED,
+          stage: 'extraction',
+        },
+      )
     }, { timeout: 30000 })
 
     const durationMs = Date.now() - started
@@ -734,6 +760,25 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       })
     }
 
+    await DocumentLifecycleService.transitionDocumentLifecycle(
+      scannedDocumentId,
+      DocumentLifecycleState.MATCHED,
+      {
+        supplierMatch: supplierMatchResult?.match ?? null,
+        productMatchSummary: productMatchResult ? {
+          total: productMatchResult.totalItems,
+          matched: productMatchResult.matched,
+          suggestions: productMatchResult.suggestions,
+          unmatched: productMatchResult.unmatched,
+          aliasesLearned: productMatchResult.aliasesLearned,
+        } : null,
+      },
+      {
+        expectedCurrentState: DocumentLifecycleState.INTELLIGENCE_DONE,
+        stage: 'matching',
+      },
+    )
+
     // Stage 7: Procurement Reconciliation (Block 4D) — deterministic, idempotent, no N+1
     let reconciliationResult: Awaited<ReturnType<typeof ProcurementReconciliationService.reconcileDocument>> | undefined
     try {
@@ -750,6 +795,24 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       })
     } catch (reconErr) {
       console.error(`[DIE-Intel] Procurement reconciliation failed for ${scannedDocumentId}:`, reconErr)
+    }
+
+    if (reconciliationResult?.success) {
+      await DocumentLifecycleService.transitionDocumentLifecycle(
+        scannedDocumentId,
+        DocumentLifecycleState.RECONCILED,
+        {
+          matchType: reconciliationResult.matchType,
+          confidence: reconciliationResult.confidence,
+          purchaseOrderId: reconciliationResult.purchaseOrderId,
+          goodsReceivedNoteId: reconciliationResult.goodsReceivedNoteId,
+          duplicateInvoice: reconciliationResult.duplicateInvoice,
+        },
+        {
+          expectedCurrentState: DocumentLifecycleState.MATCHED,
+          stage: 'reconciliation',
+        },
+      )
     }
 
     // Stage 8: Anomaly Detection (Block 4E) - deterministic, idempotent, never blocks reconciliation
@@ -777,6 +840,35 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
           message: `Anomaly detection error: ${anomalyErr instanceof Error ? anomalyErr.message : 'Unknown'}`,
         },
       }).catch(() => {})
+    }
+
+    if (reconciliationResult?.success && anomalyResult?.success) {
+      await DocumentLifecycleService.transitionDocumentLifecycle(
+        scannedDocumentId,
+        DocumentLifecycleState.ANALYZED,
+        {
+          alertsCreated: anomalyResult.alertsCreated,
+          alertTypes: anomalyResult.alertTypes,
+        },
+        {
+          expectedCurrentState: DocumentLifecycleState.RECONCILED,
+          stage: 'anomaly_detection',
+        },
+      )
+
+      await DocumentLifecycleService.transitionDocumentLifecycle(
+        scannedDocumentId,
+        DocumentLifecycleState.REVIEW_REQUIRED,
+        {
+          reviewRequired: true,
+          alertsCreated: anomalyResult.alertsCreated,
+          alertTypes: anomalyResult.alertTypes,
+        },
+        {
+          expectedCurrentState: DocumentLifecycleState.ANALYZED,
+          stage: 'review',
+        },
+      )
     }
 
     const durationMs = Date.now() - started
@@ -872,6 +964,7 @@ async function gracefulShutdown(signal: string) {
   await intelligenceWorker.close()
   await extractEvents.close()
   await intelligenceEvents.close()
+  repairScheduler.stop()
 
   await prisma.$disconnect()
   await connection.quit()

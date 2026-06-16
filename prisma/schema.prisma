@@ -4065,6 +4065,7 @@ model ScannedDocument {
 
   // Status
   status DocumentStatus @default(UPLOADED)
+  lifecycleState DocumentLifecycleState @default(UPLOADED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -4079,6 +4080,7 @@ model ScannedDocument {
   reconciliation               ProcurementReconciliation?
   entityLinks                  DocumentEntityLink[]
   anomalyAlerts                AnomalyAlert[]
+  eventTimelines               DocumentEventTimeline[]
   ExtractedDocumentHeaderField ExtractedDocumentHeaderField[]
 
   @@index([invoiceNumber])
@@ -4138,6 +4140,21 @@ model DocumentProcessingLog {
 
   @@index([scanJobId, createdAt])
   @@index([level])
+}
+
+// Canonical document lifecycle observability timeline
+model DocumentEventTimeline {
+  id                String   @id @default(cuid())
+  scannedDocumentId  String
+  stage             String
+  status            String
+  metadata          Json?
+  createdAt         DateTime @default(now())
+
+  scannedDocument ScannedDocument @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+
+  @@index([scannedDocumentId])
+  @@index([stage])
 }
 
 // Procurement reconciliation tracker - links documents to operational records
@@ -4313,6 +4330,19 @@ enum DocumentStatus {
   EXTRACTED
   INTELLIGENCE_DONE
   REVIEW
+  APPROVED
+  APPLIED
+  FAILED
+}
+
+enum DocumentLifecycleState {
+  UPLOADED
+  EXTRACTED
+  INTELLIGENCE_DONE
+  MATCHED
+  RECONCILED
+  ANALYZED
+  REVIEW_REQUIRED
   APPROVED
   APPLIED
   FAILED

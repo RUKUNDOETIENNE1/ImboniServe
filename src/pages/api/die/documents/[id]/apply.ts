@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import {
+  DocumentLifecycleService,
+  DocumentLifecycleState,
+} from '@/lib/die/services/document-lifecycle.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -27,15 +31,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!document) return res.status(404).json({ error: 'Document not found' })
     if (document.businessId !== ctx.businessId) return res.status(404).json({ error: 'Document not found' })
 
+    const currentState = DocumentLifecycleService.normalizeState(document.lifecycleState || document.status)
+
     // Idempotent: already applied
-    if (document.status === 'APPLIED') {
+    if (currentState === DocumentLifecycleState.APPLIED) {
       return res.status(200).json({ data: { id: document.id, status: 'APPLIED' }, message: 'Already applied' })
     }
 
     // Only APPROVED → APPLIED
-    if (document.status !== 'APPROVED') {
+    if (currentState !== DocumentLifecycleState.APPROVED) {
       return res.status(409).json({
-        error: `Cannot apply document in status '${document.status}'. Must be APPROVED first.`,
+        error: `Cannot apply document in lifecycle state '${currentState}'. Must be APPROVED first.`,
       })
     }
 
@@ -67,26 +73,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
 
-      // 4. Mark document as APPLIED
-      await tx.scannedDocument.update({ where: { id }, data: { status: 'APPLIED' } })
-      await tx.scanJob.update({ where: { id: document.scanJob.id }, data: { status: 'APPLIED' } })
-
-      // 5. Audit log
-      await tx.documentProcessingLog.create({
-        data: {
-          scanJobId: document.scanJob.id,
-          stage: 'application',
-          level: 'info',
-          message: 'Document applied to system',
-          payload: {
-            appliedBy: ctx.userId,
-            appliedAt: new Date().toISOString(),
-            itemsUpdated: document.items.filter((i: any) => i.productId).length,
-            poUpdated: !!document.matchedPurchaseOrderId,
-            grnUpdated: !!document.matchedGoodsReceivedNoteId,
-          },
+      // 4. Mark document as APPLIED using the canonical lifecycle helper
+      await DocumentLifecycleService.transitionDocumentLifecycleOnTransaction(
+        tx,
+        id,
+        DocumentLifecycleState.APPLIED,
+        {
+          appliedBy: ctx.userId,
+          appliedAt: new Date().toISOString(),
+          itemsUpdated: document.items.filter((i: any) => i.productId).length,
+          poUpdated: !!document.matchedPurchaseOrderId,
+          grnUpdated: !!document.matchedGoodsReceivedNoteId,
         },
-      })
+        {
+          expectedCurrentState: currentState,
+          stage: 'application',
+        },
+      )
     })
 
     return res.status(200).json({ data: { id: document.id, status: 'APPLIED' } })

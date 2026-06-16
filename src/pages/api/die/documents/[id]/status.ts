@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { DocumentLifecycleService } from '@/lib/die/services/document-lifecycle.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
@@ -21,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id: true,
         businessId: true,
         status: true,
+        lifecycleState: true,
         confidenceScore: true,
         reconciliationStatus: true,
         _count: { select: { anomalyAlerts: true } },
@@ -33,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       data: {
         status: document.status,
+        lifecycleState: DocumentLifecycleService.normalizeState(document.lifecycleState || document.status),
         reconciliationStatus: document.reconciliationStatus,
         confidenceScore: document.confidenceScore,
         anomalyCount: document._count.anomalyAlerts,
