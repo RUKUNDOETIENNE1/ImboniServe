@@ -58,7 +58,7 @@ export class TicketEventService {
           actorName: input.actorName,
           previousState: input.previousState,
           newState: input.newState,
-          metadata: input.metadata || null,
+          metadata: (input.metadata || null) as any,
           idempotencyKey,
           sequenceNumber,
         },

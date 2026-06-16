@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const request = await DemoRequestService.updateStatus({
         id,
         status,
-        contactedBy: session.user?.email,
+        contactedBy: session.user?.email || undefined,
         notes
       })
 

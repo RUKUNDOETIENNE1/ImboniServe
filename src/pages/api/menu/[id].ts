@@ -51,7 +51,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           priceCents: true,
           category: true,
           isAvailable: true,
-          isSpecial: true,
         },
       })
 

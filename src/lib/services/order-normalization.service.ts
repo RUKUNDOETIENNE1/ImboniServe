@@ -152,7 +152,7 @@ export class OrderNormalizationService {
   ): Promise<{ id: string; name: string; priceCents: number; confidence: number } | null> {
     const menuItems = await prisma.menuItem.findMany({
       where: {
-        isActive: true,
+        isAvailable: true,
       },
       select: {
         id: true,

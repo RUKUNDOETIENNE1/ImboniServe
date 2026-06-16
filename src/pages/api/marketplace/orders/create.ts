@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { EmailService } from '@/lib/services/email.service'
+import { PaymentMethod, PaymentStatus } from '@prisma/client'
 
 interface OrderItem {
   productId: string
@@ -42,6 +43,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'Invalid order data' })
     }
 
+    const userEmail = dbUser?.email || ctx.email
+    const userName = dbUser?.name || 'Customer'
+
     // Create orders in database (one per supplier)
     const createdOrders = await Promise.all(
       orders.map(async (orderReq) => {
@@ -50,38 +54,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           0
         )
 
+        const supplier = await prisma.supplier.findUnique({
+          where: { id: orderReq.supplierId },
+          select: { id: true, name: true },
+        })
+
         // Create the order
-        const order = await prisma.supplierOrder.create({
+        const order = await prisma.marketplaceOrder.create({
           data: {
             businessId,
-            supplierId: orderReq.supplierId,
-            status: 'pending',
-            totalCents,
+            userId,
+            orderNumber: `MKT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+            status: 'PENDING',
+            totalAmountCents: totalCents,
+            paymentMethod: orderReq.paymentMethod === 'cash' ? PaymentMethod.CASH : PaymentMethod.MTN_MOBILE_MONEY,
+            paymentStatus: PaymentStatus.PENDING,
             deliveryAddress: orderReq.deliveryAddress,
-            deliveryPhone: orderReq.deliveryPhone,
             deliveryNotes: orderReq.deliveryNotes || null,
-            paymentMethod: orderReq.paymentMethod,
-            paymentStatus: 'pending',
+            notes: `deliveryPhone=${orderReq.deliveryPhone}`,
             items: {
               create: orderReq.items.map((item) => ({
                 productId: item.productId,
-                productName: item.productName,
                 quantity: item.quantity,
                 unitPriceCents: item.unitPriceCents,
-                subtotalCents: item.unitPriceCents * item.quantity
-              }))
-            }
+                totalPriceCents: item.unitPriceCents * item.quantity,
+              })),
+            },
           },
           include: {
             items: true,
-            supplier: {
-              select: {
-                id: true,
-                name: true
-              }
-            }
-          }
+          },
         })
+
+        const supplierName = supplier?.name || 'Supplier'
 
         // Log recommendation action (order placed)
         try {
@@ -94,51 +99,50 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               metadata: {
                 orderId: order.id,
                 totalCents,
-                itemCount: orderReq.items.length
-              }
-            }
+                itemCount: orderReq.items.length,
+              },
+            },
           })
         } catch (logError) {
           console.error('Failed to log recommendation action:', logError)
         }
 
-        return order
+        if (userEmail) {
+          try {
+            await EmailService.sendOrderConfirmation({
+              to: userEmail,
+              customerName: userName,
+              orderId: order.id,
+              supplierName,
+              items: orderReq.items.map((item) => ({
+                productName: item.productName,
+                quantity: item.quantity,
+                unitPriceCents: item.unitPriceCents,
+                subtotalCents: item.unitPriceCents * item.quantity,
+              })),
+              totalCents,
+              deliveryAddress: orderReq.deliveryAddress,
+              deliveryPhone: orderReq.deliveryPhone,
+              paymentMethod: orderReq.paymentMethod,
+            })
+          } catch (emailError) {
+            console.error('Failed to send order confirmation email:', emailError)
+          }
+        }
+
+        return { order, supplierName, totalCents, orderReq }
       })
     )
 
-    // Send order confirmation emails
-    const userEmail = dbUser?.email || ctx.email
-    const userName = dbUser?.name || 'Customer'
-    
-    if (userEmail) {
-      for (const order of createdOrders) {
-        try {
-          await EmailService.sendOrderConfirmation({
-            to: userEmail,
-            customerName: userName,
-            orderId: order.id,
-            supplierName: order.supplier.name,
-            items: order.items.map(item => ({
-              productName: item.productName,
-              quantity: item.quantity,
-              unitPriceCents: item.unitPriceCents,
-              subtotalCents: item.subtotalCents
-            })),
-            totalCents: order.totalCents,
-            deliveryAddress: order.deliveryAddress,
-            deliveryPhone: order.deliveryPhone,
-            paymentMethod: order.paymentMethod
-          })
-        } catch (emailError) {
-          console.error('Failed to send order confirmation email:', emailError)
-        }
-      }
-    }
 
     return res.status(200).json({
       success: true,
-      orderIds: createdOrders.map(o => o.id),
-      orders: createdOrders,
+      orderIds: createdOrders.map(o => o.order.id),
+      orders: createdOrders.map(o => ({
+        ...o.order,
+        supplierName: o.supplierName,
+        totalCents: o.totalCents,
+      })),
     })
   } catch (error) {
     console.error('Order creation error:', error)

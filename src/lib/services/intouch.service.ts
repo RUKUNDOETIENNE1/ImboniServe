@@ -37,7 +37,7 @@ export class InTouchService {
   private static readonly API_URL = process.env.INTOUCH_API_URL || 'https://www.intouchpay.co.rw/api'
   private static readonly USERNAME = process.env.INTOUCH_USERNAME || ''
   private static readonly ACCOUNT_NO = process.env.INTOUCH_ACCOUNT_NO || ''
-  private static readonly PASSWORD = process.env.INTOUCH_PASSWORD || ''
+  private static readonly PASSWORD = process.env.INTOUCH_PASSWORD || process.env.INTOUCH_PARTNER_PASSWORD || ''
 
   /**
    * Generate SHA256 password hash

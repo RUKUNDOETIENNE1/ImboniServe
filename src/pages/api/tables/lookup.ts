@@ -25,23 +25,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         number: true,
         businessId: true,
         capacity: true,
-        isActive: true,
+        status: true,
         business: {
           select: {
             id: true,
             name: true,
-            enableQRInVenue: true
-          }
+            enableQRInVenue: true,
+          },
         }
       }
     })
 
     if (!table) {
       return res.status(404).json({ error: 'Table not found' })
-    }
-
-    if (!table.isActive) {
-      return res.status(403).json({ error: 'Table is not active' })
     }
 
     if (!table.business.enableQRInVenue) {

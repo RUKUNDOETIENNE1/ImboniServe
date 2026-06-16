@@ -218,15 +218,12 @@ export async function getFeaturedBusinesses(limit: number = 10) {
     },
     include: {
       discoverySubscription: true,
-      businessProfile: {
-        include: {
-          businessReviews: {
-            select: {
-              rating: true
-            }
-          }
-        }
-      }
+      businessProfile: true,
+      businessReviews: {
+        select: {
+          rating: true,
+        },
+      },
     },
     take: 100 // Get more than needed for filtering
   });
@@ -236,9 +233,9 @@ export async function getFeaturedBusinesses(limit: number = 10) {
     businesses
       .filter(b => b.businessProfile)
       .map(async (business) => {
-        const avgRating = business.businessProfile!.businessReviews.length > 0
-          ? business.businessProfile!.businessReviews.reduce((sum, r) => sum + r.rating, 0) / 
-            business.businessProfile!.businessReviews.length
+        const avgRating = business.businessReviews.length > 0
+          ? business.businessReviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) /
+            business.businessReviews.length
           : 0;
 
         const baseScore = avgRating * 20; // Convert 5-star to 100-point scale

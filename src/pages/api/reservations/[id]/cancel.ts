@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -63,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             paymentMethod: phone.startsWith('078') || phone.startsWith('079') ? 'MTN_MOBILE_MONEY' : 'AIRTEL_MONEY',
             paymentProvider: phone.startsWith('078') || phone.startsWith('079') ? 'MTN' : 'AIRTEL',
             businessId: reservation.businessId,
-            callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+            callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
             rawRequest: { reservationId: reservation.id, type: 'RESERVATION_CANCELLATION_FEE', percent: applyCancellationFeePercent },
           },
         })
@@ -72,7 +73,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           amount: amountRwf,
           mobilePhoneNo: phone,
           requestTransactionId,
-          callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+          callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
         })
 
         await prisma.paymentTransaction.update({
@@ -80,12 +81,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           data: {
             rawCallback: intouchResponse as any,
             status: InTouchService.isSuccess(intouchResponse.responsecode)
-              ? 'PAID'
+              ? 'SUCCESS'
               : InTouchService.isPending(intouchResponse.responsecode)
               ? 'PENDING'
               : 'FAILED',
             paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
           },
+        })
+        await ensurePaymentLedgerEvent(payment.id, undefined, {
+          source: 'reservations/cancel',
+          reservationId: reservation.id,
+          responsecode: intouchResponse.responsecode,
+          cancellationFeePercent: applyCancellationFeePercent,
         })
       }
     }

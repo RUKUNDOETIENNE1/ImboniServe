@@ -26,7 +26,8 @@
     "test:edge": "jest tests/edge-cases",
     "test:integration": "jest tests/integration",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
-    "die:worker": "tsx src/lib/die/orchestrator/worker.ts"
+    "die:worker": "tsx src/lib/die/orchestrator/worker-start.ts",
+    "die:worker:legacy": "tsx src/lib/die/orchestrator/worker.ts"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { Calendar, Clock, ClipboardList, MapPin, Phone, Save, CheckCircle2, Plus, AlertTriangle } from 'lucide-react'
 
@@ -13,6 +14,17 @@ interface AnalyticsSummary {
   totalCustomers: number
   totalMenuItems: number
   totalTables: number
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
 }
 
 interface ActivityLogItem {

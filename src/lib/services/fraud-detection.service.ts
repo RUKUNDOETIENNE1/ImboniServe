@@ -316,11 +316,11 @@ export class FraudDetectionService {
           entityType: params.entityType,
           entityId: params.entityId,
           riskScore: params.result.riskScore,
-          riskFactors: params.result.riskFactors,
+          riskFactors: params.result.riskFactors as any,
           action: params.result.action,
           ipAddress: params.ipAddress,
           deviceId: params.deviceId,
-          metadata: params.metadata
+          metadata: params.metadata as any
         }
       })
     } catch (error) {

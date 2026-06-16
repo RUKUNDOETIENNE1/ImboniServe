@@ -50,7 +50,7 @@ export class ExpoFinalizationService {
 
     const activeItems = sale.items
     const readyItems = activeItems.filter((item) => item.itemStatus === 'READY')
-    const stations = new Set(activeItems.map((item) => item.stationId).filter(Boolean))
+    const stations = new Set(activeItems.map((item) => item.stationId).filter((id): id is string => Boolean(id)))
 
     const stationReadiness = new Map<string, boolean>()
 
@@ -62,7 +62,7 @@ export class ExpoFinalizationService {
 
     const readyStations = Array.from(stationReadiness.entries())
       .filter(([_, ready]) => ready)
-      .map(([stationId]) => stationId)
+      .map(([stationId]) => stationId!)
 
     const pendingStations = Array.from(stationReadiness.entries())
       .filter(([_, ready]) => !ready)

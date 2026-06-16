@@ -138,7 +138,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         approvedAt: shouldAutoApprove ? new Date() : null,
         riskLevel: riskAssessment.riskLevel,
         duplicateFlags: riskAssessment.duplicateMatches.length > 0 
-          ? riskAssessment.duplicateMatches 
+          ? (riskAssessment.duplicateMatches as any) 
           : undefined,
       },
     })

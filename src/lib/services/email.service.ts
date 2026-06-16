@@ -339,4 +339,94 @@ export class EmailService {
       return { success: false, error: err?.message }
     }
   }
+
+  /**
+   * Send subscription renewal reminder
+   */
+  static async sendSubscriptionReminder(opts: {
+    to: string
+    name: string
+    businessName: string
+    planName: string
+    expiryDate: Date
+    daysUntilExpiry: number
+    renewalUrl: string
+  }): Promise<{ success: boolean; error?: string }> {
+    const transport = createTransport()
+    const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'
+
+    const expiryDateStr = opts.expiryDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+
+    let subject: string
+    let message: string
+
+    if (opts.daysUntilExpiry > 0) {
+      subject = `Your ${opts.planName} subscription expires in ${opts.daysUntilExpiry} day${opts.daysUntilExpiry > 1 ? 's' : ''}`
+      message = `
+        <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#fff;">
+          <h2 style="color:#1e293b;margin:0 0 16px;">Subscription Renewal Reminder</h2>
+          <p>Hi ${opts.name},</p>
+          <p>This is a reminder that your <strong>${opts.planName}</strong> subscription for <strong>${opts.businessName}</strong> will expire in <strong>${opts.daysUntilExpiry} day${opts.daysUntilExpiry > 1 ? 's' : ''}</strong> on <strong>${expiryDateStr}</strong>.</p>
+          <p>To continue enjoying uninterrupted service, please renew your subscription:</p>
+          <div style="text-align:center;margin:24px 0;">
+            <a href="${opts.renewalUrl}" style="display:inline-block;background:#4CAF50;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Renew Now</a>
+          </div>
+          <p style="color:#64748b;font-size:13px;">If you have any questions, please contact our support team.</p>
+          <p>Best regards,<br>The Imboni Serve Team</p>
+        </div>
+      `
+    } else if (opts.daysUntilExpiry === 0) {
+      subject = `Your ${opts.planName} subscription expires today`
+      message = `
+        <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#fff;">
+          <h2 style="color:#dc2626;margin:0 0 16px;">⚠️ Subscription Expires Today</h2>
+          <p>Hi ${opts.name},</p>
+          <p>Your <strong>${opts.planName}</strong> subscription for <strong>${opts.businessName}</strong> expires <strong>today</strong> (${expiryDateStr}).</p>
+          <p>Please renew immediately to avoid service interruption:</p>
+          <div style="text-align:center;margin:24px 0;">
+            <a href="${opts.renewalUrl}" style="display:inline-block;background:#FF5722;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Renew Now</a>
+          </div>
+          <p>Best regards,<br>The Imboni Serve Team</p>
+        </div>
+      `
+    } else {
+      const daysOverdue = Math.abs(opts.daysUntilExpiry)
+      subject = `Your ${opts.planName} subscription expired ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} ago`
+      message = `
+        <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#fff;">
+          <h2 style="color:#dc2626;margin:0 0 16px;">🚨 Subscription Expired</h2>
+          <p>Hi ${opts.name},</p>
+          <p>Your <strong>${opts.planName}</strong> subscription for <strong>${opts.businessName}</strong> expired <strong>${daysOverdue} day${daysOverdue > 1 ? 's' : ''} ago</strong> on ${expiryDateStr}.</p>
+          <p>Your account may have limited access. Please renew to restore full functionality:</p>
+          <div style="text-align:center;margin:24px 0;">
+            <a href="${opts.renewalUrl}" style="display:inline-block;background:#F44336;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Renew Now</a>
+          </div>
+          <p style="color:#64748b;font-size:13px;">If you need assistance, please contact our support team.</p>
+          <p>Best regards,<br>The Imboni Serve Team</p>
+        </div>
+      `
+    }
+
+    if (!transport) {
+      console.log('[EmailService] [DEV] Subscription reminder email:', { to: opts.to, subject })
+      return { success: true }
+    }
+
+    try {
+      await transport.sendMail({
+        from,
+        to: opts.to,
+        subject,
+        html: message,
+      })
+      return { success: true }
+    } catch (err: any) {
+      console.error('[EmailService] Subscription reminder send failed:', err?.message || err)
+      return { success: false, error: err?.message || 'Email send failed' }
+    }
+  }
 }

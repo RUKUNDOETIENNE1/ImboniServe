@@ -7,6 +7,7 @@ import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { withRateLimit } from '@/lib/middleware/rateLimit.redis'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 const refundSchema = z.object({
   transactionId: z.string().min(1),
@@ -56,7 +57,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(409).json({ error: 'Transaction already refunded', code: 'ALREADY_REFUNDED' })
     }
 
-    if (tx.status !== 'COMPLETED') {
+    if (tx.status !== 'SUCCESS') {
       return res.status(422).json({
         error: `Cannot refund a transaction with status ${tx.status}`,
         code: 'INVALID_STATUS',
@@ -111,6 +112,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
       }
     })
+    if (depositSucceeded) {
+      await ensurePaymentLedgerEvent(transactionId, 'REFUNDED', {
+        source: 'payments/refunds',
+        refundTxId,
+        reason,
+      })
+    }
 
     await AuditLogService.log({
       actorId,

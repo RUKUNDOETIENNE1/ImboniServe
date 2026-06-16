@@ -90,7 +90,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
       }
       acc[method].total++
-      if (tx.status === 'COMPLETED') {
+      if (tx.status === 'SUCCESS') {
         acc[method].successful++
       } else if (tx.status === 'FAILED') {
         acc[method].failed++

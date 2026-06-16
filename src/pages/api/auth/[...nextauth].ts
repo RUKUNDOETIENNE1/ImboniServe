@@ -19,7 +19,8 @@ export const authOptions: NextAuthOptions = {
     maxAge: 8 * 60 * 60, // 8 hours
     updateAge: 60 * 60,  // Refresh token every hour
   },
-  providers: [
+  providers: (() => {
+    const providers: any[] = [
     /**
      * MFA Provider — Step 2: confirmToken flow
      * Called after OTP verification with { email, confirmToken }.
@@ -61,49 +62,52 @@ export const authOptions: NextAuthOptions = {
         }
         return authUser
       },
-    }),
+    })
+    ]
 
-    /**
-     * Legacy direct credentials (kept for admin CLI / API, bypasses MFA).
-     * Should not be called from the UI in production.
-     */
-    CredentialsProvider({
-      id: 'credentials',
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const email = credentials?.email?.toLowerCase().trim()
-        const password = credentials?.password
+    // Enable legacy credentials only when explicitly allowed and not in production
+    if (process.env.ALLOW_LEGACY_CREDENTIALS === 'true' && process.env.NODE_ENV !== 'production') {
+      providers.push(
+        CredentialsProvider({
+          id: 'credentials',
+          name: 'Credentials',
+          credentials: {
+            email: { label: 'Email', type: 'email' },
+            password: { label: 'Password', type: 'password' },
+          },
+          async authorize(credentials) {
+            const email = credentials?.email?.toLowerCase().trim()
+            const password = credentials?.password
 
-        if (!email || !password) return null
+            if (!email || !password) return null
 
-        const user = await prisma.user.findUnique({
-          where: { email },
+            const user = await prisma.user.findUnique({
+              where: { email },
+            })
+
+            if (!user || !user.isActive) return null
+
+            const ok = await bcrypt.compare(password, user.password)
+            if (!ok) return null
+
+            const roles = (user as any).roles || []
+            const primaryRole = roles && roles.length > 0 ? roles[0] : undefined
+            const authUser: AppUser = {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              roles,
+              role: primaryRole,
+              businessId: (user as any).businessId ?? null,
+            }
+
+            return authUser
+          },
         })
-
-        if (!user || !user.isActive) return null
-
-        const ok = await bcrypt.compare(password, user.password)
-        if (!ok) return null
-
-        const roles = (user as any).roles || []
-        const primaryRole = roles && roles.length > 0 ? roles[0] : undefined
-        const authUser: AppUser = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          roles,
-          role: primaryRole,
-          businessId: (user as any).businessId ?? null,
-        }
-
-        return authUser
-      },
-    }),
-  ],
+      )
+    }
+    return providers
+  })(),
   callbacks: {
     async jwt({ token, user }): Promise<AppJWT> {
       const t = token as AppJWT

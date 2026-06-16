@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2018",
     "lib": [
       "dom",
       "dom.iterable",
@@ -30,6 +30,10 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**/*"
   ]
 }

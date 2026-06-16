@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { MoMoService } from '@/lib/services/momo.service'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { z } from 'zod'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -52,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Initiate MoMo payment
     const paymentRequest = {
-      amountCents: order.totalCents,
+      amountCents: order.totalAmountCents,
       currency: order.business?.currency || 'RWF',
       orderId: order.id,
       orderNumber: order.orderNumber,
@@ -93,13 +94,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       data: {
         transactionId: result.transactionId!,
         referenceId: result.reference!,
-        status: 'INITIATED',
+        status: 'PROCESSING',
         rawRequest: {
           provider,
           phoneNumber,
           initiatedAt: new Date().toISOString()
         }
       }
+    })
+    await ensurePaymentLedgerEvent(order.paymentTransaction!.id, 'PROCESSING', {
+      source: 'payments/momo/initiate',
+      provider,
     })
 
     // Update sale with reference
@@ -122,7 +127,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         transactionId: result.transactionId,
         reference: result.reference,
         phoneNumber,
-        amountCents: order.totalCents,
+        amountCents: order.totalAmountCents,
         orderNumber: order.orderNumber
       }
     })

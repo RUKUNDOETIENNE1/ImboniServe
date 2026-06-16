@@ -44,16 +44,16 @@ export class ReorderAutopilotService {
         id: true,
         name: true,
         currentStock: true,
-        minStock: true,
+        minStockLevel: true,
         unit: true,
         category: true
       }
     })
 
     const lowStockItems: LowStockItem[] = inventory
-      .filter(item => item.currentStock <= item.minStock)
+      .filter(item => item.currentStock <= item.minStockLevel)
       .map(item => {
-        const stockPercentage = item.currentStock / item.minStock
+        const stockPercentage = item.currentStock / item.minStockLevel
         let urgency: 'critical' | 'low' | 'warning'
 
         if (stockPercentage <= this.CRITICAL_THRESHOLD) {
@@ -68,7 +68,7 @@ export class ReorderAutopilotService {
           id: item.id,
           name: item.name,
           currentStock: item.currentStock,
-          minStock: item.minStock,
+          minStock: item.minStockLevel,
           unit: item.unit,
           category: item.category || undefined,
           stockPercentage,
@@ -193,9 +193,12 @@ export class ReorderAutopilotService {
     const order = await prisma.marketplaceOrder.create({
       data: {
         businessId,
+        userId,
+        orderNumber: `AUTO-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         status: 'PENDING',
-        totalCents: Math.round(suggestion.estimatedCost * 100),
-        createdBy: userId,
+        totalAmountCents: Math.round(suggestion.estimatedCost * 100),
+        paymentMethod: 'OTHER' as any,
+        paymentStatus: 'PENDING' as any,
         items: {
           create: {
             productId: suggestion.recommendedSupplier.productId,

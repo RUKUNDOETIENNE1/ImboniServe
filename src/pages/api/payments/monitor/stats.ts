@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       prisma.paymentTransaction.aggregate({
         where: {
           businessId: user.businessId,
-          status: 'COMPLETED',
+          status: 'SUCCESS',
           createdAt: {
             gte: today,
             lt: tomorrow,
@@ -52,7 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       prisma.paymentTransaction.count({
         where: {
           businessId: user.businessId,
-          status: { in: ['PENDING', 'INITIATED'] },
+          status: { in: ['PENDING', 'PROCESSING'] },
         },
       }),
 
@@ -87,7 +87,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     ])
 
     return res.status(200).json({
-      todayTotal: todayTransactions._sum.amountCents || 0,
+      todayTotal: todayTransactions._sum?.amountCents || 0,
       todayCount: todayTransactions._count || 0,
       pendingCount,
       failedCount,

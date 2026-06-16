@@ -37,31 +37,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const renewalCandidates = await prisma.paymentTransaction.findMany({
       where: {
-        status: 'COMPLETED',
-        metadata: {
-          path: ['type'],
-          equals: 'addon'
+        status: 'SUCCESS',
+        rawRequest: {
+          path: ['meta', 'type'],
+          equals: 'addon',
         },
         createdAt: {
           gte: new Date(thirtyDaysAgo.getTime() - 24 * 60 * 60 * 1000), // 1 day buffer
-          lte: new Date(thirtyDaysAgo.getTime() + 24 * 60 * 60 * 1000)
-        }
+          lte: new Date(thirtyDaysAgo.getTime() + 24 * 60 * 60 * 1000),
+        },
       },
       include: {
         business: {
           select: {
             id: true,
             name: true,
-            user: {
+            owner: {
               select: {
                 email: true,
                 phone: true,
-                name: true
-              }
-            }
-          }
-        }
-      }
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     log.info('Found renewal candidates', { count: renewalCandidates.length });
@@ -75,17 +75,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     for (const transaction of renewalCandidates) {
       try {
-        const metadata = transaction.metadata as any;
-        
+        const meta = (transaction.rawRequest as any)?.meta || {};
+
         // Check if already renewed
         const existingRenewal = await prisma.paymentTransaction.findFirst({
           where: {
             businessId: transaction.businessId,
-            metadata: {
-              path: ['renewalOf'],
-              equals: transaction.id
-            }
-          }
+            rawRequest: {
+              path: ['meta', 'renewalOf'],
+              equals: transaction.id,
+            },
+          },
         });
 
         if (existingRenewal) {
@@ -98,12 +98,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const invoice = await IremboPayService.createInvoice({
           businessId: transaction.businessId,
           amountCents: transaction.amountCents,
-          description: `${metadata.addon} - Monthly Renewal - ${transaction.business.name}`,
+          description: `${meta.addon || 'addon'} - Monthly Renewal - ${transaction.business.name}`,
           customer: {
-            email: transaction.business.user.email,
-            phoneNumber: transaction.business.user.phone,
-            name: transaction.business.user.name
-          }
+            email: transaction.business.owner.email || undefined,
+            phoneNumber: transaction.business.owner.phone || undefined,
+            name: transaction.business.owner.name || undefined,
+          },
         });
 
         // Store renewal transaction
@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             transactionId: invoice.transactionId,
             gateway: 'IREMBO_PAY',
             paymentMethod: 'WEB',
-            status: 'INITIATED',
+            status: 'PENDING',
             amountCents: transaction.amountCents,
             currency: 'RWF',
             vatAmountCents: transaction.vatAmountCents,
@@ -123,22 +123,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             netToBusinessCents: transaction.netToBusinessCents,
             paymentLinkUrl: invoice.paymentLinkUrl,
             expiryAt: invoice.expiryAt ? new Date(invoice.expiryAt) : null,
-            payerName: transaction.business.user.name,
-            payerEmail: transaction.business.user.email,
-            payerPhone: transaction.business.user.phone,
-            metadata: {
-              ...metadata,
-              renewalOf: transaction.id,
-              renewalDate: today.toISOString()
-            },
-            rawRequest: invoice as any
+            payerName: transaction.business.owner.name,
+            payerEmail: transaction.business.owner.email,
+            payerPhone: transaction.business.owner.phone,
+            rawRequest: {
+              ...invoice,
+              meta: {
+                ...(typeof meta === 'object' && meta ? meta : {}),
+                renewalOf: transaction.id,
+                renewalDate: today.toISOString(),
+              },
+            }
           }
         });
 
         results.invoicesCreated++;
         log.info('Renewal invoice created', { 
           businessId: transaction.businessId, 
-          addon: metadata.addon,
+          addon: meta.addon,
           invoiceNumber: invoice.invoiceNumber
         });
 

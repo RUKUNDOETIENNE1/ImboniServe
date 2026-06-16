@@ -74,7 +74,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: invoice.transactionId,
         gateway: 'IREMBO_PAY',
         paymentMethod: 'WEB',
-        status: 'INITIATED',
+        status: 'PENDING',
         amountCents: grossAmountCents,
         currency: 'RWF',
         vatAmountCents,
@@ -86,13 +86,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payerName: (session.user as any).name,
         payerEmail: (session.user as any).email,
         payerPhone: (session.user as any).phone,
-        metadata: {
-          type: 'addon',
-          addon: 'discovery',
-          tier: tier,
-          billingPeriod: 'monthly'
-        },
-        rawRequest: invoice as any
+        rawRequest: {
+          ...invoice,
+          meta: {
+            type: 'addon',
+            addon: 'discovery',
+            tier,
+            billingPeriod: 'monthly',
+          },
+        }
       }
     });
 

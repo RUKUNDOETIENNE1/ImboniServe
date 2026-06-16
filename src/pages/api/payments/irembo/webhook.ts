@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { buffer } from 'micro'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
+import { logBillingEvent } from '@/lib/services/billing-ledger.service'
+import { BillingEventType } from '@prisma/client'
 
 export const config = {
   api: {
@@ -60,10 +62,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Compute final status from verified invoice status
-    const finalStatus = invoiceStatus.paymentStatus === 'PAID' ? 'PAID' : 
-                        invoiceStatus.paymentStatus === 'EXPIRED' ? 'EXPIRED' : 'FAILED'
+    const finalStatus = invoiceStatus.paymentStatus === 'PAID' ? 'SUCCESS' : 
+                        invoiceStatus.paymentStatus === 'EXPIRED' ? 'CANCELLED' : 'FAILED'
 
-    // Idempotency + invariants: update transaction only if not already PAID
+    // Idempotency + invariants: update transaction only if not already SUCCESS
     const txUpdate: any = {
       status: finalStatus,
       webhookSignature: signature,
@@ -73,24 +75,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       rawStatus: invoiceStatus,
       updatedAt: new Date(),
     }
-    if (finalStatus === 'PAID') {
+    if (finalStatus === 'SUCCESS') {
       txUpdate.paidAt = new Date(paidAt || invoiceStatus.updatedAt)
     }
 
     const updatedTx = await prisma.paymentTransaction.updateMany({
-      where: { id: transaction.id, status: { not: 'PAID' } },
+      where: { id: transaction.id, status: { not: 'SUCCESS' } },
       data: txUpdate
     })
 
-    const firstProcess = updatedTx.count > 0 && finalStatus === 'PAID'
-    if (!firstProcess && transaction.status === 'PAID') {
+    const firstProcess = updatedTx.count > 0 && finalStatus === 'SUCCESS'
+    if (!firstProcess && transaction.status === 'SUCCESS') {
       // Already processed by a prior call
-      console.log('[Webhook] Idempotent replay; transaction already PAID', { invoiceNumber })
+      console.log('[Webhook] Idempotent replay; transaction already SUCCESS', { invoiceNumber })
       return res.status(200).json({ success: true, message: 'Already processed' })
     }
 
     // If became PAID in this call, cascade to Sale and downstream effects
     if (firstProcess) {
+      await logBillingEvent({
+        businessId: transaction.businessId,
+        paymentTransactionId: transaction.id,
+        eventType: BillingEventType.PAYMENT_SUCCESS,
+        metadata: { source: 'payments/irembo/webhook', invoiceNumber, paymentReference, paymentMethod },
+      })
       await AuditLogService.log({
         action: 'PAYMENT_PAID',
         entityType: 'PaymentTransaction',
@@ -176,9 +184,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await createAffiliateCommissions(transaction)
     }
 
-    // For non-PAID statuses or if already processed, we updated raw data above; finish
-    if (updatedTx.count > 0 && finalStatus !== 'PAID') {
-      const action = finalStatus === 'EXPIRED' ? 'PAYMENT_EXPIRED' : 'PAYMENT_FAILED'
+    // For non-SUCCESS statuses or if already processed, we updated raw data above; finish
+    if (updatedTx.count > 0 && finalStatus !== 'SUCCESS') {
+      await logBillingEvent({
+        businessId: transaction.businessId,
+        paymentTransactionId: transaction.id,
+        eventType: finalStatus === 'CANCELLED' ? BillingEventType.PAYMENT_CANCELLED : BillingEventType.PAYMENT_FAILED,
+        metadata: { source: 'payments/irembo/webhook', invoiceNumber, finalStatus },
+      })
+      const action = finalStatus === 'CANCELLED' ? 'PAYMENT_EXPIRED' : 'PAYMENT_FAILED'
       await AuditLogService.log({
         action,
         entityType: 'PaymentTransaction',
