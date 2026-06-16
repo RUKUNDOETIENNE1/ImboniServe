@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { PaymentStatus } from '@prisma/client'
 
 export class ProfitService {
   static async calculateDailyProfit(businessId: string, date?: Date) {
@@ -13,7 +14,7 @@ export class ProfitService {
           gte: startOfDay,
           lte: endOfDay,
         },
-        paymentStatus: 'COMPLETED',
+        paymentStatus: PaymentStatus.COMPLETED,
       },
       include: {
         items: {
@@ -60,7 +61,7 @@ export class ProfitService {
           gte: start,
           lt: end,
         },
-        paymentStatus: 'COMPLETED',
+        paymentStatus: PaymentStatus.COMPLETED,
       },
       include: {
         items: {
@@ -122,7 +123,7 @@ export class ProfitService {
           gte: start,
           lte: end,
         },
-        paymentStatus: 'COMPLETED',
+        paymentStatus: PaymentStatus.COMPLETED,
       },
       include: {
         items: {
@@ -166,7 +167,7 @@ export class ProfitService {
           createdAt: {
             gte: startDate,
           },
-          paymentStatus: 'COMPLETED',
+          paymentStatus: PaymentStatus.COMPLETED,
         },
       },
       _sum: {

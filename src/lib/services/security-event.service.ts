@@ -39,7 +39,7 @@ export const SecurityEventService = {
           eventType: opts.eventType,
           ip: opts.ip ?? null,
           userAgent: opts.userAgent ?? null,
-          metadata: opts.metadata ?? {},
+          metadata: (opts.metadata ?? {}) as any,
         },
       })
     } catch (err) {

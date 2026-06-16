@@ -57,7 +57,8 @@ export default function TablesPage() {
       if (!r.ok) throw new Error(data.error || r.statusText)
       setNumber('')
       setCapacity('')
-      showToast('success', t('tables.table_created_success', { number }))
+      // t returns string; ensure payload interpolation handled by translation layer externally
+      showToast('success', String(t('tables.table_created_success')))
       await loadTables()
     } catch (e: any) {
       showToast('error', e.message || t('tables.failed_to_create'))
@@ -67,12 +68,12 @@ export default function TablesPage() {
   }
 
   const onDelete = async (id: string, tableNumber: string) => {
-    if (!confirm(t('tables.delete_confirm', { number: tableNumber }))) return
+    if (!confirm(String(t('tables.delete_confirm')))) return
     setDeleting(id)
     try {
       const r = await fetch(`/api/tables/${id}`, { method: 'DELETE' })
       if (!r.ok) throw new Error('Failed to delete table')
-      showToast('success', t('tables.table_deleted_success', { number: tableNumber }))
+      showToast('success', String(t('tables.table_deleted_success')))
       await loadTables()
     } catch (e: any) {
       showToast('error', e.message || t('tables.failed_to_delete'))
@@ -192,7 +193,7 @@ export default function TablesPage() {
                           <span className="text-sm" suppressHydrationWarning>{t('common.cancel')}</span>
                         </button>
                       </div>
-                      <form onSubmit={onEdit} className="space-y-3">
+                      <form onSubmit={(e) => { e.preventDefault(); onEdit(table.id) }} className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1" suppressHydrationWarning>{t('tables.table_number')}</label>

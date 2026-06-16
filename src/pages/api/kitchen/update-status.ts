@@ -8,6 +8,8 @@ import { prisma } from '@/lib/prisma';
 import { requirePermission } from '@/lib/middleware/permission.middleware';
 import { resolveBusinessContext } from '@/lib/api/business-context';
 import { triggerEvent } from '@/lib/pusher-server';
+import { TicketEventService } from '@/lib/services/ticket-event.service';
+import type { ItemStatus } from '@prisma/client';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -91,26 +93,70 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         break;
     }
 
-    // Update order
-    const updatedOrder = await prisma.sale.update({
-      where: { id: orderId },
-      data: updateData,
-      include: {
-        items: {
-          include: {
-            menuItem: {
-              select: { name: true },
+    // Map order status to item status
+    const itemStatusMap: Record<string, ItemStatus> = {
+      'pending': 'NEW',
+      'accepted': 'NEW',
+      'preparing': 'PREPARING',
+      'almost_ready': 'PREPARING',
+      'ready': 'READY',
+      'served': 'DELIVERED',
+    };
+
+    const itemStatus = itemStatusMap[newStatus];
+
+    // Update order and all items in a transaction
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      // Update order-level status
+      const order = await tx.sale.update({
+        where: { id: orderId },
+        data: updateData,
+        include: {
+          items: {
+            include: {
+              menuItem: {
+                select: { name: true },
+              },
             },
           },
+          table: {
+            select: { number: true },
+          },
+          participant: {
+            select: { name: true },
+          },
         },
-        table: {
-          select: { number: true },
-        },
-        participant: {
-          select: { name: true },
-        },
-      },
+      });
+
+      // Update all items to match order status (Phase 1: synchronized)
+      if (itemStatus) {
+        await tx.saleItem.updateMany({
+          where: { saleId: orderId },
+          data: {
+            itemStatus,
+            ...(itemStatus === 'PREPARING' && { prepStartedAt: now }),
+            ...(itemStatus === 'READY' && { readyAt: now }),
+            ...(itemStatus === 'DELIVERED' && { deliveredAt: now }),
+          },
+        });
+      }
+
+      return order;
     });
+
+    // Record event (async, non-blocking)
+    TicketEventService.recordEvent({
+      saleId: orderId,
+      eventType: 'ORDER_UPDATED',
+      actorId: ctx.userId,
+      actorName: undefined, // Will be resolved from actorId in service if needed
+      previousState: currentStatus,
+      newState: newStatus,
+      metadata: {
+        orderNumber: updatedOrder.orderNumber,
+        itemCount: updatedOrder.items.length,
+      },
+    }).catch((err) => console.error('[TicketEvent] Record failed:', err));
 
     // Emit real-time events (single emit, no duplicates)
     try {

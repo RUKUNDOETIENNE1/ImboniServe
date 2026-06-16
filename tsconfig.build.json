@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src/lib",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "es2020",
+    "incremental": false,
+    "isolatedModules": false
+  },
+  "include": [
+    "src/lib/die/orchestrator/worker.ts",
+    "src/lib/die/**/*.ts",
+    "src/lib/prisma.ts",
+    "src/lib/services/storage.service.ts",
+    "src/lib/die/queue/queues.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**/*",
+    "src/pages",
+    "src/components",
+    "src/app",
+    "next-env.d.ts"
+  ]
+}

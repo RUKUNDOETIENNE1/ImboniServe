@@ -46,11 +46,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'MoMo push only supports RWF currency' })
     }
 
-    if (transaction.status === 'PAID') {
+    if (transaction.status === 'SUCCESS') {
       return res.status(400).json({ error: 'Invoice already paid' })
     }
 
-    if (transaction.status === 'EXPIRED') {
+    if (transaction.status === 'CANCELLED') {
       return res.status(400).json({ error: 'Invoice has expired. Please create a new invoice' })
     }
 

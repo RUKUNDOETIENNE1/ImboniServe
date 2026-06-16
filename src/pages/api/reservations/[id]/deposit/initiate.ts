@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -61,7 +62,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         paymentMethod: phone.startsWith('078') || phone.startsWith('079') ? 'MTN_MOBILE_MONEY' : 'AIRTEL_MONEY',
         paymentProvider: phone.startsWith('078') || phone.startsWith('079') ? 'MTN' : 'AIRTEL',
         businessId: reservation.businessId,
-        callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+        callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
         rawRequest: {
           reservationId: reservation.id,
           type: 'RESERVATION_DEPOSIT',
@@ -73,7 +74,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       amount: amountRwf,
       mobilePhoneNo: phone,
       requestTransactionId,
-      callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+      callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
     })
 
     await prisma.paymentTransaction.update({
@@ -81,12 +82,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: intouchResponse as any,
         status: InTouchService.isSuccess(intouchResponse.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(intouchResponse.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
       },
+    })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'reservations/deposit/initiate',
+      reservationId: reservation.id,
+      responsecode: intouchResponse.responsecode,
     })
 
     return res.status(200).json(successResponse({

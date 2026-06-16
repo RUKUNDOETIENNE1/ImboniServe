@@ -48,8 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Calculate total for addon items
-    let totalCents = 0
-    const saleItems = []
+    let totalAmountCents = 0
+    const saleItems: Array<{ menuItemId: string; quantity: number; unitPriceCents: number; totalPriceCents: number }> = []
 
     for (const item of items) {
       const menuItem = await prisma.menuItem.findUnique({
@@ -73,14 +73,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const quantity = item.quantity || 1
       const itemTotal = menuItem.priceCents * quantity
 
-      totalCents += itemTotal
+      totalAmountCents += itemTotal
 
       saleItems.push({
         menuItemId: menuItem.id,
         quantity,
-        priceCents: menuItem.priceCents,
-        totalCents: itemTotal,
-        name: menuItem.name
+        unitPriceCents: menuItem.priceCents,
+        totalPriceCents: itemTotal,
       })
     }
 
@@ -88,26 +87,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const addonOrder = await prisma.sale.create({
       data: {
         businessId: parentOrder.businessId,
+        userId: parentOrder.userId,
         tableId: parentOrder.tableId,
-        sessionId: sessionId || parentOrder.sessionId,
+        tableSessionId: sessionId || parentOrder.tableSessionId,
         participantId: participantId || parentOrder.participantId,
-        totalCents,
-        status: 'pending',
-        source: parentOrder.source || 'QR_IN_VENUE',
-        paymentStatus: 'unpaid',
+        orderNumber: `ADD-${parentOrder.orderNumber}-${Date.now()}`,
+        totalAmountCents: totalAmountCents,
+        paymentMethod: parentOrder.paymentMethod,
+        paymentStatus: 'PENDING',
+        isPaid: false,
+        status: parentOrder.status,
+        orderSource: parentOrder.orderSource,
         // Add-on specific fields
         isAddon: true,
         parentOrderId,
         addedAt: new Date(),
         notes: note || 'Additional items added to order',
         items: {
-          create: saleItems.map(item => ({
+          create: saleItems.map((item) => ({
             menuItemId: item.menuItemId,
             quantity: item.quantity,
-            priceCents: item.priceCents,
-            totalCents: item.totalCents,
-            name: item.name
-          }))
+            unitPriceCents: item.unitPriceCents,
+            totalPriceCents: item.totalPriceCents,
+          })),
         }
       },
       include: {
@@ -138,10 +140,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         parentOrderId,
         tableNumber: parentOrder.table?.number,
         itemCount: saleItems.length,
-        totalCents,
-        items: addonOrder.items.map(item => ({
-          name: item.name,
-          quantity: item.quantity
+        totalCents: totalAmountCents,
+        items: addonOrder.items.map((item) => ({
+          name: item.menuItem.name,
+          quantity: item.quantity,
         })),
         timestamp: addonOrder.createdAt
       }
@@ -159,7 +161,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           metadata: {
             parentOrderId,
             itemCount: saleItems.length,
-            totalCents,
+            totalCents: totalAmountCents,
             tableId: parentOrder.tableId
           },
           sessionId: sessionId || null
@@ -171,7 +173,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       success: true,
       addonOrder: {
         id: addonOrder.id,
-        totalCents: addonOrder.totalCents,
+        totalCents: addonOrder.totalAmountCents,
         itemCount: saleItems.length,
         status: addonOrder.status,
         createdAt: addonOrder.createdAt

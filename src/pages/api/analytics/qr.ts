@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const uniqueVisitors = new Set(sales.map(s => s.customerId).filter(Boolean)).size
     const completedSales = sales.filter(s => s.status === 'COMPLETED' || s.status === 'PAID')
     const conversionRate = totalScans > 0 ? (completedSales.length / totalScans) * 100 : 0
-    const totalRevenue = completedSales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
+    const totalRevenue = completedSales.reduce((sum, s) => sum + (s.totalAmountCents || 0), 0) / 100
     const avgOrderValue = completedSales.length > 0 ? totalRevenue / completedSales.length : 0
 
     // Top performing QR codes (by table)
@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       existing.scans++
       if (sale.status === 'COMPLETED' || sale.status === 'PAID') {
         existing.orders++
-        existing.revenue += (sale.totalCents || 0) / 100
+        existing.revenue += (sale.totalAmountCents || 0) / 100
       }
       tableStats.set(key, existing)
     })

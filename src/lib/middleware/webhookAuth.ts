@@ -20,9 +20,9 @@ export function validateIremboPayWebhook(
   signature: string,
   rawBody: string
 ): boolean {
-  const secret = process.env.IREMBO_SECRET_KEY
+  const secret = process.env.IREMBOPAY_SECRET_KEY
   if (!secret) {
-    console.error('[WebhookAuth] IREMBO_SECRET_KEY not configured')
+    console.error('[WebhookAuth] IREMBOPAY_SECRET_KEY not configured')
     return false
   }
 

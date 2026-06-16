@@ -442,7 +442,7 @@ export default function HomePage() {
               href="/refer"
               className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
             >
-              {t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}
+              {t('public.nav.share_earn', 'Share & earn rewards')}
             </Link>
             <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
             <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
@@ -519,7 +519,7 @@ export default function HomePage() {
                 </div>
               </div>
               <Link href="#store" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.store', 'Store')}</Link>
-              <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn').replace(/\p{Extended_Pictographic}/gu, '')}</Link>
+              <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn')}</Link>
               <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.discover', 'Discover')}</Link>
               <a href="https://wa.me/250735214496" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
               

@@ -94,7 +94,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           reference: reference || `MANUAL-${Date.now()}`,
           notes,
           confirmedBy: ctx.userId,
-          amountCents: sale.totalCents,
+          amountCents: sale.totalAmountCents,
           businessId: sale.businessId,
         },
       })

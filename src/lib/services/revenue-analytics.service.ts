@@ -85,9 +85,9 @@ export class RevenueAnalyticsService {
       // Sort based on metric
       const sorted = marketers.sort((a, b) => {
         if (metric === 'earnings') {
-          return (b.wallet?.totalEarnedCents || 0) - (a.wallet?.totalEarnedCents || 0)
+          return (b.wallet?.totalEarned || 0) - (a.wallet?.totalEarned || 0)
         } else if (metric === 'payouts') {
-          return (b.wallet?.totalPaidOutCents || 0) - (a.wallet?.totalPaidOutCents || 0)
+          return (b.wallet?.totalPaidOut || 0) - (a.wallet?.totalPaidOut || 0)
         } else {
           return b._count.referredBusinesses - a._count.referredBusinesses
         }
@@ -99,9 +99,9 @@ export class RevenueAnalyticsService {
         name: m.name,
         email: m.email,
         referralCode: m.referralCode,
-        totalEarned: m.wallet?.totalEarnedCents || 0,
-        totalPaidOut: m.wallet?.totalPaidOutCents || 0,
-        availableBalance: m.wallet?.availableBalanceCents || 0,
+        totalEarned: m.wallet?.totalEarned || 0,
+        totalPaidOut: m.wallet?.totalPaidOut || 0,
+        availableBalance: m.wallet?.availableBalance || 0,
         referralsCount: m._count.referredBusinesses,
         commissionsCount: m._count.commissions,
         payoutsCount: m._count.payouts
@@ -130,25 +130,23 @@ export class RevenueAnalyticsService {
       const attributions = await prisma.marketerAttribution.findMany({
         where,
         select: {
-          source: true,
-          campaign: true,
           utmSource: true,
           utmMedium: true,
-          utmCampaign: true
+          utmCampaign: true,
         }
       })
 
       // Group by source
       const sourceMap = new Map<string, number>()
       attributions.forEach(attr => {
-        const source = attr.utmSource || attr.source || 'direct'
+        const source = attr.utmSource || 'direct'
         sourceMap.set(source, (sourceMap.get(source) || 0) + 1)
       })
 
       // Group by campaign
       const campaignMap = new Map<string, number>()
       attributions.forEach(attr => {
-        const campaign = attr.utmCampaign || attr.campaign || 'none'
+        const campaign = attr.utmCampaign || 'none'
         campaignMap.set(campaign, (campaignMap.get(campaign) || 0) + 1)
       })
 
@@ -199,8 +197,8 @@ export class RevenueAnalyticsService {
       return Array.from(cohortMap.entries()).map(([month, cohort]) => ({
         month,
         marketersCount: cohort.length,
-        totalEarned: cohort.reduce((sum, m) => sum + (m.wallet?.totalEarnedCents || 0), 0),
-        avgEarned: cohort.reduce((sum, m) => sum + (m.wallet?.totalEarnedCents || 0), 0) / cohort.length,
+        totalEarned: cohort.reduce((sum, m) => sum + (m.wallet?.totalEarned || 0), 0),
+        avgEarned: cohort.reduce((sum, m) => sum + (m.wallet?.totalEarned || 0), 0) / cohort.length,
         totalReferrals: cohort.reduce((sum, m) => sum + m._count.referredBusinesses, 0),
         avgReferrals: cohort.reduce((sum, m) => sum + m._count.referredBusinesses, 0) / cohort.length,
         activeMarketers: cohort.filter(m => m.status === 'ACTIVE').length

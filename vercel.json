@@ -1,5 +1,6 @@
 {
   "crons": [],
+  "buildCommand": "npx prisma generate && next build",
   "functions": {
     "src/pages/api/cron/reconciliation.ts": { "maxDuration": 300 },
     "src/pages/api/cron/tap-leave-sweep.ts": { "maxDuration": 120 },

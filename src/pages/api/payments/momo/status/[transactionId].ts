@@ -4,6 +4,7 @@ import { MoMoService } from '@/lib/services/momo.service'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { NotificationService } from '@/lib/services/notification.service'
 import { broadcast } from '@/lib/realtime'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -56,8 +57,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     // If successful and not already processed, mark order as paid
-    if (status.status === 'SUCCESSFUL' && paymentTx.status !== 'COMPLETED') {
-      await processSuccessfulPayment(paymentTx.id, paymentTx.sale?.id || '')
+    if (status.status === 'SUCCESSFUL' && paymentTx.status !== 'SUCCESS') {
+      if (paymentTx.sale?.id) {
+        await processSuccessfulPayment(paymentTx.id, paymentTx.sale.id)
+      }
     }
 
     // If failed and not already marked failed
@@ -93,12 +96,11 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
       await tx.paymentTransaction.update({
         where: { id: paymentTxId },
         data: {
-          status: 'COMPLETED',
+          status: 'SUCCESS',
           paidAt: now,
           updatedAt: now
         }
       })
-
       // Update sale/order
       const sale = await tx.sale.update({
         where: { id: orderId },
@@ -122,7 +124,7 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
         metadata: {
           paymentTxId,
           orderNumber: sale.orderNumber,
-          amountCents: sale.totalCents,
+          amountCents: sale.totalAmountCents,
           confirmedAt: now.toISOString()
         }
       })
@@ -136,24 +138,21 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
 
       // Broadcast real-time update
       try {
-        await broadcast(`business:${sale.businessId}:orders`, {
+        await broadcast(`business:${sale.businessId}:orders`, 'ORDER_PAYMENT_CONFIRMED', {
           type: 'ORDER_PAYMENT_CONFIRMED',
           orderId: orderId,
           orderNumber: sale.orderNumber,
           paymentMethod: sale.paymentMethod,
-          timestamp: now.toISOString()
+          timestamp: now.toISOString(),
         })
       } catch (error) {
         console.error('[MoMo] Broadcast error:', error)
       }
 
-      // Create affiliate commission if applicable
-      try {
-        const { createAffiliateCommission } = await import('@/lib/services/affiliate.service')
-        await createAffiliateCommission(orderId)
-      } catch (error) {
-        console.error('[MoMo] Affiliate commission error:', error)
-      }
+    })
+    await ensurePaymentLedgerEvent(paymentTxId, 'SUCCESS', {
+      source: 'payments/momo/status',
+      mode: 'poll',
     })
 
     console.log('[MoMo] Payment successfully processed:', orderId)
@@ -177,7 +176,6 @@ async function processFailedPayment(paymentTxId: string, orderId: string, reason
           updatedAt: new Date()
         }
       })
-
       // Update sale
       await tx.sale.update({
         where: { id: orderId },
@@ -198,6 +196,11 @@ async function processFailedPayment(paymentTxId: string, orderId: string, reason
           reason: reason || 'Payment failed'
         }
       })
+    })
+    await ensurePaymentLedgerEvent(paymentTxId, 'FAILED', {
+      source: 'payments/momo/status',
+      mode: 'poll',
+      reason: reason || 'Payment failed',
     })
 
     console.log('[MoMo] Payment marked as failed:', orderId)

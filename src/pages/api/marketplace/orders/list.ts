@@ -26,10 +26,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           select: {
             id: true,
             productId: true,
-            productName: true,
             quantity: true,
             unitPriceCents: true,
-            subtotalCents: true
+            totalPriceCents: true,
+            product: {
+              select: {
+                name: true
+              }
+            }
           }
         }
       },

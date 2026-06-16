@@ -14,6 +14,7 @@ import { useTranslation } from '@/lib/i18n'
 
 interface AdminLayoutProps {
   children: ReactNode
+  title?: string
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

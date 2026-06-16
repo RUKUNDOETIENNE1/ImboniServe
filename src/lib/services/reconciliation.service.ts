@@ -13,7 +13,7 @@ export class ReconciliationService {
 
     const pending = await prisma.paymentTransaction.findMany({
       where: {
-        status: { in: ['PENDING', 'INITIATED'] },
+        status: { in: ['PENDING', 'PROCESSING'] },
         createdAt: { lte: cutoff },
       },
       select: {
@@ -34,7 +34,7 @@ export class ReconciliationService {
         if (isExpired) {
           await prisma.paymentTransaction.update({
             where: { id: tx.id },
-            data: { status: 'EXPIRED' },
+            data: { status: 'CANCELLED' },
           })
           await prisma.reconciliationLog.create({
             data: {
@@ -69,7 +69,7 @@ export class ReconciliationService {
     // Check for payment-order mismatches (CRITICAL)
     const completedPayments = await prisma.paymentTransaction.findMany({
       where: {
-        status: 'COMPLETED',
+        status: 'SUCCESS',
         createdAt: { gte: cutoff },
       },
       select: {

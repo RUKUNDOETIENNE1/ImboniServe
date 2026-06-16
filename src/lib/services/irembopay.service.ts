@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 export interface CreateInvoiceParams {
   businessId: string
-  subscriptionId: string
+  subscriptionId?: string
   amountCents: number
   description: string
   customer: {
@@ -53,13 +53,13 @@ export interface MomoPushResponse {
 }
 
 export class IremboPayService {
-  private static readonly API_BASE = process.env.IREMBO_API_BASE || 'https://api.sandbox.irembopay.com'
-  private static readonly SECRET_KEY = process.env.IREMBO_SECRET_KEY!
-  private static readonly PUBLIC_KEY = process.env.IREMBO_PUBLIC_KEY!
-  private static readonly PAYMENT_ACCOUNT = process.env.IREMBO_PAYMENT_ACCOUNT!
-  private static readonly PAYMENT_ITEM_CODE = process.env.IREMBO_PAYMENT_ITEM_CODE!
-  private static readonly API_VERSION = process.env.IREMBO_API_VERSION || '2'
-  private static readonly WEBHOOK_TOLERANCE_SECONDS = parseInt(process.env.IREMBO_WEBHOOK_TOLERANCE_SECONDS || '300')
+  private static readonly API_BASE = process.env.IREMBOPAY_API_BASE || 'https://api.sandbox.irembopay.com'
+  private static readonly SECRET_KEY = process.env.IREMBOPAY_SECRET_KEY!
+  private static readonly PUBLIC_KEY = process.env.IREMBOPAY_PUBLIC_KEY!
+  private static readonly PAYMENT_ACCOUNT = process.env.IREMBOPAY_PAYMENT_ACCOUNT!
+  private static readonly PAYMENT_ITEM_CODE = process.env.IREMBOPAY_PAYMENT_ITEM_CODE!
+  private static readonly API_VERSION = process.env.IREMBOPAY_API_VERSION || '2'
+  private static readonly WEBHOOK_TOLERANCE_SECONDS = parseInt(process.env.IREMBOPAY_WEBHOOK_TOLERANCE_SECONDS || '300')
 
   static async createInvoice(params: CreateInvoiceParams): Promise<InvoiceResponse> {
     const transactionId = `IMBONI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`

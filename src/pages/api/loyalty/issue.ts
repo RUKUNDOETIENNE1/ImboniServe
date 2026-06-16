@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             businessId,
             phone: customerPhone,
             name: `Customer ${customerPhone}`,
-            pointsBalance: 0
+            loyaltyPoints: 0
           }
         })
       }
@@ -75,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await prisma.customer.update({
       where: { id: customer.id },
       data: {
-        pointsBalance: {
+        loyaltyPoints: {
           increment: parseInt(amount)
         }
       }
@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id: true,
         name: true,
         phone: true,
-        pointsBalance: true
+        loyaltyPoints: true
       }
     })
 

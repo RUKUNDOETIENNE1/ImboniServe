@@ -18,13 +18,6 @@ const envConfig: EnvConfig = {
     // Authentication
     'NEXTAUTH_SECRET',
     'NEXTAUTH_URL',
-    
-    // IremboPay Payment Gateway (Primary)
-    'IREMBO_PUBLIC_KEY',
-    'IREMBO_SECRET_KEY',
-    'IREMBO_PAYMENT_ACCOUNT',
-    'IREMBO_PAYMENT_ITEM_CODE',
-    'IREMBO_API_BASE',
   ],
   optional: [
     // OpenAI (AI features)
@@ -81,6 +74,43 @@ export function validateEnv(): void {
     }
   }
 
+  // Conditionally require payment provider variables
+  const provider = (process.env.PAYMENTS_PROVIDER || 'intouch').toLowerCase()
+  if (provider === 'intouch') {
+    const intouchRequired = [
+      'INTOUCH_API_URL',
+      'INTOUCH_USERNAME',
+      'INTOUCH_ACCOUNT_NO',
+      'INTOUCH_WEBHOOK_USERNAME',
+      'INTOUCH_WEBHOOK_PASSWORD',
+    ]
+    for (const key of intouchRequired) {
+      if (!process.env[key]) missing.push(key)
+    }
+    // Require one of partner password aliases
+    if (!process.env['INTOUCH_PARTNER_PASSWORD'] && !process.env['INTOUCH_PASSWORD']) {
+      missing.push('INTOUCH_PARTNER_PASSWORD')
+    }
+  } else if (provider === 'irembo') {
+    const iremboPayRequired = [
+      'IREMBOPAY_SECRET_KEY',
+      'IREMBOPAY_PUBLIC_KEY',
+      'IREMBOPAY_PAYMENT_ACCOUNT',
+      'IREMBOPAY_PAYMENT_ITEM_CODE',
+      'IREMBOPAY_API_BASE',
+      'IREMBOPAY_API_VERSION',
+      'IREMBOPAY_API_URL',
+      'IREMBOPAY_MERCHANT_ID',
+      'IREMBOPAY_API_KEY',
+      'IREMBOPAY_API_SECRET',
+      'IREMBOPAY_CALLBACK_URL',
+      'IREMBOPAY_RETURN_URL',
+    ]
+    for (const key of iremboPayRequired) {
+      if (!process.env[key]) missing.push(key)
+    }
+  }
+
   // Check optional but recommended variables
   for (const key of envConfig.optional) {
     if (!process.env[key]) {
@@ -126,9 +156,9 @@ function validateSpecificFormats(): void {
     throw new Error('NEXTAUTH_SECRET must be at least 32 characters long for security')
   }
 
-  // Validate IREMBO_API_BASE format
-  if (process.env.IREMBO_API_BASE && !process.env.IREMBO_API_BASE.startsWith('http')) {
-    throw new Error('IREMBO_API_BASE must be a valid HTTP/HTTPS URL')
+  // Validate IREMBOPAY_API_URL format
+  if (process.env.IREMBOPAY_API_URL && !process.env.IREMBOPAY_API_URL.startsWith('http')) {
+    throw new Error('IREMBOPAY_API_URL must be a valid HTTP/HTTPS URL')
   }
 
   // Validate Redis URL format if provided

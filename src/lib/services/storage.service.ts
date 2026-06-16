@@ -22,6 +22,7 @@ export class StorageService {
   private static supabase = process.env.SUPABASE_STORAGE_URL && process.env.SUPABASE_STORAGE_KEY
     ? createClient(process.env.SUPABASE_STORAGE_URL, process.env.SUPABASE_STORAGE_KEY)
     : null
+  private static privBucket = process.env.SUPABASE_STORAGE_PRIV_BUCKET || 'documents-priv'
 
   /**
    * Upload video to storage
@@ -93,6 +94,62 @@ export class StorageService {
         mimeType,
       }
     }
+  }
+
+  // Private document storage for DIE
+  static async uploadPrivateDocument(
+    file: Buffer,
+    filename: string,
+    mimeType: string,
+    businessId: string
+  ): Promise<{ storageKey: string; sizeBytes: number; mimeType: string }> {
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(mimeType)) {
+      throw new Error('Invalid document type')
+    }
+    const sizeMB = file.length / (1024 * 1024)
+    const maxMB = parseInt(process.env.DIE_MAX_DOC_MB || '25', 10)
+    if (sizeMB > maxMB) {
+      throw new Error(`File too large. Maximum: ${maxMB}MB`)
+    }
+    const ext = path.extname(filename) || (mimeType === 'application/pdf' ? '.pdf' : '.bin')
+    const hash = crypto.randomBytes(16).toString('hex')
+    const storageKey = `die/${businessId}/${Date.now()}-${hash}${ext}`
+
+    if (this.supabase) {
+      const { data, error } = await this.supabase.storage
+        .from(this.privBucket)
+        .upload(storageKey, file, { contentType: mimeType, upsert: false })
+      if (error) throw new Error(`Storage upload failed: ${error.message}`)
+      return { storageKey: data.path, sizeBytes: file.length, mimeType }
+    } else {
+      const localPath = path.join(process.cwd(), 'private_uploads', storageKey)
+      const dir = path.dirname(localPath)
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+      fs.writeFileSync(localPath, file)
+      return { storageKey: `private/${storageKey}`, sizeBytes: file.length, mimeType }
+    }
+  }
+
+  static async getPrivateSignedUrl(storageKey: string, expiresInSeconds = 600): Promise<string> {
+    if (!this.supabase) return ''
+    const { data, error } = await this.supabase.storage
+      .from(this.privBucket)
+      .createSignedUrl(storageKey, expiresInSeconds)
+    if (error) throw new Error(`Signed URL failed: ${error.message}`)
+    return (data as any).signedUrl as string
+  }
+
+  static async downloadPrivate(storageKey: string): Promise<Buffer> {
+    if (this.supabase) {
+      const { data, error } = await this.supabase.storage.from(this.privBucket).download(storageKey)
+      if (error) throw new Error(`Download failed: ${error.message}`)
+      const arr = await (data as any).arrayBuffer()
+      return Buffer.from(arr)
+    }
+    const rel = storageKey.startsWith('private/') ? storageKey.slice('private/'.length) : storageKey
+    const localPath = path.join(process.cwd(), 'private_uploads', rel)
+    return fs.readFileSync(localPath)
   }
 
   /**

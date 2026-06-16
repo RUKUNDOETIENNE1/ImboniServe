@@ -33,13 +33,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       include: {
         sales: {
           where: {
-            status: { in: ['COMPLETED', 'PAID'] }
+            isPaid: true,
           },
           select: {
             id: true,
-            totalCents: true,
-            createdAt: true
-          }
+            totalAmountCents: true,
+            createdAt: true,
+          },
         }
       }
     })
@@ -50,12 +50,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const customersWithRFM = customers.map(customer => {
       const sales = customer.sales
       const totalOrders = sales.length
-      const totalSpent = sales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
+      const totalSpent = sales.reduce((sum: number, s: { totalAmountCents: number }) => sum + (s.totalAmountCents || 0), 0) / 100
       const avgOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0
 
       // Recency: Days since last order
       const lastOrderDate = sales.length > 0 
-        ? new Date(Math.max(...sales.map(s => new Date(s.createdAt).getTime())))
+        ? new Date(Math.max(...sales.map((s: { createdAt: Date }) => new Date(s.createdAt).getTime())))
         : new Date(customer.createdAt)
       const daysSinceLastOrder = Math.floor((now.getTime() - lastOrderDate.getTime()) / (1000 * 60 * 60 * 24))
 
@@ -67,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // First order date
       const firstOrderDate = sales.length > 0
-        ? new Date(Math.min(...sales.map(s => new Date(s.createdAt).getTime())))
+        ? new Date(Math.min(...sales.map((s: { createdAt: Date }) => new Date(s.createdAt).getTime())))
         : new Date(customer.createdAt)
 
       // Calculate RFM scores (1-5 scale)

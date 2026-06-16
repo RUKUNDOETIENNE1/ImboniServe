@@ -52,7 +52,7 @@ async function handleCreateWaiterCall(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Table not found' })
     }
 
-    if (!table.isActive) {
+    if (table.status === 'INACTIVE') {
       return res.status(403).json({ error: 'Table is not active' })
     }
 

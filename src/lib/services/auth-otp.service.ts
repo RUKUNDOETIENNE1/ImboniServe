@@ -67,7 +67,7 @@ export const AuthOTPService = {
     phone?: string | null
     ip?: string
     deviceId?: string
-  }): Promise<{ success: boolean; channel: 'email' | 'whatsapp' | 'both' | 'failed' }> {
+  }): Promise<{ success: boolean; channel: 'email' | 'whatsapp' | 'both' | 'failed'; reason?: string }> {
     const { email, name, phone, ip, deviceId, userId } = opts
     const otp = await AuthOTPService.issue({ userId, ip, deviceId })
 
@@ -75,14 +75,21 @@ export const AuthOTPService = {
     let whatsappSent = false
 
     // Primary: email
-    const emailResult = await EmailService.sendLoginOTP({
-      to: email,
-      name,
-      otp,
-      ip,
-      expiresMinutes: OTP_TTL_MINUTES,
-    })
-    emailSent = emailResult.success
+    try {
+      const emailResult = await EmailService.sendLoginOTP({
+        to: email,
+        name,
+        otp,
+        ip,
+        expiresMinutes: OTP_TTL_MINUTES,
+      })
+      emailSent = emailResult.success
+      if (!emailResult.success) {
+        console.error('[AuthOTP] Email send failed:', emailResult.error)
+      }
+    } catch (e: any) {
+      console.error('[AuthOTP] Email exception:', e?.message || e)
+    }
 
     // Fallback / parallel: WhatsApp if phone is set
     if (phone) {
@@ -90,8 +97,11 @@ export const AuthOTPService = {
       try {
         const waResult = await NotificationService.sendWhatsApp(phone, msg)
         whatsappSent = waResult.success
-      } catch {
-        // non-fatal
+        if (!waResult.success) {
+          console.error('[AuthOTP] WhatsApp send failed:', waResult.error || waResult.message)
+        }
+      } catch (e: any) {
+        console.error('[AuthOTP] WhatsApp exception:', e?.message || e)
       }
     }
 
@@ -101,7 +111,7 @@ export const AuthOTPService = {
         console.info(`[AuthOTP] DEV OTP for user ${userId}: ${otp}`)
         return { success: true, channel: 'email' }
       }
-      return { success: false, channel: 'failed' }
+      return { success: false, channel: 'failed', reason: 'no_channel_succeeded' }
     }
 
     const channel = emailSent && whatsappSent ? 'both' : emailSent ? 'email' : 'whatsapp'

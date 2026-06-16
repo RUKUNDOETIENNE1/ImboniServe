@@ -119,10 +119,10 @@ export class MarketerPayoutService {
       if (approve) {
         await this.approvePayout(payout.id, 'system:auto-approval');
         await RevenueEventService.emit({
-          type: 'PAYOUT_AUTO_APPROVED',
+          type: 'PAYOUT_APPROVED',
           entityType: 'payout',
           entityId: payout.id,
-          payload: { marketerId: params.marketerId, amountCents: params.amountCents, reasons }
+          payload: { marketerId: params.marketerId, amountCents: params.amountCents, reasons, autoApproved: true }
         });
         // Notify marketer
         RevenueNotificationService.sendPayoutApproved({

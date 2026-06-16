@@ -23,6 +23,7 @@ import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { getPlatformFee, FeeType } from '@/lib/services/platform-fee.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -156,7 +157,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await DiningSessionSlipService.markPaymentTriggered(slip.id, payment.id)
 
     // Prepare callback URL
-    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/checkout/tap-and-leave/webhook`
+    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Development-only: simulation mode to bypass external gateway
     const simulate = (req.query?.simulate === '1') || (req.body && req.body.simulate === true)
@@ -202,12 +203,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: intouchResponse as any,
         status: InTouchService.isSuccess(intouchResponse.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(intouchResponse.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
       },
+    })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'checkout/tap-and-leave/initiate',
+      responsecode: intouchResponse.responsecode,
+      sessionId,
+      slipId: slip.id,
     })
 
     // Check if payment failed immediately

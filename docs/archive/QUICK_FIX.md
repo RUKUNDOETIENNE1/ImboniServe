@@ -17,7 +17,7 @@
 **Problem:** Wrong port for transaction pooler
 **Fix:** Updated `.env` to use port 6543:
 ```env
-DATABASE_URL="postgresql://postgres.fvpzgmnqotggopimxrhx:Umugisha1234567890%40%21@aws-1-eu-central-1.pooler.supabase.com:6543/postgres"
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@YOUR_HOST:6543/postgres"
 ```
 
 ### 3. Styling Will Load After Restart

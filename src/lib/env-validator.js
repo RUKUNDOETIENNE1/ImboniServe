@@ -7,10 +7,10 @@ function validateEnv() {
   const requiredProd = [
     'DATABASE_URL',
     'NEXTAUTH_SECRET',
-    'IREMBO_PUBLIC_KEY',
-    'IREMBO_SECRET_KEY',
-    'IREMBO_PAYMENT_ACCOUNT',
-    'IREMBO_PAYMENT_ITEM_CODE'
+    'IREMBOPAY_PUBLIC_KEY',
+    'IREMBOPAY_SECRET_KEY',
+    'IREMBOPAY_PAYMENT_ACCOUNT',
+    'IREMBOPAY_PAYMENT_ITEM_CODE'
   ]
 
   const missing = isProd ? requiredProd.filter(k => !process.env[k]) : []
@@ -24,10 +24,10 @@ function validateEnv() {
     const recommended = [
       'NEXTAUTH_SECRET',
       'DATABASE_URL',
-      'IREMBO_PUBLIC_KEY',
-      'IREMBO_SECRET_KEY',
-      'IREMBO_PAYMENT_ACCOUNT',
-      'IREMBO_PAYMENT_ITEM_CODE'
+      'IREMBOPAY_PUBLIC_KEY',
+      'IREMBOPAY_SECRET_KEY',
+      'IREMBOPAY_PAYMENT_ACCOUNT',
+      'IREMBOPAY_PAYMENT_ITEM_CODE'
     ]
     const warnings = recommended.filter(k => !process.env[k])
     if (warnings.length > 0) {

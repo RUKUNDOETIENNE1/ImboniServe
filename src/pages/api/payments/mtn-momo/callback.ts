@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { MTNMoMoService } from '@/lib/services/mtn-momo.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -27,10 +28,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Transaction not found' })
     }
 
-    let newStatus: 'PENDING' | 'PAID' | 'FAILED' = 'PENDING'
+    let newStatus: 'PENDING' | 'SUCCESS' | 'FAILED' = 'PENDING'
     
     if (status.status === 'SUCCESSFUL') {
-      newStatus = 'PAID'
+      newStatus = 'SUCCESS'
     } else if (status.status === 'FAILED') {
       newStatus = 'FAILED'
     }
@@ -43,8 +44,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updatedAt: new Date()
       }
     })
+    await ensurePaymentLedgerEvent(transaction.id, newStatus, {
+      source: 'payments/mtn-momo/callback',
+      referenceId,
+    })
 
-    if (newStatus === 'PAID' && transaction.subscriptionId) {
+    if (newStatus === 'SUCCESS' && transaction.subscriptionId) {
       await prisma.subscription.update({
         where: { id: transaction.subscriptionId },
         data: {
