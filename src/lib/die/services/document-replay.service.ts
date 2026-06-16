@@ -53,19 +53,17 @@ async function acquireReplayLock(documentId: string, ttlSeconds = 300): Promise<
 
   if (redis) {
     const token = `${Date.now()}:${Math.random().toString(36).slice(2)}`
-    const ok = await redis.set(key, token, 'NX', 'EX', ttlSeconds)
+    // ioredis type defs are stricter than the runtime command parser here.
+    const ok = await (redis as any).set(key, token, 'EX', ttlSeconds, 'NX')
     if (!ok) throw new ReplayInProgressError(documentId)
 
     return {
       release: async () => {
-        const script = `
-          if redis.call("get", KEYS[1]) == ARGV[1] then
-            return redis.call("del", KEYS[1])
-          end
-          return 0
-        `
         try {
-          await redis.eval(script, 1, key, token)
+          const current = await redis.get(key)
+          if (current === token) {
+            await redis.del(key)
+          }
         } catch {
           // best-effort release
         }
