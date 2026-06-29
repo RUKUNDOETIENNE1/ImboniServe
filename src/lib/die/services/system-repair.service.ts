@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { DocumentLifecycleService, DocumentLifecycleState } from './document-lifecycle.service'
 import { DocumentReplayService } from './document-replay.service'
 import { SystemConsistencyService } from './system-consistency.service'
+import { extractQueue } from '@/lib/die/queue/queues'
 
 export interface StuckDocumentCandidate {
   documentId: string
@@ -33,6 +34,11 @@ function deriveCheckpoint(doc: {
   entityLinks: Array<{ linkType: string }>
   eventTimelines: Array<{ status: string; createdAt: Date }>
 }): DocumentLifecycleState {
+  const normalizedCurrent = DocumentLifecycleService.normalizeState(doc.lifecycleState || doc.status)
+  if (normalizedCurrent === DocumentLifecycleState.UPLOADED) {
+    return DocumentLifecycleState.UPLOADED
+  }
+
   const timelineState = doc.eventTimelines[0]?.status
   const normalizedTimeline = timelineState ? DocumentLifecycleService.normalizeState(timelineState) : null
   if (normalizedTimeline && normalizedTimeline !== DocumentLifecycleState.UPLOADED) {
@@ -46,6 +52,7 @@ function deriveCheckpoint(doc: {
 
   if (doc.status === 'INTELLIGENCE_DONE') return DocumentLifecycleState.INTELLIGENCE_DONE
   if (doc.status === 'EXTRACTED') return DocumentLifecycleState.EXTRACTED
+  if (doc.status === 'UPLOADED') return DocumentLifecycleState.UPLOADED
   return DocumentLifecycleState.EXTRACTED
 }
 
@@ -54,9 +61,79 @@ export class SystemRepairService {
     const p: any = prisma
     const cutoff = new Date(Date.now() - thresholdMinutes * 60_000)
 
+    const processingStates = [
+      DocumentLifecycleState.UPLOADED,
+      DocumentLifecycleState.EXTRACTED,
+      DocumentLifecycleState.INTELLIGENCE_DONE,
+      DocumentLifecycleState.MATCHED,
+      DocumentLifecycleState.RECONCILED,
+      DocumentLifecycleState.ANALYZED,
+    ]
+
     const docs = await p.scannedDocument.findMany({
       where: {
-        lifecycleState: { notIn: ['APPLIED', 'FAILED'] },
+        lifecycleState: { in: processingStates },
+        updatedAt: { lt: cutoff },
+      },
+      select: {
+        id: true,
+        lifecycleState: true,
+        status: true,
+        updatedAt: true,
+        supplierId: true,
+        reconciliation: { select: { id: true } },
+        items: { select: { productId: true, supplierProductId: true } },
+        entityLinks: { select: { linkType: true } },
+        eventTimelines: {
+          select: { status: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+      take: limit,
+      orderBy: { updatedAt: 'asc' },
+    })
+
+    return docs.map((doc: any) => {
+      const checkpoint = deriveCheckpoint(doc)
+      const downstreamEvidence =
+        doc.reconciliation ||
+        doc.supplierId ||
+        doc.items.some((item: any) => item.productId || item.supplierProductId) ||
+        doc.entityLinks.length > 0
+
+      return {
+        documentId: doc.id,
+        lifecycleState: DocumentLifecycleService.normalizeState(doc.lifecycleState || doc.status),
+        updatedAt: doc.updatedAt,
+        ageMinutes: ageMinutes(doc.updatedAt),
+        reason: downstreamEvidence ? 'downstream-data-with-incomplete-lifecycle' : 'stale-lifecycle',
+        repairCheckpoint: checkpoint,
+      }
+    })
+  }
+
+  static async detectStuckDocumentsForBusiness(
+    businessId: string,
+    thresholdMinutes = 30,
+    limit = 100,
+  ): Promise<StuckDocumentCandidate[]> {
+    const p: any = prisma
+    const cutoff = new Date(Date.now() - thresholdMinutes * 60_000)
+
+    const processingStates = [
+      DocumentLifecycleState.UPLOADED,
+      DocumentLifecycleState.EXTRACTED,
+      DocumentLifecycleState.INTELLIGENCE_DONE,
+      DocumentLifecycleState.MATCHED,
+      DocumentLifecycleState.RECONCILED,
+      DocumentLifecycleState.ANALYZED,
+    ]
+
+    const docs = await p.scannedDocument.findMany({
+      where: {
+        businessId,
+        lifecycleState: { in: processingStates },
         updatedAt: { lt: cutoff },
       },
       select: {
@@ -107,6 +184,7 @@ export class SystemRepairService {
         lifecycleState: true,
         status: true,
         supplierId: true,
+        scanJob: { select: { sourceFileKey: true, sourceMime: true, documentType: true } },
         reconciliation: { select: { id: true } },
         items: { select: { productId: true, supplierProductId: true } },
         entityLinks: { select: { linkType: true } },
@@ -123,6 +201,41 @@ export class SystemRepairService {
     }
 
     const checkpoint = deriveCheckpoint(doc)
+
+    if (checkpoint === DocumentLifecycleState.UPLOADED) {
+      const fileKey = doc.scanJob?.sourceFileKey
+      const mime = doc.scanJob?.sourceMime
+      const documentType = doc.scanJob?.documentType
+      if (!doc.scanJobId || !fileKey || !mime || !documentType) {
+        throw new Error('Cannot repair UPLOADED document: missing scanJob source file metadata')
+      }
+
+      await extractQueue.add(
+        'extract',
+        { scanJobId: doc.scanJobId, fileKey, mime, documentType },
+        { jobId: doc.scanJobId },
+      )
+
+      if (doc.scanJobId) {
+        await p.documentProcessingLog.create({
+          data: {
+            scanJobId: doc.scanJobId,
+            stage: 'repair',
+            level: 'info',
+            message: 'Repair re-enqueued extraction for UPLOADED document',
+            payload: { documentId, checkpoint: DocumentLifecycleState.UPLOADED } as any,
+          },
+        })
+      }
+
+      return {
+        documentId,
+        repaired: true,
+        checkpoint,
+        replay: { enqueuedExtraction: true },
+      }
+    }
+
     if (doc.scanJobId) {
       await p.documentProcessingLog.create({
         data: {

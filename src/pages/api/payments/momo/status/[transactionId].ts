@@ -105,7 +105,7 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
       const sale = await tx.sale.update({
         where: { id: orderId },
         data: {
-          paymentStatus: 'PAID',
+          paymentStatus: 'COMPLETED',
           isPaid: true,
           kitchenReleasedAt: now,
           updatedAt: now

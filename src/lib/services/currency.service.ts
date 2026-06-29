@@ -1,3 +1,13 @@
+/**
+ * ⚠️ DEPRECATED: This currency service is being phased out.
+ * 
+ * ARCHITECTURAL RULE:
+ * Use currency-exchange.service.ts as the SINGLE SOURCE OF TRUTH.
+ * 
+ * This file remains for backward compatibility during migration only.
+ * DO NOT add new functions. DO NOT use in new code.
+ */
+
 export const SUPPORTED_CURRENCIES = {
   RWF: { code: 'RWF', name: 'Rwandan Franc', symbol: 'RWF', decimals: 0, country: 'RW' },
   USD: { code: 'USD', name: 'US Dollar', symbol: '$', decimals: 2, country: 'US' },

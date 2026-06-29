@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import type { CreateSaleInput, UpdateSaleInput, SalesQueryInput } from '@/lib/validations/sales.schema'
+import type { CreateSaleInput, UpdateSaleInput, SalesQueryInput, CancelSaleInput } from '@/lib/validations/sales.schema'
 import { calculateConvenienceFee } from '@/lib/pricing/fee-calculator'
 import type { PaymentMethod } from '@/lib/pricing/fee-config'
 import { SmartDiningSlipService } from './smart-dining-slip.service'
+import { FinancialTruthService, CostSource } from './financial-truth.service'
 
 export class SalesService {
   static async createSale(userId: string, input: CreateSaleInput) {
@@ -138,11 +139,24 @@ export class SalesService {
   }
 
   static async updateSale(id: string, input: UpdateSaleInput, businessId?: string) {
-    const where: any = { id }
-    if (businessId) where.businessId = businessId
+    // Validate business ownership if required
+    if (businessId) {
+      const existing = await prisma.sale.findUnique({
+        where: { id },
+        select: { businessId: true }
+      })
+      
+      if (!existing) {
+        throw new Error('Sale not found')
+      }
+      
+      if (existing.businessId !== businessId) {
+        throw new Error('Forbidden: Sale does not belong to this business')
+      }
+    }
 
     const sale = await prisma.sale.update({
-      where,
+      where: { id },
       data: input,
       include: {
         items: {
@@ -170,17 +184,93 @@ export class SalesService {
     return sale
   }
 
-  static async deleteSale(id: string, businessId?: string) {
-    const where: any = { id }
-    if (businessId) where.businessId = businessId
-
-    return prisma.sale.delete({ where })
+  static async cancelSale(id: string, input: CancelSaleInput, businessId?: string) {
+    // Validate business ownership and payment status
+    const existing = await prisma.sale.findUnique({
+      where: { id },
+      select: { 
+        businessId: true, 
+        paymentStatus: true, 
+        isPaid: true,
+        status: true 
+      }
+    })
+    
+    if (!existing) {
+      throw new Error('Sale not found')
+    }
+    
+    if (businessId && existing.businessId !== businessId) {
+      throw new Error('Forbidden: Sale does not belong to this business')
+    }
+    
+    // Block cancellation of paid orders without refund
+    if (existing.isPaid || existing.paymentStatus === 'COMPLETED' || existing.paymentStatus === 'PAID') {
+      throw new Error('Cannot cancel paid orders. Process refund first.')
+    }
+    
+    // Prevent double-cancellation
+    if (existing.status === 'CANCELLED') {
+      throw new Error('Order is already cancelled')
+    }
+    
+    // Update sale to cancelled status
+    const cancelledSale = await prisma.sale.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
+        paymentStatus: 'CANCELLED',
+        notes: existing.status === 'ACTIVE' 
+          ? `CANCELLED: ${input.reason}` 
+          : `${existing.status} | CANCELLED: ${input.reason}`
+      },
+      include: {
+        items: {
+          include: {
+            menuItem: true,
+          },
+        },
+      },
+    })
+    
+    return cancelledSale
   }
 
+  static async deleteSale(id: string, businessId?: string) {
+    // Validate business ownership if required
+    if (businessId) {
+      const existing = await prisma.sale.findUnique({
+        where: { id },
+        select: { businessId: true, paymentStatus: true, isPaid: true }
+      })
+      
+      if (!existing) {
+        throw new Error('Sale not found')
+      }
+      
+      if (existing.businessId !== businessId) {
+        throw new Error('Forbidden: Sale does not belong to this business')
+      }
+      
+      // Block deletion of paid orders (safety guard)
+      if (existing.isPaid || existing.paymentStatus === 'COMPLETED' || existing.paymentStatus === 'PAID') {
+        throw new Error('Cannot delete paid orders. Use cancellation with refund instead.')
+      }
+    }
+
+    return prisma.sale.delete({ where: { id } })
+  }
+
+  /**
+   * Get daily sales with actual consumption costs where available.
+   * Falls back to estimated costs for historical data without consumption records.
+   */
   static async getDailySales(businessId: string, date?: Date) {
     const targetDate = date || new Date()
-    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0))
-    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999))
+    const startOfDay = new Date(targetDate)
+    startOfDay.setHours(0, 0, 0, 0)
+    const endOfDay = new Date(targetDate)
+    endOfDay.setHours(23, 59, 59, 999)
 
     const sales = await prisma.sale.findMany({
       where: {
@@ -200,14 +290,15 @@ export class SalesService {
     })
 
     const totalRevenue = sales.reduce((sum: number, sale: any) => sum + (sale.totalAmountCents as number), 0)
-    const totalCost = sales.reduce((sum: number, sale: any) => {
-      return (
-        sum + (sale.items as any[]).reduce(
-          (itemSum: number, item: any) => itemSum + ((item.menuItem.costCents as number) * (item.quantity as number)),
-          0,
-        )
-      )
-    }, 0)
+
+    // Get actual + estimated cost from FinancialTruthService
+    const costData = await FinancialTruthService.getCombinedPeriodCost(
+      businessId,
+      startOfDay,
+      endOfDay
+    )
+
+    const totalCost = costData.totalCostCents
 
     return {
       sales,
@@ -216,6 +307,11 @@ export class SalesService {
       totalCost,
       profit: totalRevenue - totalCost,
       profitMargin: totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0,
+      // Financial truth metadata
+      costSource: costData.source,
+      actualCostCents: costData.actualCostCents,
+      estimatedCostCents: costData.estimatedCostCents,
+      actualCostPercentage: costData.actualPercentage,
     }
   }
 }

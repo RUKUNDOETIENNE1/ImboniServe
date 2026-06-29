@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ReconciliationService } from '@/lib/services/reconciliation.service'
 import { logger } from '@/lib/logger'
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 
 const log = logger.child({ service: 'cron-reconciliation' })
 
@@ -30,6 +31,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ ok: true, ...result })
   } catch (error: any) {
     log.error('Reconciliation cron failed', { error: String(error) })
+    
+    // Alert on reconciliation failure
+    await AlertDeliveryService.deliver({
+      severity: 'error',
+      title: 'Nightly reconciliation job failed',
+      details: {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      },
+    }).catch((alertError) => {
+      log.error('Failed to send reconciliation failure alert', { alertError })
+    })
+    
     return res.status(500).json({ error: 'Reconciliation failed', message: error.message })
   }
 }

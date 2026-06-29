@@ -108,12 +108,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   } catch (error) {
     console.error('Dashboard stats error:', error)
-    // Fail soft with empty/default stats to avoid UI breaking
-    res.status(200).json({
-      todaySales: { revenue: 0, count: 0, change: '0%' },
-      staff: { total: 0, active: 0 },
-      inventory: { lowStockCount: 0 },
-      tables: []
+    // Return an explicit error to avoid masking failures on the frontend
+    res.status(500).json({
+      error: 'Failed to load dashboard stats. Please try again.',
     })
   }
 }

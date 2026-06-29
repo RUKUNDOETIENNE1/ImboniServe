@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_SWC_NATIVE_PATCH=1 next dev",
     "build": "prisma generate && cross-env NODE_OPTIONS=--max-old-space-size=8192 NEXT_TELEMETRY_DISABLED=1 next build",
-    "build:worker": "tsc --project tsconfig.build.json",
+    "build:worker": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "build:local": "prisma generate && cross-env BUILD_PROFILE=local NODE_OPTIONS=--max-old-space-size=8192 NEXT_TELEMETRY_DISABLED=1 next build",
     "build:ci": "prisma generate && cross-env BUILD_PROFILE=ci NODE_OPTIONS=--max-old-space-size=12288 NEXT_TELEMETRY_DISABLED=1 next build",
     "start": "next start",
@@ -100,6 +100,7 @@
     "jest": "^29.7.0",
     "postcss": "^8.4.32",
     "ts-jest": "^29.4.6",
+    "tsc-alias": "^1.8.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.0",
     "typescript": "^5"

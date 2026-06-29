@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { WhatsAppOrderService } from '@/lib/services/whatsapp-order.service'
 import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { ingestDeliveryShadowEvent } from '@/lib/die/business-as-plugin/delivery/delivery.shadow'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -46,6 +47,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     where: { id },
     data: { status }
   })
+
+  // Shadow tap: map status to delivery events (feature-flagged inside ingestor)
+  try {
+    const lower = String(status).toUpperCase()
+    const map: Record<string, import('@/lib/die/business-as-plugin/delivery/delivery.shadow').DeliveryShadowEvent> = {
+      ASSIGNED: 'DELIVERY_ASSIGNED',
+      ACCEPTED: 'DELIVERY_ACCEPTED',
+      PICKED_UP: 'DELIVERY_PICKED_UP',
+      IN_TRANSIT: 'DELIVERY_IN_TRANSIT',
+      DELIVERED: 'DELIVERY_COMPLETED',
+      FAILED: 'DELIVERY_FAILED',
+      CANCELLED: 'DELIVERY_CANCELLED',
+      DRIVER_ALERT: 'DELIVERY_DRIVER_ALERT',
+    }
+    const evt = map[lower]
+    if (evt) {
+      // Fetch order number for observability context (read-only)
+      const o = await prisma.sale.findUnique({ where: { id: id as string }, select: { orderNumber: true, businessId: true } })
+      if (o?.businessId) {
+        await ingestDeliveryShadowEvent({
+          type: evt,
+          businessId: o.businessId,
+          orderId: id as string,
+          orderNumber: o.orderNumber || undefined,
+        }).catch(() => {})
+      }
+    }
+  } catch {}
 
   // If order is ready and came from WhatsApp, notify staff
   if (status === 'READY' && order.orderSource === 'WHATSAPP') {

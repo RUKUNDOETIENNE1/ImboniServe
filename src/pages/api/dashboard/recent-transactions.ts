@@ -46,8 +46,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).json({ transactions })
   } catch (error) {
     console.error('Recent transactions error:', error)
-    // Fail soft to avoid UI 500 spam
-    res.status(200).json({ transactions: [] })
+    res.status(500).json({ error: 'Failed to load recent transactions.' })
   }
 }
 

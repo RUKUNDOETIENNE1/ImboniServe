@@ -492,14 +492,15 @@ export class ProcurementReconciliationService {
         confidenceScore: finalDecision.confidence,
       }
 
+      const linkRows = dedupeLinks(this.buildLinks(doc, finalDecision))
+
+      // Single atomic transaction: scannedDocument update + reconciliation upsert + entity links
       await p.$transaction(async (tx: any) => {
         await tx.scannedDocument.update({
           where: { id: doc.id },
           data: scannedDocumentUpdate,
         })
-      }, { timeout: 10000 })
 
-      await p.$transaction(async (tx: any) => {
         await tx.procurementReconciliation.upsert({
           where: { fingerprint },
           create: {
@@ -521,19 +522,14 @@ export class ProcurementReconciliationService {
             confidence: finalDecision.confidence,
           },
         })
-      }, { timeout: 10000 })
 
-      const linkRows = dedupeLinks(
-        this.buildLinks(doc, finalDecision)
-      )
-
-      await p.$transaction(async (tx: any) => {
-        if (linkRows.length === 0) return
-        await tx.documentEntityLink.createMany({
-          data: linkRows,
-          skipDuplicates: true,
-        })
-      }, { timeout: 10000 })
+        if (linkRows.length > 0) {
+          await tx.documentEntityLink.createMany({
+            data: linkRows,
+            skipDuplicates: true,
+          })
+        }
+      }, { timeout: 15000 })
 
       await logProcessingEvent(doc.scanJobId, 'info', 'RECONCILIATION_COMPLETED', {
         scannedDocumentId: doc.id,

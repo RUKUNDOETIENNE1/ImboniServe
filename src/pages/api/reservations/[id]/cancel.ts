@@ -6,6 +6,7 @@ import { InTouchService } from '@/lib/services/intouch.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -36,6 +37,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         specialRequests: reason ? `CANCELLED: ${reason}` : 'CANCELLED',
       },
     })
+
+    // Shadow tap: BOOKING_CANCELLED (feature-flagged, non-blocking)
+    ingestReservationShadowEvent({
+      type: 'BOOKING_CANCELLED',
+      businessId: reservation.businessId,
+      reservationId: reservation.id,
+      reason,
+    }).catch(() => {})
 
     // Optional: charge cancellation fee
     let feeChargedCents = 0

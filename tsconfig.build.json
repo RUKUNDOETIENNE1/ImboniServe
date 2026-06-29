@@ -4,6 +4,10 @@
     "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src/lib",
+    "baseUrl": "./src/lib",
+    "paths": {
+      "@/lib/*": ["./*"]
+    },
     "module": "CommonJS",
     "moduleResolution": "node",
     "target": "es2020",

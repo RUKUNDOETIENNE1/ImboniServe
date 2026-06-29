@@ -35,7 +35,7 @@ export class RevenueAnalyticsService {
         prisma.marketerCommission.count({ where: { ...where, type: 'SIGNUP_BONUS' } }),
         prisma.marketerCommission.count({ where: { ...where, type: 'RECURRING_COMMISSION' } }),
         prisma.marketerPayout.count({ where }),
-        prisma.marketerPayout.count({ where: { ...where, status: 'PAID' } })
+        prisma.marketerPayout.count({ where: { ...where, status: 'PAID' } }) // MarketerPayout.status enum value
       ])
 
       return {

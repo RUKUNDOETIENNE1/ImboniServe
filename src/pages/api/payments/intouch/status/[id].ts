@@ -90,7 +90,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         await prisma.sale
           .update({
             where: { id: payment.referenceId },
-            data: { paymentStatus: 'PAID', isPaid: true, paymentTransactionId: payment.id },
+            data: { paymentStatus: 'COMPLETED', isPaid: true, paymentTransactionId: payment.id },
           })
           .catch((err: any) => console.log('[InTouch Status] Sale update failed:', err.message))
       }

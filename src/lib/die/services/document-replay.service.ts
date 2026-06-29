@@ -13,6 +13,7 @@ import {
   DocumentLifecycleService,
   DocumentLifecycleState,
 } from './document-lifecycle.service'
+import { extractQueue } from '@/lib/die/queue/queues'
 
 export class ReplayInProgressError extends Error {
   constructor(documentId: string) {
@@ -42,12 +43,12 @@ function getRedisClient(): IORedis | null {
   redisClient = new IORedis(process.env.REDIS_URL!, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    tls: { rejectUnauthorized: false },
+    tls: { rejectUnauthorized: true },
   })
   return redisClient
 }
 
-async function acquireReplayLock(documentId: string, ttlSeconds = 300): Promise<ReplayLock> {
+async function acquireReplayLock(documentId: string, ttlSeconds = 1800): Promise<ReplayLock> {
   const key = `die:replay:${documentId}`
   const redis = getRedisClient()
 
@@ -202,6 +203,49 @@ export class DocumentReplayService {
       const replayedStages: string[] = []
       const startState = guard.currentState
 
+      if (
+        startState === DocumentLifecycleState.UPLOADED &&
+        normalizedStage === DocumentLifecycleState.EXTRACTED
+      ) {
+        const p: any = prisma
+        const [anyHeader, anyLine] = await Promise.all([
+          p.extractedDocumentHeaderField.findFirst({ where: { scannedDocumentId: documentId }, select: { id: true } }),
+          p.scannedDocumentItem.findFirst({ where: { scannedDocumentId: documentId }, select: { id: true } }),
+        ])
+
+        if (!anyHeader && !anyLine) {
+          const doc = await p.scannedDocument.findUnique({
+            where: { id: documentId },
+            select: {
+              id: true,
+              scanJobId: true,
+              scanJob: { select: { sourceFileKey: true, sourceMime: true, documentType: true } },
+            },
+          })
+          if (!doc?.scanJobId || !doc.scanJob?.sourceFileKey || !doc.scanJob?.sourceMime || !doc.scanJob?.documentType) {
+            throw new Error('Cannot replay from UPLOADED: missing scanJob source metadata for extraction')
+          }
+
+          await extractQueue.add(
+            'extract',
+            {
+              scanJobId: doc.scanJobId,
+              fileKey: doc.scanJob.sourceFileKey,
+              mime: doc.scanJob.sourceMime,
+              documentType: doc.scanJob.documentType,
+            },
+            { jobId: doc.scanJobId },
+          )
+
+          replayedStages.push('extraction_enqueued')
+          return {
+            documentId,
+            startStage: DocumentLifecycleState.UPLOADED,
+            replayedStages,
+          }
+        }
+      }
+
       // Controlled reset to the requested checkpoint.
       await DocumentLifecycleService.transitionDocumentLifecycle(
         documentId,
@@ -252,8 +296,9 @@ export class DocumentReplayService {
 
         if (step === 'reconciliation') {
           reconciliation = await ProcurementReconciliationService.reconcileDocument(documentId)
+          // Reconciliation failure is non-blocking — log and continue so anomaly/review stages still run
           if (!reconciliation.success) {
-            throw new Error(reconciliation.error || 'Reconciliation replay failed')
+            console.warn(`[DIE-Replay] Reconciliation soft-failed for ${documentId}: ${reconciliation.error || 'unknown'}`)
           }
           await DocumentLifecycleService.transitionDocumentLifecycle(
             documentId,

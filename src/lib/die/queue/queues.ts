@@ -9,7 +9,7 @@ const connection = new IORedis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 })
 

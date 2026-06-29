@@ -31,12 +31,22 @@ dev-start.log
 public/uploads/*
 !public/uploads/.gitkeep
 
+# Private uploads (DIE documents)
+private_uploads/
+
 # Vercel
 .vercel
 
 # Typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Compiled workers
+/dist/
+
+# IDE
+.vscode/
+.idea/
 
 # Prisma
 /prisma/migrations/dev.db

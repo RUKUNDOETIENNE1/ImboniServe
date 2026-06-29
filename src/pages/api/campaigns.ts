@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestCampaignShadowEvent } from '@/lib/die/business-as-plugin/campaigns/campaigns.shadow'
 
 function shapeCampaign(p: any) {
   const cfg = (p.config || {}) as any
@@ -80,6 +81,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           isActive: !!scheduledFor,
         },
       })
+      // Shadow: CAMPAIGN_CREATED/SCHEDULED
+      try {
+        await ingestCampaignShadowEvent({ type: 'CAMPAIGN_CREATED', businessId, campaignId: created.id, channel: 'whatsapp' }).catch(() => {})
+        if (status === 'SCHEDULED') {
+          await ingestCampaignShadowEvent({ type: 'CAMPAIGN_SCHEDULED', businessId, campaignId: created.id, channel: 'whatsapp' }).catch(() => {})
+        }
+      } catch {}
 
       return res.status(201).json({ campaign: shapeCampaign(created) })
     } catch (error) {

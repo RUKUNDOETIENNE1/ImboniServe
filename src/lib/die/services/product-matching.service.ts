@@ -200,11 +200,12 @@ export class ProductMatchingService {
       }
     }
 
-    // 2. Try alias match
+    // 2. Try alias match — scoped to business via inventoryItem relation
     const aliasMatch = await p.productAlias.findFirst({
       where: {
         normalized: normalizedInput,
         inventoryItemId: { not: null },
+        inventoryItem: { businessId, isActive: true },
       },
       include: {
         inventoryItem: {

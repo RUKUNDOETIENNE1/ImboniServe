@@ -1,3 +1,16 @@
+/**
+ * ⚠️ DEPRECATED: Direct MTN MoMo integration bypasses provider factory.
+ * 
+ * ARCHITECTURAL RULE:
+ * MTN MoMo payments MUST be routed through InTouch provider abstraction.
+ * Use: PaymentProviderFactory.getProvider(PaymentProviderType.INTOUCH)
+ * 
+ * This service remains for backward compatibility during migration only.
+ * DO NOT use in new code. DO NOT add new methods.
+ * 
+ * Migration: All MTN MoMo flows should use InTouch as the aggregator gateway.
+ */
+
 import crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 

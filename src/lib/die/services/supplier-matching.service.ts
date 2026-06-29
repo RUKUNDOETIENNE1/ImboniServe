@@ -154,7 +154,7 @@ export class SupplierMatchingService {
 
     const p: any = prisma
 
-    // 1. Try exact match on Supplier name (normalized)
+    // 1. Try exact match on Supplier name (normalized) — scoped to business
     const exactMatches = await p.supplier.findMany({
       where: {
         OR: [
@@ -164,6 +164,7 @@ export class SupplierMatchingService {
           { name: { equals: rawSupplierName.trim(), mode: 'insensitive' } },
         ],
         isActive: true,
+        businessId,
       },
       select: { id: true, name: true },
       take: 5,
@@ -180,10 +181,11 @@ export class SupplierMatchingService {
       }
     }
 
-    // 2. Try alias match
+    // 2. Try alias match — scoped to business via supplier relation
     const aliasMatch = await p.supplierAlias.findFirst({
       where: {
         normalized: normalizedInput,
+        supplier: { businessId, isActive: true },
       },
       include: {
         supplier: {
@@ -203,9 +205,9 @@ export class SupplierMatchingService {
       }
     }
 
-    // 3. Fuzzy match against all active suppliers
+    // 3. Fuzzy match against active suppliers scoped to this business
     const allSuppliers = await p.supplier.findMany({
-      where: { isActive: true },
+      where: { isActive: true, businessId },
       select: { id: true, name: true },
     })
 
@@ -417,6 +419,7 @@ export class SupplierMatchingService {
    */
   static async getSuggestions(
     rawSupplierName: string,
+    businessId: string,
     limit = 5
   ): Promise<Array<{ supplierId: string; name: string; confidence: number }>> {
     const normalizedInput = this.normalizeName(rawSupplierName)
@@ -426,7 +429,7 @@ export class SupplierMatchingService {
     const p: any = prisma
 
     const allSuppliers = await p.supplier.findMany({
-      where: { isActive: true },
+      where: { isActive: true, businessId },
       select: { id: true, name: true },
     })
 

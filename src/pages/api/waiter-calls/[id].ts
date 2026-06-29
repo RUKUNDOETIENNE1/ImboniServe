@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { realtimeService } from '@/lib/realtime'
+import { WaiterCallsPluginAdapter } from '@/lib/die/business-as-plugin/waiter-calls/waiter-calls.adapter'
+import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
+import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
 
 /**
  * Waiter Call Management API
@@ -98,6 +101,32 @@ async function handleUpdateWaiterCall(
         action
       }
     )
+
+    // Shadow taps (feature-flagged inside bindings)
+    try {
+      const adapter = new WaiterCallsPluginAdapter()
+      const ts = new Date().toISOString()
+      if (action === 'acknowledge') {
+        await routeDomainEvent(adapter, shadowBindings, {
+          domain: 'waiter-calls',
+          type: 'CALL_ACKNOWLEDGED',
+          timestamp: ts,
+          businessId: call.table.businessId,
+          severity: 'INFO',
+          data: { callId: updatedCall.id, tableId: call.tableId },
+        })
+      }
+      if (action === 'resolve') {
+        await routeDomainEvent(adapter, shadowBindings, {
+          domain: 'waiter-calls',
+          type: 'CALL_RESOLVED',
+          timestamp: ts,
+          businessId: call.table.businessId,
+          severity: 'INFO',
+          data: { callId: updatedCall.id, tableId: call.tableId },
+        })
+      }
+    } catch {}
 
     return res.status(200).json({
       success: true,

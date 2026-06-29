@@ -2,10 +2,25 @@
  * Currency Conversion Service
  * Uses API Ninjas for real-time exchange rates
  * Caches rates to minimize API calls (3000/month limit)
+ * 
+ * ⚠️ DEPRECATED FOR RUNTIME USE: External API should be fallback only.
+ * 
+ * ARCHITECTURAL RULE:
+ * Use currency-exchange.service.ts (DB-backed) as primary source.
+ * This service should ONLY be used for:
+ * - Admin rate updates
+ * - Backfill operations
+ * - Emergency fallback when DB rates unavailable
+ * 
+ * DO NOT use in hot payment/checkout paths.
  */
 
-const API_KEY = 'bzaajp79jpidQJ2A8CwY3k8ks7vVla49EP8ASE20'
+const API_KEY = process.env.API_NINJAS_KEY
 const API_BASE = 'https://api.api-ninjas.com/v1/convertcurrency'
+
+if (!API_KEY) {
+  console.warn('[CurrencyConversion] API_NINJAS_KEY not configured; external FX will use fallback rates only')
+}
 
 // Cache exchange rates for 6 hours (optimized for API limit)
 const rateCache = new Map<string, { rate: number; timestamp: number }>()
@@ -38,12 +53,16 @@ export async function getExchangeRate(
   }
 
   try {
-    // Call API Ninjas
+    // Call API Ninjas (only if key is configured)
+    if (!API_KEY) {
+      throw new Error('API_NINJAS_KEY not configured')
+    }
+    
     const response = await fetch(
       `${API_BASE}?have=RWF&want=${targetCurrency}&amount=1`,
       {
         headers: {
-          'X-Api-Key': API_KEY
+          'X-Api-Key': API_KEY as string
         }
       }
     )

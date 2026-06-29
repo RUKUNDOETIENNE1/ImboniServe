@@ -2,6 +2,15 @@
  * InTouch Mobile Money Payment Service
  * Integrates with InTouch API for MTN Mobile Money and Airtel Money payments
  * Documentation: https://www.intouchpay.co.rw/api
+ * 
+ * ⚠️ DEPRECATED: This service is legacy and should NOT be used in new code.
+ * Use PaymentProviderFactory.getProvider(PaymentProviderType.INTOUCH) instead.
+ * This file remains for backward compatibility during migration only.
+ * 
+ * Migration path:
+ * - Replace InTouchService.requestPayment() with provider.createPayment()
+ * - Replace InTouchService.checkStatus() with provider.verifyPayment()
+ * - All new payment flows MUST use PaymentProviderFactory
  */
 
 import crypto from 'crypto'

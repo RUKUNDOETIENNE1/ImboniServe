@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './alias-bootstrap'
 import { Worker, type Job, QueueEvents } from 'bullmq'
 import IORedis from 'ioredis'
 import {
@@ -12,6 +13,7 @@ import {
 import { prisma } from '../../prisma'
 import { StorageService } from '../../services/storage.service'
 import { buildProviderChain } from '../provider/index'
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -21,7 +23,7 @@ const connection = new IORedis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 })
 
@@ -238,6 +240,22 @@ extractWorker.on('failed', async (job, err) => {
         data: job.data,
         error: err?.message || 'unknown',
         failedAt: new Date().toISOString(),
+      })
+      
+      // Alert on DLQ addition (permanent failure)
+      await AlertDeliveryService.deliver({
+        severity: 'error',
+        title: 'Document extraction job failed permanently',
+        details: {
+          jobId: job.id,
+          scanJobId: job.data.scanJobId,
+          documentType: job.data.documentType,
+          error: err?.message || 'unknown',
+          attempts: job.attemptsMade,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((alertError) => {
+        console.error('[DIE] Failed to send DLQ alert', alertError)
       })
     }
   } catch (e) {

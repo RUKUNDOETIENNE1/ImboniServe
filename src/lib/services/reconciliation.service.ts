@@ -115,18 +115,18 @@ export class ReconciliationService {
         }
 
         // Check if order is marked as paid
-        if (sale.paymentStatus !== 'PAID' || !sale.isPaid) {
+        if (sale.paymentStatus !== 'COMPLETED' || !sale.isPaid) {
           // CRITICAL: Payment succeeded but order not updated
           log.warn('Payment-order mismatch detected - auto-fixing', {
             transactionId: payment.transactionId,
             orderNumber,
           })
 
-          // Auto-fix: Update order to PAID
+          // Auto-fix: Update order to COMPLETED
           await prisma.sale.update({
             where: { id: sale.id },
             data: {
-              paymentStatus: 'PAID',
+              paymentStatus: 'COMPLETED',
               isPaid: true,
             },
           })

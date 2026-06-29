@@ -24,6 +24,11 @@ export const updateSaleSchema = z.object({
   isPaid: z.boolean().optional(),
 })
 
+export const cancelSaleSchema = z.object({
+  reason: z.string().min(3).max(500),
+  cancelledBy: z.string().optional(),
+})
+
 export const salesQuerySchema = z.object({
   businessId: z.string().cuid().optional(),
   startDate: z.string().datetime().optional(),
@@ -37,3 +42,4 @@ export const salesQuerySchema = z.object({
 export type CreateSaleInput = z.infer<typeof createSaleSchema>
 export type UpdateSaleInput = z.infer<typeof updateSaleSchema>
 export type SalesQueryInput = z.infer<typeof salesQuerySchema>
+export type CancelSaleInput = z.infer<typeof cancelSaleSchema>

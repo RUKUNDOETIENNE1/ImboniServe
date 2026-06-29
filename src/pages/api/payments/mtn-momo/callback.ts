@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
-import { MTNMoMoService } from '@/lib/services/mtn-momo.service'
-import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { PaymentProviderFactory } from '@/lib/payments/providers'
+import { PaymentProviderType, PaymentTransactionStatus, BillingEventType } from '@prisma/client'
+import { logBillingEvent } from '@/lib/services/billing-ledger.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -15,7 +16,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Missing referenceId' })
     }
 
-    const status = await MTNMoMoService.getTransactionStatus(referenceId)
+    // MTN MoMo is routed through InTouch provider abstraction
+    const provider = PaymentProviderFactory.getProvider(PaymentProviderType.INTOUCH)
+    const verificationResult = await provider.verifyPayment({ transactionId: referenceId })
 
     const transaction = await prisma.paymentTransaction.findFirst({
       where: {
@@ -28,28 +31,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Transaction not found' })
     }
 
-    let newStatus: 'PENDING' | 'SUCCESS' | 'FAILED' = 'PENDING'
-    
-    if (status.status === 'SUCCESSFUL') {
-      newStatus = 'SUCCESS'
-    } else if (status.status === 'FAILED') {
-      newStatus = 'FAILED'
-    }
+    // Map provider status to canonical enum
+    const newStatus = verificationResult.status as PaymentTransactionStatus
 
+    // Update transaction with canonical status
     await prisma.paymentTransaction.update({
       where: { id: transaction.id },
       data: {
         status: newStatus,
-        rawStatus: status as any,
-        updatedAt: new Date()
+        rawStatus: verificationResult.metadata as any,
+        updatedAt: new Date(),
+        paidAt: newStatus === PaymentTransactionStatus.SUCCESS ? new Date() : null
       }
     })
-    await ensurePaymentLedgerEvent(transaction.id, newStatus, {
-      source: 'payments/mtn-momo/callback',
-      referenceId,
+
+    // Log to primary ledger writer
+    const eventType = newStatus === PaymentTransactionStatus.SUCCESS 
+      ? BillingEventType.PAYMENT_SUCCESS 
+      : newStatus === PaymentTransactionStatus.FAILED 
+      ? BillingEventType.PAYMENT_FAILED 
+      : BillingEventType.PAYMENT_PENDING
+
+    await logBillingEvent({
+      businessId: transaction.businessId,
+      paymentTransactionId: transaction.id,
+      eventType,
+      metadata: { source: 'payments/mtn-momo/callback', referenceId, provider: 'INTOUCH' },
     })
 
-    if (newStatus === 'SUCCESS' && transaction.subscriptionId) {
+    if (newStatus === PaymentTransactionStatus.SUCCESS && transaction.subscriptionId) {
       await prisma.subscription.update({
         where: { id: transaction.subscriptionId },
         data: {

@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './alias-bootstrap'
 import { Worker, type Job, QueueEvents } from 'bullmq'
 import IORedis from 'ioredis'
 import {
@@ -9,6 +10,8 @@ import {
   markIntelJobFailed,
 } from '../queue/queues'
 import { prisma } from '../../prisma'
+import { DocumentLifecycleService, DocumentLifecycleState } from '../services/document-lifecycle.service'
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -18,7 +21,7 @@ const connection = new IORedis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 })
 
@@ -398,6 +401,7 @@ export const intelligenceWorker = new Worker<IntelligenceJobData>(
       console.log(
         `[DIE-Intel] Skipping ${scannedDocumentId} — status is ${doc.status}, expected EXTRACTED`,
       )
+
       return { skipped: true, reason: `status=${doc.status}` }
     }
 
@@ -500,11 +504,25 @@ export const intelligenceWorker = new Worker<IntelligenceJobData>(
         await tx.scannedDocument.update({
           where: { id: scannedDocumentId },
           data: {
-            status: 'INTELLIGENCE_DONE',
             confidenceOverall: confidenceOverall ?? undefined,
             validationScore: validationScore ?? undefined,
           },
         })
+
+        await DocumentLifecycleService.transitionDocumentLifecycleOnTransaction(
+          tx,
+          scannedDocumentId,
+          DocumentLifecycleState.INTELLIGENCE_DONE,
+          {
+            lowConfidence: anyLowConf,
+            confidenceOverall,
+            validationScore,
+          },
+          {
+            expectedCurrentState: DocumentLifecycleState.EXTRACTED,
+            stage: 'intelligence',
+          },
+        )
       },
       { timeout: 10000 },
     )
@@ -568,6 +586,22 @@ intelligenceWorker.on('failed', async (job, err) => {
         data: job.data,
         error: err?.message || 'unknown',
         failedAt: new Date().toISOString(),
+      })
+      
+      // Alert on DLQ addition (permanent failure)
+      await AlertDeliveryService.deliver({
+        severity: 'error',
+        title: 'Document intelligence job failed permanently',
+        details: {
+          jobId: job.id,
+          scannedDocumentId: job.data.scannedDocumentId,
+          scanJobId: job.data.scanJobId,
+          error: err?.message || 'unknown',
+          attempts: job.attemptsMade,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((alertError) => {
+        console.error('[DIE-Intel] Failed to send DLQ alert', alertError)
       })
     }
   } catch (e) {

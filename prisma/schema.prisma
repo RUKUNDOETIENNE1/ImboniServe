@@ -1,7 +1,8 @@
 generator client {
-  provider      = "prisma-client-js"
-  engineType    = "binary"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  engineType      = "binary"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+  previewFeatures = ["multiSchema"]
 }
 
 /// Canonical Financial Ledger (single source of truth for finance)
@@ -101,70 +102,70 @@ model User {
 }
 
 model Business {
-  id                                String                    @id @default(cuid())
+  id                                String                      @id @default(cuid())
   name                              String
   description                       String?
   address                           String?
-  city                              String                    @default("Kigali")
+  city                              String                      @default("Kigali")
   district                          String?
-  country                           String                    @default("RW")
+  country                           String                      @default("RW")
   latitude                          Float?
   longitude                         Float?
   phone                             String
   whatsappNumber                    String?
   ownerId                           String
   planId                            String?
-  currency                          String                    @default("RWF")
-  timezone                          String                    @default("Africa/Kigali")
-  isActive                          Boolean                   @default(true)
+  currency                          String                      @default("RWF")
+  timezone                          String                      @default("Africa/Kigali")
+  isActive                          Boolean                     @default(true)
   referredByAffiliateId             String?
-  whatsappOwnerReportsEnabled       Boolean                   @default(true)
-  whatsappClientSlipsEnabled        Boolean                   @default(false)
-  whatsappClientSlipsConsent        Boolean                   @default(false)
-  whatsappDailyCapClient            Int                       @default(50)
+  whatsappOwnerReportsEnabled       Boolean                     @default(true)
+  whatsappClientSlipsEnabled        Boolean                     @default(false)
+  whatsappClientSlipsConsent        Boolean                     @default(false)
+  whatsappDailyCapClient            Int                         @default(50)
   whatsappMonthlyBudgetCents        Int?
-  createdAt                         DateTime                  @default(now())
-  updatedAt                         DateTime                  @updatedAt
-  defaultDepositPercent             Float                     @default(50.0)
-  enableQRInVenue                   Boolean                   @default(false)
-  enableQRRemote                    Boolean                   @default(false)
-  maxRemoteOrdersPerSlot            Int                       @default(10)
-  prepBufferMinutes                 Int                       @default(10)
-  requireDepositRemote              Boolean                   @default(true)
-  slotDurationMinutes               Int                       @default(30)
-  dailyReportEnabled                Boolean                   @default(true)
-  dailyReportLocalTime              String                    @default("07:30")
+  createdAt                         DateTime                    @default(now())
+  updatedAt                         DateTime                    @updatedAt
+  defaultDepositPercent             Float                       @default(50.0)
+  enableQRInVenue                   Boolean                     @default(false)
+  enableQRRemote                    Boolean                     @default(false)
+  maxRemoteOrdersPerSlot            Int                         @default(10)
+  prepBufferMinutes                 Int                         @default(10)
+  requireDepositRemote              Boolean                     @default(true)
+  slotDurationMinutes               Int                         @default(30)
+  dailyReportEnabled                Boolean                     @default(true)
+  dailyReportLocalTime              String                      @default("07:30")
   lastDailyReportSentForDate        String?
-  defaultLanguage                   String                    @default("en")
+  defaultLanguage                   String                      @default("en")
   businessType                      String?
-  followUpDay10Done                 Boolean                   @default(false)
-  followUpDay13Done                 Boolean                   @default(false)
-  followUpDay2Done                  Boolean                   @default(false)
-  followUpDay5Done                  Boolean                   @default(false)
+  followUpDay10Done                 Boolean                     @default(false)
+  followUpDay13Done                 Boolean                     @default(false)
+  followUpDay2Done                  Boolean                     @default(false)
+  followUpDay5Done                  Boolean                     @default(false)
   nextAction                        String?
-  nextActionCompleted               Boolean                   @default(false)
+  nextActionCompleted               Boolean                     @default(false)
   nextActionDate                    DateTime?
   salesNotes                        String?
-  salesStatus                       String?                   @default("LEAD")
+  salesStatus                       String?                     @default("LEAD")
   trialEndDate                      DateTime?
   trialStartDate                    DateTime?
-  approvalStatus                    String                    @default("PENDING")
+  approvalStatus                    String                      @default("PENDING")
   approvedBy                        String?
   approvedAt                        DateTime?
   rejectionReason                   String?
-  riskLevel                         String                    @default("LOW")
+  riskLevel                         String                      @default("LOW")
   duplicateFlags                    Json?
-  cmsNotifyTrending                 Boolean                   @default(false)
+  cmsNotifyTrending                 Boolean                     @default(false)
   activityLogs                      ActivityLog[]
   affiliateCommissions              AffiliateCommission[]
   affiliateCommissionsNew           AffiliateCommissionNew[]
   branches                          Branch[]
   featureOverrides                  BusinessFeatureOverride[]
   insightReports                    BusinessInsightReport[]
-  supportConversations              SupportConversation[]     @relation("BusinessSupportConversations")
-  supportCannedReplies              SupportCannedReply[]      @relation("BusinessSupportCannedReplies")
-  receivedInvite                    BusinessInvite?           @relation("InviteInvitee")
-  sentInvites                       BusinessInvite[]          @relation("InviteReferrer")
+  supportConversations              SupportConversation[]       @relation("BusinessSupportConversations")
+  supportCannedReplies              SupportCannedReply[]        @relation("BusinessSupportCannedReplies")
+  receivedInvite                    BusinessInvite?             @relation("InviteInvitee")
+  sentInvites                       BusinessInvite[]            @relation("InviteReferrer")
   businessProfile                   BusinessProfile?
   businessReviews                   BusinessReview[]
   contentPosts                      ContentPost[]
@@ -192,27 +193,27 @@ model Business {
   procurementReconciliations        ProcurementReconciliation[]
   reconciliationLogs                ReconciliationLog[]
   reservations                      Reservation[]
-  owner                             User                      @relation("BusinessOwner", fields: [ownerId], references: [id])
-  plan                              Plan?                     @relation(fields: [planId], references: [id])
-  referredByAffiliate               Affiliate?                @relation("BusinessAffiliate", fields: [referredByAffiliateId], references: [id])
+  owner                             User                        @relation("BusinessOwner", fields: [ownerId], references: [id])
+  plan                              Plan?                       @relation(fields: [planId], references: [id])
+  referredByAffiliate               Affiliate?                  @relation("BusinessAffiliate", fields: [referredByAffiliateId], references: [id])
   rooms                             Room[]
   sales                             Sale[]
   serviceAreas                      ServiceArea[]
-  buyerDocuments                    SmartDiningSlip[]         @relation("BuyerDocuments")
+  buyerDocuments                    SmartDiningSlip[]           @relation("BuyerDocuments")
   subscriptions                     Subscription[]
   supplierOrders                    SupplierOrder[]
   tables                            Table[]
   tableSessions                     TableSession[]
   taxConfigurations                 TaxConfiguration[]
-  users                             User[]                    @relation("BusinessUsers")
+  users                             User[]                      @relation("BusinessUsers")
   whatsappMessages                  WhatsAppMessage[]
-  freeMonthsGranted                 Int                       @default(0)
+  freeMonthsGranted                 Int                         @default(0)
   staffTips                         StaffTip[]
-  splitPaymentConvenienceFeeEnabled Boolean                   @default(false)
-  splitPaymentConvenienceFeePercent Float                     @default(1.0)
-  enableDigitalTipping              Boolean                   @default(false)
-  taxMode                           TaxMode                   @default(EXCLUSIVE)
-  taxRate                           Float                     @default(18.0)
+  splitPaymentConvenienceFeeEnabled Boolean                     @default(false)
+  splitPaymentConvenienceFeePercent Float                       @default(1.0)
+  enableDigitalTipping              Boolean                     @default(false)
+  taxMode                           TaxMode                     @default(EXCLUSIVE)
+  taxRate                           Float                       @default(18.0)
   qrDesigns                         QrDesign[]
   qrCodes                           QrCode[]
   businessViews                     BusinessView[]
@@ -267,6 +268,11 @@ model Business {
   ScannedDocument ScannedDocument[]
   AnomalyAlert    AnomalyAlert[]
 
+  // Kitchen Consumption Engine (Phase 0)
+  inventoryDefaultCostingMethod String                 @default("WAVG")
+  recipes                       Recipe[]
+  inventoryConsumption          InventoryConsumption[]
+
   @@map("Restaurant")
 }
 
@@ -319,11 +325,17 @@ model MenuItem {
   prepTimeMinutes Int? // Estimated preparation time
   imageReal       String? // URL to real dish photo
 
+  // Kitchen Consumption Engine (Phase 0)
+  recipeId String? @unique
+
   business     Business              @relation(fields: [businessId], references: [id])
   translations MenuItemTranslation[]
   sales        SaleItem[]
   abTests      ABTest[]
   routeRules   RouteRule[]
+  recipe       Recipe?               @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+
+  @@index([recipeId])
 }
 
 model Sale {
@@ -447,50 +459,148 @@ model SaleItem {
   mutationType MutationType @default(CREATED)
   replacedBy   String? // ID of item that replaced this one
 
-  menuItem        MenuItem                @relation(fields: [menuItemId], references: [id])
-  sale            Sale                    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  diningSlipItems DiningSessionSlipItem[] @relation("SaleItemDiningSlipItems")
-  ticketEvents    TicketEvent[]
+  // Kitchen Consumption Engine (Phase 0)
+  consumptionState String? @default("PENDING")
+
+  menuItem             MenuItem                @relation(fields: [menuItemId], references: [id])
+  sale                 Sale                    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  diningSlipItems      DiningSessionSlipItem[] @relation("SaleItemDiningSlipItems")
+  ticketEvents         TicketEvent[]
+  inventoryConsumption InventoryConsumption[]
 
   @@index([itemStatus])
   @@index([stationId])
   @@index([saleId, itemStatus])
   @@index([parentItemId])
   @@index([mutationType])
+  @@index([consumptionState])
 }
 
 model InventoryItem {
-  id                  String                @id @default(cuid())
-  name                String
-  description         String?
-  category            String?
-  unit                String
-  currentStock        Float                 @default(0)
-  minStockLevel       Float                 @default(10)
-  unitCostCents       Int
-  isActive            Boolean               @default(true)
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  businessId          String
-  business            Business              @relation(fields: [businessId], references: [id])
-  updates             InventoryUpdate[]
-  ScannedDocumentItem ScannedDocumentItem[]
-  ProductAlias        ProductAlias[]
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  category      String?
+  unit          String
+  currentStock  Float    @default(0)
+  minStockLevel Float    @default(10)
+  unitCostCents Int
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  businessId    String
+
+  // Kitchen Consumption Engine (Phase 0)
+  costingMethod String @default("WAVG")
+
+  business             Business               @relation(fields: [businessId], references: [id])
+  updates              InventoryUpdate[]
+  ScannedDocumentItem  ScannedDocumentItem[]
+  ProductAlias         ProductAlias[]
+  recipeIngredients    RecipeIngredient[]
+  inventoryConsumption InventoryConsumption[]
 }
 
 model InventoryUpdate {
-  id              String        @id @default(cuid())
-  inventoryItemId String
-  userId          String
-  type            String
+  id                   String                @id @default(cuid())
+  inventoryItemId      String
+  userId               String
+  type                 String
+  quantity             Float
+  reason               String?
+  notes                String?
+  createdAt            DateTime              @default(now())
+  businessId           String
+  business             Business              @relation(fields: [businessId], references: [id])
+  inventoryItem        InventoryItem         @relation(fields: [inventoryItemId], references: [id])
+  user                 User                  @relation(fields: [userId], references: [id])
+  inventoryConsumption InventoryConsumption?
+}
+
+// ====================================================
+// KITCHEN CONSUMPTION ENGINE (Phase 0)
+// ====================================================
+
+/// Recipe - defines ingredient composition for a menu item
+model Recipe {
+  id               String    @id @default(cuid())
+  businessId       String
+  name             String
+  yieldQuantity    Float
+  yieldUnit        String
+  version          Int       @default(1)
+  isActive         Boolean   @default(true)
+  costCentsCached  Int?
+  costCalculatedAt DateTime?
+  costStale        Boolean   @default(true)
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  business             Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  menuItem             MenuItem?
+  ingredients          RecipeIngredient[]     @relation("RecipeIngredients")
+  subRecipeUsages      RecipeIngredient[]     @relation("SubRecipeUsages")
+  inventoryConsumption InventoryConsumption[]
+
+  @@index([businessId, isActive])
+}
+
+/// RecipeIngredient - links recipes to inventory items or sub-recipes
+model RecipeIngredient {
+  id              String  @id @default(cuid())
+  recipeId        String
+  inventoryItemId String?
+  subRecipeId     String?
   quantity        Float
-  reason          String?
-  notes           String?
-  createdAt       DateTime      @default(now())
-  businessId      String
-  business        Business      @relation(fields: [businessId], references: [id])
-  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
-  user            User          @relation(fields: [userId], references: [id])
+  unit            String
+  yieldFactor     Float   @default(1.0)
+  isOptional      Boolean @default(false)
+  displayOrder    Int     @default(0)
+
+  recipe               Recipe                 @relation("RecipeIngredients", fields: [recipeId], references: [id], onDelete: Cascade)
+  inventoryItem        InventoryItem?         @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+  subRecipe            Recipe?                @relation("SubRecipeUsages", fields: [subRecipeId], references: [id], onDelete: SetNull)
+  inventoryConsumption InventoryConsumption[]
+
+  @@index([recipeId])
+  @@index([inventoryItemId])
+  @@index([subRecipeId])
+}
+
+/// InventoryConsumption - audit trail for inventory deductions from sales
+model InventoryConsumption {
+  id                         String   @id @default(cuid())
+  businessId                 String
+  saleItemId                 String
+  inventoryItemId            String
+  recipeId                   String?
+  recipeIngredientId         String?
+  quantityConsumed           Float
+  unit                       String
+  unitCostAtConsumptionCents Int
+  totalCostCents             Int
+  inventoryUpdateId          String?  @unique
+  state                      String   @default("ACTIVE")
+  reversedByConsumptionId    String?  @unique
+  reasonCode                 String?
+  actorUserId                String?
+  createdAt                  DateTime @default(now())
+
+  business         Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  saleItem         SaleItem              @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  inventoryItem    InventoryItem         @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  recipe           Recipe?               @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  recipeIngredient RecipeIngredient?     @relation(fields: [recipeIngredientId], references: [id], onDelete: SetNull)
+  inventoryUpdate  InventoryUpdate?      @relation(fields: [inventoryUpdateId], references: [id], onDelete: SetNull)
+  reversedBy       InventoryConsumption? @relation("ConsumptionReversal", fields: [reversedByConsumptionId], references: [id], onDelete: SetNull)
+  reversalOf       InventoryConsumption? @relation("ConsumptionReversal")
+
+  @@index([businessId, createdAt])
+  @@index([saleItemId])
+  @@index([inventoryItemId, createdAt])
+  @@index([recipeId])
+  @@index([state])
 }
 
 model Subscription {
@@ -3981,6 +4091,9 @@ enum TicketEventType {
   RECONCILIATION
   CONFLICT_DETECTED
   INVALID_TRANSITION
+  // Kitchen Consumption Engine (Phase 0)
+  INGREDIENTS_CONSUMED
+  CONSUMPTION_REVERSED
 }
 
 // Phase 3: Idempotency tracking for request deduplication
@@ -4056,15 +4169,15 @@ model ScannedDocument {
   totalCents    Int?
 
   // AI metadata
-  providerPayload   Json? // Raw provider response
-  normalizedVersion String @default("1.0")
-  confidenceOverall Float? // 0.0 - 1.0
-  validationScore   Float? // 0.0 - 1.0
+  providerPayload      Json? // Raw provider response
+  normalizedVersion    String  @default("1.0")
+  confidenceOverall    Float? // 0.0 - 1.0
+  validationScore      Float? // 0.0 - 1.0
   reconciliationStatus String?
   confidenceScore      Float? // 0.0 - 1.0
 
   // Status
-  status DocumentStatus @default(UPLOADED)
+  status         DocumentStatus         @default(UPLOADED)
   lifecycleState DocumentLifecycleState @default(UPLOADED)
 
   createdAt DateTime @default(now())
@@ -4145,7 +4258,7 @@ model DocumentProcessingLog {
 // Canonical document lifecycle observability timeline
 model DocumentEventTimeline {
   id                String   @id @default(cuid())
-  scannedDocumentId  String
+  scannedDocumentId String
   stage             String
   status            String
   metadata          Json?
@@ -4164,9 +4277,9 @@ model ProcurementReconciliation {
   businessId        String
 
   // Matching fields
-  purchaseOrderId      String? @map("matchedPurchaseOrderId")
-  goodsReceivedNoteId   String? @map("matchedGoodsReceivedNoteId")
-  matchType             String
+  purchaseOrderId     String? @map("matchedPurchaseOrderId")
+  goodsReceivedNoteId String? @map("matchedGoodsReceivedNoteId")
+  matchType           String
 
   // Fingerprint for idempotency (business-scoped unique identifier)
   fingerprint String @unique
@@ -4180,10 +4293,10 @@ model ProcurementReconciliation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  scannedDocument          ScannedDocument    @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
-  business                 Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  purchaseOrder           PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id])
-  goodsReceivedNote       GoodsReceivedNote? @relation(fields: [goodsReceivedNoteId], references: [id])
+  scannedDocument   ScannedDocument    @relation(fields: [scannedDocumentId], references: [id], onDelete: Cascade)
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  purchaseOrder     PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id])
+  goodsReceivedNote GoodsReceivedNote? @relation(fields: [goodsReceivedNoteId], references: [id])
 
   @@index([businessId])
   @@index([businessId, matchType])
@@ -4249,9 +4362,9 @@ model AnomalyAlert {
   scannedDocumentItemId String?
 
   // Alert metadata
-  type     String // e.g., "PRICE_SPIKE", "DUPLICATE_INVOICE", "QUANTITY_ANOMALY"
-  severity AnomalySeverity
-  title    String
+  type       String // e.g., "PRICE_SPIKE", "DUPLICATE_INVOICE", "QUANTITY_ANOMALY"
+  severity   AnomalySeverity
+  title      String
   details    Json? // Additional context
   confidence Float? // 0.0 - 1.0
 
@@ -4312,6 +4425,29 @@ model ExtractionPayload {
   extractedAt   DateTime
 
   scanJob ScanJob @relation(fields: [scanJobId], references: [id], onDelete: Cascade)
+}
+
+// ====================================================
+// DIE PLUGIN DATA
+// ====================================================
+
+model PluginQrMenu {
+  id               String   @id @default(cuid())
+  businessId       String
+  menuItems        Json
+  qrCodeStorageKey String
+  jsonStorageKey   String
+  publicUrl        String
+  sourceDocumentId String?
+  sourceScanJobId  String?
+  sourceFileKey    String
+  status           String   @default("GENERATED")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([status])
+  @@map("plugin_data_qr_menu")
 }
 
 // ====================================================
@@ -4380,4 +4516,125 @@ enum AnomalySeverity {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+// ====================================================
+// DIE ENTERPRISE PERSISTENCE LAYER v1.6
+// ====================================================
+// These models enable durable governance, audit trails,
+// and historical analytics for the DIE platform.
+// Added: 2026-06-19
+// ====================================================
+
+/// Plugin Governance State — persistent lifecycle tracking
+model PluginGovernanceState {
+  id                String    @id @default(cuid())
+  pluginId          String
+  businessId        String? // null = global scope
+  lifecycleState    String // DISCOVERED | INSTALLED | ENABLED | DISABLED
+  installCount      Int       @default(0)
+  enableCount       Int       @default(0)
+  disableCount      Int       @default(0)
+  firstInstalledAt  DateTime?
+  lastInstalledAt   DateTime?
+  lastEnabledAt     DateTime?
+  lastDisabledAt    DateTime?
+  lastStateChangeAt DateTime
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([pluginId, businessId])
+  @@index([pluginId])
+  @@index([businessId])
+  @@index([lifecycleState])
+  @@index([lastStateChangeAt])
+}
+
+/// Plugin Audit Event — immutable lifecycle event log
+model PluginAuditEvent {
+  id         String   @id @default(cuid())
+  pluginId   String
+  businessId String? // null = global scope
+  eventType  String // INSTALL | ENABLE | DISABLE | ANOMALY_DETECTED
+  metadata   Json? // previousState, newState, anomalyType, etc.
+  timestamp  DateTime @default(now())
+
+  @@index([pluginId, timestamp])
+  @@index([businessId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([timestamp])
+}
+
+/// Plugin Lifecycle History — detailed state transition log
+model PluginLifecycleHistory {
+  id           String   @id @default(cuid())
+  pluginId     String
+  businessId   String? // null = global scope
+  fromState    String? // null for initial state
+  toState      String
+  triggeredBy  String? // userId or system
+  reason       String? // install, enable, disable, auto
+  metadata     Json?
+  transitionAt DateTime @default(now())
+
+  @@index([pluginId, transitionAt])
+  @@index([businessId, transitionAt])
+  @@index([transitionAt])
+}
+
+/// Plugin Anomaly Event — governance anomaly tracking
+model PluginAnomalyEvent {
+  id             String    @id @default(cuid())
+  pluginId       String
+  businessId     String? // null = global scope
+  anomalyType    String // ENABLE_WITHOUT_INSTALL | REPEATED_LIFECYCLE_INCONSISTENCY | etc.
+  severity       String // LOW | MEDIUM | HIGH | CRITICAL
+  details        String
+  metadata       Json?
+  detectedAt     DateTime  @default(now())
+  acknowledgedAt DateTime?
+  acknowledgedBy String?
+  resolvedAt     DateTime?
+  resolvedBy     String?
+  status         String    @default("OPEN") // OPEN | ACKNOWLEDGED | DISMISSED | RESOLVED
+
+  @@index([pluginId, detectedAt])
+  @@index([businessId, detectedAt])
+  @@index([severity, status])
+  @@index([detectedAt])
+}
+
+/// Control Plane Snapshot — system health time-series
+model ControlPlaneSnapshot {
+  id                        String   @id @default(cuid())
+  totalPlugins              Int
+  activePlugins             Int
+  disabledPlugins           Int
+  discoveredPlugins         Int
+  marketplaceCoverage       Float
+  governanceHealthScore     Int
+  lifecycleConsistencyScore Int
+  qrMenuStatus              String // healthy | degraded | unknown
+  runtimeWarnings           Json // array of warning strings
+  metadata                  Json? // additional metrics
+  generatedAt               DateTime @default(now())
+
+  @@index([generatedAt])
+}
+
+/// Plugin Alert Event — alert delivery history
+model PluginAlertEvent {
+  id              String   @id @default(cuid())
+  alertType       String // SYSTEM_HEALTH_LOW | GOVERNANCE_ANOMALY | etc.
+  severity        String // low | medium | high | critical
+  title           String
+  message         String   @db.Text
+  metadata        Json?
+  channels        Json // array of delivery channels attempted
+  deliveryResults Json // array of delivery results per channel
+  firedAt         DateTime @default(now())
+
+  @@index([alertType, firedAt])
+  @@index([severity, firedAt])
+  @@index([firedAt])
 }

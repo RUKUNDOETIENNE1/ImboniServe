@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { realtimeService } from '@/lib/realtime'
+import { WaiterCallsPluginAdapter } from '@/lib/die/business-as-plugin/waiter-calls/waiter-calls.adapter'
+import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
+import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
 
 /**
  * Waiter Call API
@@ -109,6 +112,19 @@ async function handleCreateWaiterCall(req: NextApiRequest, res: NextApiResponse)
           },
           sessionId: sessionId || null,
         }),
+      })
+    } catch {}
+
+    // Shadow tap (feature-flagged inside bindings): WAITER_CALLED
+    try {
+      const adapter = new WaiterCallsPluginAdapter()
+      await routeDomainEvent(adapter, shadowBindings, {
+        domain: 'waiter-calls',
+        type: 'WAITER_CALLED',
+        timestamp: new Date().toISOString(),
+        businessId: table.businessId,
+        severity: 'INFO',
+        data: { callId: call.id, tableId: table.id, reason: call.reason, priority: call.priority },
       })
     } catch {}
 

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { IremboPayService } from '@/lib/services/irembopay.service';
 import { logger } from '@/lib/logger';
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service';
 
 const log = logger.child({ service: 'addon-renewals' });
 
@@ -166,6 +167,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error: any) {
     log.error('Add-on renewal cron failed', { error: error.message });
+    
+    // Alert on renewal processing failure
+    await AlertDeliveryService.deliver({
+      severity: 'error',
+      title: 'Add-on renewal job failed',
+      details: {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      },
+    }).catch((alertError) => {
+      log.error('Failed to send addon renewal failure alert', { alertError })
+    })
+    
     return res.status(500).json({ 
       error: 'Renewal processing failed',
       message: error.message 

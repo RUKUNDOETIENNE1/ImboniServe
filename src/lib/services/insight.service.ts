@@ -47,7 +47,7 @@ export async function computeKPIs(businessId: string, period: PeriodType) {
 
   const [sales, txs, customersInPeriod, customersBefore, subscription] = await Promise.all([
     prisma.sale.findMany({
-      where: { businessId, isPaid: true, createdAt: { gte: start, lt: end } },
+      where: { businessId, isPaid: true, createdAt: { gte: start, lt: end } }, // Sale.isPaid boolean field
       select: { totalAmountCents: true, paymentMethod: true, createdAt: true }
     }),
     prisma.paymentTransaction.findMany({

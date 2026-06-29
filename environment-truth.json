@@ -1,0 +1,3778 @@
+{
+  "discoveryDate": "2026-06-22T05:03:08.925Z",
+  "summary": {
+    "totalVariablesInCode": 149,
+    "totalVariablesInExample": 102,
+    "totalVariablesInActualEnv": 52,
+    "missingVariables": 63,
+    "unusedVariables": 16,
+    "publicVariables": 9,
+    "secretVariables": 35
+  },
+  "variables": {
+    "NEXT_PUBLIC_MTN_ENABLE": {
+      "name": "NEXT_PUBLIC_MTN_ENABLE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/checkout/DigitalPaymentSelector.tsx",
+          "line": 20,
+          "context": "const enableMTN = (process.env.NEXT_PUBLIC_MTN_ENABLE || 'false') === 'true';"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "NEXT_PUBLIC_AIRTEL_ENABLE": {
+      "name": "NEXT_PUBLIC_AIRTEL_ENABLE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/checkout/DigitalPaymentSelector.tsx",
+          "line": 21,
+          "context": "const enableAIRTEL = (process.env.NEXT_PUBLIC_AIRTEL_ENABLE || 'false') === 'true';"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "APP_URL": {
+      "name": "APP_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/dashboard/DashboardQRButton.tsx",
+          "line": 14,
+          "context": "const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.APP_URL || 'htt"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 68,
+          "context": "callbackUrl: config?.callbackUrl || process.env.INTOUCH_CALLBACK_URL || `${process.env.APP_URL}/api/"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 94,
+          "context": "callbackUrl: config?.callbackUrl || process.env.IREMBOPAY_CALLBACK_URL || `${process.env.APP_URL}/ap"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 95,
+          "context": "returnUrl: config?.returnUrl || process.env.IREMBOPAY_RETURN_URL || `${process.env.APP_URL}/billing/"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 187,
+          "context": "<a href=\"${process.env.APP_URL}/dashboard/security\" style=\"color:#3b82f6;\">review your security sett"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 227,
+          "context": "<p>If this was not you, <a href=\"${process.env.APP_URL}/dashboard/security\">revoke access immediatel"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 123,
+          "context": "`View details: ${process.env.APP_URL}/dashboard/reports`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 37,
+          "context": "callback_url: `${process.env.APP_URL}/api/payments/pesapal/callback`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/qr-generator.service.ts",
+          "line": 4,
+          "context": "const APP_URL = process.env.APP_URL || 'http://localhost:3000'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/receipt-generator.service.ts",
+          "line": 148,
+          "context": "<p style=\"margin-top:4px\">Questions? Contact support at ${process.env.APP_URL || 'https://imboni.rw'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/slip-pdf-generator.service.ts",
+          "line": 6,
+          "context": "const APP_URL = process.env.APP_URL || 'http://localhost:3000'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/table-invite.service.ts",
+          "line": 52,
+          "context": "const APP_URL = process.env.APP_URL || 'http://localhost:3000'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/business-invite/generate.ts",
+          "line": 21,
+          "context": "const inviteUrl = `${process.env.APP_URL || process.env.NEXTAUTH_URL}/signup?inv=${code}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/subscription-reminders.ts",
+          "line": 84,
+          "context": "renewalUrl: `${process.env.APP_URL}/dashboard/billing?action=renew&subscriptionId=${subscription.id}"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/customer-referrals/generate.ts",
+          "line": 29,
+          "context": "referralLink: `${process.env.APP_URL}/signup?ref=${existingReferral.referralCode}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/customer-referrals/generate.ts",
+          "line": 47,
+          "context": "referralLink: `${process.env.APP_URL}/signup?ref=${referral.referralCode}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/invoices/[id]/download.ts",
+          "line": 147,
+          "context": "<p style=\"margin-top:4px\">Questions? Contact support at ${process.env.APP_URL || 'https://imboni.rw'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/support/conversations/index.ts",
+          "line": 102,
+          "context": "const viewUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard/support/inbox?conv=${co"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "config",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NODE_ENV": {
+      "name": "NODE_ENV",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/ErrorBoundary.tsx",
+          "line": 41,
+          "context": "if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/components/ErrorBoundary.tsx",
+          "line": 82,
+          "context": "{process.env.NODE_ENV === 'development' && this.state.error && ("
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/components/PerformanceMonitor.tsx",
+          "line": 9,
+          "context": "if (process.env.NODE_ENV !== 'production') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/components/PerformanceMonitor.tsx",
+          "line": 57,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/components/PerformanceMonitor.tsx",
+          "line": 76,
+          "context": "if (process.env.NODE_ENV === 'development') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/analytics/pwa-telemetry.ts",
+          "line": 28,
+          "context": "if (process.env.NODE_ENV === 'development') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 747,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.js",
+          "line": 4,
+          "context": "const isProd = process.env.NODE_ENV === 'production'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 128,
+          "context": "if (warnings.length > 0 && process.env.NODE_ENV === 'development') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env.ts",
+          "line": 131,
+          "context": "const env = process.env.NODE_ENV || 'development'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/i18n.ts",
+          "line": 76,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/i18n.ts",
+          "line": 84,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/logger.ts",
+          "line": 15,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+          "line": 10,
+          "context": "environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+          "line": 6,
+          "context": "environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/prisma.ts",
+          "line": 11,
+          "context": "if (process.env.NODE_ENV !== 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/sentry.ts",
+          "line": 30,
+          "context": "environment: process.env.NODE_ENV || 'development',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/sentry.ts",
+          "line": 31,
+          "context": "tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/auth-otp.service.ts",
+          "line": 110,
+          "context": "if (process.env.NODE_ENV !== 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/middleware.ts",
+          "line": 31,
+          "context": "secure: process.env.NODE_ENV === 'production',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/middleware.ts",
+          "line": 43,
+          "context": "secure: process.env.NODE_ENV === 'production',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/auth/[...nextauth].ts",
+          "line": 69,
+          "context": "if (process.env.ALLOW_LEGACY_CREDENTIALS === 'true' && process.env.NODE_ENV !== 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/auth/[...nextauth].ts",
+          "line": 156,
+          "context": "const isProd = process.env.NODE_ENV === 'production'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/checkout/tap-and-leave.ts",
+          "line": 165,
+          "context": "if (process.env.NODE_ENV !== 'production' && simulate) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/dev/bootstrap-tap-leave.ts",
+          "line": 13,
+          "context": "if (process.env.NODE_ENV === 'production') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/_app.tsx",
+          "line": 44,
+          "context": "if ('serviceWorker' in navigator && (process.env.NODE_ENV === 'production' || enableDevSW)) {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "config",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NEXT_PUBLIC_SITE_URL": {
+      "name": "NEXT_PUBLIC_SITE_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/PublicLayout.tsx",
+          "line": 21,
+          "context": "const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "NEXT_PUBLIC_CRISP_WEBSITE_ID": {
+      "name": "NEXT_PUBLIC_CRISP_WEBSITE_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/SupportChatWidget.tsx",
+          "line": 10,
+          "context": "const websiteId = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "NEXT_PUBLIC_PUSHER_KEY": {
+      "name": "NEXT_PUBLIC_PUSHER_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/components/SupportWidget.tsx",
+          "line": 101,
+          "context": "if (process.env.NEXT_PUBLIC_PUSHER_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/realtime.ts",
+          "line": 5,
+          "context": "const PUSHER_KEY = process.env.NEXT_PUBLIC_PUSHER_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/dashboard/kitchen.tsx",
+          "line": 243,
+          "context": "const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/dashboard/support/inbox.tsx",
+          "line": 75,
+          "context": "if (businessId && process.env.NEXT_PUBLIC_PUSHER_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/dashboard/support/inbox.tsx",
+          "line": 145,
+          "context": "if (process.env.NEXT_PUBLIC_PUSHER_KEY) {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": true
+    },
+    "OPENAI_MODEL_PRIMARY": {
+      "name": "OPENAI_MODEL_PRIMARY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 12,
+          "context": "primary: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/openai.ts",
+          "line": 21,
+          "context": "model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/menu-ai.service.ts",
+          "line": 80,
+          "context": "model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 294,
+          "context": "model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 334,
+          "context": "model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 378,
+          "context": "model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-4o-mini',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "OPENAI_MODEL_FALLBACK": {
+      "name": "OPENAI_MODEL_FALLBACK",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 13,
+          "context": "fallback: process.env.OPENAI_MODEL_FALLBACK || 'gpt-4-turbo'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "OPENAI_COST_INPUT_PER_1K_USD": {
+      "name": "OPENAI_COST_INPUT_PER_1K_USD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 17,
+          "context": "const inputPer1K = parseFloat(process.env.OPENAI_COST_INPUT_PER_1K_USD || '0')"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "OPENAI_COST_OUTPUT_PER_1K_USD": {
+      "name": "OPENAI_COST_OUTPUT_PER_1K_USD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 18,
+          "context": "const outputPer1K = parseFloat(process.env.OPENAI_COST_OUTPUT_PER_1K_USD || '0')"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "OPENAI_API_KEY": {
+      "name": "OPENAI_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 41,
+          "context": "if (!process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+          "line": 53,
+          "context": "'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 327,
+          "context": "if (!process.env.OPENAI_API_KEY) return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/index.ts",
+          "line": 72,
+          "context": "if (process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/openai.ts",
+          "line": 9,
+          "context": "this.client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/openai.ts",
+          "line": 9,
+          "context": "this.client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/menu-ai.service.ts",
+          "line": 57,
+          "context": "if (!process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/menu-ai.service.ts",
+          "line": 76,
+          "context": "Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 280,
+          "context": "if (!process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 290,
+          "context": "'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 320,
+          "context": "if (!process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 330,
+          "context": "'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 364,
+          "context": "if (!process.env.OPENAI_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+          "line": 374,
+          "context": "'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-menu-builder.service.ts",
+          "line": 12,
+          "context": "const openai = process.env.OPENAI_API_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-menu-builder.service.ts",
+          "line": 13,
+          "context": "? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/ai/brand-assistant.ts",
+          "line": 26,
+          "context": "const apiKey = process.env.OPENAI_API_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/business/scan.ts",
+          "line": 14,
+          "context": "apiKey: process.env.OPENAI_API_KEY,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 6,
+          "context": "const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "CRON_WORKER": {
+      "name": "CRON_WORKER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 38,
+          "context": "if (process.env.CRON_WORKER !== 'true') {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "config",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "VERCEL": {
+      "name": "VERCEL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 42,
+          "context": "if (process.env.VERCEL === '1') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NEXTAUTH_URL": {
+      "name": "NEXTAUTH_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 105,
+          "context": "`📈 *Trending Alert!*\\n\\nYour post \"${post.title || 'Untitled'}\" is trending on the Imboni feed — it"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+          "line": 580,
+          "context": "const link = `${process.env.NEXTAUTH_URL || ''}/order/reorder`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.js",
+          "line": 46,
+          "context": "const nextAuthUrl = process.env.NEXTAUTH_URL"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 150,
+          "context": "if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.startsWith('http')) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 150,
+          "context": "if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.startsWith('http')) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 85,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/dashboard/marketer\" style=\"display:inline-block;background:#1e4"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 168,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/dashboard/marketer\" style=\"display:inline-block;background:#10b"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 436,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/dashboard/marketer\" style=\"display:inline-block;background:#1e4"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 530,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/dashboard/marketer\" style=\"display:inline-block;background:#10b"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 640,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/dashboard/marketer\" style=\"display:inline-block;background:#1e4"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 722,
+          "context": "<a href=\"${process.env.NEXTAUTH_URL}/admin/payout-control\" style=\"display:inline-block;background:#e"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/auth/forgot-password.ts",
+          "line": 58,
+          "context": "const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}&email=${encodeURICo"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/business-invite/generate.ts",
+          "line": 21,
+          "context": "const inviteUrl = `${process.env.APP_URL || process.env.NEXTAUTH_URL}/signup?inv=${code}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/checkout/tap-and-leave.ts",
+          "line": 161,
+          "context": "const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/payments/intouch/initiate.ts",
+          "line": 83,
+          "context": "const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/cancel.ts",
+          "line": 76,
+          "context": "callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/cancel.ts",
+          "line": 85,
+          "context": "callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/deposit/initiate.ts",
+          "line": 65,
+          "context": "callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/deposit/initiate.ts",
+          "line": 77,
+          "context": "callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/whatsapp.ts",
+          "line": 18,
+          "context": "const webhookUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/webhooks/twilio/whats"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "EXCHANGE_RATES_API_KEY": {
+      "name": "EXCHANGE_RATES_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/currency/exchange-rates.ts",
+          "line": 46,
+          "context": "const apiKey = process.env.EXCHANGE_RATES_API_KEY"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "DIE_AI_ASSISTANT_ENABLED": {
+      "name": "DIE_AI_ASSISTANT_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/ai-business-assistant.engine.ts",
+          "line": 21,
+          "context": "if (process.env.DIE_AI_ASSISTANT_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/assistant/overview.ts",
+          "line": 10,
+          "context": "if (process.env.DIE_AI_ASSISTANT_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/trends.ts",
+          "line": 10,
+          "context": "if (process.env.DIE_AI_ASSISTANT_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_FINANCE_INTELLIGENCE_ENABLED": {
+      "name": "DIE_FINANCE_INTELLIGENCE_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/ai-business-assistant.engine.ts",
+          "line": 70,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/arbitration/intelligence-arbitrator.ts",
+          "line": 233,
+          "context": "const fin = process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true' ? await computeFinanceSnapshot()"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/assistant/reasoning-to-language.ts",
+          "line": 13,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') return 'Financial intelligence is disab"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/audit/truth-audit-engine.ts",
+          "line": 92,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') return { score: 0, kinds: [], notes: []"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-intelligence/reasoning-engine.ts",
+          "line": 95,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+          "line": 141,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') return 0"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/finance/finance-intelligence.ts",
+          "line": 192,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/baseline-engine.ts",
+          "line": 105,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/kernel/unified-intelligence-kernel.ts",
+          "line": 69,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') return null"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 100,
+          "context": "const fin = process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true' ? await computeFinanceSnapshot()"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+          "line": 75,
+          "context": "const financeEnabled = process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+          "line": 107,
+          "context": "const fin = process.env.DIE_FINANCE_INTELLIGENCE_ENABLED === 'true' ? await computeFinanceSnapshot()"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/finance.ts",
+          "line": 9,
+          "context": "if (process.env.DIE_FINANCE_INTELLIGENCE_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_AI_CEO_LAYER_ENABLED": {
+      "name": "DIE_AI_CEO_LAYER_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/ai-business-assistant.engine.ts",
+          "line": 105,
+          "context": "if (process.env.DIE_AI_CEO_LAYER_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/assistant/executive.ts",
+          "line": 10,
+          "context": "if (process.env.DIE_AI_CEO_LAYER_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_ARBITRATION_ENABLED": {
+      "name": "DIE_INTELLIGENCE_ARBITRATION_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/arbitration/intelligence-arbitrator.ts",
+          "line": 208,
+          "context": "if (process.env.DIE_INTELLIGENCE_ARBITRATION_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 85,
+          "context": "if (process.env.DIE_INTELLIGENCE_ARBITRATION_ENABLED !== 'true') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/arbitration.ts",
+          "line": 7,
+          "context": "if (process.env.DIE_INTELLIGENCE_ARBITRATION_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_KERNEL_SHADOW": {
+      "name": "DIE_INTELLIGENCE_KERNEL_SHADOW",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/arbitration/intelligence-arbitrator.ts",
+          "line": 238,
+          "context": "if (process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/audit/truth-audit-engine.ts",
+          "line": 230,
+          "context": "if (process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/confidence-calibration.ts",
+          "line": 62,
+          "context": "if (process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/kernel/unified-intelligence-kernel.ts",
+          "line": 36,
+          "context": "shadow: () => process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 115,
+          "context": "if (process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+          "line": 108,
+          "context": "if (process.env.DIE_INTELLIGENCE_KERNEL_SHADOW === 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_DUAL_READ_ENABLED": {
+      "name": "DIE_INTELLIGENCE_DUAL_READ_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/arbitration/intelligence-arbitrator.ts",
+          "line": 256,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/audit/truth-audit-engine.ts",
+          "line": 248,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+          "line": 294,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/confidence-calibration.ts",
+          "line": 65,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 124,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+          "line": 169,
+          "context": "if (process.env.DIE_INTELLIGENCE_DUAL_READ_ENABLED === 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED": {
+      "name": "DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/audit/truth-audit-engine.ts",
+          "line": 207,
+          "context": "if (process.env.DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/truth-audit.ts",
+          "line": 7,
+          "context": "if (process.env.DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_CAMPAIGNS_ENABLED": {
+      "name": "DIE_SHADOW_CAMPAIGNS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/campaigns/campaigns.shadow.ts",
+          "line": 26,
+          "context": "if (process.env.DIE_SHADOW_CAMPAIGNS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_DELIVERY_ENABLED": {
+      "name": "DIE_SHADOW_DELIVERY_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/delivery/delivery.shadow.ts",
+          "line": 35,
+          "context": "if (process.env.DIE_SHADOW_DELIVERY_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_DINING_SLIPS_ENABLED": {
+      "name": "DIE_SHADOW_DINING_SLIPS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/dining-slips/slips.shadow.ts",
+          "line": 30,
+          "context": "if (process.env.DIE_SHADOW_DINING_SLIPS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_EVENTS_ENABLED": {
+      "name": "DIE_SHADOW_EVENTS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/events/events.shadow.ts",
+          "line": 20,
+          "context": "if (process.env.DIE_SHADOW_EVENTS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_INVENTORY_ENABLED": {
+      "name": "DIE_SHADOW_INVENTORY_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/inventory/inventory.shadow.ts",
+          "line": 32,
+          "context": "if (process.env.DIE_SHADOW_INVENTORY_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_KDS_ENABLED": {
+      "name": "DIE_SHADOW_KDS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/kds/kds.shadow.ts",
+          "line": 22,
+          "context": "if (process.env.DIE_SHADOW_KDS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_LOYALTY_ENABLED": {
+      "name": "DIE_SHADOW_LOYALTY_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/loyalty/loyalty.shadow.ts",
+          "line": 20,
+          "context": "if (process.env.DIE_SHADOW_LOYALTY_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_PROCUREMENT_ENABLED": {
+      "name": "DIE_SHADOW_PROCUREMENT_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/procurement/procurement.shadow.ts",
+          "line": 31,
+          "context": "if (process.env.DIE_SHADOW_PROCUREMENT_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_RESERVATIONS_ENABLED": {
+      "name": "DIE_SHADOW_RESERVATIONS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/reservations/reservations.shadow.ts",
+          "line": 19,
+          "context": "if (process.env.DIE_SHADOW_RESERVATIONS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_SHADOW_SUPPLIERS_ENABLED": {
+      "name": "DIE_SHADOW_SUPPLIERS_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/suppliers/suppliers.shadow.ts",
+          "line": 29,
+          "context": "if (process.env.DIE_SHADOW_SUPPLIERS_ENABLED !== 'true') return"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_BUSINESS_INTELLIGENCE_ENABLED": {
+      "name": "DIE_BUSINESS_INTELLIGENCE_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-intelligence/reasoning-engine.ts",
+          "line": 61,
+          "context": "if (process.env.DIE_BUSINESS_INTELLIGENCE_ENABLED !== 'true') return []"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/insights.ts",
+          "line": 10,
+          "context": "if (process.env.DIE_BUSINESS_INTELLIGENCE_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_RELIABILITY_ENABLED": {
+      "name": "DIE_INTELLIGENCE_RELIABILITY_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-intelligence/reasoning-engine.ts",
+          "line": 335,
+          "context": "if (process.env.DIE_INTELLIGENCE_RELIABILITY_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/reliability.ts",
+          "line": 8,
+          "context": "if (process.env.DIE_INTELLIGENCE_RELIABILITY_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_EVALUATION_ENABLED": {
+      "name": "DIE_INTELLIGENCE_EVALUATION_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/business-intelligence/reasoning-engine.ts",
+          "line": 380,
+          "context": "if (process.env.DIE_INTELLIGENCE_EVALUATION_ENABLED === 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+          "line": 192,
+          "context": "if (process.env.DIE_INTELLIGENCE_EVALUATION_ENABLED !== 'true') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+          "line": 267,
+          "context": "if (process.env.DIE_INTELLIGENCE_EVALUATION_ENABLED !== 'true') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/evaluation.ts",
+          "line": 10,
+          "context": "if (process.env.DIE_INTELLIGENCE_EVALUATION_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_BACKGROUND_JOBS": {
+      "name": "DIE_BACKGROUND_JOBS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/scheduler.ts",
+          "line": 31,
+          "context": "this.enabled = process.env.DIE_BACKGROUND_JOBS !== 'false'"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_EVALUATION_WINDOW_MS": {
+      "name": "DIE_EVALUATION_WINDOW_MS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+          "line": 117,
+          "context": "const env = Number(process.env.DIE_EVALUATION_WINDOW_MS)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 23,
+          "context": "const env = Number(process.env.DIE_EVALUATION_WINDOW_MS)"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_KERNEL_ENABLED": {
+      "name": "DIE_INTELLIGENCE_KERNEL_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/kernel/unified-intelligence-kernel.ts",
+          "line": 35,
+          "context": "enabled: () => process.env.DIE_INTELLIGENCE_KERNEL_ENABLED === 'true',"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_META_VALIDATION_ENABLED": {
+      "name": "DIE_INTELLIGENCE_META_VALIDATION_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 84,
+          "context": "if (process.env.DIE_INTELLIGENCE_META_VALIDATION_ENABLED !== 'true') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 97,
+          "context": "if (process.env.DIE_INTELLIGENCE_META_VALIDATION_ENABLED !== 'true') return"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+          "line": 242,
+          "context": "if (process.env.DIE_INTELLIGENCE_META_VALIDATION_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/meta-arbitration.ts",
+          "line": 7,
+          "context": "if (process.env.DIE_INTELLIGENCE_META_VALIDATION_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "REDIS_URL": {
+      "name": "REDIS_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/intelligence-worker.ts",
+          "line": 15,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/intelligence-worker.ts",
+          "line": 19,
+          "context": "const connection = new IORedis(process.env.REDIS_URL!, {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker-start.ts",
+          "line": 43,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker-start.ts",
+          "line": 47,
+          "context": "const connection = new IORedis(process.env.REDIS_URL!, {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker.ts",
+          "line": 17,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker.ts",
+          "line": 21,
+          "context": "const connection = new IORedis(process.env.REDIS_URL!, {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/queue/queues.ts",
+          "line": 4,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/queue/queues.ts",
+          "line": 8,
+          "context": "const connection = new IORedis(process.env.REDIS_URL!, {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/services/document-replay.service.ts",
+          "line": 39,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/services/document-replay.service.ts",
+          "line": 43,
+          "context": "redisClient = new IORedis(process.env.REDIS_URL!, {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 165,
+          "context": "if (process.env.REDIS_URL && !/^rediss?:\\/\\//.test(process.env.REDIS_URL)) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 165,
+          "context": "if (process.env.REDIS_URL && !/^rediss?:\\/\\//.test(process.env.REDIS_URL)) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/middleware/rateLimit.redis.ts",
+          "line": 14,
+          "context": "if (!process.env.REDIS_URL) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/middleware/rateLimit.redis.ts",
+          "line": 21,
+          "context": "redis = new Redis(process.env.REDIS_URL, {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_PERSISTENCE_MODE": {
+      "name": "DIE_PERSISTENCE_MODE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/persistence/factory.ts",
+          "line": 16,
+          "context": "const envMode = process.env.DIE_PERSISTENCE_MODE as PersistenceMode | undefined"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NEXT_PUBLIC_APP_URL": {
+      "name": "NEXT_PUBLIC_APP_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/plugins/built-in/qr-menu.plugin.ts",
+          "line": 307,
+          "context": "const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\\/$/, '')"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/printer.service.ts",
+          "line": 121,
+          "context": "output += `${process.env.NEXT_PUBLIC_APP_URL || 'https://imboni.rw'}/slips/${slip.id}` + this.LINE_F"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/reservation-reminder.service.ts",
+          "line": 160,
+          "context": "const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://imboni.rw';"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/seat-placement.service.ts",
+          "line": 190,
+          "context": "const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://imboni.rw';"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/seat-qr.service.ts",
+          "line": 33,
+          "context": "const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://imboni.rw';"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/split-payment-whatsapp.service.ts",
+          "line": 97,
+          "context": "const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://imboni.rw';"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "config",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "AZURE_DI_ENDPOINT": {
+      "name": "AZURE_DI_ENDPOINT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/azure.ts",
+          "line": 121,
+          "context": "const endpoint = process.env.AZURE_DI_ENDPOINT?.trim()"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/index.ts",
+          "line": 59,
+          "context": "if (process.env.AZURE_DI_ENDPOINT && process.env.AZURE_DI_KEY) {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AZURE_DI_KEY": {
+      "name": "AZURE_DI_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/azure.ts",
+          "line": 122,
+          "context": "const key = process.env.AZURE_DI_KEY?.trim()"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/index.ts",
+          "line": 59,
+          "context": "if (process.env.AZURE_DI_ENDPOINT && process.env.AZURE_DI_KEY) {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "DIE_PROVIDER_TIMEOUT_MS": {
+      "name": "DIE_PROVIDER_TIMEOUT_MS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/provider/azure.ts",
+          "line": 132,
+          "context": "const parsedTimeout = parseInt(process.env.DIE_PROVIDER_TIMEOUT_MS || '30000', 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED": {
+      "name": "DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+          "line": 88,
+          "context": "if (process.env.DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED !== 'true') {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/reality-alignment.ts",
+          "line": 7,
+          "context": "if (process.env.DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NEXTAUTH_SECRET": {
+      "name": "NEXTAUTH_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.js",
+          "line": 41,
+          "context": "const secret = process.env.NEXTAUTH_SECRET"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 155,
+          "context": "if (process.env.NEXTAUTH_SECRET && process.env.NEXTAUTH_SECRET.length < 32) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 155,
+          "context": "if (process.env.NEXTAUTH_SECRET && process.env.NEXTAUTH_SECRET.length < 32) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/auth-otp.service.ts",
+          "line": 25,
+          "context": "return crypto.createHash('sha256').update(otp + (process.env.NEXTAUTH_SECRET || '')).digest('hex')"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/qr-token.service.ts",
+          "line": 11,
+          "context": "const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'default-jwt-secret';"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/auth/[...nextauth].ts",
+          "line": 155,
+          "context": "const secret = process.env.NEXTAUTH_SECRET"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PAYMENTS_PROVIDER": {
+      "name": "PAYMENTS_PROVIDER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 78,
+          "context": "const provider = (process.env.PAYMENTS_PROVIDER || 'intouch').toLowerCase()"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DATABASE_URL": {
+      "name": "DATABASE_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 145,
+          "context": "if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('postgresql://')) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 145,
+          "context": "if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('postgresql://')) {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "database",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_API_URL": {
+      "name": "IREMBOPAY_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 160,
+          "context": "if (process.env.IREMBOPAY_API_URL && !process.env.IREMBOPAY_API_URL.startsWith('http')) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+          "line": 160,
+          "context": "if (process.env.IREMBOPAY_API_URL && !process.env.IREMBOPAY_API_URL.startsWith('http')) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 90,
+          "context": "apiUrl: config?.apiUrl || process.env.IREMBOPAY_API_URL || 'https://api.irembo.com',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "LOG_LEVEL": {
+      "name": "LOG_LEVEL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/logger.ts",
+          "line": 55,
+          "context": "if (process.env.LOG_LEVEL === 'debug') {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "CRON_SECRET": {
+      "name": "CRON_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/middleware/cronAuth.ts",
+          "line": 19,
+          "context": "const expectedSecret = process.env.CRON_SECRET"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/addon-renewals.ts",
+          "line": 16,
+          "context": "const cronSecret = process.env.CRON_SECRET;"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/invite-maintenance.ts",
+          "line": 8,
+          "context": "if (secret !== process.env.CRON_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/monthly-usage-reset.ts",
+          "line": 15,
+          "context": "const cronSecret = process.env.CRON_SECRET;"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/reconciliation.ts",
+          "line": 14,
+          "context": "const cronSecret = process.env.CRON_SECRET"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/reservation-reminders.ts",
+          "line": 22,
+          "context": "const expectedSecret = process.env.CRON_SECRET;"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/subscription-reminders.ts",
+          "line": 19,
+          "context": "if (cronSecret !== process.env.CRON_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/tap-leave-reconcile.ts",
+          "line": 11,
+          "context": "const cronSecret = process.env.CRON_SECRET"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cron/tap-leave-sweep.ts",
+          "line": 11,
+          "context": "const cronSecret = process.env.CRON_SECRET"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IREMBOPAY_SECRET_KEY": {
+      "name": "IREMBOPAY_SECRET_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/middleware/webhookAuth.ts",
+          "line": 23,
+          "context": "const secret = process.env.IREMBOPAY_SECRET_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 57,
+          "context": "private static readonly SECRET_KEY = process.env.IREMBOPAY_SECRET_KEY!"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "NEXT_PUBLIC_SENTRY_DSN": {
+      "name": "NEXT_PUBLIC_SENTRY_DSN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+          "line": 4,
+          "context": "if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+          "line": 9,
+          "context": "dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/sentry.ts",
+          "line": 13,
+          "context": "const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "SENTRY_ENVIRONMENT": {
+      "name": "SENTRY_ENVIRONMENT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+          "line": 10,
+          "context": "environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+          "line": 6,
+          "context": "environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SENTRY_TRACES_SAMPLE_RATE": {
+      "name": "SENTRY_TRACES_SAMPLE_RATE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+          "line": 11,
+          "context": "tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+          "line": 7,
+          "context": "tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || '0'),"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SENTRY_DSN": {
+      "name": "SENTRY_DSN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+          "line": 3,
+          "context": "if (process.env.SENTRY_DSN) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+          "line": 5,
+          "context": "dsn: process.env.SENTRY_DSN,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/sentry.ts",
+          "line": 13,
+          "context": "const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "INTOUCH_API_URL": {
+      "name": "INTOUCH_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 64,
+          "context": "apiUrl: config?.apiUrl || process.env.INTOUCH_API_URL || 'https://www.intouchpay.co.rw/api',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+          "line": 46,
+          "context": "private static readonly API_URL = process.env.INTOUCH_API_URL || 'https://www.intouchpay.co.rw/api'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "INTOUCH_USERNAME": {
+      "name": "INTOUCH_USERNAME",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 65,
+          "context": "username: config?.username || process.env.INTOUCH_USERNAME || '',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+          "line": 47,
+          "context": "private static readonly USERNAME = process.env.INTOUCH_USERNAME || ''"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "INTOUCH_ACCOUNT_NO": {
+      "name": "INTOUCH_ACCOUNT_NO",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 66,
+          "context": "accountNo: config?.accountNo || process.env.INTOUCH_ACCOUNT_NO || '',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+          "line": 48,
+          "context": "private static readonly ACCOUNT_NO = process.env.INTOUCH_ACCOUNT_NO || ''"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "INTOUCH_PARTNER_PASSWORD": {
+      "name": "INTOUCH_PARTNER_PASSWORD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 67,
+          "context": "partnerPassword: config?.partnerPassword || process.env.INTOUCH_PARTNER_PASSWORD || process.env.INTO"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+          "line": 49,
+          "context": "private static readonly PASSWORD = process.env.INTOUCH_PASSWORD || process.env.INTOUCH_PARTNER_PASSW"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "INTOUCH_PASSWORD": {
+      "name": "INTOUCH_PASSWORD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 67,
+          "context": "partnerPassword: config?.partnerPassword || process.env.INTOUCH_PARTNER_PASSWORD || process.env.INTO"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+          "line": 49,
+          "context": "private static readonly PASSWORD = process.env.INTOUCH_PASSWORD || process.env.INTOUCH_PARTNER_PASSW"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "INTOUCH_CALLBACK_URL": {
+      "name": "INTOUCH_CALLBACK_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+          "line": 68,
+          "context": "callbackUrl: config?.callbackUrl || process.env.INTOUCH_CALLBACK_URL || `${process.env.APP_URL}/api/"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_MERCHANT_ID": {
+      "name": "IREMBOPAY_MERCHANT_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 91,
+          "context": "merchantId: config?.merchantId || process.env.IREMBOPAY_MERCHANT_ID || '',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_API_KEY": {
+      "name": "IREMBOPAY_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 92,
+          "context": "apiKey: config?.apiKey || process.env.IREMBOPAY_API_KEY || '',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IREMBOPAY_API_SECRET": {
+      "name": "IREMBOPAY_API_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 93,
+          "context": "apiSecret: config?.apiSecret || process.env.IREMBOPAY_API_SECRET || '',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IREMBOPAY_CALLBACK_URL": {
+      "name": "IREMBOPAY_CALLBACK_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 94,
+          "context": "callbackUrl: config?.callbackUrl || process.env.IREMBOPAY_CALLBACK_URL || `${process.env.APP_URL}/ap"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_RETURN_URL": {
+      "name": "IREMBOPAY_RETURN_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+          "line": 95,
+          "context": "returnUrl: config?.returnUrl || process.env.IREMBOPAY_RETURN_URL || `${process.env.APP_URL}/billing/"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "PUSHER_APP_ID": {
+      "name": "PUSHER_APP_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+          "line": 5,
+          "context": "if (!process.env.PUSHER_APP_ID) return null"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+          "line": 8,
+          "context": "appId: process.env.PUSHER_APP_ID,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+          "line": 10,
+          "context": "if (!process.env.PUSHER_APP_ID) return res.status(503).json({ error: 'Pusher not configured' })"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+          "line": 14,
+          "context": "appId: process.env.PUSHER_APP_ID,"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "PUSHER_KEY": {
+      "name": "PUSHER_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+          "line": 9,
+          "context": "key: process.env.PUSHER_KEY,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+          "line": 15,
+          "context": "key: process.env.PUSHER_KEY,"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PUSHER_SECRET": {
+      "name": "PUSHER_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+          "line": 10,
+          "context": "secret: process.env.PUSHER_SECRET,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+          "line": 16,
+          "context": "secret: process.env.PUSHER_SECRET,"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PUSHER_CLUSTER": {
+      "name": "PUSHER_CLUSTER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+          "line": 11,
+          "context": "cluster: process.env.PUSHER_CLUSTER || 'eu',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+          "line": 17,
+          "context": "cluster: process.env.PUSHER_CLUSTER || 'eu',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "NEXT_PUBLIC_PUSHER_CLUSTER": {
+      "name": "NEXT_PUBLIC_PUSHER_CLUSTER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/realtime.ts",
+          "line": 6,
+          "context": "const PUSHER_CLUSTER = process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'eu'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": true
+    },
+    "ALERT_EMAIL_TO": {
+      "name": "ALERT_EMAIL_TO",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 16,
+          "context": "const emailTo = process.env.ALERT_EMAIL_TO"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SMTP_HOST": {
+      "name": "SMTP_HOST",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 20,
+          "context": "host: process.env.SMTP_HOST,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 10,
+          "context": "const host = process.env.SMTP_HOST"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 12,
+          "context": "const host = process.env.SMTP_HOST"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SMTP_PORT": {
+      "name": "SMTP_PORT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 21,
+          "context": "port: parseInt(process.env.SMTP_PORT || '587'),"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 11,
+          "context": "const port = parseInt(process.env.SMTP_PORT || '587', 10)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 13,
+          "context": "const port = parseInt(process.env.SMTP_PORT || '587', 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SMTP_SECURE": {
+      "name": "SMTP_SECURE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 22,
+          "context": "secure: process.env.SMTP_SECURE === 'true',"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SMTP_USER": {
+      "name": "SMTP_USER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 24,
+          "context": "user: process.env.SMTP_USER,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 12,
+          "context": "const user = process.env.SMTP_USER"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 14,
+          "context": "const user = process.env.SMTP_USER"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SMTP_PASSWORD": {
+      "name": "SMTP_PASSWORD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 25,
+          "context": "pass: process.env.SMTP_PASSWORD,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 13,
+          "context": "const pass = process.env.SMTP_PASSWORD"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 15,
+          "context": "const pass = process.env.SMTP_PASSWORD"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "SMTP_FROM": {
+      "name": "SMTP_FROM",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 44,
+          "context": "from: process.env.SMTP_FROM || 'alerts@imboni.rw',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 14,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 64,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 164,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 216,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 250,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 284,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+          "line": 356,
+          "context": "const from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.serve>'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+          "line": 31,
+          "context": "private static from = process.env.SMTP_FROM || 'Imboni Serve <noreply@imboni.rw>'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SLACK_WEBHOOK_URL": {
+      "name": "SLACK_WEBHOOK_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+          "line": 55,
+          "context": "const webhookUrl = process.env.SLACK_WEBHOOK_URL"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "monitoring",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AUTO_APPROVE_THRESHOLD": {
+      "name": "AUTO_APPROVE_THRESHOLD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/business-approval.service.ts",
+          "line": 33,
+          "context": "private static readonly AUTO_APPROVE_THRESHOLD = parseInt(process.env.AUTO_APPROVE_THRESHOLD || '30'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AI_CPA_ENABLED": {
+      "name": "AI_CPA_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/cost-anomaly.service.ts",
+          "line": 16,
+          "context": "return process.env.AI_CPA_ENABLED !== 'false'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "CPA_THRESHOLD_PERCENT": {
+      "name": "CPA_THRESHOLD_PERCENT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/cost-anomaly.service.ts",
+          "line": 24,
+          "context": "const thresholdPercent = input.thresholdPercent ?? Number(process.env.CPA_THRESHOLD_PERCENT ?? 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "API_NINJAS_KEY": {
+      "name": "API_NINJAS_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/currency-conversion.service.ts",
+          "line": 18,
+          "context": "const API_KEY = process.env.API_NINJAS_KEY"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IREMBOPAY_API_BASE": {
+      "name": "IREMBOPAY_API_BASE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 56,
+          "context": "private static readonly API_BASE = process.env.IREMBOPAY_API_BASE || 'https://api.sandbox.irembopay."
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_PUBLIC_KEY": {
+      "name": "IREMBOPAY_PUBLIC_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 58,
+          "context": "private static readonly PUBLIC_KEY = process.env.IREMBOPAY_PUBLIC_KEY!"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IREMBOPAY_PAYMENT_ACCOUNT": {
+      "name": "IREMBOPAY_PAYMENT_ACCOUNT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 59,
+          "context": "private static readonly PAYMENT_ACCOUNT = process.env.IREMBOPAY_PAYMENT_ACCOUNT!"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_PAYMENT_ITEM_CODE": {
+      "name": "IREMBOPAY_PAYMENT_ITEM_CODE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 60,
+          "context": "private static readonly PAYMENT_ITEM_CODE = process.env.IREMBOPAY_PAYMENT_ITEM_CODE!"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_API_VERSION": {
+      "name": "IREMBOPAY_API_VERSION",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 61,
+          "context": "private static readonly API_VERSION = process.env.IREMBOPAY_API_VERSION || '2'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "IREMBOPAY_WEBHOOK_TOLERANCE_SECONDS": {
+      "name": "IREMBOPAY_WEBHOOK_TOLERANCE_SECONDS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+          "line": 62,
+          "context": "private static readonly WEBHOOK_TOLERANCE_SECONDS = parseInt(process.env.IREMBOPAY_WEBHOOK_TOLERANCE"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_API_KEY": {
+      "name": "MTN_MOMO_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 45,
+          "context": "if (!process.env.MTN_MOMO_API_KEY || !process.env.MTN_MOMO_SUBSCRIPTION_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 96,
+          "context": "'Authorization': `Bearer ${process.env.MTN_MOMO_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 246,
+          "context": "'Authorization': `Bearer ${process.env.MTN_MOMO_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 52,
+          "context": "private static readonly API_KEY = process.env.MTN_MOMO_API_KEY!"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 80,
+          "context": "if (!process.env.MTN_MOMO_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 108,
+          "context": "'Authorization': `Bearer ${process.env.MTN_MOMO_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 258,
+          "context": "'Authorization': `Bearer ${process.env.MTN_MOMO_API_KEY}`,"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "MTN_MOMO_SUBSCRIPTION_KEY": {
+      "name": "MTN_MOMO_SUBSCRIPTION_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 45,
+          "context": "if (!process.env.MTN_MOMO_API_KEY || !process.env.MTN_MOMO_SUBSCRIPTION_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 99,
+          "context": "'Ocp-Apim-Subscription-Key': process.env.MTN_MOMO_SUBSCRIPTION_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 248,
+          "context": "'Ocp-Apim-Subscription-Key': process.env.MTN_MOMO_SUBSCRIPTION_KEY || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 50,
+          "context": "private static readonly SUBSCRIPTION_KEY = process.env.MTN_MOMO_SUBSCRIPTION_KEY!"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 111,
+          "context": "'Ocp-Apim-Subscription-Key': process.env.MTN_MOMO_SUBSCRIPTION_KEY || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 260,
+          "context": "'Ocp-Apim-Subscription-Key': process.env.MTN_MOMO_SUBSCRIPTION_KEY || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "unknown",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "MTN_MOMO_API_URL": {
+      "name": "MTN_MOMO_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 79,
+          "context": "const apiUrl = process.env.MTN_MOMO_API_URL || 'https://sandbox.momodeveloper.mtn.com'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 239,
+          "context": "const apiUrl = process.env.MTN_MOMO_API_URL || 'https://sandbox.momodeveloper.mtn.com'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 103,
+          "context": "`${process.env.MTN_MOMO_API_URL || 'https://sandbox.momodeveloper.mtn.com'}/collection/v1_0/requestt"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 255,
+          "context": "`${process.env.MTN_MOMO_API_URL || 'https://sandbox.momodeveloper.mtn.com'}/collection/v1_0/requestt"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_ENVIRONMENT": {
+      "name": "MTN_MOMO_ENVIRONMENT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 80,
+          "context": "const environment = process.env.MTN_MOMO_ENVIRONMENT || 'sandbox'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 240,
+          "context": "const environment = process.env.MTN_MOMO_ENVIRONMENT || 'sandbox'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 49,
+          "context": "private static readonly ENVIRONMENT = process.env.MTN_MOMO_ENVIRONMENT || 'sandbox'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 110,
+          "context": "'X-Target-Environment': process.env.MTN_MOMO_ENVIRONMENT || 'sandbox',"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 259,
+          "context": "'X-Target-Environment': process.env.MTN_MOMO_ENVIRONMENT || 'sandbox',"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AIRTEL_MONEY_CLIENT_ID": {
+      "name": "AIRTEL_MONEY_CLIENT_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 136,
+          "context": "if (!process.env.AIRTEL_MONEY_CLIENT_ID || !process.env.AIRTEL_MONEY_CLIENT_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 355,
+          "context": "const clientId = process.env.AIRTEL_MONEY_CLIENT_ID"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AIRTEL_MONEY_CLIENT_SECRET": {
+      "name": "AIRTEL_MONEY_CLIENT_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 136,
+          "context": "if (!process.env.AIRTEL_MONEY_CLIENT_ID || !process.env.AIRTEL_MONEY_CLIENT_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 356,
+          "context": "const clientSecret = process.env.AIRTEL_MONEY_CLIENT_SECRET"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "AIRTEL_MONEY_API_URL": {
+      "name": "AIRTEL_MONEY_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 182,
+          "context": "const apiUrl = process.env.AIRTEL_MONEY_API_URL || 'https://openapiuat.airtel.africa'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 302,
+          "context": "const apiUrl = process.env.AIRTEL_MONEY_API_URL || 'https://openapiuat.airtel.africa'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+          "line": 354,
+          "context": "const apiUrl = process.env.AIRTEL_MONEY_API_URL || 'https://openapiuat.airtel.africa'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 164,
+          "context": "`${process.env.AIRTEL_MONEY_API_URL || 'https://openapiuat.airtel.africa'}/merchant/v1/payments/`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 274,
+          "context": "`${process.env.AIRTEL_MONEY_API_URL || 'https://openapiuat.airtel.africa'}/standard/v1/payments/${re"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_API_USER": {
+      "name": "MTN_MOMO_API_USER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 51,
+          "context": "private static readonly API_USER = process.env.MTN_MOMO_API_USER!"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_CALLBACK_HOST": {
+      "name": "MTN_MOMO_CALLBACK_HOST",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 53,
+          "context": "private static readonly CALLBACK_HOST = process.env.MTN_MOMO_CALLBACK_HOST || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_CURRENCY": {
+      "name": "MTN_MOMO_CURRENCY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 54,
+          "context": "private static readonly CURRENCY = process.env.MTN_MOMO_CURRENCY || 'RWF'"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MTN_MOMO_TARGET_ENVIRONMENT": {
+      "name": "MTN_MOMO_TARGET_ENVIRONMENT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+          "line": 55,
+          "context": "private static readonly TARGET_ENVIRONMENT = process.env.MTN_MOMO_TARGET_ENVIRONMENT || 'mtnrwanda'"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TWILIO_WHATSAPP_NUMBER": {
+      "name": "TWILIO_WHATSAPP_NUMBER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 24,
+          "context": "const fromEnv = process.env.TWILIO_WHATSAPP_NUMBER || process.env.TWILIO_PHONE_NUMBER || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 169,
+          "context": "const fromEnv = process.env.TWILIO_WHATSAPP_NUMBER || process.env.TWILIO_PHONE_NUMBER || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-order.service.ts",
+          "line": 16,
+          "context": "const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 290,
+          "context": "const fromNumber = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, '')"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TWILIO_PHONE_NUMBER": {
+      "name": "TWILIO_PHONE_NUMBER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 24,
+          "context": "const fromEnv = process.env.TWILIO_WHATSAPP_NUMBER || process.env.TWILIO_PHONE_NUMBER || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 169,
+          "context": "const fromEnv = process.env.TWILIO_WHATSAPP_NUMBER || process.env.TWILIO_PHONE_NUMBER || ''"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TWILIO_ACCOUNT_SID": {
+      "name": "TWILIO_ACCOUNT_SID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 26,
+          "context": "if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !fromEnv) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 33,
+          "context": "`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 38,
+          "context": "`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 171,
+          "context": "if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !fromEnv) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 232,
+          "context": "`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 237,
+          "context": "`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-order.service.ts",
+          "line": 14,
+          "context": "const accountSid = process.env.TWILIO_ACCOUNT_SID"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 7,
+          "context": "const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 54,
+          "context": "'Authorization': `Basic ${Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_T"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TWILIO_AUTH_TOKEN": {
+      "name": "TWILIO_AUTH_TOKEN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 26,
+          "context": "if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !fromEnv) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 38,
+          "context": "`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 171,
+          "context": "if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !fromEnv) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+          "line": 237,
+          "context": "`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-order.service.ts",
+          "line": 15,
+          "context": "const authToken = process.env.TWILIO_AUTH_TOKEN"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 7,
+          "context": "const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+          "line": 54,
+          "context": "'Authorization': `Basic ${Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_T"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/whatsapp.ts",
+          "line": 17,
+          "context": "const authToken = process.env.TWILIO_AUTH_TOKEN"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PESAPAL_CONSUMER_KEY": {
+      "name": "PESAPAL_CONSUMER_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 21,
+          "context": "if (!process.env.PESAPAL_CONSUMER_KEY || !process.env.PESAPAL_CONSUMER_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 223,
+          "context": "consumer_key: process.env.PESAPAL_CONSUMER_KEY,"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PESAPAL_CONSUMER_SECRET": {
+      "name": "PESAPAL_CONSUMER_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 21,
+          "context": "if (!process.env.PESAPAL_CONSUMER_KEY || !process.env.PESAPAL_CONSUMER_SECRET) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 224,
+          "context": "consumer_secret: process.env.PESAPAL_CONSUMER_SECRET"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "PESAPAL_IPN_ID": {
+      "name": "PESAPAL_IPN_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 38,
+          "context": "notification_id: process.env.PESAPAL_IPN_ID,"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "PESAPAL_API_URL": {
+      "name": "PESAPAL_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 46,
+          "context": "`${process.env.PESAPAL_API_URL || 'https://pay.pesapal.com/v3'}/api/Transactions/SubmitOrderRequest`"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 216,
+          "context": "`${process.env.PESAPAL_API_URL || 'https://pay.pesapal.com/v3'}/api/Auth/RequestToken`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 238,
+          "context": "`${process.env.PESAPAL_API_URL || 'https://pay.pesapal.com/v3'}/api/Transactions/GetTransactionStatu"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "AIRTEL_MONEY_API_KEY": {
+      "name": "AIRTEL_MONEY_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 138,
+          "context": "if (!process.env.AIRTEL_MONEY_API_KEY) {"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 169,
+          "context": "'Authorization': `Bearer ${process.env.AIRTEL_MONEY_API_KEY}`,"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+          "line": 277,
+          "context": "'Authorization': `Bearer ${process.env.AIRTEL_MONEY_API_KEY}`,"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": true,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "IMBONI_QR_SECRET": {
+      "name": "IMBONI_QR_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/qr-token.service.ts",
+          "line": 10,
+          "context": "const QR_SECRET = process.env.IMBONI_QR_SECRET || 'default-qr-secret-change-in-production';"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "AI_SRO_ENABLED": {
+      "name": "AI_SRO_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+          "line": 31,
+          "context": "return process.env.AI_SRO_ENABLED !== 'false'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DEFAULT_LEAD_TIME_DAYS": {
+      "name": "DEFAULT_LEAD_TIME_DAYS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+          "line": 35,
+          "context": "if (!supplierId) return Number(process.env.DEFAULT_LEAD_TIME_DAYS ?? 2)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+          "line": 37,
+          "context": "return supplier?.leadTimeDays ?? Number(process.env.DEFAULT_LEAD_TIME_DAYS ?? 2)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SRO_DAYS_WINDOW": {
+      "name": "SRO_DAYS_WINDOW",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+          "line": 60,
+          "context": "const daysWindow = input.daysWindow ?? Number(process.env.SRO_DAYS_WINDOW ?? 14)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SRO_SAFETY_STOCK_DAYS": {
+      "name": "SRO_SAFETY_STOCK_DAYS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+          "line": 61,
+          "context": "const safetyStockDays = input.safetyStockDays ?? Number(process.env.SRO_SAFETY_STOCK_DAYS ?? 1)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MAX_VIDEO_DURATION_SEC": {
+      "name": "MAX_VIDEO_DURATION_SEC",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 13,
+          "context": "const MAX_VIDEO_DURATION_SEC = parseInt(process.env.MAX_VIDEO_DURATION_SEC || '30', 10)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/cms/media/upload.ts",
+          "line": 101,
+          "context": "const maxDuration = parseInt(process.env.MAX_VIDEO_DURATION_SEC || '30', 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "MAX_VIDEO_SIZE_MB": {
+      "name": "MAX_VIDEO_SIZE_MB",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 14,
+          "context": "const MAX_VIDEO_SIZE_MB = parseInt(process.env.MAX_VIDEO_SIZE_MB || '50', 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPABASE_STORAGE_URL": {
+      "name": "SUPABASE_STORAGE_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 22,
+          "context": "private static supabase = process.env.SUPABASE_STORAGE_URL && process.env.SUPABASE_STORAGE_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 23,
+          "context": "? createClient(process.env.SUPABASE_STORAGE_URL, process.env.SUPABASE_STORAGE_KEY)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "storage",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPABASE_STORAGE_KEY": {
+      "name": "SUPABASE_STORAGE_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 22,
+          "context": "private static supabase = process.env.SUPABASE_STORAGE_URL && process.env.SUPABASE_STORAGE_KEY"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 23,
+          "context": "? createClient(process.env.SUPABASE_STORAGE_URL, process.env.SUPABASE_STORAGE_KEY)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "storage",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "SUPABASE_STORAGE_PRIV_BUCKET": {
+      "name": "SUPABASE_STORAGE_PRIV_BUCKET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 25,
+          "context": "private static privBucket = process.env.SUPABASE_STORAGE_PRIV_BUCKET || 'documents-priv'"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "storage",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPABASE_STORAGE_BUCKET": {
+      "name": "SUPABASE_STORAGE_BUCKET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 62,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 188,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 243,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 279,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 293,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/support/upload.ts",
+          "line": 91,
+          "context": "const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media-uploads'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "storage",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_MAX_DOC_MB": {
+      "name": "DIE_MAX_DOC_MB",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+          "line": 111,
+          "context": "const maxMB = parseInt(process.env.DIE_MAX_DOC_MB || '25', 10)"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/upload.ts",
+          "line": 21,
+          "context": "const MAX_FILE_SIZE = parseInt(process.env.DIE_MAX_DOC_MB || '25', 10) * 1024 * 1024"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TRIAL_HASH_SECRET": {
+      "name": "TRIAL_HASH_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 24,
+          "context": "const secret = process.env.TRIAL_HASH_SECRET || ''"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 29,
+          "context": "const secret = process.env.TRIAL_HASH_SECRET || ''"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "DISPOSABLE_EMAIL_DOMAINS": {
+      "name": "DISPOSABLE_EMAIL_DOMAINS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 48,
+          "context": "const envList = (process.env.DISPOSABLE_EMAIL_DOMAINS || '').split(',').map(d => d.trim().toLowerCas"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TRIAL_IP_RANGE_LIMIT": {
+      "name": "TRIAL_IP_RANGE_LIMIT",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 97,
+          "context": "const ipRangeLimit = parseInt(process.env.TRIAL_IP_RANGE_LIMIT || '5', 10)"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "CAPTCHA_ENABLED": {
+      "name": "CAPTCHA_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 104,
+          "context": "const captchaEnabled = process.env.CAPTCHA_ENABLED === 'true'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "TRIAL_CAPTCHA_THRESHOLD": {
+      "name": "TRIAL_CAPTCHA_THRESHOLD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 105,
+          "context": "const captchaThreshold = parseInt(process.env.TRIAL_CAPTCHA_THRESHOLD || '70', 10)"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "CAPTCHA_TEST_MODE": {
+      "name": "CAPTCHA_TEST_MODE",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 177,
+          "context": "if (process.env.CAPTCHA_TEST_MODE === 'true') {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "CAPTCHA_TEST_TOKEN": {
+      "name": "CAPTCHA_TEST_TOKEN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+          "line": 178,
+          "context": "const t = process.env.CAPTCHA_TEST_TOKEN || ''"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "WHATSAPP_CLOUD_TOKEN": {
+      "name": "WHATSAPP_CLOUD_TOKEN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+          "line": 31,
+          "context": "const token = process.env.WHATSAPP_CLOUD_TOKEN"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "WHATSAPP_PHONE_NUMBER_ID": {
+      "name": "WHATSAPP_PHONE_NUMBER_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+          "line": 32,
+          "context": "const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+          "line": 126,
+          "context": "fromNumber: from || process.env.WHATSAPP_PHONE_NUMBER_ID || '',"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "WHATSAPP_API_VERSION": {
+      "name": "WHATSAPP_API_VERSION",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+          "line": 33,
+          "context": "const version = process.env.WHATSAPP_API_VERSION || 'v18.0'"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "WHATSAPP_APP_SECRET": {
+      "name": "WHATSAPP_APP_SECRET",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+          "line": 141,
+          "context": "const appSecret = process.env.WHATSAPP_APP_SECRET"
+        },
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/whatsapp.ts",
+          "line": 31,
+          "context": "if (process.env.WHATSAPP_APP_SECRET && !WhatsAppCloudService.verifyWebhookSignature(rawBody, signatu"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "auth",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "WHATSAPP_API_URL": {
+      "name": "WHATSAPP_API_URL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp.service.ts",
+          "line": 16,
+          "context": "private static apiUrl = process.env.WHATSAPP_API_URL || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "WHATSAPP_API_KEY": {
+      "name": "WHATSAPP_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp.service.ts",
+          "line": 17,
+          "context": "private static apiKey = process.env.WHATSAPP_API_KEY || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "WHATSAPP_FROM_NUMBER": {
+      "name": "WHATSAPP_FROM_NUMBER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp.service.ts",
+          "line": 18,
+          "context": "private static fromNumber = process.env.WHATSAPP_FROM_NUMBER || ''"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "ALLOW_LEGACY_CREDENTIALS": {
+      "name": "ALLOW_LEGACY_CREDENTIALS",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/auth/[...nextauth].ts",
+          "line": 69,
+          "context": "if (process.env.ALLOW_LEGACY_CREDENTIALS === 'true' && process.env.NODE_ENV !== 'production') {"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "DIE_INTELLIGENCE_CONVERGENCE_ENABLED": {
+      "name": "DIE_INTELLIGENCE_CONVERGENCE_ENABLED",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/convergence.ts",
+          "line": 5,
+          "context": "if (process.env.DIE_INTELLIGENCE_CONVERGENCE_ENABLED !== 'true') {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPPORT_EMAIL": {
+      "name": "SUPPORT_EMAIL",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/support/public-inquiry.ts",
+          "line": 26,
+          "context": "const supportEmail = process.env.SUPPORT_EMAIL || 'support@imboniserve.com'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": true,
+      "category": "messaging",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPPORT_PUBLIC_BUSINESS_ID": {
+      "name": "SUPPORT_PUBLIC_BUSINESS_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/support/public-inquiry.ts",
+          "line": 56,
+          "context": "const envBusinessId = process.env.SUPPORT_PUBLIC_BUSINESS_ID || null"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "SUPPORT_ASSIGN_USER_ID": {
+      "name": "SUPPORT_ASSIGN_USER_ID",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/support/public-inquiry.ts",
+          "line": 57,
+          "context": "const envAssignUserId = process.env.SUPPORT_ASSIGN_USER_ID || null"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "WEATHER_PROVIDER": {
+      "name": "WEATHER_PROVIDER",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/weather/current.ts",
+          "line": 127,
+          "context": "const provider = (process.env.WEATHER_PROVIDER || 'open-meteo').toLowerCase()"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "api",
+      "isSecret": false,
+      "isPublic": false
+    },
+    "OPENWEATHER_API_KEY": {
+      "name": "OPENWEATHER_API_KEY",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/weather/current.ts",
+          "line": 128,
+          "context": "const openWeatherKey = process.env.OPENWEATHER_API_KEY"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "api",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "INTOUCH_WEBHOOK_USERNAME": {
+      "name": "INTOUCH_WEBHOOK_USERNAME",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/intouch.ts",
+          "line": 29,
+          "context": "const expectedUsername = process.env.INTOUCH_WEBHOOK_USERNAME"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "INTOUCH_WEBHOOK_PASSWORD": {
+      "name": "INTOUCH_WEBHOOK_PASSWORD",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/intouch.ts",
+          "line": 30,
+          "context": "const expectedPassword = process.env.INTOUCH_WEBHOOK_PASSWORD"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "payment",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "WHATSAPP_VERIFY_TOKEN": {
+      "name": "WHATSAPP_VERIFY_TOKEN",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/whatsapp.ts",
+          "line": 21,
+          "context": "if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {"
+        }
+      ],
+      "inExample": false,
+      "inActualEnv": false,
+      "category": "messaging",
+      "isSecret": true,
+      "isPublic": false
+    },
+    "NEXT_PUBLIC_ENABLE_SW_DEV": {
+      "name": "NEXT_PUBLIC_ENABLE_SW_DEV",
+      "usages": [
+        {
+          "file": "C:/Dev/ImboniResto/src/pages/_app.tsx",
+          "line": 43,
+          "context": "const enableDevSW = process.env.NEXT_PUBLIC_ENABLE_SW_DEV === 'true'"
+        }
+      ],
+      "inExample": true,
+      "inActualEnv": false,
+      "category": "unknown",
+      "isSecret": false,
+      "isPublic": true
+    }
+  },
+  "missingVariables": [
+    "NEXT_PUBLIC_MTN_ENABLE",
+    "NEXT_PUBLIC_AIRTEL_ENABLE",
+    "NODE_ENV",
+    "NEXT_PUBLIC_SITE_URL",
+    "VERCEL",
+    "EXCHANGE_RATES_API_KEY",
+    "DIE_AI_ASSISTANT_ENABLED",
+    "DIE_FINANCE_INTELLIGENCE_ENABLED",
+    "DIE_AI_CEO_LAYER_ENABLED",
+    "DIE_INTELLIGENCE_ARBITRATION_ENABLED",
+    "DIE_INTELLIGENCE_KERNEL_SHADOW",
+    "DIE_INTELLIGENCE_DUAL_READ_ENABLED",
+    "DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED",
+    "DIE_SHADOW_CAMPAIGNS_ENABLED",
+    "DIE_SHADOW_DELIVERY_ENABLED",
+    "DIE_SHADOW_DINING_SLIPS_ENABLED",
+    "DIE_SHADOW_EVENTS_ENABLED",
+    "DIE_SHADOW_INVENTORY_ENABLED",
+    "DIE_SHADOW_KDS_ENABLED",
+    "DIE_SHADOW_LOYALTY_ENABLED",
+    "DIE_SHADOW_PROCUREMENT_ENABLED",
+    "DIE_SHADOW_RESERVATIONS_ENABLED",
+    "DIE_SHADOW_SUPPLIERS_ENABLED",
+    "DIE_BUSINESS_INTELLIGENCE_ENABLED",
+    "DIE_INTELLIGENCE_RELIABILITY_ENABLED",
+    "DIE_INTELLIGENCE_EVALUATION_ENABLED",
+    "DIE_BACKGROUND_JOBS",
+    "DIE_EVALUATION_WINDOW_MS",
+    "DIE_INTELLIGENCE_KERNEL_ENABLED",
+    "DIE_INTELLIGENCE_META_VALIDATION_ENABLED",
+    "DIE_PERSISTENCE_MODE",
+    "NEXT_PUBLIC_APP_URL",
+    "AZURE_DI_ENDPOINT",
+    "AZURE_DI_KEY",
+    "DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED",
+    "API_NINJAS_KEY",
+    "MTN_MOMO_API_KEY",
+    "MTN_MOMO_SUBSCRIPTION_KEY",
+    "MTN_MOMO_API_URL",
+    "MTN_MOMO_ENVIRONMENT",
+    "AIRTEL_MONEY_CLIENT_ID",
+    "AIRTEL_MONEY_CLIENT_SECRET",
+    "AIRTEL_MONEY_API_URL",
+    "MTN_MOMO_API_USER",
+    "MTN_MOMO_CALLBACK_HOST",
+    "MTN_MOMO_CURRENCY",
+    "MTN_MOMO_TARGET_ENVIRONMENT",
+    "PESAPAL_CONSUMER_KEY",
+    "PESAPAL_CONSUMER_SECRET",
+    "PESAPAL_IPN_ID",
+    "PESAPAL_API_URL",
+    "AIRTEL_MONEY_API_KEY",
+    "SUPABASE_STORAGE_PRIV_BUCKET",
+    "TRIAL_CAPTCHA_THRESHOLD",
+    "WHATSAPP_CLOUD_TOKEN",
+    "WHATSAPP_PHONE_NUMBER_ID",
+    "WHATSAPP_API_VERSION",
+    "WHATSAPP_APP_SECRET",
+    "WHATSAPP_API_URL",
+    "WHATSAPP_API_KEY",
+    "WHATSAPP_FROM_NUMBER",
+    "DIE_INTELLIGENCE_CONVERGENCE_ENABLED",
+    "WHATSAPP_VERIFY_TOKEN"
+  ],
+  "unusedVariables": [
+    "DIRECT_URL",
+    "SUPPORT_PHONE",
+    "SUPPORT_WHATSAPP",
+    "FEATURE_FLAG_AUTO_CHECK_ENABLED",
+    "STORAGE_PROVIDER",
+    "MAX_IMAGE_SIZE_MB",
+    "AI_CREDITS_ENABLED",
+    "AI_CREDITS_COST_BUSINESS_SCANNER",
+    "AI_CREDITS_COST_SITE_BUILDER_AI",
+    "AI_CREDITS_COST_MENU_SUGGESTIONS",
+    "SITE_BUILDER_PRO_MONTHLY_PRICE",
+    "DISCOVERY_FEATURED_MONTHLY_PRICE",
+    "DISCOVERY_PREMIUM_MONTHLY_PRICE",
+    "AI_CREDITS_PACK_SMALL",
+    "AI_CREDITS_PACK_MEDIUM",
+    "AI_CREDITS_PACK_LARGE"
+  ],
+  "duplicatedVariables": [],
+  "greenVariables": [
+    "APP_URL",
+    "NEXT_PUBLIC_PUSHER_KEY",
+    "OPENAI_MODEL_PRIMARY",
+    "OPENAI_MODEL_FALLBACK",
+    "OPENAI_COST_INPUT_PER_1K_USD",
+    "OPENAI_COST_OUTPUT_PER_1K_USD",
+    "OPENAI_API_KEY",
+    "CRON_WORKER",
+    "NEXTAUTH_URL",
+    "REDIS_URL",
+    "NEXTAUTH_SECRET",
+    "PAYMENTS_PROVIDER",
+    "DATABASE_URL",
+    "CRON_SECRET",
+    "IREMBOPAY_SECRET_KEY",
+    "INTOUCH_API_URL",
+    "INTOUCH_USERNAME",
+    "INTOUCH_ACCOUNT_NO",
+    "INTOUCH_PASSWORD",
+    "PUSHER_APP_ID",
+    "PUSHER_KEY",
+    "PUSHER_SECRET",
+    "PUSHER_CLUSTER",
+    "NEXT_PUBLIC_PUSHER_CLUSTER",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+    "SMTP_FROM",
+    "IREMBOPAY_API_BASE",
+    "IREMBOPAY_PUBLIC_KEY",
+    "IREMBOPAY_PAYMENT_ACCOUNT",
+    "IREMBOPAY_PAYMENT_ITEM_CODE",
+    "IREMBOPAY_API_VERSION",
+    "IREMBOPAY_WEBHOOK_TOLERANCE_SECONDS",
+    "TWILIO_WHATSAPP_NUMBER",
+    "TWILIO_PHONE_NUMBER",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "IMBONI_QR_SECRET",
+    "TRIAL_HASH_SECRET",
+    "SUPPORT_EMAIL"
+  ],
+  "yellowVariables": [
+    "NEXT_PUBLIC_CRISP_WEBSITE_ID",
+    "DIE_PROVIDER_TIMEOUT_MS",
+    "IREMBOPAY_API_URL",
+    "LOG_LEVEL",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "SENTRY_ENVIRONMENT",
+    "SENTRY_TRACES_SAMPLE_RATE",
+    "SENTRY_DSN",
+    "INTOUCH_PARTNER_PASSWORD",
+    "INTOUCH_CALLBACK_URL",
+    "IREMBOPAY_MERCHANT_ID",
+    "IREMBOPAY_API_KEY",
+    "IREMBOPAY_API_SECRET",
+    "IREMBOPAY_CALLBACK_URL",
+    "IREMBOPAY_RETURN_URL",
+    "ALERT_EMAIL_TO",
+    "SMTP_SECURE",
+    "SLACK_WEBHOOK_URL",
+    "AUTO_APPROVE_THRESHOLD",
+    "AI_CPA_ENABLED",
+    "CPA_THRESHOLD_PERCENT",
+    "AI_SRO_ENABLED",
+    "DEFAULT_LEAD_TIME_DAYS",
+    "SRO_DAYS_WINDOW",
+    "SRO_SAFETY_STOCK_DAYS",
+    "MAX_VIDEO_DURATION_SEC",
+    "MAX_VIDEO_SIZE_MB",
+    "SUPABASE_STORAGE_URL",
+    "SUPABASE_STORAGE_KEY",
+    "SUPABASE_STORAGE_BUCKET",
+    "DIE_MAX_DOC_MB",
+    "DISPOSABLE_EMAIL_DOMAINS",
+    "TRIAL_IP_RANGE_LIMIT",
+    "CAPTCHA_ENABLED",
+    "CAPTCHA_TEST_MODE",
+    "CAPTCHA_TEST_TOKEN",
+    "ALLOW_LEGACY_CREDENTIALS",
+    "SUPPORT_PUBLIC_BUSINESS_ID",
+    "SUPPORT_ASSIGN_USER_ID",
+    "WEATHER_PROVIDER",
+    "OPENWEATHER_API_KEY",
+    "INTOUCH_WEBHOOK_USERNAME",
+    "INTOUCH_WEBHOOK_PASSWORD",
+    "NEXT_PUBLIC_ENABLE_SW_DEV"
+  ],
+  "redVariables": [
+    "NEXT_PUBLIC_MTN_ENABLE",
+    "NEXT_PUBLIC_AIRTEL_ENABLE",
+    "NODE_ENV",
+    "NEXT_PUBLIC_SITE_URL",
+    "VERCEL",
+    "EXCHANGE_RATES_API_KEY",
+    "DIE_AI_ASSISTANT_ENABLED",
+    "DIE_FINANCE_INTELLIGENCE_ENABLED",
+    "DIE_AI_CEO_LAYER_ENABLED",
+    "DIE_INTELLIGENCE_ARBITRATION_ENABLED",
+    "DIE_INTELLIGENCE_KERNEL_SHADOW",
+    "DIE_INTELLIGENCE_DUAL_READ_ENABLED",
+    "DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED",
+    "DIE_SHADOW_CAMPAIGNS_ENABLED",
+    "DIE_SHADOW_DELIVERY_ENABLED",
+    "DIE_SHADOW_DINING_SLIPS_ENABLED",
+    "DIE_SHADOW_EVENTS_ENABLED",
+    "DIE_SHADOW_INVENTORY_ENABLED",
+    "DIE_SHADOW_KDS_ENABLED",
+    "DIE_SHADOW_LOYALTY_ENABLED",
+    "DIE_SHADOW_PROCUREMENT_ENABLED",
+    "DIE_SHADOW_RESERVATIONS_ENABLED",
+    "DIE_SHADOW_SUPPLIERS_ENABLED",
+    "DIE_BUSINESS_INTELLIGENCE_ENABLED",
+    "DIE_INTELLIGENCE_RELIABILITY_ENABLED",
+    "DIE_INTELLIGENCE_EVALUATION_ENABLED",
+    "DIE_BACKGROUND_JOBS",
+    "DIE_EVALUATION_WINDOW_MS",
+    "DIE_INTELLIGENCE_KERNEL_ENABLED",
+    "DIE_INTELLIGENCE_META_VALIDATION_ENABLED",
+    "DIE_PERSISTENCE_MODE",
+    "NEXT_PUBLIC_APP_URL",
+    "AZURE_DI_ENDPOINT",
+    "AZURE_DI_KEY",
+    "DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED",
+    "API_NINJAS_KEY",
+    "MTN_MOMO_API_KEY",
+    "MTN_MOMO_SUBSCRIPTION_KEY",
+    "MTN_MOMO_API_URL",
+    "MTN_MOMO_ENVIRONMENT",
+    "AIRTEL_MONEY_CLIENT_ID",
+    "AIRTEL_MONEY_CLIENT_SECRET",
+    "AIRTEL_MONEY_API_URL",
+    "MTN_MOMO_API_USER",
+    "MTN_MOMO_CALLBACK_HOST",
+    "MTN_MOMO_CURRENCY",
+    "MTN_MOMO_TARGET_ENVIRONMENT",
+    "PESAPAL_CONSUMER_KEY",
+    "PESAPAL_CONSUMER_SECRET",
+    "PESAPAL_IPN_ID",
+    "PESAPAL_API_URL",
+    "AIRTEL_MONEY_API_KEY",
+    "SUPABASE_STORAGE_PRIV_BUCKET",
+    "TRIAL_CAPTCHA_THRESHOLD",
+    "WHATSAPP_CLOUD_TOKEN",
+    "WHATSAPP_PHONE_NUMBER_ID",
+    "WHATSAPP_API_VERSION",
+    "WHATSAPP_APP_SECRET",
+    "WHATSAPP_API_URL",
+    "WHATSAPP_API_KEY",
+    "WHATSAPP_FROM_NUMBER",
+    "DIE_INTELLIGENCE_CONVERGENCE_ENABLED",
+    "WHATSAPP_VERIFY_TOKEN"
+  ]
+}

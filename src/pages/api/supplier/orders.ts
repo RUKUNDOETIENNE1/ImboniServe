@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/middleware/auth.middleware'
+import { ingestProcurementShadowEvent } from '@/lib/die/business-as-plugin/procurement/procurement.shadow'
+import { ingestSuppliersShadowEvent } from '@/lib/die/business-as-plugin/suppliers/suppliers.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -99,6 +101,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         },
       })
+
+      // Shadow taps (feature-flagged, non-blocking)
+      ingestProcurementShadowEvent({
+        type: 'PURCHASE_ORDER_CREATED',
+        businessId: isAdmin ? resolvedBusinessId : (businessIdFromUser as string),
+        poId: order.id,
+        supplierId,
+        orderNumber,
+      }).catch(() => {})
+
+      ingestSuppliersShadowEvent({
+        type: 'SUPPLIER_ORDER_ASSIGNED',
+        businessId: isAdmin ? resolvedBusinessId : (businessIdFromUser as string),
+        supplierId,
+        orderId: order.id,
+        orderNumber,
+      }).catch(() => {})
 
       return res.status(201).json(order)
     }

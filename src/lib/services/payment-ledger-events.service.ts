@@ -21,6 +21,12 @@ function mapStatusToBillingEvent(status: PaymentTransactionStatus): BillingEvent
   }
 }
 
+/**
+ * READ-ONLY GUARD: Verifies that a FinancialLedgerEntry exists for the payment transaction.
+ * Does NOT write. All writes must go through billing-ledger.service.ts (single writer rule).
+ * 
+ * @deprecated Use logBillingEvent from billing-ledger.service.ts directly for writes.
+ */
 export async function ensurePaymentLedgerEvent(
   paymentTransactionId: string,
   status?: PaymentTransactionStatus,
@@ -37,12 +43,22 @@ export async function ensurePaymentLedgerEvent(
   const eventType = mapStatusToBillingEvent(effectiveStatus)
   if (!eventType) return
 
-  // Enforce once-per-status per payment transaction.
+  // Check if ledger entry exists
   const existing = await prisma.financialLedgerEntry.count({
     where: { paymentTransactionId: tx.id, eventType },
   })
-  if (existing > 0) return
+  
+  if (existing > 0) {
+    // Entry exists, guard satisfied
+    return
+  }
 
+  // Entry missing: delegate to primary writer
+  console.warn('[PaymentLedgerEvents] Missing FLE detected; delegating to billing-ledger', {
+    paymentTransactionId: tx.id,
+    eventType,
+  })
+  
   await logBillingEvent({
     businessId: tx.businessId,
     paymentTransactionId: tx.id,

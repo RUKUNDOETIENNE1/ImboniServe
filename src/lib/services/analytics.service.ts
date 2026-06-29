@@ -6,7 +6,7 @@ export class AnalyticsService {
 
     const [totalSales, salesByDay, topItems, salesBySource, revenueByPayment] = await Promise.all([
       prisma.sale.aggregate({
-        where: { businessId, createdAt: { gte: since }, isPaid: true },
+        where: { businessId, createdAt: { gte: since }, isPaid: true }, // Sale.isPaid boolean field
         _sum: { totalAmountCents: true },
         _count: { id: true },
         _avg: { totalAmountCents: true },
@@ -20,7 +20,7 @@ export class AnalyticsService {
         FROM "Sale"
         WHERE "businessId" = ${businessId}
           AND "createdAt" >= ${since}
-          AND "isPaid" = true
+          AND "isPaid" = true -- Sale.isPaid boolean column
         GROUP BY 1
         ORDER BY 1 ASC
       `,

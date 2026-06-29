@@ -26,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       sale: {
         businessId,
         customerId: id as string,
-        status: { in: ['COMPLETED', 'PAID'] }
+        paymentStatus: 'COMPLETED'
       }
     },
     _count: { menuItemId: true },

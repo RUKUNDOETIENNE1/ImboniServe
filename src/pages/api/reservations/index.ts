@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
+import { PaymentTransactionStatus } from '@prisma/client'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -53,7 +55,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse, businessId: 
       partySize: r.partySize,
       tableNumber: r.table?.number,
       depositAmount: r.depositCents ? r.depositCents / 100 : 0,
-      depositPaid: r.depositStatus === 'PAID',
+      depositPaid: r.depositStatus === PaymentTransactionStatus.SUCCESS,
       status: r.status,
       specialRequests: r.specialRequests,
       createdAt: r.createdAt.toISOString()
@@ -101,6 +103,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, businessId:
       }
     })
 
+    // Shadow tap: BOOKING_CREATED (feature-flagged, non-blocking)
+    ingestReservationShadowEvent({
+      type: 'BOOKING_CREATED',
+      businessId,
+      reservationId: reservation.id,
+      partySize: reservation.partySize,
+      scheduledAtIso: new Date(`${date}T${time}`).toISOString(),
+    }).catch(() => {})
+
     return res.status(201).json({
       reservation: {
         id: reservation.id,
@@ -111,7 +122,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, businessId:
         time: reservation.reservationTime,
         partySize: reservation.partySize,
         depositAmount: reservation.depositCents ? reservation.depositCents / 100 : 0,
-        depositPaid: reservation.depositStatus === 'PAID',
+        depositPaid: reservation.depositStatus === PaymentTransactionStatus.SUCCESS,
         status: reservation.status,
         specialRequests: reservation.specialRequests
       }

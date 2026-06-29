@@ -6,8 +6,10 @@
  */
 
 import { prisma } from '@/lib/prisma'
-import type { TicketEventType } from '@prisma/client'
+import type { TicketEventType, PrismaClient, TicketEvent } from '@prisma/client'
 import { randomBytes } from 'crypto'
+
+type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>
 
 export interface RecordEventInput {
   saleId: string
@@ -72,6 +74,56 @@ export class TicketEventService {
 
       // Log other errors but don't fail the operation
       console.error('[TicketEvent] Failed to record event:', error)
+    }
+  }
+
+  /**
+   * Record an event within an existing transaction.
+   * Use this when you need to include the event in a larger atomic operation.
+   */
+  static async recordEventTx(
+    tx: TransactionClient,
+    input: RecordEventInput
+  ): Promise<TicketEvent | null> {
+    try {
+      const idempotencyKey =
+        input.idempotencyKey ||
+        this.generateIdempotencyKey(input.saleId, input.saleItemId, input.eventType)
+
+      let sequenceNumber: number | undefined
+
+      if (input.saleItemId) {
+        const lastEvent = await tx.ticketEvent.findFirst({
+          where: { saleItemId: input.saleItemId },
+          orderBy: { sequenceNumber: 'desc' },
+          select: { sequenceNumber: true },
+        })
+
+        sequenceNumber = (lastEvent?.sequenceNumber || 0) + 1
+      }
+
+      return await tx.ticketEvent.create({
+        data: {
+          saleId: input.saleId,
+          eventType: input.eventType,
+          saleItemId: input.saleItemId,
+          stationId: input.stationId,
+          actorId: input.actorId,
+          actorName: input.actorName,
+          previousState: input.previousState,
+          newState: input.newState,
+          metadata: (input.metadata || null) as any,
+          idempotencyKey,
+          sequenceNumber,
+        },
+      })
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('idempotencyKey')) {
+        console.log('[TicketEvent] Duplicate event ignored (idempotent):', input.eventType)
+        return null
+      }
+      console.error('[TicketEvent] Failed to record event:', error)
+      return null
     }
   }
 

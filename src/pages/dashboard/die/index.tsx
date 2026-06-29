@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/components/DashboardLayout'
 import { DocumentStatusBadge, ConfidenceBadge } from '@/components/die/StatusBadge'
 import { useToast } from '@/components/ui/Toast'
+import ConfirmModal from '@/components/ConfirmModal'
 import Link from 'next/link'
 import type { GetServerSideProps } from 'next'
 import {
   FileText, Upload, CheckCircle, AlertTriangle, Clock, Search,
-  ChevronLeft, ChevronRight, Eye, Filter, X, ScanLine
+  ChevronLeft, ChevronRight, Eye, Filter, X, ScanLine, Wrench, RotateCcw, XCircle, BarChart2, Activity
 } from 'lucide-react'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -45,6 +46,13 @@ export default function DIEDashboard() {
   const [filters, setFilters] = useState({ status: '', documentType: '', search: '' })
   const [showFilters, setShowFilters] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState<'approve' | 'reject' | 'replay' | 'repair' | null>(null)
+  const [bulkRejectReason, setBulkRejectReason] = useState('')
+  const [bulkRunning, setBulkRunning] = useState(false)
+  const [bulkProgress, setBulkProgress] = useState({ total: 0, done: 0, ok: 0, failed: 0 })
+  const [bulkErrors, setBulkErrors] = useState<Array<{ id: string; error: string }>>([])
 
   const limit = 15
 
@@ -89,6 +97,10 @@ export default function DIEDashboard() {
 
   useEffect(() => { fetchDocuments() }, [fetchDocuments])
   useEffect(() => { fetchStats() }, [fetchStats])
+
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [page, filters.status, filters.documentType, filters.search])
 
   // SSE for real-time updates
   useEffect(() => {
@@ -144,6 +156,115 @@ export default function DIEDashboard() {
   }
 
   const pages = Math.ceil(total / limit)
+  const pageIds = useMemo(() => documents.map((d) => d.id).filter(Boolean), [documents])
+  const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id))
+  const selectedCount = selectedIds.size
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const selectPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      for (const id of pageIds) next.add(id)
+      return next
+    })
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const toggleSelectPage = () => {
+    if (allPageSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        for (const id of pageIds) next.delete(id)
+        return next
+      })
+      return
+    }
+    selectPage()
+  }
+
+  const runBulk = async () => {
+    if (!bulkAction) return
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+
+    setBulkRunning(true)
+    setBulkErrors([])
+    setBulkProgress({ total: ids.length, done: 0, ok: 0, failed: 0 })
+
+    const errors: Array<{ id: string; error: string }> = []
+    let ok = 0
+
+    for (const id of ids) {
+      try {
+        if (bulkAction === 'approve') {
+          const res = await fetch(`/api/die/documents/${id}/approve`, { method: 'POST' })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(json?.error || 'Approve failed')
+        }
+
+        if (bulkAction === 'reject') {
+          const res = await fetch(`/api/die/documents/${id}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: bulkRejectReason || 'Bulk rejected' }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(json?.error || 'Reject failed')
+        }
+
+        if (bulkAction === 'replay') {
+          const res = await fetch('/api/die/operations/replay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ documentId: id, fullReplay: true, force: true }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(json?.error || 'Replay failed')
+        }
+
+        if (bulkAction === 'repair') {
+          const res = await fetch('/api/die/operations/repair', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ documentId: id }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(json?.error || 'Repair failed')
+        }
+
+        ok += 1
+      } catch (e: any) {
+        errors.push({ id, error: e?.message || 'Bulk action failed' })
+      } finally {
+        setBulkProgress((p) => ({
+          total: ids.length,
+          done: p.done + 1,
+          ok: ok,
+          failed: errors.length,
+        }))
+      }
+    }
+
+    setBulkErrors(errors)
+    setBulkRunning(false)
+
+    if (errors.length === 0) success(`Bulk ${bulkAction} completed`, `${ok}/${ids.length} succeeded`)
+    else showError(`Bulk ${bulkAction} completed with errors`, `${errors.length}/${ids.length} failed`)
+
+    setBulkAction(null)
+    clearSelection()
+    fetchDocuments()
+    fetchStats()
+  }
 
   return (
     <DashboardLayout>
@@ -155,6 +276,21 @@ export default function DIEDashboard() {
               <ScanLine className="w-6 h-6" /> Document Intelligence
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">Upload, process, and review supplier documents</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/die/overview"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50"
+            >
+              <BarChart2 className="w-4 h-4" /> Overview
+            </Link>
+            <Link
+              href="/dashboard/die/operations"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50"
+            >
+              <Activity className="w-4 h-4" /> Operations
+            </Link>
           </div>
         </div>
 
@@ -267,10 +403,64 @@ export default function DIEDashboard() {
             </div>
           ) : (
             <>
+              {selectedCount > 0 && (
+                <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="text-sm text-slate-700">
+                    <span className="font-semibold">{selectedCount}</span> selected
+                    <button
+                      onClick={toggleSelectPage}
+                      className="ml-3 text-xs px-2 py-1 rounded border border-slate-200 hover:bg-white"
+                    >
+                      {allPageSelected ? 'Unselect page' : 'Select page'}
+                    </button>
+                    <button
+                      onClick={clearSelection}
+                      className="ml-2 text-xs px-2 py-1 rounded border border-slate-200 hover:bg-white"
+                    >
+                      Clear
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => setBulkAction('approve')}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700"
+                    >
+                      <span className="inline-flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Approve</span>
+                    </button>
+                    <button
+                      onClick={() => setBulkAction('reject')}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                    >
+                      <span className="inline-flex items-center gap-1"><XCircle className="w-3.5 h-3.5" /> Reject</span>
+                    </button>
+                    <button
+                      onClick={() => setBulkAction('replay')}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700"
+                    >
+                      <span className="inline-flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> Replay</span>
+                    </button>
+                    <button
+                      onClick={() => setBulkAction('repair')}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      <span className="inline-flex items-center gap-1"><Wrench className="w-3.5 h-3.5" /> Repair</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
+                      <th className="text-left px-4 py-3 font-medium text-slate-600">
+                        <input
+                          type="checkbox"
+                          checked={allPageSelected}
+                          onChange={toggleSelectPage}
+                        />
+                      </th>
                       <th className="text-left px-4 py-3 font-medium text-slate-600">Invoice</th>
                       <th className="text-left px-4 py-3 font-medium text-slate-600">Type</th>
                       <th className="text-left px-4 py-3 font-medium text-slate-600">Supplier</th>
@@ -283,6 +473,13 @@ export default function DIEDashboard() {
                   <tbody className="divide-y divide-slate-100">
                     {documents.map((doc: any) => (
                       <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(doc.id)}
+                            onChange={() => toggleSelect(doc.id)}
+                          />
+                        </td>
                         <td className="px-4 py-3">
                           <span className="font-medium text-slate-800">{doc.invoiceNumber || 'N/A'}</span>
                         </td>
@@ -333,6 +530,65 @@ export default function DIEDashboard() {
             </>
           )}
         </div>
+
+        <ConfirmModal
+          isOpen={bulkAction !== null}
+          onClose={() => {
+            if (bulkRunning) return
+            setBulkAction(null)
+          }}
+          onConfirm={() => {
+            if (bulkRunning) return
+            void runBulk()
+          }}
+          title={bulkAction ? `Bulk ${bulkAction}` : 'Bulk Action'}
+          message={`You are about to ${bulkAction} ${selectedCount} documents. Continue?`}
+          confirmText={bulkRunning ? 'Running…' : 'Confirm'}
+          cancelText="Cancel"
+          type={bulkAction === 'reject' ? 'danger' : bulkAction === 'repair' ? 'warning' : 'info'}
+        />
+
+        {bulkAction === 'reject' && (
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <p className="text-sm text-slate-600 mb-2">Reject reason (bulk)</p>
+            <textarea
+              value={bulkRejectReason}
+              onChange={(e) => setBulkRejectReason(e.target.value)}
+              className="w-full border border-slate-200 rounded-lg p-3 text-sm min-h-[90px]"
+              placeholder="Reason for bulk rejection..."
+            />
+          </div>
+        )}
+
+        {bulkRunning && (
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <p className="text-sm text-slate-700 font-medium">Bulk progress</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Done: {bulkProgress.done}/{bulkProgress.total} · OK: {bulkProgress.ok} · Failed: {bulkProgress.failed}
+            </p>
+            <div className="h-2 bg-slate-100 rounded mt-2 overflow-hidden">
+              <div
+                className="h-2 bg-imboni-blue"
+                style={{ width: `${bulkProgress.total ? Math.round((bulkProgress.done / bulkProgress.total) * 100) : 0}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {bulkErrors.length > 0 && (
+          <div className="bg-white rounded-xl border border-red-200 p-4">
+            <p className="text-sm font-semibold text-red-700">Bulk errors</p>
+            <div className="mt-2 space-y-1 text-xs text-red-700">
+              {bulkErrors.slice(0, 10).map((e) => (
+                <div key={e.id} className="flex items-center justify-between gap-2">
+                  <span className="font-mono">{e.id.slice(0, 10)}…</span>
+                  <span className="truncate">{e.error}</span>
+                </div>
+              ))}
+              {bulkErrors.length > 10 && <p className="text-xs text-red-600">+{bulkErrors.length - 10} more…</p>}
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )

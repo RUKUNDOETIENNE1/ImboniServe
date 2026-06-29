@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { TableManagementPluginAdapter } from '@/lib/die/business-as-plugin/table-management/table.adapter'
+import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
+import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
@@ -51,6 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(404).json({ error: 'Table not found' })
       }
 
+      const before = await prisma.table.findFirst({ where: { id: tableId, businessId } })
       const updated = await prisma.table.update({
         where: { id: tableId },
         data: {
@@ -72,6 +76,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         }
       })
+
+      // Shadow taps (feature-flagged inside router/bindings)
+      try {
+        const adapter = new TableManagementPluginAdapter()
+        const nowTs = new Date().toISOString()
+        if (status && before?.status !== status) {
+          await routeDomainEvent(adapter, shadowBindings, {
+            domain: 'table-management',
+            type: 'TABLE_STATUS_UPDATED',
+            timestamp: nowTs,
+            businessId,
+            severity: 'INFO',
+            data: { tableId: tableId, status },
+          })
+        }
+        if (assignedWaiterId !== undefined && before?.assignedWaiterId !== assignedWaiterId) {
+          await routeDomainEvent(adapter, shadowBindings, {
+            domain: 'table-management',
+            type: 'WAITER_ASSIGNED',
+            timestamp: nowTs,
+            businessId,
+            severity: 'INFO',
+            data: { tableId: tableId, waiterId: assignedWaiterId },
+          })
+        }
+      } catch {}
 
       return res.status(200).json({ table: updated })
     }

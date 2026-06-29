@@ -8,10 +8,15 @@
  * - NEVER overwrite silently
  * - ALWAYS append new versions
  * - Stations see "what changed, not just current state"
+ * 
+ * MIGRATED TO SaleItemStatusService (Phase 2 Kitchen Consumption Engine)
+ * cancelItem now flows through the authoritative service chain:
+ * SaleItemStatusService → ConsumptionEngineService → InventoryLedgerService
  */
 
 import { prisma } from '@/lib/prisma'
 import type { MutationType } from '@prisma/client'
+import { SaleItemStatusService } from './sale-item-status.service'
 
 export interface MutationInput {
   saleId: string
@@ -118,6 +123,9 @@ export class OrderMutationService {
 
   /**
    * Cancel item (marks as cancelled, never deletes)
+   * 
+   * MIGRATED TO SaleItemStatusService (Phase 2 Kitchen Consumption Engine)
+   * This ensures consumption reversal is triggered if item was already consumed.
    */
   static async cancelItem(itemId: string, actorId?: string): Promise<MutationResult> {
     const item = await prisma.saleItem.findUnique({
@@ -129,16 +137,43 @@ export class OrderMutationService {
       throw new Error('Item not found')
     }
 
-    // Update to cancelled
-    const cancelledItem = await prisma.saleItem.update({
-      where: { id: itemId },
-      data: {
-        mutationType: 'CANCELLED',
-        itemStatus: 'CANCELED',
-      },
-      include: {
-        menuItem: true,
-      },
+    // ─────────────────────────────────────────────────────────────────────────
+    // PHASE 2 MIGRATION: Use SaleItemStatusService for cancellation
+    // This ensures consumption reversal is triggered if item was consumed
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Use transaction to update both mutationType and itemStatus atomically
+    const cancelledItem = await prisma.$transaction(async (tx) => {
+      // First, transition status via SaleItemStatusService (handles reversal)
+      try {
+        await SaleItemStatusService.transitionTx(tx, {
+          saleItemId: itemId,
+          newStatus: 'CANCELED',
+          actorUserId: actorId,
+          metadata: {
+            source: 'order-mutation-service',
+            reason: 'CANCELLED',
+          },
+        })
+      } catch (transitionError) {
+        // If transition fails (e.g., already cancelled), log but continue
+        // The mutationType update is still needed for order mutation tracking
+        console.warn(
+          `[OrderMutationService] Status transition failed for ${itemId}:`,
+          transitionError
+        )
+      }
+
+      // Update mutationType (this is separate from itemStatus)
+      return tx.saleItem.update({
+        where: { id: itemId },
+        data: {
+          mutationType: 'CANCELLED',
+        },
+        include: {
+          menuItem: true,
+        },
+      })
     })
 
     return {

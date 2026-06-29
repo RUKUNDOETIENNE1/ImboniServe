@@ -36,6 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { invoiceNumber, paymentStatus, paidAt, paymentMethod, paymentReference } = payload.data
 
     console.log('[Webhook] Received IremboPay notification', { invoiceNumber, paymentStatus })
+    // PII redacted: phone/customer data not logged
 
     // Fetch invoice status from IremboPay API (server-to-server verification)
     const invoiceStatus = await IremboPayService.getInvoiceStatus(invoiceNumber)
@@ -136,10 +137,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
       if (sale) {
-        // Atomically set PAID if not already; derive isPaid to avoid drift
+        // Atomically set COMPLETED if not already; derive isPaid to avoid drift
         const saleUpdate = await prisma.sale.updateMany({
-          where: { id: sale.id, paymentStatus: { not: 'PAID' } },
-          data: { paymentStatus: 'PAID', isPaid: true }
+          where: { id: sale.id, paymentStatus: { not: 'COMPLETED' } },
+          data: { paymentStatus: 'COMPLETED', isPaid: true }
         })
 
         if (saleUpdate.count > 0) {

@@ -1,3 +1,20 @@
+/**
+ * InventoryService
+ * 
+ * Handles MANUAL inventory operations:
+ * - Creating/updating inventory items
+ * - Recording manual stock adjustments (ADD, REMOVE, WASTE, ADJUSTMENT)
+ * - Stock alerts and low stock queries
+ * 
+ * NOTE: This service is for MANUAL inventory management, NOT kitchen consumption.
+ * Kitchen consumption flows through:
+ *   SaleItemStatusService → ConsumptionEngineService → InventoryLedgerService
+ * 
+ * The two paths are intentionally separate:
+ * - InventoryService: Manual adjustments (deliveries, waste, corrections)
+ * - InventoryLedgerService: Automated consumption from kitchen execution
+ */
+
 import { prisma } from '@/lib/prisma'
 import type { CreateInventoryItemInput, UpdateInventoryItemInput, InventoryUpdateInput } from '@/lib/validations/inventory.schema'
 

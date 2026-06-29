@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestSuppliersShadowEvent } from '@/lib/die/business-as-plugin/suppliers/suppliers.shadow'
+import { ingestProcurementShadowEvent } from '@/lib/die/business-as-plugin/procurement/procurement.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -30,6 +32,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       select: { id: true, orderNumber: true, status: true, updatedAt: true, business: true }
     })
+
+    // Shadow taps (feature-flagged, non-blocking)
+    const businessId = updated.business.id
+    ingestSuppliersShadowEvent({
+      type: 'SUPPLIER_DELIVERY_COMPLETED',
+      businessId,
+      supplierId: (order as any)?.supplierId,
+      orderId: id as string,
+      orderNumber: updated.orderNumber,
+    }).catch(() => {})
+
+    ingestProcurementShadowEvent({
+      type: 'PURCHASE_ORDER_RECEIVED',
+      businessId,
+      poId: id as string,
+      supplierId: (order as any)?.supplierId,
+      orderNumber: updated.orderNumber,
+    }).catch(() => {})
+
+    ingestProcurementShadowEvent({
+      type: 'GOODS_RECEIVED',
+      businessId,
+      poId: id as string,
+      supplierId: (order as any)?.supplierId,
+      orderNumber: updated.orderNumber,
+    }).catch(() => {})
 
     if (updated.business.whatsappNumber) {
       await prisma.whatsAppMessage.create({

@@ -9,9 +9,11 @@ import { InTouchService } from './services/intouch.service'
 import { DiningSessionSlipService } from './services/dining-session-slip.service'
 import { TapLeaveFinalizationService } from './services/tap-leave-finalization.service'
 import { WhatsAppCloudService } from './services/whatsapp-cloud.service'
+import { AlertDeliveryService } from './services/alert-delivery.service'
 import { runAutopilotCheck } from './cron/autopilot-features'
 import { prisma } from './prisma'
 import { logger } from './logger'
+import { PaymentTransactionStatus } from '@prisma/client'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -59,6 +61,7 @@ export class CronService {
     this.scheduleTapLeaveFinalizationSweeper()
     this.scheduleWhatsappReorderFunnel()
     this.scheduleReservationNoShowForfeit()
+    this.scheduleGenericPaymentWatchdog()
 
     logger.info('All cron jobs started')
   }
@@ -394,7 +397,7 @@ export class CronService {
         const ordersToRelease = await prisma.sale.findMany({
           where: {
             orderSource: 'QR_REMOTE',
-            paymentStatus: 'PAID',
+            paymentStatus: 'COMPLETED',
             kitchenReleasedAt: null,
             scheduledAt: { not: null }
           },
@@ -462,7 +465,7 @@ export class CronService {
               await prisma.paymentTransaction.update({
                 where: { id: p.id },
                 data: {
-                  status: 'PAID' as any,
+                  status: PaymentTransactionStatus.SUCCESS,
                   paidAt: new Date(),
                   rawStatus: { ...(p.rawStatus as any), reconciled: status },
                 },
@@ -476,7 +479,7 @@ export class CronService {
               // Mark as failed
               await prisma.paymentTransaction.update({
                 where: { id: p.id },
-                data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), reconciled: status } },
+                data: { status: PaymentTransactionStatus.FAILED, rawStatus: { ...(p.rawStatus as any), reconciled: status } },
               })
               await DiningSessionSlipService.markPaymentFailed(slipId, p.id, InTouchService.getErrorMessage(status.responsecode))
               continue
@@ -485,7 +488,7 @@ export class CronService {
             // Pending too long → timeout
             const ageMs = now.getTime() - new Date(p.createdAt).getTime()
             if (ageMs > 5 * 60 * 1000) {
-              await prisma.paymentTransaction.update({ where: { id: p.id }, data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), timeout: true } } })
+              await prisma.paymentTransaction.update({ where: { id: p.id }, data: { status: PaymentTransactionStatus.FAILED, rawStatus: { ...(p.rawStatus as any), timeout: true } } })
               await DiningSessionSlipService.markPaymentFailed(slipId, p.id, 'Payment timeout (reconciler)')
             }
           } catch (err) {
@@ -502,7 +505,7 @@ export class CronService {
   }
 
   /**
-   * Finalization Sweeper: recover any PAID Tap & Leave payments that missed finalization
+   * Finalization Sweeper: recover any SUCCESS Tap & Leave payments that missed finalization
    */
   private static scheduleTapLeaveFinalizationSweeper() {
     const tick = async () => {
@@ -510,7 +513,7 @@ export class CronService {
         const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
         const candidates = await prisma.paymentTransaction.findMany({
           where: {
-            status: 'PAID' as any,
+            status: PaymentTransactionStatus.SUCCESS,
             gateway: 'INTOUCH' as any,
             updatedAt: { lt: twoMinutesAgo },
           },
@@ -544,7 +547,7 @@ export class CronService {
   }
 
   /**
-   * WhatsApp re-order funnel: message customers 7 days after a paid order
+   * WhatsApp re-order funnel: message customers 7 days after a successful order
    */
   private static scheduleWhatsappReorderFunnel() {
     const tick = async () => {
@@ -595,7 +598,7 @@ export class CronService {
   }
 
   /**
-   * No-show forfeit: mark paid deposits as FORFEITED if guest did not show within 60 minutes after reservedAt
+   * No-show forfeit: mark successful deposits as FORFEITED if guest did not show within 60 minutes after reservedAt
    */
   private static scheduleReservationNoShowForfeit() {
     const tick = async () => {
@@ -606,7 +609,7 @@ export class CronService {
           where: {
             reservedAt: { lte: cutoff },
             status: { in: ['PENDING', 'CONFIRMED'] },
-            depositStatus: 'PAID' as any,
+            depositStatus: PaymentTransactionStatus.SUCCESS,
             completedAt: null,
             noShowReason: null,
           },
@@ -651,6 +654,86 @@ export class CronService {
     }, 60 * 60000) // Check every hour
 
     this.intervals.set('autopilot-features', interval)
+  }
+
+  /**
+   * Generic Payment Watchdog: Monitor all providers for stuck PENDING/PROCESSING payments
+   */
+  private static scheduleGenericPaymentWatchdog() {
+    const tick = async () => {
+      try {
+        const PENDING_THRESHOLD_MINUTES = 10
+        const PROCESSING_THRESHOLD_MINUTES = 15
+        const cutoffPending = new Date(Date.now() - PENDING_THRESHOLD_MINUTES * 60 * 1000)
+        const cutoffProcessing = new Date(Date.now() - PROCESSING_THRESHOLD_MINUTES * 60 * 1000)
+
+        // Find stuck PENDING payments
+        const stuckPending = await prisma.paymentTransaction.findMany({
+          where: {
+            status: PaymentTransactionStatus.PENDING,
+            createdAt: { lt: cutoffPending },
+          },
+          select: { id: true, gateway: true, transactionId: true, businessId: true, amountCents: true, createdAt: true },
+          take: 50,
+        })
+
+        // Find stuck PROCESSING payments
+        const stuckProcessing = await prisma.paymentTransaction.findMany({
+          where: {
+            status: PaymentTransactionStatus.PROCESSING,
+            updatedAt: { lt: cutoffProcessing },
+          },
+          select: { id: true, gateway: true, transactionId: true, businessId: true, amountCents: true, updatedAt: true },
+          take: 50,
+        })
+
+        const stuckCount = stuckPending.length + stuckProcessing.length
+
+        if (stuckCount > 0) {
+          logger.warn('[PaymentWatchdog] Stuck payments detected', {
+            pendingCount: stuckPending.length,
+            processingCount: stuckProcessing.length,
+          })
+
+          // Alert on high stuck payment count
+          if (stuckCount >= 10) {
+            await AlertDeliveryService.deliver({
+              severity: 'error',
+              title: `High stuck payment count: ${stuckCount}`,
+              details: {
+                pendingCount: stuckPending.length,
+                processingCount: stuckProcessing.length,
+                pendingThresholdMinutes: PENDING_THRESHOLD_MINUTES,
+                processingThresholdMinutes: PROCESSING_THRESHOLD_MINUTES,
+              },
+            })
+          }
+
+          // Alert on individual high-value stuck payments
+          for (const p of [...stuckPending, ...stuckProcessing]) {
+            if (p.amountCents >= 5000000) { // 50,000 RWF or more
+              await AlertDeliveryService.deliver({
+                severity: 'warning',
+                title: `High-value stuck payment: ${p.amountCents / 100} RWF`,
+                details: {
+                  paymentId: p.id,
+                  gateway: p.gateway,
+                  transactionId: p.transactionId,
+                  businessId: p.businessId,
+                  amountCents: p.amountCents,
+                },
+              })
+            }
+          }
+        }
+      } catch (err) {
+        logger.error('[PaymentWatchdog] Tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 5 minutes
+    const interval = setInterval(tick, 5 * 60 * 1000)
+    this.intervals.set('payment-watchdog', interval)
   }
 
   static async runManualReport(businessId: string) {

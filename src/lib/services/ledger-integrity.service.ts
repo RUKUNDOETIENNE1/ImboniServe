@@ -1,3 +1,13 @@
+/**
+ * BACKFILL-ONLY SERVICE
+ * 
+ * This service is for administrative backfill and reconciliation ONLY.
+ * DO NOT call from transaction flows, webhooks, or real-time payment processing.
+ * 
+ * Primary ledger writer: billing-ledger.service.ts
+ * This service: repair/backfill missing entries after the fact.
+ */
+
 import { prisma } from '@/lib/prisma'
 import { BillingEventType, PaymentTransactionStatus, LedgerDomain } from '@prisma/client'
 
@@ -68,6 +78,7 @@ async function createLedgerForTransaction(txId: string, occurredAt?: Date) {
 
 export class LedgerIntegrityService {
   static async validateRecentTransactions(hours: number = 48) {
+    console.warn('[LedgerIntegrity] BACKFILL MODE: Running validateRecentTransactions', { hours })
     const since = new Date(Date.now() - hours * 60 * 60 * 1000)
     const txs = await prisma.paymentTransaction.findMany({ where: { updatedAt: { gte: since } }, select: { id: true } })
     let checked = 0
@@ -77,6 +88,7 @@ export class LedgerIntegrityService {
       const r = await createLedgerForTransaction(t.id)
       if (r.created) created++
     }
+    console.warn('[LedgerIntegrity] BACKFILL COMPLETE', { checked, created })
     return { checked, created }
   }
 

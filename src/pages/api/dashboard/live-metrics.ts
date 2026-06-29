@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: {
         businessId,
         createdAt: { gte: todayStart },
-        paymentStatus: { in: ['COMPLETED', 'PAID'] }
+        paymentStatus: 'COMPLETED'
       },
       _sum: { totalAmountCents: true },
       _count: true
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: {
         businessId,
         createdAt: { gte: yesterdayStart, lt: todayStart },
-        paymentStatus: { in: ['COMPLETED', 'PAID'] }
+        paymentStatus: 'COMPLETED'
       },
       _sum: { totalAmountCents: true }
     })

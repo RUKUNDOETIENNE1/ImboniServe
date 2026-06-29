@@ -103,7 +103,7 @@ export class StorageService {
     mimeType: string,
     businessId: string
   ): Promise<{ storageKey: string; sizeBytes: number; mimeType: string }> {
-    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/json', 'text/plain']
     if (!allowed.includes(mimeType)) {
       throw new Error('Invalid document type')
     }

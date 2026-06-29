@@ -106,17 +106,30 @@ export default function Login() {
           await router.push('/admin')
           return
         }
-        // Check if the user is an affiliate; if the endpoint doesn't exist or returns non-200, fall back
+        // Affiliates
         try {
           const affRes = await fetch('/api/affiliate/dashboard', { method: 'GET' })
           if (affRes.ok) {
-            const data = await affRes.json().catch(() => ({}))
-            if (data && data.affiliate) {
+            const data = await affRes.json().catch(() => ({} as any))
+            if (data && (data as any).affiliate) {
               await router.push('/affiliate')
               return
             }
           }
         } catch { /* ignore and fall back */ }
+
+        // Onboarding completion validation — send first-timers to setup wizard
+        try {
+          const setupRes = await fetch('/api/business/setup-status')
+          if (setupRes.ok) {
+            const setup = await setupRes.json()
+            if (!setup.coreSetupComplete) {
+              await router.push('/setup')
+              return
+            }
+          }
+        } catch { /* ignore and fall back */ }
+
         await router.push('/dashboard')
       } else {
         setError('Login could not be completed. The code may have expired — request a new one.')

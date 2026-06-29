@@ -34,6 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         entityLinks: { orderBy: { createdAt: 'desc' } },
         reconciliation: true,
         anomalyAlerts: { orderBy: { createdAt: 'desc' } },
+        eventTimelines: {
+          orderBy: { createdAt: 'asc' },
+          take: 200,
+          select: { id: true, stage: true, status: true, metadata: true, createdAt: true },
+        },
       },
     })
 

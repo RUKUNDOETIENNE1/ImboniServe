@@ -9,6 +9,7 @@
  */
 
 import 'dotenv/config'
+import './alias-bootstrap'
 import { Worker, type Job, QueueEvents } from 'bullmq'
 import IORedis from 'ioredis'
 import {
@@ -27,6 +28,7 @@ import {
 import { prisma } from '../../prisma'
 import { StorageService } from '../../services/storage.service'
 import { buildProviderChain } from '../provider/index'
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 import { SupplierMatchingService } from '../services/supplier-matching.service'
 import { ProductMatchingService } from '../services/product-matching.service'
 import { ProcurementReconciliationService } from '../services/procurement-reconciliation.service'
@@ -36,6 +38,8 @@ import {
   DocumentLifecycleState,
 } from '../services/document-lifecycle.service'
 import { SystemRepairService } from '../services/system-repair.service'
+import { DIE_PLUGIN_EVENTS } from '@/lib/die/plugins/core/plugin-events'
+import { pluginRunner } from '@/lib/die/plugins/runtime/plugin-runner'
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
@@ -45,7 +49,7 @@ const connection = new IORedis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 })
 
@@ -102,12 +106,17 @@ const extractWorker = new Worker<ExtractJobData>(
   'die_extract',
   async (job: Job<ExtractJobData>) => {
     const started = Date.now()
-    const { scanJobId, fileKey, mime, documentType } = job.data
+    const { scanJobId, fileKey, mime, documentType: jobDocumentType } = job.data
 
     const p: any = prisma as any
     const scanJob = await p.scanJob.findUnique({ where: { id: scanJobId } })
     if (!scanJob) throw new Error('ScanJob not found')
     if (scanJob.status === 'EXTRACTED') return { skipped: true }
+
+    const extractionDocumentType = jobDocumentType ?? scanJob.documentType
+    let scannedDocumentId: string | null = null
+    let fieldsExtracted = 0
+    let linesExtracted = 0
 
     // Use a single transaction for status update + log creation
     await p.$transaction(async (tx: any) => {
@@ -125,7 +134,7 @@ const extractWorker = new Worker<ExtractJobData>(
     for (const prov of providerChain) {
       try {
         if (!prov.supportsMime(mime)) continue
-        result = await prov.extract({ buffer, mime, documentType: documentType as any })
+        result = await prov.extract({ buffer, mime, documentType: extractionDocumentType as any })
         providerUsed = prov.name
         break
       } catch (e) {
@@ -160,7 +169,10 @@ const extractWorker = new Worker<ExtractJobData>(
         })
       }
 
+      scannedDocumentId = scannedDoc.id
+
       if (Array.isArray(result.fields) && result.fields.length > 0) {
+        fieldsExtracted = result.fields.length
         await tx.extractedDocumentHeaderField.createMany({
           data: result.fields.map((f: any) => ({
             scannedDocumentId: scannedDoc.id,
@@ -173,6 +185,7 @@ const extractWorker = new Worker<ExtractJobData>(
       }
 
       if (Array.isArray(result.lines)) {
+        linesExtracted = result.lines.length
         let lineNo = 0
         for (const line of result.lines) {
           lineNo += 1
@@ -222,6 +235,48 @@ const extractWorker = new Worker<ExtractJobData>(
     }, { timeout: 30000 })
 
     const durationMs = Date.now() - started
+
+    if (scannedDocumentId) {
+      const basePayload = {
+        businessId: scanJob.businessId,
+        documentId: scannedDocumentId,
+        scanJobId,
+        documentType: extractionDocumentType,
+        userId: scanJob.createdByUserId ?? null,
+      }
+      const timestamp = new Date()
+
+      void pluginRunner
+        .emit({
+          type: DIE_PLUGIN_EVENTS.OCR_COMPLETED,
+          trigger: DIE_PLUGIN_EVENTS.OCR_COMPLETED,
+          timestamp,
+          payload: {
+            ...basePayload,
+            durationMs,
+          },
+        })
+        .catch((err) => {
+          console.error('[PluginRunner] Failed to emit ocr.completed', err)
+        })
+
+      void pluginRunner
+        .emit({
+          type: DIE_PLUGIN_EVENTS.EXTRACTION_COMPLETED,
+          trigger: DIE_PLUGIN_EVENTS.EXTRACTION_COMPLETED,
+          timestamp,
+          payload: {
+            ...basePayload,
+            provider: providerUsed,
+            fieldsExtracted,
+            linesExtracted,
+          },
+        })
+        .catch((err) => {
+          console.error('[PluginRunner] Failed to emit extraction.completed', err)
+        })
+    }
+
     return { ok: true, durationMs }
   },
   { connection, concurrency: 5, limiter: { max: 10, duration: 1000 } }
@@ -264,8 +319,8 @@ extractWorker.on('completed', (job: Job<ExtractJobData>) => {
 extractWorker.on('failed', async (job, err) => {
   void markJobFailed()
   if (!job) return
+  const p: any = prisma
   try {
-    const p: any = prisma
     await p.documentProcessingLog.create({
       data: {
         scanJobId: job.data.scanJobId,
@@ -283,6 +338,36 @@ extractWorker.on('failed', async (job, err) => {
     try {
       await extractDLQ.add('failed-extraction', { ...job.data, error: err.message, failedAt: new Date().toISOString() })
       console.log(`[DIE-Extract] Job ${job.id} moved to DLQ after ${job.attemptsMade} attempts`)
+
+      try {
+        await p.scanJob.update({
+          where: { id: job.data.scanJobId },
+          data: {
+            status: 'FAILED',
+            errorMessage: String(err?.message || 'Extraction failed'),
+          },
+        })
+        await p.scannedDocument.updateMany({
+          where: { scanJobId: job.data.scanJobId },
+          data: { status: 'FAILED', lifecycleState: 'FAILED' },
+        })
+      } catch (stateErr) {
+        console.error('[DIE-Extract] Failed to mark ScanJob/Document as FAILED', stateErr)
+      }
+      // Alert on DLQ addition (permanent failure)
+      await AlertDeliveryService.deliver({
+        severity: 'error',
+        title: 'DIE-Extract job failed permanently (moved to DLQ)',
+        details: {
+          jobId: job.id,
+          scanJobId: job.data?.scanJobId,
+          error: err?.message || 'unknown',
+          attempts: job.attemptsMade,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((alertError) => {
+        console.error('[DIE-Extract] Failed to send DLQ alert', alertError)
+      })
     } catch (dlqErr) {
       console.error('[DIE-Extract] Failed to move job to DLQ', dlqErr)
     }
@@ -630,15 +715,28 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       const confidenceOverall = await computeOverallConfidence(tx, scannedDocumentId)
       const validationScore = anyLowConf ? 0.5 : (confidenceOverall ?? undefined)
 
-      // Stage 4: Final status transition (atomic within same transaction)
       await tx.scannedDocument.update({
         where: { id: scannedDocumentId },
         data: {
-          status: 'INTELLIGENCE_DONE',
           confidenceOverall: confidenceOverall ?? undefined,
           validationScore: validationScore ?? undefined,
         },
       })
+
+      await DocumentLifecycleService.transitionDocumentLifecycleOnTransaction(
+        tx,
+        scannedDocumentId,
+        DocumentLifecycleState.INTELLIGENCE_DONE,
+        {
+          lowConfidence: anyLowConf,
+          confidenceOverall,
+          validationScore,
+        },
+        {
+          expectedCurrentState: DocumentLifecycleState.EXTRACTED,
+          stage: 'intelligence',
+        },
+      )
 
       // Log completion inside transaction
       await tx.documentProcessingLog.create({
@@ -797,23 +895,42 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       console.error(`[DIE-Intel] Procurement reconciliation failed for ${scannedDocumentId}:`, reconErr)
     }
 
-    if (reconciliationResult?.success) {
-      await DocumentLifecycleService.transitionDocumentLifecycle(
-        scannedDocumentId,
-        DocumentLifecycleState.RECONCILED,
-        {
-          matchType: reconciliationResult.matchType,
-          confidence: reconciliationResult.confidence,
-          purchaseOrderId: reconciliationResult.purchaseOrderId,
-          goodsReceivedNoteId: reconciliationResult.goodsReceivedNoteId,
-          duplicateInvoice: reconciliationResult.duplicateInvoice,
+    await DocumentLifecycleService.transitionDocumentLifecycle(
+      scannedDocumentId,
+      DocumentLifecycleState.RECONCILED,
+      {
+        success: reconciliationResult?.success === true,
+        matchType: reconciliationResult?.matchType ?? 'RECONCILIATION_FAILED',
+        confidence: reconciliationResult?.confidence ?? 0,
+        purchaseOrderId: reconciliationResult?.purchaseOrderId ?? null,
+        goodsReceivedNoteId: reconciliationResult?.goodsReceivedNoteId ?? null,
+        duplicateInvoice: reconciliationResult?.duplicateInvoice ?? false,
+        conflictReason: reconciliationResult?.conflictReason,
+        error: reconciliationResult?.error,
+      },
+      {
+        expectedCurrentState: DocumentLifecycleState.MATCHED,
+        stage: 'reconciliation',
+      },
+    )
+
+    void pluginRunner
+      .emit({
+        type: DIE_PLUGIN_EVENTS.RECONCILIATION_COMPLETED,
+        trigger: DIE_PLUGIN_EVENTS.RECONCILIATION_COMPLETED,
+        timestamp: new Date(),
+        payload: {
+          businessId: docDetails.businessId,
+          documentId: scannedDocumentId,
+          scanJobId,
+          matchType: reconciliationResult?.matchType ?? 'UNKNOWN',
+          success: reconciliationResult?.success === true,
+          confidence: reconciliationResult?.confidence ?? 0,
         },
-        {
-          expectedCurrentState: DocumentLifecycleState.MATCHED,
-          stage: 'reconciliation',
-        },
-      )
-    }
+      })
+      .catch((err) => {
+        console.error('[PluginRunner] Failed to emit reconciliation.completed', err)
+      })
 
     // Stage 8: Anomaly Detection (Block 4E) - deterministic, idempotent, never blocks reconciliation
     let anomalyResult: Awaited<ReturnType<typeof DocumentAnomalyService.detectAnomalies>> | undefined
@@ -842,34 +959,55 @@ const intelligenceWorker = new Worker<IntelligenceJobData>(
       }).catch(() => {})
     }
 
-    if (reconciliationResult?.success && anomalyResult?.success) {
-      await DocumentLifecycleService.transitionDocumentLifecycle(
-        scannedDocumentId,
-        DocumentLifecycleState.ANALYZED,
-        {
-          alertsCreated: anomalyResult.alertsCreated,
-          alertTypes: anomalyResult.alertTypes,
-        },
-        {
-          expectedCurrentState: DocumentLifecycleState.RECONCILED,
-          stage: 'anomaly_detection',
-        },
-      )
+    await DocumentLifecycleService.transitionDocumentLifecycle(
+      scannedDocumentId,
+      DocumentLifecycleState.ANALYZED,
+      {
+        success: anomalyResult?.success === true,
+        alertsCreated: anomalyResult?.alertsCreated ?? 0,
+        alertTypes: anomalyResult?.alertTypes ?? [],
+        error: anomalyResult?.error,
+      },
+      {
+        expectedCurrentState: DocumentLifecycleState.RECONCILED,
+        stage: 'anomaly_detection',
+      },
+    )
 
-      await DocumentLifecycleService.transitionDocumentLifecycle(
-        scannedDocumentId,
-        DocumentLifecycleState.REVIEW_REQUIRED,
-        {
-          reviewRequired: true,
-          alertsCreated: anomalyResult.alertsCreated,
-          alertTypes: anomalyResult.alertTypes,
-        },
-        {
-          expectedCurrentState: DocumentLifecycleState.ANALYZED,
-          stage: 'review',
-        },
-      )
+    if (anomalyResult?.success && (anomalyResult.alertsCreated ?? 0) > 0) {
+      void pluginRunner
+        .emit({
+          type: DIE_PLUGIN_EVENTS.ANOMALY_DETECTED,
+          trigger: DIE_PLUGIN_EVENTS.ANOMALY_DETECTED,
+          timestamp: new Date(),
+          payload: {
+            businessId: docDetails.businessId,
+            documentId: scannedDocumentId,
+            alertTypes: anomalyResult.alertTypes ?? [],
+            alertsCreated: anomalyResult.alertsCreated ?? 0,
+          },
+        })
+        .catch((err) => {
+          console.error('[PluginRunner] Failed to emit anomaly.detected', err)
+        })
     }
+
+    await DocumentLifecycleService.transitionDocumentLifecycle(
+      scannedDocumentId,
+      DocumentLifecycleState.REVIEW_REQUIRED,
+      {
+        reviewRequired: true,
+        reconciliationSuccess: reconciliationResult?.success === true,
+        reconciliationMatchType: reconciliationResult?.matchType,
+        anomalySuccess: anomalyResult?.success === true,
+        alertsCreated: anomalyResult?.alertsCreated ?? 0,
+        alertTypes: anomalyResult?.alertTypes ?? [],
+      },
+      {
+        expectedCurrentState: DocumentLifecycleState.ANALYZED,
+        stage: 'review',
+      },
+    )
 
     const durationMs = Date.now() - started
     console.log(
@@ -937,6 +1075,37 @@ intelligenceWorker.on('failed', async (job, err) => {
     try {
       await intelligenceDLQ.add('failed-intelligence', { ...job.data, error: err.message, failedAt: new Date().toISOString() })
       console.log(`[DIE-Intel] Job ${job.id} moved to DLQ after ${job.attemptsMade} attempts`)
+
+      try {
+        await p.scanJob.update({
+          where: { id: job.data.scanJobId },
+          data: {
+            status: 'FAILED',
+            errorMessage: String(err?.message || 'Intelligence failed'),
+          },
+        })
+        await p.scannedDocument.update({
+          where: { id: job.data.scannedDocumentId },
+          data: { status: 'FAILED', lifecycleState: 'FAILED' },
+        })
+      } catch (stateErr) {
+        console.error('[DIE-Intel] Failed to mark ScanJob/Document as FAILED', stateErr)
+      }
+      // Alert on DLQ addition (permanent failure)
+      await AlertDeliveryService.deliver({
+        severity: 'error',
+        title: 'DIE-Intelligence job failed permanently (moved to DLQ)',
+        details: {
+          jobId: job.id,
+          scannedDocumentId: job.data?.scannedDocumentId,
+          scanJobId: job.data?.scanJobId,
+          error: err?.message || 'unknown',
+          attempts: job.attemptsMade,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((alertError) => {
+        console.error('[DIE-Intel] Failed to send DLQ alert', alertError)
+      })
     } catch (dlqErr) {
       console.error('[DIE-Intel] Failed to move job to DLQ', dlqErr)
     }

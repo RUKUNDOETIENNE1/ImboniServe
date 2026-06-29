@@ -14,6 +14,7 @@ import { counter } from '@/lib/observability/metrics'
 import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalization.service'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -21,9 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('[InTouch Webhook] Received:', req.body)
     counter('webhook_received_total', 'Webhooks received').inc({ provider: 'intouch' })
-    console.log('[InTouch Webhook] Headers:', req.headers)
+    // PII redaction: do not log raw body or headers containing auth credentials
 
     // InTouch webhook security: basic auth is mandatory in production paths.
     const expectedUsername = process.env.INTOUCH_WEBHOOK_USERNAME
@@ -64,13 +64,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Initialize provider
     const provider = new InTouchProvider()
 
+    // HMAC signature validation (defense-in-depth)
+    const intouchSignature = req.headers['x-intouch-signature'] as string | undefined
+    if (intouchSignature) {
+      try {
+        const validation = await provider.validateWebhook(req.body, intouchSignature)
+        if (!validation.valid) {
+          console.error('[InTouch Webhook] Invalid HMAC signature:', validation.error)
+          await AlertDeliveryService.deliver({
+            severity: 'error',
+            title: 'InTouch webhook HMAC validation failed',
+            details: {
+              error: validation.error,
+              hasBasicAuth: true,
+            },
+          })
+          return res.status(401).json({ error: 'Invalid signature' })
+        }
+        console.log('[InTouch Webhook] HMAC signature validated successfully')
+      } catch (error: any) {
+        console.error('[InTouch Webhook] HMAC validation error:', error)
+        await AlertDeliveryService.deliver({
+          severity: 'error',
+          title: 'InTouch webhook HMAC validation error',
+          details: { error: error.message },
+        })
+        // Continue with Basic Auth only if HMAC validation fails
+        console.warn('[InTouch Webhook] Falling back to Basic Auth only')
+      }
+    }
+
     // Parse webhook payload
     const webhookPayload = await provider.handleWebhook(req.body)
 
     console.log('[InTouch Webhook] Parsed:', {
       transactionId: webhookPayload.transactionId,
       status: webhookPayload.status,
-      amount: webhookPayload.amount,
+      // PII redacted: amount logged without customer/phone data
     })
 
     // Find transaction by provider reference or transaction ID
@@ -109,14 +139,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ? PaymentTransactionStatus.REFUNDED
         : PaymentTransactionStatus.FAILED
 
-    const signature = req.headers['x-intouch-signature'] as string | undefined
+    // Use the validated signature captured earlier (if present)
+    const signatureToStore = intouchSignature
 
     await prisma.paymentTransaction.update({
       where: { id: transaction.id },
       data: {
         status: mappedStatus,
         paidAt: mappedStatus === PaymentTransactionStatus.SUCCESS ? webhookPayload.timestamp : null,
-        webhookSignature: signature,
+        webhookSignature: signatureToStore,
         webhookTimestamp: BigInt(webhookPayload.timestamp.getTime()),
         webhookVerified: true,
         rawCallback: webhookPayload.rawPayload,
@@ -152,12 +183,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (rawRequest.sessionId && rawRequest.slipId) {
       if (mappedStatus === PaymentTransactionStatus.SUCCESS) {
         await TapLeaveFinalizationService.finalize(transaction.id, 'webhook')
+        // Shadow: SLIP_PAID
+        try {
+          await ingestDiningSlipShadowEvent({ type: 'SLIP_PAID', businessId: transaction.businessId, sessionId: rawRequest.sessionId, slipId: rawRequest.slipId, amountCents: (transaction as any).netToBusinessCents || undefined }).catch(() => {})
+        } catch {}
       } else if (mappedStatus === PaymentTransactionStatus.FAILED || mappedStatus === PaymentTransactionStatus.CANCELLED) {
         await DiningSessionSlipService.markPaymentFailed(
           rawRequest.slipId,
           transaction.id,
           webhookPayload.rawPayload?.statusdesc || webhookPayload.rawPayload?.responsecode || 'Payment not successful'
         )
+        // Shadow: PAYMENT_EXCEPTION
+        try {
+          await ingestDiningSlipShadowEvent({ type: 'PAYMENT_EXCEPTION', businessId: transaction.businessId, sessionId: rawRequest.sessionId, slipId: rawRequest.slipId, reason: String(webhookPayload.rawPayload?.responsecode || 'FAILED') }).catch(() => {})
+        } catch {}
       }
     }
 
@@ -172,7 +211,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           await prisma.reservation.update({
             where: { id: reservation.id },
             data: {
-              depositStatus: 'PAID' as any,
+              depositStatus: PaymentTransactionStatus.SUCCESS,
               depositPaidAt: new Date(),
               paymentTransactionId: transaction.id,
             },

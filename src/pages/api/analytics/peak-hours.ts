@@ -34,7 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     where: {
       businessId,
       createdAt: { gte: startDate },
-      status: { in: ['COMPLETED', 'PAID'] }
+      paymentStatus: 'COMPLETED'
     },
     select: {
       createdAt: true,

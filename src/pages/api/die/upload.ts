@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 import formidable, { Fields, Files, File as FormidableFile } from 'formidable'
 import fs from 'fs'
 import crypto from 'crypto'
@@ -11,6 +10,8 @@ import {
   DocumentLifecycleService,
   DocumentLifecycleState,
 } from '@/lib/die/services/document-lifecycle.service'
+import { DIE_PLUGIN_EVENTS } from '@/lib/die/plugins/core/plugin-events'
+import { pluginRunner } from '@/lib/die/plugins/runtime/plugin-runner'
 
 export const config = {
   api: { bodyParser: false },
@@ -25,12 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const session = await getServerSession(req, res, authOptions)
-    if (!session?.user) return res.status(401).json({ error: 'Unauthorized' })
-
-    const user = session.user as any
-    const businessId = user.businessId as string | undefined
-    if (!businessId) return res.status(400).json({ error: 'No business associated with user' })
+    const ctx = await resolveBusinessContext(req, res)
+    if (!ctx) return
+    const { businessId, userId } = ctx
 
     const form = formidable({ maxFileSize: MAX_FILE_SIZE, keepExtensions: true })
     const [fields, files] = await new Promise<[Fields, Files]>((resolve, reject) => {
@@ -84,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const createdScanJob = await tx.scanJob.create({
         data: {
           businessId,
-          createdByUserId: user.id,
+          createdByUserId: userId,
           documentType: documentType as any,
           sourceFileKey: uploaded.storageKey,
           sourceMime: mimeType,
@@ -131,6 +129,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { scanJobId: scanJob.id, fileKey: uploaded.storageKey, mime: mimeType, documentType },
       { jobId: scanJob.id, priority }
     )
+
+    void pluginRunner
+      .emit({
+        type: DIE_PLUGIN_EVENTS.DOCUMENT_UPLOADED,
+        trigger: DIE_PLUGIN_EVENTS.DOCUMENT_UPLOADED,
+        timestamp: new Date(),
+        payload: {
+          businessId,
+          documentId: scannedDocument.id,
+          scanJobId: scanJob.id,
+          documentType,
+          mimeType,
+          userId,
+        },
+      })
+      .catch((err) => {
+        console.error('[PluginRunner] Failed to emit document.uploaded', err)
+      })
 
     fs.unlinkSync(file.filepath)
 

@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma'
 import { triggerEvent } from '@/lib/pusher-server'
 import { RoutingService } from './routing.service'
 import { TicketEventService } from './ticket-event.service'
+import { ingestKDSShadowEvent } from '@/lib/die/business-as-plugin/kds/kds.shadow'
 
 export interface KitchenOrderItem {
   menuItemName: string
@@ -80,6 +81,9 @@ export class KitchenDispatchService {
 
             if (route.stationId) {
               // Update item with station assignment
+              // NOTE: Setting itemStatus: 'NEW' is the initial state assignment, not a transition.
+              // This does NOT trigger consumption (which only happens on NEW → PREPARING).
+              // This is intentional - consumption should only occur when kitchen starts preparing.
               await prisma.saleItem.update({
                 where: { id: item.id },
                 data: {
@@ -144,6 +148,14 @@ export class KitchenDispatchService {
         // Pusher failure is non-critical - log but don't fail
         console.warn('[Kitchen Dispatch] Pusher notification failed:', pusherError)
       }
+
+      // Shadow tap: KDS ORDER_RECEIVED (feature-flagged, non-blocking)
+      ingestKDSShadowEvent({
+        type: 'ORDER_RECEIVED',
+        businessId: input.businessId,
+        saleId: input.saleId,
+        orderNumber: input.orderNumber,
+      }).catch(() => {})
 
       // 4. Record order creation event
       TicketEventService.recordEvent({

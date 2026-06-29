@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -28,6 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   return res.status(405).json({ error: 'Method not allowed' })
 }
 
+import { PaymentTransactionStatus } from '@prisma/client'
+
 async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string, businessId: string) {
   const { status, depositPaid, tableId } = req.body
 
@@ -44,7 +47,7 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
     const updateData: any = {}
     if (status) updateData.status = status
     if (depositPaid !== undefined) {
-      updateData.depositStatus = depositPaid ? 'PAID' : 'PENDING'
+      updateData.depositStatus = depositPaid ? PaymentTransactionStatus.SUCCESS : PaymentTransactionStatus.PENDING
       if (depositPaid) {
         updateData.depositPaidAt = new Date()
       }
@@ -56,11 +59,28 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
       data: updateData
     })
 
+    // Shadow tap: BOOKING_UPDATED (+ optional CONFIRMED) (feature-flagged, non-blocking)
+    ingestReservationShadowEvent({
+      type: 'BOOKING_UPDATED',
+      businessId,
+      reservationId: reservation.id,
+      partySize: reservation.partySize,
+    }).catch(() => {})
+
+    if (status === 'CONFIRMED') {
+      ingestReservationShadowEvent({
+        type: 'CONFIRMED',
+        businessId,
+        reservationId: reservation.id,
+        partySize: reservation.partySize,
+      }).catch(() => {})
+    }
+
     return res.status(200).json({
       reservation: {
         id: reservation.id,
         status: reservation.status,
-        depositPaid: reservation.depositStatus === 'PAID'
+        depositPaid: reservation.depositStatus === PaymentTransactionStatus.SUCCESS
       }
     })
   } catch (error: any) {

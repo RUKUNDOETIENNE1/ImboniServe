@@ -9,6 +9,7 @@ import { useOffline } from '@/hooks/useOffline'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 import BusinessRevenueScanner from '@/components/BusinessRevenueScanner'
+import SetupProgressBanner from '@/components/SetupProgressBanner'
 const LiveMetricsTicker = dynamic(
   () => import('@/components/dashboard/LiveMetricsTicker').then(m => m.LiveMetricsTicker),
   { ssr: false, loading: () => null }
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showScanner, setShowScanner] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -51,6 +53,7 @@ export default function Dashboard() {
   }, [])
 
   const fetchDashboardData = async () => {
+    setError(null)
     try {
       const [statsRes, chartRes, transactionsRes] = await Promise.all([
         fetch('/api/dashboard/stats'),
@@ -61,19 +64,27 @@ export default function Dashboard() {
       if (statsRes.ok) {
         const statsData = await statsRes.json()
         setStats(statsData)
+      } else {
+        const errData = await statsRes.json().catch(() => ({}))
+        setError(errData.error || 'Failed to load dashboard stats')
       }
 
       if (chartRes.ok) {
         const chartData = await chartRes.json()
         setSalesChartData(chartData.data || [])
+      } else {
+        console.warn('Failed to load sales chart')
       }
 
       if (transactionsRes.ok) {
         const txData = await transactionsRes.json()
         setRecentTransactions(txData.transactions || [])
+      } else {
+        console.warn('Failed to load recent transactions')
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
+      setError('Unable to connect to server. Please check your connection.')
     } finally {
       setLoading(false)
     }
@@ -177,6 +188,28 @@ export default function Dashboard() {
         <div className="mb-6 flex items-center bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl">
           <WifiOff className="w-5 h-5 mr-3" />
           <span className="text-sm font-medium">{t('dashboard.offline', "You're offline.")} {pendingCount} {t('dashboard.pending_syncs', 'pending sync(s)')}</span>
+        </div>
+      )}
+
+      <SetupProgressBanner />
+
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
+              <span className="text-red-600 text-xs font-bold">!</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-red-900 mb-1">Unable to Load Dashboard</h3>
+              <p className="text-sm text-red-800">{error}</p>
+              <button
+                onClick={fetchDashboardData}
+                className="mt-3 text-sm font-medium text-red-700 hover:text-red-900 underline"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

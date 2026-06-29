@@ -54,7 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
-    if (sale.paymentStatus === 'PAID') {
+    if (sale.paymentStatus === 'COMPLETED') {
       return res.status(409).json({ error: 'Order already marked as paid' })
     }
 
@@ -64,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const updated = await tx.sale.update({
         where: { id },
         data: {
-          paymentStatus: 'PAID',
+          paymentStatus: 'COMPLETED',
           isPaid: true,
           paymentMethod: paymentMethod,
           paymentReference: reference || `MANUAL-${Date.now()}`,

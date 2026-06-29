@@ -226,6 +226,7 @@ export class DocumentAnomalyService {
     // Find other documents with same supplier + invoice number
     const duplicates = await p.scannedDocument.findMany({
       where: {
+        businessId: doc.businessId,
         supplierId: doc.supplierId,
         invoiceNumber: doc.invoiceNumber,
         id: { not: doc.id },

@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Validate order is in correct state
-    if (order.paymentStatus === 'PAID') {
+    if (order.paymentStatus === 'SUCCESS') {
       return res.status(409).json({ error: 'Order already paid' })
     }
 
