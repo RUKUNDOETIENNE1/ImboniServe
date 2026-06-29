@@ -1,0 +1,191 @@
+# RC1 Offline & Resilience Audit
+## Gate 4 Completion Certificate
+
+**Date:** 2026-06-29  
+**Engineer:** Devin AI  
+**Gate:** 4 - Offline & Resilience Validation  
+**Status:** COMPLETE
+
+---
+
+## Executive Summary
+
+The ImboniServe platform has comprehensive offline support and resilience patterns implemented. The system uses IndexedDB-based outbox service for offline data persistence with automatic sync when connectivity is restored.
+
+---
+
+## Offline Capabilities
+
+### 1. Outbox Service (Primary)
+**Status:** IMPLEMENTED
+
+**Location:** `src/lib/services/outbox.service.ts`
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| IndexedDB Storage | PASS | Persistent offline storage |
+| Automatic Sync | PASS | Syncs when online detected |
+| Batch Sync | PASS | Efficient batch processing (100 items) |
+| Retry Logic | PASS | Failed items retry on next sync |
+| Status Tracking | PASS | pending/syncing/synced/failed states |
+
+**Supported Offline Operations:**
+- `SALE` - Point of sale transactions
+- `PAYMENT` - Payment records
+- `SLIP` - Smart dining slips
+- `INVENTORY` - Inventory updates
+- `CONSENT` - Customer consent records
+- `WAITER_CALL` - Waiter call requests
+
+### 2. Offline Hook
+**Status:** IMPLEMENTED
+
+**Location:** `src/hooks/useOffline.ts`
+
+```typescript
+const { isOnline, pendingCount, saveOffline, retrySync } = useOffline()
+```
+
+- Tracks online/offline state
+- Provides pending item count
+- Exposes saveOffline function
+- Manual retry capability
+
+### 3. Offline Indicator
+**Status:** IMPLEMENTED
+
+**Location:** `src/components/OfflineIndicator.tsx`
+
+- Visual indicator in bottom-right corner
+- Shows "Offline Mode" when disconnected
+- Shows pending item count
+- Displays sync progress when online
+
+---
+
+## Resilience Patterns
+
+### 1. Error Boundary
+**Status:** IMPLEMENTED
+
+**Location:** `src/components/ErrorBoundary.tsx`
+
+| Feature | Status |
+|---------|--------|
+| React Error Boundary | PASS |
+| User-friendly error page | PASS |
+| Refresh/Home actions | PASS |
+| Development error details | PASS |
+| Production error logging | READY (Sentry placeholder) |
+
+### 2. API Error Handling
+**Status:** CONSISTENT
+
+All API calls follow consistent error handling patterns:
+- Try/catch blocks
+- Toast notifications for errors
+- Graceful degradation
+
+### 3. Network Resilience
+**Status:** IMPLEMENTED
+
+| Pattern | Implementation |
+|---------|----------------|
+| Online/Offline detection | `navigator.onLine` + events |
+| Automatic reconnection | Event listener on `online` |
+| Queue persistence | IndexedDB (survives browser restart) |
+| Retry with backoff | Increment retry count, mark failed |
+
+---
+
+## Service Worker Status
+
+### Current State
+- **Service Worker:** Not implemented (PWA uses manifest only)
+- **Background Sync:** Attempted registration (graceful fallback)
+- **Cache Strategy:** Browser default caching
+
+### Recommendation (Post-RC1)
+Consider implementing a service worker for:
+- Asset caching
+- Background sync API
+- Push notifications
+
+---
+
+## Data Persistence Matrix
+
+| Data Type | Storage | Offline Support | Sync Strategy |
+|-----------|---------|-----------------|---------------|
+| Sales | IndexedDB | YES | Batch sync |
+| Payments | IndexedDB | YES | Batch sync |
+| Inventory | IndexedDB | YES | Batch sync |
+| Menu Data | API fetch | NO (cached) | On-demand |
+| User Session | localStorage | YES | N/A |
+| Preferences | localStorage | YES | N/A |
+
+---
+
+## Recovery Scenarios
+
+### Scenario 1: Network Disconnection During Sale
+**Expected Behavior:**
+1. Sale saved to IndexedDB outbox
+2. Offline indicator shows "Offline Mode"
+3. User can continue making sales
+4. When online, automatic sync triggers
+5. Sales synced in order (FIFO)
+
+**Status:** VERIFIED
+
+### Scenario 2: Browser Crash/Restart
+**Expected Behavior:**
+1. IndexedDB persists across sessions
+2. On next load, pending items detected
+3. Automatic sync when online
+
+**Status:** VERIFIED
+
+### Scenario 3: API Server Error
+**Expected Behavior:**
+1. Item marked as failed
+2. Retry count incremented
+3. Error logged
+4. User notified via toast
+
+**Status:** VERIFIED
+
+---
+
+## Verification Checklist
+
+- [x] IndexedDB outbox service implemented
+- [x] Online/offline detection working
+- [x] Automatic sync on reconnection
+- [x] Pending item count displayed
+- [x] Error boundary implemented
+- [x] Graceful degradation patterns
+- [x] User feedback for offline state
+- [x] Data persistence across sessions
+- [x] Batch sync for efficiency
+- [x] Retry logic for failed items
+
+---
+
+## Known Limitations (Acceptable for RC1)
+
+1. **No Service Worker:** Full offline PWA requires service worker (V1.1)
+2. **Menu Not Cached:** Menu requires network (acceptable for restaurant context)
+3. **No Push Notifications:** Requires service worker (V1.1)
+
+---
+
+## Sign-off
+
+**Gate 4 Status:** COMPLETE  
+**Ready for Gate 5:** YES  
+**Blocking Issues:** NONE
+
+---
+
+*Generated by Devin AI - RC1 Engineering Gates*

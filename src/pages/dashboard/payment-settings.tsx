@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Save, Info } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface BusinessSettings {
   id: string;
@@ -52,7 +53,7 @@ export default function PaymentSettingsPage() {
       setSettings(data);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      alert('Failed to load settings');
+      toast.error('Failed to load settings');
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ export default function PaymentSettingsPage() {
       const businessId = user.businessId;
       
       if (!businessId) {
-        alert('No business associated with your account');
+        toast.error('No business associated with your account');
         setSaving(false);
         return;
       }
@@ -88,10 +89,10 @@ export default function PaymentSettingsPage() {
         throw new Error('Failed to save settings');
       }
 
-      alert('Settings saved successfully!');
+      toast.success('Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save settings');
+      toast.error('Failed to save settings');
     } finally {
       setSaving(false);
     }

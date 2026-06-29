@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Plus, Edit2, Power, PowerOff, Save, X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { toast } from 'react-hot-toast'
 
 interface Station {
   id: string
@@ -58,7 +59,7 @@ export default function StationsManagement() {
 
   const handleCreateStation = async () => {
     if (!newStation.name || !newStation.code) {
-      alert('Name and code are required')
+      toast.error('Name and code are required')
       return
     }
 
@@ -73,13 +74,14 @@ export default function StationsManagement() {
         setShowAddForm(false)
         setNewStation({ name: '', code: '', type: 'KITCHEN' })
         fetchStations()
+        toast.success('Station created')
       } else {
         const data = await res.json()
-        alert(data.error || 'Failed to create station')
+        toast.error(data.error || 'Failed to create station')
       }
     } catch (err) {
       console.error('Failed to create station:', err)
-      alert('Failed to create station')
+      toast.error('Failed to create station')
     }
   }
 
@@ -107,12 +109,14 @@ export default function StationsManagement() {
 
       if (res.ok) {
         fetchStations()
+        toast.success('Default stations initialized')
       } else {
         const data = await res.json()
-        alert(data.error || 'Failed to initialize stations')
+        toast.error(data.error || 'Failed to initialize stations')
       }
     } catch (err) {
       console.error('Failed to initialize stations:', err)
+      toast.error('Failed to initialize stations')
     }
   }
 

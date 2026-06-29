@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import QRCode from 'qrcode'
+import { toast } from 'react-hot-toast'
 import { Save, Download, ExternalLink, Copy, Trash2, Copy as CopyIcon } from 'lucide-react'
 
 type TemplateListItem = {
@@ -62,6 +64,7 @@ export default function QrBuilderPage() {
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
 
@@ -123,20 +126,21 @@ export default function QrBuilderPage() {
   }, [logoUrl])
 
   const onDeleteDesign = async (designId: string) => {
-    if (!confirm('Delete this QR design? This cannot be undone.')) return
     setDeletingId(designId)
     try {
       const r = await fetch(`/api/qr/designs/${designId}`, { method: 'DELETE' })
       if (r.ok) {
         loadDesigns()
+        toast.success('Design deleted')
       } else {
-        alert('Failed to delete design')
+        toast.error('Failed to delete design')
       }
     } catch (e) {
       console.error(e)
-      alert('Failed to delete design')
+      toast.error('Failed to delete design')
     } finally {
       setDeletingId(null)
+      setShowDeleteConfirm(null)
     }
   }
 
@@ -146,12 +150,13 @@ export default function QrBuilderPage() {
       const r = await fetch(`/api/qr/designs/${designId}`, { method: 'POST' })
       if (r.ok) {
         loadDesigns()
+        toast.success('Design duplicated')
       } else {
-        alert('Failed to duplicate design')
+        toast.error('Failed to duplicate design')
       }
     } catch (e) {
       console.error(e)
-      alert('Failed to duplicate design')
+      toast.error('Failed to duplicate design')
     } finally {
       setDuplicatingId(null)
     }
@@ -250,13 +255,14 @@ export default function QrBuilderPage() {
         const data = await r.json()
         setShortUrl(data.shortUrl as string)
         loadDesigns()
+        toast.success('Design saved')
       } else {
         const e = await r.json().catch(() => ({}))
-        alert(`Failed to save: ${e.error || r.statusText}`)
+        toast.error(`Failed to save: ${e.error || r.statusText}`)
       }
     } catch (e) {
       console.error(e)
-      alert('Failed to save design')
+      toast.error('Failed to save design')
     } finally {
       setIsSaving(false)
     }
@@ -295,7 +301,7 @@ export default function QrBuilderPage() {
       document.body.removeChild(a)
     } catch (e) {
       console.error(e)
-      alert('Failed to generate PNG')
+      toast.error('Failed to generate PNG')
     } finally {
       setIsDownloading(false)
     }
@@ -315,7 +321,7 @@ export default function QrBuilderPage() {
       URL.revokeObjectURL(url)
     } catch (e) {
       console.error(e)
-      alert('Failed to download SVG')
+      toast.error('Failed to download SVG')
     }
   }
 
@@ -467,7 +473,7 @@ export default function QrBuilderPage() {
                       }
                     } catch (e) {
                       console.error(e)
-                      alert('Bulk download failed')
+                      toast.error('Bulk download failed')
                     } finally {
                       setIsDownloading(false)
                     }
@@ -673,7 +679,7 @@ export default function QrBuilderPage() {
                             <CopyIcon size={14} /> {duplicatingId === d.id ? '...' : 'Dup'}
                           </button>
                           <button
-                            onClick={() => onDeleteDesign(d.id)}
+                            onClick={() => setShowDeleteConfirm(d.id)}
                             disabled={deletingId === d.id}
                             className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border border-red-300 text-red-700 hover:bg-red-50 disabled:opacity-50"
                             title="Delete design"
@@ -690,6 +696,18 @@ export default function QrBuilderPage() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={() => showDeleteConfirm && onDeleteDesign(showDeleteConfirm)}
+        title="Delete QR Design"
+        message="Are you sure you want to delete this QR design? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </DashboardLayout>
   )
 }
