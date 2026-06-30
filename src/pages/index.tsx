@@ -171,7 +171,7 @@ const heroSlides = [
     title: 'The Operating System',
     highlight: 'for Hospitality.',
     subtitle: 'Run your restaurant, café, hotel, or hospitality business from one intelligent platform.',
-    description: 'Bringing together orders, kitchen operations, inventory, procurement, payments, QR ordering, AI, and reporting with configurable localization for every market.',
+    description: 'Everything you need to run your business — from orders and inventory to payments and insights — in one platform built for hospitality.',
     image: '/imgs/ideogr1.jpg'
   },
   {
@@ -213,7 +213,7 @@ export default function HomePage() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 7000)
+    }, 10000)
     return () => clearInterval(timer)
   }, [])
 
@@ -542,10 +542,6 @@ export default function HomePage() {
         })}
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-block bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-4 py-1.5 rounded-full mb-6 animate-fade-in-down">
-            🎉 {t('homepage.hero.launch_badge', 'Launch Special — 50% OFF All Plans')}
-          </div>
-          
           {/* Carousel Content */}
           <div className="relative min-h-[400px]">
             {heroSlides.map((s, index) => {
@@ -1069,6 +1065,11 @@ export default function HomePage() {
           </div>
 
           <div className="text-center">
+            <div className="bg-gradient-to-r from-imboni-orange/10 to-imboni-blue/10 border border-imboni-orange/20 rounded-2xl p-6 mb-8 max-w-3xl mx-auto">
+              <p className="text-gray-700 font-medium text-lg" suppressHydrationWarning>
+                {t('homepage.pricing_preview.founding_note', '🎉 Founding Restaurant Program members receive 50% lifetime discount on all plans')} — <a href="#founding-program" className="text-imboni-orange hover:text-imboni-blue transition font-semibold">{t('homepage.pricing_preview.founding_link', 'Learn more below ↓')}</a>
+              </p>
+            </div>
             <Link
               href="/pricing"
               className="inline-flex items-center gap-2 bg-imboni-blue text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-imboni-blue/90 hover:scale-105 transition-all shadow-lg"
@@ -1090,10 +1091,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('homepage.product_trust.title', 'Built on Operational Truth')}
+              {t('homepage.product_trust.title', 'Why Restaurant Owners Trust ImboniServe')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
-              {t('homepage.product_trust.subtitle', 'ImboniServe is designed for accuracy, auditability, and trust — not marketing promises.')}
+              {t('homepage.product_trust.subtitle', 'Built for accuracy, auditability, and control — not marketing promises.')}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1105,7 +1106,7 @@ export default function HomePage() {
                 {t('homepage.product_trust.inventory_audit', 'Fully Auditable Inventory')}
               </h3>
               <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.inventory_audit_desc', 'Every inventory movement is tracked with timestamps, user attribution, and full audit trails.')}
+                {t('homepage.product_trust.inventory_audit_desc', 'Never lose track of stock. Every movement is recorded with who, what, and when — complete accountability.')}
               </p>
             </div>
             <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
@@ -1160,7 +1161,7 @@ export default function HomePage() {
                 {t('homepage.product_trust.ai', 'AI Built on Real Data')}
               </h3>
               <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.ai_desc', 'AI insights and recommendations are based on your actual operational data, not generic industry averages.')}
+                {t('homepage.product_trust.ai_desc', 'Get recommendations that actually work for your business — based on your real sales, not industry guesses.')}
               </p>
             </div>
           </div>
@@ -1168,7 +1169,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FOUNDING RESTAURANT PROGRAM ── */}
-      <section className="py-20 px-4 bg-gradient-to-br from-imboni-blue via-imboni-blue to-indigo-700 text-white relative overflow-hidden">
+      <section id="founding-program" className="py-20 px-4 bg-gradient-to-br from-imboni-blue via-imboni-blue to-indigo-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(231,111,81,0.15),_transparent_60%)]" />
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-12">
@@ -1243,7 +1244,7 @@ export default function HomePage() {
                     {t('homepage.founding_program.benefit_4_title', 'Shape Platform Development')}
                   </h3>
                   <p className="text-white/80 leading-relaxed" suppressHydrationWarning>
-                    {t('homepage.founding_program.benefit_4_desc', 'Your feedback and operational needs help guide future platform development.')}
+                    {t('homepage.founding_program.benefit_4_desc', 'Direct input on roadmap priorities — your operational needs help guide what we build next.')}
                   </p>
                 </div>
               </div>
