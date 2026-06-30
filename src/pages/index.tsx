@@ -220,7 +220,7 @@ export default function HomePage() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 5000)
+    }, 7000)
     return () => clearInterval(timer)
   }, [])
 
@@ -327,6 +327,8 @@ export default function HomePage() {
   ]
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://imboniserve.com'
+  const displayCurrency = process.env.NEXT_PUBLIC_DISPLAY_CURRENCY || 'RWF'
+  const supportWhatsAppUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || 'https://wa.me/250735214496'
   const navClass = `bg-imboni-blue/95 dark:bg-gray-800/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10 dark:border-gray-700 transition-colors transition-shadow ${scrolled ? 'shadow-md' : ''}`
 
   return (
@@ -377,7 +379,7 @@ export default function HomePage() {
           offers: {
             '@type': 'Offer',
             price: '15000',
-            priceCurrency: 'RWF',
+            priceCurrency: displayCurrency,
           },
           url: `${siteUrl}/`,
         }) }}
@@ -414,10 +416,6 @@ export default function HomePage() {
               </button>
               {solutionsOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50" role="menu">
-                  <Link href="/dashboard/site-builder" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.site_builder', 'Site Builder')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.create_website', 'Create your website')}</div>
-                  </Link>
                   <Link href="/discover" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
                     <div className="font-medium">{t('public.nav.marketplace', 'Marketplace')}</div>
                     <div className="text-xs text-slate-500">{t('public.nav.find_suppliers', 'Find suppliers & partners')}</div>
@@ -425,10 +423,6 @@ export default function HomePage() {
                   <Link href="/store" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
                     <div className="font-medium">{t('public.nav.store', 'Store')}</div>
                     <div className="text-xs text-slate-500">{t('public.nav.procurement_market', 'Procurement marketplace')}</div>
-                  </Link>
-                  <Link href="/dashboard/profile" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.list_business', 'List Your Business')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
                   </Link>
                   <Link href="/refer" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
                     <div className="font-medium">{t('public.nav.referral', 'Referral Program')}</div>
@@ -445,7 +439,7 @@ export default function HomePage() {
               {t('public.nav.share_earn', 'Share & earn rewards')}
             </Link>
             <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
-            <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
+            <a href={supportWhatsAppUrl} className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
           </div>
           
           {/* Right side actions */}
@@ -511,17 +505,15 @@ export default function HomePage() {
               <div className="py-2">
                 <div className="text-white/80 font-medium mb-2">{t('public.nav.solutions', 'Solutions')}</div>
                 <div className="pl-4 space-y-1">
-                  <Link href="/dashboard/site-builder" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.site_builder', 'Site Builder')}</Link>
                   <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.marketplace', 'Marketplace')}</Link>
                   <Link href="/store" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.store', 'Store')}</Link>
-                  <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.list_business', 'List Your Business')}</Link>
                   <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.referral', 'Referral Program')}</Link>
                 </div>
               </div>
               <Link href="#store" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.store', 'Store')}</Link>
               <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn')}</Link>
               <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.discover', 'Discover')}</Link>
-              <a href="https://wa.me/250735214496" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
+              <a href={supportWhatsAppUrl} onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
               
               <div className="pt-3 mt-3 border-t border-white/10 space-y-2">
                 {isInstalled && (
@@ -602,7 +594,7 @@ export default function HomePage() {
                   <p className="text-xl text-white/90 mb-4 max-w-3xl mx-auto">
                     {slide.description}
                   </p>
-                  <p className="text-sm text-white/60" suppressHydrationWarning>
+                  <p className="text-base text-white/80 font-medium" suppressHydrationWarning>
                     {t('homepage.hero.description', 'Built for restaurants, hotels, bars, and cafés.')}
                   </p>
                   <p className="text-sm text-white/80 mb-8" suppressHydrationWarning>
@@ -687,9 +679,9 @@ export default function HomePage() {
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{s.title}</h3>
                   <p className="text-sm text-slate-600 mb-4">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-imboni-blue hover:text-imboni-orange font-medium text-sm">
-                    {s.cta} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <span className="inline-flex items-center gap-2 text-slate-500 font-medium text-sm" aria-label={s.cta}>
+                    {s.cta}
+                  </span>
                 </div>
               ))}
             </div>
@@ -728,9 +720,9 @@ export default function HomePage() {
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{s.title}</h3>
                   <p className="text-sm text-slate-600 mb-4">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-imboni-blue hover:text-imboni-orange font-medium text-sm">
-                    {s.cta} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <span className="inline-flex items-center gap-2 text-slate-500 font-medium text-sm" aria-label={s.cta}>
+                    {s.cta}
+                  </span>
                 </div>
               ))}
             </div>
@@ -863,7 +855,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-3" suppressHydrationWarning>{t('homepage.how_it_works.step4_title', 'Connect WhatsApp & Payments')}</h3>
               <p className="text-white/80 text-sm leading-relaxed" suppressHydrationWarning>
-                {t('homepage.how_it_works.step4_desc', 'Link your WhatsApp number to receive instant order alerts and daily reports. Enable MTN MoMo and Airtel Money for seamless mobile payments.')}
+                {t('homepage.how_it_works.step4_desc', 'Link your WhatsApp number to receive instant order alerts and daily reports. Enable your preferred payment methods for seamless digital payments.')}
               </p>
             </div>
 
@@ -1000,7 +992,7 @@ export default function HomePage() {
                 <Receipt className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.smart_slips', 'Smart Dining Slips™')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.smart_slips_desc', 'Auto-generated digital receipts with referral links — share & earn 1,000 RWF per friend.')}</p>
+              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.smart_slips_desc', 'Auto-generated digital receipts with referral links — share & earn rewards for every friend.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-pink-50 text-pink-700">
@@ -1028,7 +1020,7 @@ export default function HomePage() {
                 <Smartphone className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.mobile_money', 'Mobile Money Payments')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.mobile_money_desc', 'Accept MTN MoMo and Airtel Money natively — no POS terminal required.')}</p>
+              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.mobile_money_desc', 'Accept mobile money payments natively — no POS terminal required.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-slate-50 text-slate-700">
@@ -1125,10 +1117,10 @@ export default function HomePage() {
                   {billing === 'monthly' ? (
                     typeof plan.monthlyPrice === 'number' ? (
                       <>
-                        <div className="text-lg text-gray-400 line-through">{formatCurrency((plan.monthlyPrice || 0) * 2, 'RWF')}</div>
+                        <div className="text-lg text-gray-400 line-through">{formatCurrency((plan.monthlyPrice || 0) * 2, displayCurrency)}</div>
                         <div>
-                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency(plan.monthlyPrice || 0, 'RWF', { showSymbol: false })}</span>
-                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>RWF{t('pricing.per_month', ' / month')}</span>
+                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency(plan.monthlyPrice || 0, displayCurrency, { showSymbol: false })}</span>
+                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>{displayCurrency}{t('pricing.per_month', ' / month')}</span>
                         </div>
                         <div className="text-xs text-green-600 font-medium mt-1" suppressHydrationWarning>50% Launch Discount</div>
                       </>
@@ -1140,17 +1132,17 @@ export default function HomePage() {
                   ) : (
                     typeof plan.annualMonthly === 'number' ? (
                       <>
-                        <div className="text-lg text-gray-400 line-through">{formatCurrency(((plan.annualMonthly as number) || 0) * 2, 'RWF')}</div>
+                        <div className="text-lg text-gray-400 line-through">{formatCurrency(((plan.annualMonthly as number) || 0) * 2, displayCurrency)}</div>
                         <div>
-                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency((plan.annualMonthly as number) || 0, 'RWF', { showSymbol: false })}</span>
-                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>RWF{t('pricing.per_month', ' / month')}</span>
+                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency((plan.annualMonthly as number) || 0, displayCurrency, { showSymbol: false })}</span>
+                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>{displayCurrency}{t('pricing.per_month', ' / month')}</span>
                         </div>
                         <div className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
-                          {t('pricing.billed_annually', 'Billed annually')}: {formatCurrency((plan.annualTotal as number) || 0, 'RWF')}
+                          {t('pricing.billed_annually', 'Billed annually')}: {formatCurrency((plan.annualTotal as number) || 0, displayCurrency)}
                         </div>
                         {typeof plan.monthlyPrice === 'number' && typeof plan.annualMonthly === 'number' && (
                           <div className="text-xs text-green-600 font-medium mt-0.5" suppressHydrationWarning>
-                            50% Launch Discount + {t('pricing.save_25', 'Save 25%')} ({formatCurrency(((plan.monthlyPrice as number) - (plan.annualMonthly as number)) * 12, 'RWF')}{t('pricing.per_year', ' / year')})
+                            50% Launch Discount + {t('pricing.save_25', 'Save 25%')} ({formatCurrency(((plan.monthlyPrice as number) - (plan.annualMonthly as number)) * 12, displayCurrency)}{t('pricing.per_year', ' / year')})
                           </div>
                         )}
                       </>
@@ -1194,7 +1186,7 @@ export default function HomePage() {
 
           <p className="text-center text-gray-500 text-sm mt-8" suppressHydrationWarning>
             {t('pricing.need_help', 'Need help choosing?')}{' '}
-            <a href="https://wa.me/250735214496" className="text-imboni-blue font-medium hover:text-imboni-orange transition">
+            <a href={supportWhatsAppUrl} className="text-imboni-blue font-medium hover:text-imboni-orange transition">
               {t('pricing.chat_whatsapp', 'Chat with us on WhatsApp')}
             </a>
           </p>
@@ -1255,7 +1247,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.referral', 'Referral Program')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.referral_desc', 'Customers earn 1,000 RWF per referral. No limits, no caps — just instant rewards.')}</p>
+                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.referral_desc', 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
@@ -1356,7 +1348,7 @@ export default function HomePage() {
               {t('homepage.final_cta.cta_start', 'Get Started Free')} <ArrowRight className="w-4 h-4" />
             </a>
             <a
-              href="https://wa.me/250735214496"
+              href={supportWhatsAppUrl}
               className="bg-imboni-green text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:opacity-90 transition flex items-center gap-2"
             >
               <MessageCircle className="w-4 h-4" /> {t('homepage.final_cta.cta_whatsapp', 'Chat on WhatsApp')}
@@ -1403,7 +1395,7 @@ export default function HomePage() {
               <a href="#store" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.store', 'Store')}</a>
               <a href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.discover', 'Discover')}</a>
               <a href="/faq" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.faqs', 'FAQs')}</a>
-              <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.contact', 'Contact')}</a>
+              <a href={supportWhatsAppUrl} className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.contact', 'Contact')}</a>
             </div>
           </div>
           <div className="border-t border-white/10 pt-4 text-center">
