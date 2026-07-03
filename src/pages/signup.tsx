@@ -30,7 +30,7 @@ export default function Signup() {
     phone: '',
     businessName: '',
     city: 'Kigali',
-    planCode: 'ESSENTIALS', // Default entry plan for trial (overridden by ?plan=)
+    planCode: 'STARTER', // Default entry plan for trial (overridden by ?plan=)
     businessType: 'RESTAURANT', // RESTAURANT, HOTEL, CAFE, BAR, SUPPLIER
     latitude: null as number | null,
     longitude: null as number | null,
@@ -41,7 +41,7 @@ export default function Signup() {
 
   useEffect(() => {
     const qp = (router.query.plan as string | undefined)?.toUpperCase()
-    const allowed = ['ESSENTIALS', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE', 'GROWTH', 'STARTER']
+    const allowed = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
     if (qp && allowed.includes(qp)) {
       setFormData(prev => ({ ...prev, planCode: qp as any }))
     }

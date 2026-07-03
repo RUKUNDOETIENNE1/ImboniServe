@@ -39,8 +39,7 @@ export default function FeatureGate({
 
   const upgradePlan = getUpgradePlanForFeature(feature)
   const planNames: Record<PlanCode, string> = {
-    ESSENTIALS: 'Essentials',
-    STARTER: 'Essentials',
+    STARTER: 'Starter',
     PROFESSIONAL: 'Professional',
     BUSINESS: 'Business',
     PREMIUM: 'Premium',
@@ -112,8 +111,7 @@ export function FeatureLockBadge({
 
   const upgradePlan = getUpgradePlanForFeature(feature)
   const planNames: Record<PlanCode, string> = {
-    ESSENTIALS: 'Essentials',
-    STARTER: 'Essentials',
+    STARTER: 'Starter',
     PROFESSIONAL: 'Pro',
     BUSINESS: 'Business',
     PREMIUM: 'Premium',

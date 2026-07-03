@@ -26,8 +26,6 @@ import {
   Receipt,
   Gift,
   Tag,
-  Hotel,
-  Palette,
   Sparkles,
   Rss,
   Globe,
@@ -138,29 +136,46 @@ const features = [
 
 const advancedFeatures = [
   {
-    icon: <Hotel className="w-5 h-5" />,
-    title: 'Hotel Mode',
-    desc: 'Room management, service areas, and front desk operations built-in.',
-  },
-  {
-    icon: <Palette className="w-5 h-5" />,
-    title: 'Site Builder',
-    desc: 'Launch your own website with customizable templates — no code needed.',
-  },
-  {
     icon: <Sparkles className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.ai_menu',
     title: 'AI Menu Builder',
-    desc: 'Upload a photo or document and let AI build your menu for you.',
+    descKey: 'homepage.advanced.ai_menu_desc',
+    desc: 'Turn menus into digital experiences in minutes. Upload a photo or document and let AI create a professional digital menu ready for ordering.',
   },
   {
     icon: <Globe className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.marketplace',
     title: 'Business Discovery',
-    desc: 'Get discovered by customers searching for restaurants powered by ImboniServe.',
+    descKey: 'homepage.advanced.marketplace_desc',
+    desc: 'Help more customers discover your business through the Imboni ecosystem with searchable business profiles, promotions, and digital visibility.',
+  },
+  {
+    icon: <Package className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.procurement',
+    title: 'Procurement & Inventory',
+    descKey: 'homepage.advanced.procurement_desc',
+    desc: 'Manage purchasing, suppliers, stock levels, and food costs with complete operational visibility from delivery to consumption.',
   },
   {
     icon: <Users className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.staff',
     title: 'Staff & Roles',
-    desc: 'Granular role permissions: waiter, cashier, supervisor, manager, and more.',
+    descKey: 'homepage.advanced.staff_desc',
+    desc: 'Control who can access what with flexible roles and permissions for every member of your team.',
+  },
+  {
+    icon: <Building2 className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.multi_branch',
+    title: 'Multi-Branch Operations',
+    descKey: 'homepage.advanced.multi_branch_desc',
+    desc: 'Run multiple branches from one platform with centralized reporting, inventory visibility, and operational consistency.',
+  },
+  {
+    icon: <BarChart3 className="w-5 h-5" />,
+    titleKey: 'homepage.advanced.business_intelligence',
+    title: 'Business Intelligence',
+    descKey: 'homepage.advanced.business_intelligence_desc',
+    desc: 'Monitor sales, customer trends, inventory, and financial performance with real-time insights that support better business decisions.',
   },
 ]
 
@@ -901,13 +916,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('homepage.features.title', 'Everything you need to run a tight operation')}
+              {t('homepage.features.title', 'One Platform. Complete Operations.')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-2" suppressHydrationWarning>
-              {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your business.')}
-            </p>
-            <p className="text-sm text-imboni-blue/80 font-medium tracking-wide">
-              Unified. Intelligent. Reliable.
+              {t('homepage.features.subtitle', 'Run your entire hospitality business from one intelligent platform — orders, inventory, payments, insights, and growth.')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1276,72 +1288,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── ADVANCED FEATURES ── */}
+      {/* ── ADVANCED CAPABILITIES ── */}
       <section className="py-16 px-4 bg-imboni-light border-t border-slate-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-imboni-blue mb-3" suppressHydrationWarning>
-              {t('homepage.advanced.title', 'Even more in the box')}
+              {t('homepage.advanced.title', 'Built for Growth')}
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto" suppressHydrationWarning>
-              {t('homepage.advanced.subtitle', 'Advanced capabilities available on higher plans — all built-in, no third-party tools required.')}
+              {t('homepage.advanced.subtitle', 'Everything you need to grow from a single location to a modern hospitality business—all from one intelligent platform.')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Hotel className="w-5 h-5" />
+            {advancedFeatures.map((feature) => (
+              <div key={feature.titleKey} className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+                <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>
+                    {t(feature.titleKey, feature.title)}
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>
+                    {t(feature.descKey, feature.desc)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.hotel_mode', 'Hotel Mode')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.hotel_mode_desc', 'Room management, service areas, and front desk operations built-in.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Palette className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.site_builder', 'Site Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.site_builder_desc', 'Launch your own website with customizable templates — no code needed.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.ai_menu', 'AI Menu Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.ai_menu_desc', 'Upload a photo or document and let AI build your menu for you.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Globe className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.marketplace', 'Discovery Marketplace')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.marketplace_desc', 'Get listed on a public directory where customers search for places to eat.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Gift className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.referral', 'Referral Program')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.referral_desc', 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.staff', 'Staff & Roles')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.staff_desc', 'Granular role permissions: waiter, cashier, supervisor, manager, and more.')}</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1354,45 +1327,45 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10 relative z-10">
           <div className="flex-1 text-center md:text-left">
             <div className="inline-block bg-white/10 border border-white/20 text-white/90 text-xs font-semibold px-3 py-1 rounded-full mb-4" suppressHydrationWarning>
-              {t('homepage.discovery.badge', 'NEW — Discovery Feed')}
+              {t('homepage.discovery.badge', 'Business Discovery')}
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>
-              {t('homepage.discovery.title', 'Get discovered by customers looking for great experiences')}
+              {t('homepage.discovery.title', 'Help customers discover your business')}
             </h2>
             <p className="text-white/75 text-lg mb-6" suppressHydrationWarning>
-              {t('homepage.discovery.subtitle', 'List your business on the Imboni Serve discovery marketplace. Publish content, promotions, and daily specials — customers find you and order directly.')}
+              {t('homepage.discovery.subtitle', 'Get discovered through the Imboni ecosystem. Customers searching for hospitality businesses can find you, view your offerings, and place orders directly.')}
             </p>
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <a
                 href="/discover"
                 className="bg-white text-imboni-blue px-6 py-3 rounded-xl font-semibold text-sm hover:bg-slate-100 transition flex items-center gap-2"
               >
-                <Globe className="w-4 h-4" /> {t('homepage.discovery.cta_browse', 'Browse the Marketplace')}
+                <Globe className="w-4 h-4" /> {t('homepage.discovery.cta_browse', 'Explore Discovery')}
               </a>
               <a
                 href="/signup"
                 className="bg-imboni-orange text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-accent-dark transition flex items-center gap-2"
               >
-                <Rss className="w-4 h-4" /> {t('homepage.discovery.cta_claim', 'Claim Your Free Listing')}
+                <ArrowRight className="w-4 h-4" /> {t('homepage.discovery.cta_claim', 'Get Started')}
               </a>
             </div>
           </div>
           <div className="flex-shrink-0 grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-3">
-              <span className="text-imboni-orange"><Rss className="w-4 h-4" /></span>
-              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_posts', 'Shoppable Posts')}</span>
+              <span className="text-imboni-orange"><Globe className="w-4 h-4" /></span>
+              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_visibility', 'Customer Visibility')}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-3">
-              <span className="text-imboni-orange"><Palette className="w-4 h-4" /></span>
-              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_media', 'Photo & Video')}</span>
+              <span className="text-imboni-orange"><ShoppingCart className="w-4 h-4" /></span>
+              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_orders', 'Direct Orders')}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-3">
-              <span className="text-imboni-orange"><Tag className="w-4 h-4" /></span>
-              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_promos', 'Promos & Combos')}</span>
+              <span className="text-imboni-orange"><TrendingUp className="w-4 h-4" /></span>
+              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_growth', 'Business Growth')}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-3">
-              <span className="text-imboni-orange"><Receipt className="w-4 h-4" /></span>
-              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_attribution', 'Order Attribution')}</span>
+              <span className="text-imboni-orange"><Users className="w-4 h-4" /></span>
+              <span className="font-medium text-white/90" suppressHydrationWarning>{t('homepage.discovery.feature_customers', 'New Customers')}</span>
             </div>
           </div>
         </div>
@@ -1401,15 +1374,21 @@ export default function HomePage() {
       {/* ── PAYMENT METHODS ── */}
       <section className="py-14 px-4 bg-imboni-light border-t border-slate-100">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-imboni-blue mb-2" suppressHydrationWarning>{t('homepage.payments.title', '🇷🇼 Rwanda-Ready Payments')}</h2>
-          <p className="text-gray-600 mb-6" suppressHydrationWarning>{t('homepage.payments.subtitle', 'Accept all major payment methods your customers use every day.')}</p>
+          <h2 className="text-2xl font-bold text-imboni-blue mb-2" suppressHydrationWarning>{t('homepage.payments.title', 'Accept Payments Your Customers Already Use')}</h2>
+          <p className="text-gray-600 mb-6" suppressHydrationWarning>{t('homepage.payments.subtitle', 'Flexible payment options configured for your market — mobile money, cards, cash, and digital wallets.')}</p>
           <div className="flex flex-wrap justify-center gap-4">
-            {['MTN MoMo', 'Airtel Money', 'Cash', 'Card / POS', 'IremboPay'].map((m) => (
+            {[
+              { label: t('homepage.payments.mobile_money', 'Mobile Money'), icon: <Smartphone className="w-4 h-4" /> },
+              { label: t('homepage.payments.cards', 'Cards & POS'), icon: <ShoppingCart className="w-4 h-4" /> },
+              { label: t('homepage.payments.cash', 'Cash'), icon: <Receipt className="w-4 h-4" /> },
+              { label: t('homepage.payments.digital_wallets', 'Digital Wallets'), icon: <Globe className="w-4 h-4" /> },
+            ].map((m) => (
               <span
-                key={m}
-                className="bg-white border border-slate-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full shadow-sm"
+                key={m.label}
+                className="bg-white border border-slate-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full shadow-sm flex items-center gap-2"
               >
-                {m}
+                {m.icon}
+                {m.label}
               </span>
             ))}
           </div>
@@ -1419,9 +1398,9 @@ export default function HomePage() {
       {/* ── FINAL CTA ── */}
       <section className="bg-gradient-imboni text-white py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>{t('homepage.final_cta.title', 'Ready to grow your business?')}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>{t('homepage.final_cta.title', 'Ready to transform your hospitality business?')}</h2>
           <p className="text-white/80 text-lg mb-8" suppressHydrationWarning>
-            {t('homepage.final_cta.subtitle', 'Join 500+ hospitality businesses across Rwanda using Imboni Serve. Start your free 14-day trial today — no credit card needed.')}
+            {t('homepage.final_cta.subtitle', 'Start your free 14-day trial today — no credit card needed. Experience the Operating System for Hospitality.')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
@@ -1434,7 +1413,7 @@ export default function HomePage() {
               href={supportWhatsAppUrl}
               className="bg-imboni-green text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:opacity-90 transition flex items-center gap-2"
             >
-              <MessageCircle className="w-4 h-4" /> {t('homepage.final_cta.cta_whatsapp', 'Chat on WhatsApp')}
+              <MessageCircle className="w-4 h-4" /> {t('homepage.final_cta.cta_whatsapp', 'Talk to Our Team')}
             </a>
           </div>
         </div>
@@ -1451,7 +1430,7 @@ export default function HomePage() {
             <div>
               <SocialShare 
                 title="ImboniServe" 
-                text="Discover ImboniServe – Smart Dining for Restaurants in Rwanda"
+                text="Discover ImboniServe — Smart Dining for Hospitality"
                 variant="compact"
               />
             </div>

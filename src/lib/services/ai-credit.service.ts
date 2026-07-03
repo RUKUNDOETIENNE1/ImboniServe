@@ -263,7 +263,6 @@ export async function getPlanCreditLimit(businessId: string): Promise<number> {
 
   // Default limits by plan if not set in database
   const DEFAULT_LIMITS: Record<string, number> = {
-    'ESSENTIALS': 20,
     'STARTER': 20,
     'PROFESSIONAL': 50,
     'GROWTH': 100,

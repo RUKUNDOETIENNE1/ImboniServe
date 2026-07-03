@@ -171,8 +171,8 @@
       }
     },
     "features": {
-      "title": "Tout ce dont vous avez besoin pour une gestion efficace",
-      "subtitle": "Des commandes à l'approvisionnement, des analyses à la gestion multi-établissements — Imboni Serve couvre tous les aspects de votre entreprise.",
+      "title": "Une seule plateforme. Des opérations complètes.",
+      "subtitle": "Gérez toute votre activité d’hôtellerie-restauration depuis une plateforme intelligente — commandes, inventaire, paiements, insights et croissance.",
       "qr_ordering": "Commande par QR Code",
       "qr_ordering_desc": "Les clients scannent, consultent votre menu et commandent directement depuis leur téléphone — aucune application nécessaire.",
       "inventory": "Inventaire & Approvisionnement",
@@ -199,41 +199,51 @@
       "roles_desc": "Caissier, serveur, superviseur, gérant — chaque rôle ne voit que ce dont il a besoin."
     },
     "advanced": {
-      "title": "Encore plus de fonctionnalités",
-      "subtitle": "Capacités avancées disponibles sur les plans supérieurs — toutes intégrées, aucun outil tiers requis.",
-      "hotel_mode": "Mode Hôtel",
-      "hotel_mode_desc": "Gestion des chambres, zones de service et opérations de réception intégrées.",
+      "title": "Conçu pour la croissance",
+      "subtitle": "Tout ce qu’il vous faut pour passer d’un seul établissement à une activité d’hospitalité moderne—depuis une plateforme intelligente unique.",
+      "hotel_mode": "Opérations Hôtelières",
+      "hotel_mode_desc": "Gestion des chambres, zones de service et opérations de réception pour les activités d’hospitalité.",
       "site_builder": "Créateur de Site",
       "site_builder_desc": "Lancez votre propre site web avec des modèles personnalisables — aucun code nécessaire.",
       "ai_menu": "Créateur de Menu IA",
-      "ai_menu_desc": "Téléchargez une photo ou un document et laissez l'IA créer votre menu pour vous.",
-      "marketplace": "Marché de Découverte",
-      "marketplace_desc": "Soyez répertorié dans un annuaire public où les clients recherchent des endroits où manger.",
+      "ai_menu_desc": "Transformez vos menus en expériences digitales en quelques minutes. Téléchargez une photo ou un document et laissez l’IA créer un menu digital professionnel prêt à la commande.",
+      "marketplace": "Découverte de l’établissement",
+      "marketplace_desc": "Aidez davantage de clients à découvrir votre établissement via l’écosystème Imboni grâce à des profils d’établissement recherchables, des promotions et une visibilité digitale.",
+      "procurement": "Approvisionnement & Inventaire",
+      "procurement_desc": "Gérez les achats, les fournisseurs, les niveaux de stock et les coûts alimentaires avec une visibilité opérationnelle complète, de la livraison à la consommation.",
       "referral": "Programme de Parrainage",
       "referral_desc": "Partagez et gagnez — les clients parrainent des amis et gagnent automatiquement des crédits repas.",
       "staff": "Personnel & Rôles",
-      "staff_desc": "Permissions de rôle granulaires : serveur, caissier, superviseur, gérant, et plus."
+      "staff_desc": "Contrôlez qui peut accéder à quoi grâce à des rôles et permissions flexibles pour chaque membre de votre équipe.",
+      "multi_branch": "Opérations Multi-Établissements",
+      "multi_branch_desc": "Pilotez plusieurs établissements depuis une seule plateforme avec des rapports centralisés, une visibilité des stocks et une cohérence opérationnelle.",
+      "business_intelligence": "Business Intelligence",
+      "business_intelligence_desc": "Suivez les ventes, les tendances clients, l’inventaire et la performance financière avec des insights en temps réel pour prendre de meilleures décisions."
     },
     "discovery": {
-      "badge": "NOUVEAU — Flux de Découverte",
-      "title": "Soyez découvert par les clients à la recherche d'expériences exceptionnelles",
-      "subtitle": "Répertoriez votre entreprise sur le marché de découverte Imboni Serve. Publiez du contenu, des promotions et des spéciaux du jour — les clients vous trouvent et commandent directement.",
-      "cta_browse": "Parcourir le Marché",
-      "cta_claim": "Réclamer Votre Inscription Gratuite",
-      "feature_posts": "Publications Achetables",
-      "feature_media": "Photo & Vidéo",
-      "feature_promos": "Promos & Combos",
-      "feature_attribution": "Attribution des Commandes"
+      "badge": "Découverte de l’établissement",
+      "title": "Aidez les clients à découvrir votre établissement",
+      "subtitle": "Soyez découvert via l’écosystème Imboni. Les clients qui recherchent des établissements d’hospitalité peuvent vous trouver, voir vos offres et commander directement.",
+      "cta_browse": "Explorer la découverte",
+      "cta_claim": "Commencer",
+      "feature_visibility": "Visibilité",
+      "feature_orders": "Commandes directes",
+      "feature_growth": "Croissance",
+      "feature_customers": "Nouveaux clients"
     },
     "payments": {
-      "title": " Paiements Prêts pour le Rwanda",
-      "subtitle": "Acceptez tous les principaux modes de paiement utilisés quotidiennement par vos clients."
+      "title": "Acceptez les paiements que vos clients utilisent déjà",
+      "subtitle": "Des options de paiement flexibles configurées pour votre marché — mobile money, cartes, espèces et portefeuilles numériques.",
+      "mobile_money": "Mobile Money",
+      "cards": "Cartes & TPE",
+      "cash": "Espèces",
+      "digital_wallets": "Portefeuilles numériques"
     },
     "final_cta": {
-      "title": "Prêt à développer votre entreprise ?",
-      "subtitle": "Rejoignez plus de 500 entreprises d'hôtellerie au Rwanda utilisant Imboni Serve. Commencez votre essai gratuit de 14 jours aujourd'hui — aucune carte de crédit requise.",
+      "title": "Prêt à transformer votre activité d’hospitalité ?",
+      "subtitle": "Commencez votre essai gratuit de 14 jours dès aujourd’hui — aucune carte de crédit requise. Découvrez l’Operating System for Hospitality.",
       "cta_start": "Commencer Gratuitement",
-      "cta_whatsapp": "Discuter sur WhatsApp"
+      "cta_whatsapp": "Parler à notre équipe"
     },
     "footer": {
       "copyright": "Imboni Serve. Conçu pour l'industrie de l'hôtellerie.",

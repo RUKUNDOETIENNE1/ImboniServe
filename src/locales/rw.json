@@ -153,8 +153,8 @@
       }
     },
     "features": {
-      "title": "Ibyo ukeneye byose ngo uyobore ubucuruzi bwawe mu buryo buhamye.",
-      "subtitle": "Kuva ku ma commande kugeza ku gutanga ibicuruzwa, uhereye ku mibare y’ubucuruzi kugeza ku mashami menshi — Imboni Serve ikubiyemo byose ubucuruzi bwawe bukeneye.",
+      "title": "Platforme imwe. Imikorere yuzuye.",
+      "subtitle": "Genzura ubucuruzi bwawe bwo kwakira abakiriya uhereye kuri platforme imwe y'ubwenge — ama commande, ububiko, ubwishyu, isesengura, n’iterambere.",
       "qr_ordering": "Gutumiza ukoresheje QR (Impishabanga shusho)",
       "qr_ordering_desc": "Abakiriya barasikana, bakareba menu yawe, bagakora commande kuri telefoni zabo — nta app ikenewe.",
       "inventory": "Ibikoresho n'Ubucuruzi",
@@ -181,41 +181,51 @@
       "roles_desc": "Cashier, umuseriveri, supervisor, na manager — buri wese abona ibyo akeneye gusa."
     },
     "advanced": {
-      "title": "Ibindi byinshi mu isanduku",
-      "subtitle": "Ubushobozi bwateye imbere buboneka kuri gahunda zo hejuru — byose byubatswe imbere, nta bikoresho byo hanze bikenewe.",
-      "hotel_mode": "Uburyo bwa Hotel",
-      "hotel_mode_desc": "Imicungire y’icyumba, serivisi n’ahakirwa abakiriya byose biri muri sisitemu.",
+      "title": "Yubakiwe Iterambere",
+      "subtitle": "Ibyo ukeneye byose kugira ngo ukure uva ku ishami rimwe ujye ku bucuruzi bugezweho bwo kwakira abakiriya—byose muri platforme imwe y'ubwenge.",
+      "hotel_mode": "Imikorere ya Hotel",
+      "hotel_mode_desc": "Imicungire y’icyumba, serivisi n’ahakirwa abakiriya ku bucuruzi bwo kwakira abakiriya.",
       "site_builder": "Kubaka Urubuga",
       "site_builder_desc": "Tangiza urubuga rwawe (website) ukoresheje templates zihindurwa uko ushaka — nta bumenyi bwa coding bukenewe.",
       "ai_menu": "Gukora Menu ya AI",
-      "ai_menu_desc": "Ohereza ifoto cyangwa inyandiko ya PDF, ureke AI igukorere menu yawe mu buryo bwikora.",
-      "marketplace": "Isoko ryo Kuvumbura",
-      "marketplace_desc": "Shyirwa ku rutonde rusange aho abakiriya bashakisha ahantu ho kurya.",
+      "ai_menu_desc": "Hindura menu yawe igere ku rwego rwa digital mu minota mike. Ohereza ifoto cyangwa inyandiko, AI ikore menu y'umwuga yiteguye gutumizwaho.",
+      "marketplace": "Kugaragara ku Bakiriya",
+      "marketplace_desc": "Fasha abakiriya benshi kuvumbura ubucuruzi bwawe binyuze muri ecosystem ya Imboni, hamwe na profile zishakishwa, promotions, n'ukugaragara kuri digital.",
+      "procurement": "Ibyo Kugura & Ububiko",
+      "procurement_desc": "Cunga ibyo ugura, abagurisha, ibiri mu bubiko, n'igiciro cy'ibiryo mu buryo bugaragara neza kuva ku kwakira ibicuruzwa kugeza ku mikoreshereze.",
       "referral": "Gahunda yo Gutumira (Referral Program)",
       "referral_desc": "Sangiza, winjize — Abakiriya batumira inshuti zabo bagahita babona ibihembo mu buryo bwikora.",
       "staff": "Abakozi & Inshingano",
-      "staff_desc": "Uburenganzira bushingiye ku nshingano busobanuye neza uruhare rwa buri wese: cashier, supervisor, manager, n’abandi."
+      "staff_desc": "Genzura uwo wemerewe kugera ku ki ukoresheje inshingano n'uburenganzira byoroshye kuri buri mukozi wawe.",
+      "multi_branch": "Imikorere y'Amashami Menshi",
+      "multi_branch_desc": "Cunga amashami menshi ukoresheje platforme imwe, raporo zihuriweho, ukugaragara kw'ububiko, n'imikorere ihamye.",
+      "business_intelligence": "Ubwenge bw'Ubucuruzi",
+      "business_intelligence_desc": "Kurikirana igurisha, imyitwarire y'abakiriya, ububiko, n'uko imari ihagaze ukoresheje insights z'igihe nyacyo zigufasha gufata ibyemezo byiza."
     },
     "discovery": {
-      "badge": "GISHYA — Kuvumbura",
-      "title": "Vumburwa n'abakiriya bashaka uburambe buhebuje",
-      "subtitle": "Andikisha ubucuruzi bwawe ku isoko ry' Imboni Serve. Tangaza ibirimo, ibishushanyo, n'ibyiza bya buri munsi — abakiriya bakubona kandi batumize ku buryo bwihuse.",
-      "cta_browse": "Reba Isoko",
-      "cta_claim": "Tangira Iyandikishwa Ryawe Ry'Ubuntu",
-      "feature_posts": "Ibyanditswe Bigurwa",
-      "feature_media": "Amafoto & Video",
-      "feature_promos": "Ibishushanyo & Combos",
-      "feature_attribution": "Gutanga Itumiza"
+      "badge": "Kuvumburwa n'Abakiriya",
+      "title": "Fasha abakiriya kuvumbura ubucuruzi bwawe",
+      "subtitle": "Vumburwa binyuze muri ecosystem ya Imboni. Abakiriya bashakisha ubucuruzi bwo kwakira abakiriya barakubona, bakareba ibyo utanga, kandi bagatumiza ako kanya.",
+      "cta_browse": "Reba Discovery",
+      "cta_claim": "Tangira",
+      "feature_visibility": "Kugaragara",
+      "feature_orders": "Itumiza",
+      "feature_growth": "Iterambere",
+      "feature_customers": "Abakiriya Bashya"
     },
     "payments": {
-      "title": "🇷🇼 Kwishyura Guteguriye u Rwanda",
-      "subtitle": "Emera uburyo bwose bwo kwishyura abakiriya bawe bakoresha mu buzima bwa buri munsi."
+      "title": "Emera uburyo bwo kwishyura abakiriya bawe bakoresha",
+      "subtitle": "Uburyo bwo kwishyura buhindurwa bitewe n'isoko ryawe — mobile money, amakarita, cash, na digital wallets.",
+      "mobile_money": "Mobile Money",
+      "cards": "Amakarita & POS",
+      "cash": "Cash",
+      "digital_wallets": "Digital Wallets"
     },
     "final_cta": {
-      "title": "Witeguye guzamura ubucuruzi bwawe?",
-      "subtitle": "Ufatanye n'ubucuruzi burenga 500 bwo kwakira abakiriya mu Rwanda bukoresha Imboni Serve. Tangira igerageza ryawe ry'ubuntu ry'iminsi 14 uyu munsi — nta karita y'inguzanyo ikenewe.",
+      "title": "Witeguye guhindura imikorere y'ubucuruzi bwawe?",
+      "subtitle": "Tangira igerageza ry'ubuntu ry'iminsi 14 uyu munsi — nta karita y'inguzanyo ikenewe. Gerageza Operating System for Hospitality.",
       "cta_start": "Tangira Ku buntu",
-      "cta_whatsapp": "Ganira kuri WhatsApp"
+      "cta_whatsapp": "Vugana n'Ikipe yacu"
     },
     "footer": {
       "copyright": "Imboni Serve. Yubakiwe ubucuruzi bwo kwakira abakiriya.",

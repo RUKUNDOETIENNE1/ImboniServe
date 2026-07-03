@@ -298,8 +298,8 @@ async function createAffiliateCommissions(transaction: any) {
       })
 
       if (plan) {
-        // Recruiter welcome bonus: 5,000 RWF for non-base, 2,000 RWF for base plan (ESSENTIALS/STARTER)
-        const isBasePlan = plan.code === 'ESSENTIALS' || plan.code === 'STARTER'
+        // Recruiter welcome bonus: 5,000 RWF for non-base, 2,000 RWF for base plan (STARTER)
+        const isBasePlan = plan.code === 'STARTER'
         const bonusAmountCents = isBasePlan ? 200000 : 500000
         
         await prisma.affiliateCommissionNew.create({

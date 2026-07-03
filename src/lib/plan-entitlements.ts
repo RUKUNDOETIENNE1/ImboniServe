@@ -3,7 +3,7 @@
  * Centralized feature gating based on subscription tier
  */
 
-export type PlanCode = 'ESSENTIALS' | 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
+export type PlanCode = 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
 
 export interface PlanEntitlements {
   // Core Operations
@@ -161,7 +161,6 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
   }
 
   switch (planCode) {
-    case 'ESSENTIALS':
     case 'STARTER':
       return {
         ...baseEntitlements,
@@ -391,7 +390,7 @@ export function hasFeatureAccess(
  * Get upgrade target plan for a feature
  */
 export function getUpgradePlanForFeature(featureKey: keyof PlanEntitlements): PlanCode | null {
-  const plans: PlanCode[] = ['ESSENTIALS', 'STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
+  const plans: PlanCode[] = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
   
   for (const plan of plans) {
     if (hasFeatureAccess(plan, featureKey)) {

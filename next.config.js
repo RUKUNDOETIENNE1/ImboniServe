@@ -128,8 +128,8 @@ const nextConfig = {
   },
   // Performance budgets
   onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+    maxInactiveAge: 10 * 60 * 1000,
+    pagesBufferLength: 10,
   },
   images: {
     remotePatterns: [

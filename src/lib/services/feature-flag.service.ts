@@ -106,7 +106,7 @@ const INITIAL_FLAGS = [
     enabled: true,
     autoEnableThreshold: null,
     planGated: true,
-    minimumPlan: 'ESSENTIALS',
+    minimumPlan: 'STARTER',
   },
   {
     key: FEATURE_FLAGS.CONFIGURABLE_REPORTS,

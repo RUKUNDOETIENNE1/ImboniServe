@@ -152,8 +152,8 @@
     },
     "nav_tagline": "Run Smarter. Serve Better.",
     "features": {
-      "title": "Everything you need to run a tight operation",
-      "subtitle": "From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your business.",
+      "title": "One Platform. Complete Operations.",
+      "subtitle": "Run your entire hospitality business from one intelligent platform — orders, inventory, payments, insights, and growth.",
       "qr_ordering": "QR Code Ordering",
       "qr_ordering_desc": "Customers scan, browse your menu, and order directly from their phones — no app needed.",
       "inventory": "Inventory & Procurement",
@@ -180,41 +180,51 @@
       "roles_desc": "Cashier, waiter, supervisor, manager — each role sees only what they need."
     },
     "advanced": {
-      "title": "Even more in the box",
-      "subtitle": "Advanced capabilities available on higher plans — all built-in, no third-party tools required.",
-      "hotel_mode": "Hotel Mode",
-      "hotel_mode_desc": "Room management, service areas, and front desk operations built-in.",
+      "title": "Built for Growth",
+      "subtitle": "Everything you need to grow from a single location to a modern hospitality business—all from one intelligent platform.",
+      "hotel_mode": "Hotel Operations",
+      "hotel_mode_desc": "Room management, service areas, and front desk operations for hospitality businesses.",
       "site_builder": "Site Builder",
       "site_builder_desc": "Launch your own website with customizable templates — no code needed.",
       "ai_menu": "AI Menu Builder",
-      "ai_menu_desc": "Upload a photo or document and let AI build your menu for you.",
-      "marketplace": "Discovery Marketplace",
-      "marketplace_desc": "Get listed on a public directory where customers search for places to eat.",
+      "ai_menu_desc": "Turn menus into digital experiences in minutes. Upload a photo or document and let AI create a professional digital menu ready for ordering.",
+      "marketplace": "Business Discovery",
+      "marketplace_desc": "Help more customers discover your business through the Imboni ecosystem with searchable business profiles, promotions, and digital visibility.",
+      "procurement": "Procurement & Inventory",
+      "procurement_desc": "Manage purchasing, suppliers, stock levels, and food costs with complete operational visibility from delivery to consumption.",
       "referral": "Referral Program",
       "referral_desc": "Share & earn — customers refer friends and earn dining credits automatically.",
       "staff": "Staff & Roles",
-      "staff_desc": "Granular role permissions: waiter, cashier, supervisor, manager, and more."
+      "staff_desc": "Control who can access what with flexible roles and permissions for every member of your team.",
+      "multi_branch": "Multi-Branch Operations",
+      "multi_branch_desc": "Run multiple branches from one platform with centralized reporting, inventory visibility, and operational consistency.",
+      "business_intelligence": "Business Intelligence",
+      "business_intelligence_desc": "Monitor sales, customer trends, inventory, and financial performance with real-time insights that support better business decisions."
     },
     "discovery": {
-      "badge": "NEW — Discovery Feed",
-      "title": "Get discovered by customers looking for great experiences",
-      "subtitle": "List your business on the Imboni Serve discovery marketplace. Publish content, promotions, and daily specials — customers find you and order directly.",
-      "cta_browse": "Browse the Marketplace",
-      "cta_claim": "Claim Your Free Listing",
-      "feature_posts": "Shoppable Posts",
-      "feature_media": "Photo & Video",
-      "feature_promos": "Promos & Combos",
-      "feature_attribution": "Order Attribution"
+      "badge": "Business Discovery",
+      "title": "Help customers discover your business",
+      "subtitle": "Get discovered through the Imboni ecosystem. Customers searching for hospitality businesses can find you, view your offerings, and place orders directly.",
+      "cta_browse": "Explore Discovery",
+      "cta_claim": "Get Started",
+      "feature_visibility": "Customer Visibility",
+      "feature_orders": "Direct Orders",
+      "feature_growth": "Business Growth",
+      "feature_customers": "New Customers"
     },
     "payments": {
-      "title": "🇷🇼 Rwanda-Ready Payments",
-      "subtitle": "Accept all major payment methods your customers use every day."
+      "title": "Accept Payments Your Customers Already Use",
+      "subtitle": "Flexible payment options configured for your market — mobile money, cards, cash, and digital wallets.",
+      "mobile_money": "Mobile Money",
+      "cards": "Cards & POS",
+      "cash": "Cash",
+      "digital_wallets": "Digital Wallets"
     },
     "final_cta": {
-      "title": "Ready to grow your business?",
-      "subtitle": "Join 500+ hospitality businesses across Rwanda using Imboni Serve. Start your free 14-day trial today — no credit card needed.",
+      "title": "Ready to transform your hospitality business?",
+      "subtitle": "Start your free 14-day trial today — no credit card needed. Experience the Operating System for Hospitality.",
       "cta_start": "Get Started Free",
-      "cta_whatsapp": "Chat on WhatsApp"
+      "cta_whatsapp": "Talk to Our Team"
     },
     "footer": {
       "copyright": "Imboni Serve. Built for the hospitality industry.",
