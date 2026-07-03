@@ -8,9 +8,9 @@ import { prisma } from '@/lib/prisma'
 import { AuthOTPService } from '@/lib/services/auth-otp.service'
 import { SecurityEventService } from '@/lib/services/security-event.service'
 
-type AppUser = User & { roles: string[]; role?: string; businessId: string | null }
-type AppJWT = JWT & { roles?: string[]; role?: string; businessId?: string | null }
-type AppSession = Session & { user?: Session['user'] & { roles?: string[]; role?: string; businessId?: string | null } }
+type AppUser = User & { roles: string[]; role?: string; businessId: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null }
+type AppJWT = JWT & { roles?: string[]; role?: string; businessId?: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null }
+type AppSession = Session & { user?: Session['user'] & { roles?: string[]; role?: string; businessId?: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null } }
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -44,7 +44,23 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { id: userId },
-          select: { id: true, name: true, email: true, roles: true, businessId: true, isActive: true },
+          select: { 
+            id: true, 
+            name: true, 
+            email: true, 
+            roles: true, 
+            businessId: true, 
+            isActive: true,
+            business: {
+              select: {
+                plan: {
+                  select: { code: true }
+                },
+                subscriptionStatus: true,
+                trialEndDate: true
+              }
+            }
+          },
         })
 
         if (!user || !user.isActive || user.email !== email) return null
@@ -59,6 +75,9 @@ export const authOptions: NextAuthOptions = {
           roles,
           role: roles[0],
           businessId: user.businessId ?? null,
+          planCode: user.business?.plan?.code,
+          subscriptionStatus: user.business?.subscriptionStatus,
+          trialEndDate: user.business?.trialEndDate
         }
         return authUser
       },
@@ -83,6 +102,17 @@ export const authOptions: NextAuthOptions = {
 
             const user = await prisma.user.findUnique({
               where: { email },
+              include: {
+                business: {
+                  select: {
+                    plan: {
+                      select: { code: true }
+                    },
+                    subscriptionStatus: true,
+                    trialEndDate: true
+                  }
+                }
+              }
             })
 
             if (!user || !user.isActive) return null
@@ -99,6 +129,9 @@ export const authOptions: NextAuthOptions = {
               roles,
               role: primaryRole,
               businessId: (user as any).businessId ?? null,
+              planCode: user.business?.plan?.code,
+              subscriptionStatus: user.business?.subscriptionStatus,
+              trialEndDate: user.business?.trialEndDate
             }
 
             return authUser
@@ -117,6 +150,9 @@ export const authOptions: NextAuthOptions = {
         t.roles = u.roles
         t.role = u.role
         t.businessId = u.businessId
+        t.planCode = u.planCode
+        t.subscriptionStatus = u.subscriptionStatus
+        t.trialEndDate = u.trialEndDate
       }
       return t
     },
@@ -128,6 +164,9 @@ export const authOptions: NextAuthOptions = {
         s.user.roles = t.roles
         s.user.role = t.role // backward-compat
         s.user.businessId = t.businessId
+        s.user.planCode = t.planCode
+        s.user.subscriptionStatus = t.subscriptionStatus
+        s.user.trialEndDate = t.trialEndDate
       }
       return s
     },
