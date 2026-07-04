@@ -6,8 +6,9 @@ import { WhatsAppOrderService } from '@/lib/services/whatsapp-order.service'
 import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { ingestDeliveryShadowEvent } from '@/lib/die/business-as-plugin/delivery/delivery.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
 
@@ -83,5 +84,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).json(successResponse(updated, 'Order status updated'))
 }
+
+// Apply commercial enforcement: Orders require Starter plan or higher
+const handler = requiresFeature('hasOrders')(baseHandler)
 
 export default withErrorHandler(handler)

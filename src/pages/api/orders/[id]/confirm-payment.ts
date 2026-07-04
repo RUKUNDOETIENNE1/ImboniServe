@@ -5,8 +5,9 @@ import { resolveBusinessContext } from '@/lib/api/business-context'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { triggerEvent } from '@/lib/pusher-server'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -138,5 +139,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Failed to confirm payment' })
   }
 }
+
+// Apply commercial enforcement: Orders require Starter plan or higher
+const handler = requiresFeature('hasOrders')(baseHandler)
 
 export default withRateLimit(requirePermission('payments.create')(handler), { maxRequests: 20, windowMs: 60000 })
