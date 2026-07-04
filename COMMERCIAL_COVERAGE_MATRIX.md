@@ -11,14 +11,14 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-04 09:00 UTC
+**Last Updated:** 2026-07-04 10:15 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 0 / 19 | 19 | 🔄 In Progress |
-| **Business Capabilities** | 0 / 92 | 92 | 🔄 In Progress |
+| **Business Domains** | 1 / 19 | 19 | 🔄 In Progress |
+| **Business Capabilities** | 5 / 92 | 92 | 🔄 In Progress |
 | **Commercial Endpoints** | 4 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 0% | 100% | 🔄 In Progress |
+| **Capability Coverage** | 5.4% | 100% | 🔄 In Progress |
 | **Endpoint Coverage** | 3.9% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
@@ -34,7 +34,7 @@
 | 1 | Orders | 8 | 14 | 0 | 0 | ❌ | ⏳ Ready |
 | 2 | Kitchen Operations | 5 | 8 | 0 | 0 | ❌ | ⏳ Ready |
 | 3 | Tables | 4 | 6 | 0 | 0 | ❌ | ⏳ Ready |
-| 4 | Reservations | 5 | 4 | 1 | 0 | ❌ | 🔄 In Progress |
+| 4 | Reservations | 5 | 4 | 4 | 4 | ✅ | ✅ Certified |
 | 5 | Menu Management | 7 | 12 | 0 | 0 | ❌ | ⏳ Ready |
 | 6 | Inventory | 6 | 10 | 0 | 0 | ❌ | ⏳ Ready |
 | 7 | Procurement | 4 | 6 | 0 | 0 | ❌ | ⏳ Ready |

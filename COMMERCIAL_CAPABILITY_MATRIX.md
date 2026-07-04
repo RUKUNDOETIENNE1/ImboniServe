@@ -13,10 +13,10 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 0 / 19 | 19 | 🔄 In Progress |
-| **Business Capabilities** | 0 / 92 | 92 | 🔄 In Progress |
+| **Business Domains** | 1 / 19 | 19 | 🔄 In Progress |
+| **Business Capabilities** | 5 / 92 | 92 | 🔄 In Progress |
 | **Commercial Endpoints** | 4 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 0% | 100% | 🔄 In Progress |
+| **Capability Coverage** | 5.4% | 100% | 🔄 In Progress |
 | **Endpoint Coverage** | 3.9% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -81,20 +81,20 @@
 
 ---
 
-### DOMAIN 4: RESERVATIONS (0/5 Capabilities) 🔄
+### DOMAIN 4: RESERVATIONS (5/5 Capabilities) ✅
 
 **Constitutional Authority:** Section 6.3 (Professional - Reservations)
 
 | Capability | Description | Plan Required | Endpoints | Coverage | Regression | Certified |
 |------------|-------------|---------------|-----------|----------|------------|-----------|
-| Create Reservation | Customer can book tables | PROFESSIONAL | `/api/reservations` (POST) | ✅ | ⏳ | ❌ |
-| View Reservations | Customer can view bookings | PROFESSIONAL | `/api/reservations` (GET) | ✅ | ⏳ | ❌ |
-| Edit Reservation | Customer can modify bookings | PROFESSIONAL | `/api/reservations/[id]` | ❌ | ⏳ | ❌ |
-| Cancel Reservation | Customer can cancel bookings | PROFESSIONAL | `/api/reservations/[id]/cancel` | ❌ | ⏳ | ❌ |
-| Reservation Deposits | Customer can pay deposits | PROFESSIONAL | `/api/reservations/[id]/deposit/initiate` | ❌ | ⏳ | ❌ |
+| Create Reservation | Customer can book tables | PROFESSIONAL | `/api/reservations` (POST) | ✅ | ✅ | ✅ |
+| View Reservations | Customer can view bookings | PROFESSIONAL | `/api/reservations` (GET) | ✅ | ✅ | ✅ |
+| Edit Reservation | Customer can modify bookings | PROFESSIONAL | `/api/reservations/[id]` | ✅ | ✅ | ✅ |
+| Cancel Reservation | Customer can cancel bookings | PROFESSIONAL | `/api/reservations/[id]/cancel` | ✅ | ✅ | ✅ |
+| Reservation Deposits | Customer can pay deposits | PROFESSIONAL | `/api/reservations/[id]/deposit/initiate` | ✅ | ✅ | ✅ |
 
-**Domain Status:** 🔄 In Progress  
-**Capability Coverage:** 2/5 (40%) — Create and View partially protected
+**Domain Status:** ✅ CERTIFIED  
+**Capability Coverage:** 5/5 (100%)
 
 ---
 

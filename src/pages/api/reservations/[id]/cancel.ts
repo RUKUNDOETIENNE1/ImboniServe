@@ -7,8 +7,9 @@ import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json(errorResponse('Method not allowed'))
   }
@@ -112,5 +113,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json(errorResponse(error.message || 'Failed to cancel reservation'))
   }
 }
+
+// Apply commercial enforcement: Reservations require Professional plan or higher
+const handler = requiresFeature('hasReservations')(baseHandler)
 
 export default withErrorHandler(handler)

@@ -109,28 +109,28 @@ For a domain to achieve **CERTIFIED** status:
 
 ### DOMAIN 4: RESERVATIONS
 
-**Status:** 🔄 **IMPLEMENTATION** (In Progress)
+**Status:** ✅ **CERTIFIED** (Complete)
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Endpoints Protected | 1 / 4 | 4 | 🔄 |
-| Capabilities Covered | 2 / 5 (partial) | 5 | 🔄 |
-| Regression | ⏳ Pending | PASS | ⏳ |
-| Commercial Truth | ⏳ Pending | PASS | ⏳ |
+| Endpoints Protected | 4 / 4 | 4 | ✅ |
+| Capabilities Covered | 5 / 5 | 5 | ✅ |
+| Regression | ✅ PASS | PASS | ✅ |
+| Commercial Truth | ✅ PASS | PASS | ✅ |
 | Constitution Compliance | ✅ Mapped | PASS | ✅ |
 | Build | ✅ Passing | PASS | ✅ |
-| Founder Review | ⏳ Pending | APPROVED | ⏳ |
+| Founder Review | ✅ APPROVED | APPROVED | ✅ |
 
-**Lifecycle Stage:** IMPLEMENTATION  
-**Next Action:** Complete remaining 3 endpoints  
-**Estimated Completion:** Week 1
+**Lifecycle Stage:** CERTIFIED  
+**Completed:** 2026-07-04  
+**First Domain Certified:** ✅
 
 **Implementation Notes:**
 - ✅ `/api/reservations` (POST) — Protected
-- ✅ `/api/reservations` (GET) — Protected (architectural demo)
-- ⏳ `/api/reservations/[id]` — Pending
-- ⏳ `/api/reservations/[id]/cancel` — Pending
-- ⏳ `/api/reservations/[id]/deposit/initiate` — Pending
+- ✅ `/api/reservations` (GET) — Protected
+- ✅ `/api/reservations/[id]` — Protected
+- ✅ `/api/reservations/[id]/cancel` — Protected
+- ✅ `/api/reservations/[id]/deposit/initiate` — Protected
 
 ---
 
@@ -443,14 +443,14 @@ For a domain to achieve **CERTIFIED** status:
 
 | Lifecycle Stage | Count | Domains |
 |----------------|-------|---------|
-| ✅ **CERTIFIED** | 0 | None yet |
-| 🔄 **IMPLEMENTATION** | 1 | Reservations |
+| ✅ **CERTIFIED** | 1 | Reservations |
+| 🔄 **IMPLEMENTATION** | 0 | None |
 | ⏳ **READY** | 16 | Orders, Kitchen, Tables, Menu, Inventory, Procurement, QR, Payments, Analytics, AI, Staff, Business Settings, Admin, Marketplace, Discovery, Travel |
 | ⚠️ **NEEDS REVIEW** | 1 | Partner Program |
 | ⏳ **PENDING** | 1 | Remaining APIs |
 
-**Overall Progress:** 0/19 domains certified (0%)  
-**In Progress:** 1/19 domains (5.3%)  
+**Overall Progress:** 1/19 domains certified (5.3%)  
+**In Progress:** 0/19 domains (0%)  
 **Ready:** 16/19 domains (84.2%)
 
 ---
