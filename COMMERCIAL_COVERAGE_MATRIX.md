@@ -1,21 +1,26 @@
 # COMMERCIAL_COVERAGE_MATRIX
 
-**Document:** Authoritative Commercial Enforcement Coverage Inventory  
-**Date:** 2026-07-03  
+**Document:** Authoritative Commercial Enforcement Coverage Inventory (Engineering View)  
+**Date:** 2026-07-04  
 **Purpose:** Track Commercial Truth coverage across all business domains  
 **Status:** 🔄 Live (Updated Continuously)
+
+**Note:** This matrix provides the **engineering view** of Commercial Truth. For the **business view** (customer capabilities), see <ref_file file="C:/Dev/ImboniResto/COMMERCIAL_CAPABILITY_MATRIX.md" />
 
 ---
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-03 14:30 UTC
+**Last Updated:** 2026-07-04 09:00 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Domains Complete** | 1 / 19 | 19 | 🔄 In Progress |
-| **Endpoints Protected** | 4 / 103 | 103 | 🔄 In Progress |
-| **Coverage Percentage** | 3.9% | 100% | 🔄 In Progress |
+| **Business Domains** | 0 / 19 | 19 | 🔄 In Progress |
+| **Business Capabilities** | 0 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 4 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 0% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 3.9% | 100% | 🔄 In Progress |
+| **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
 | **Build Status** | ✅ Success | Success | ✅ Pass |
@@ -24,29 +29,29 @@
 
 ## BUSINESS DOMAIN PROGRESS
 
-| # | Domain | Endpoints | Protected | Tested | Certified | Status |
-|---|--------|-----------|-----------|--------|-----------|--------|
-| 1 | Orders | 14 | 0 | 0 | ❌ | ⏳ Next |
-| 2 | Kitchen Operations | 8 | 0 | 0 | ❌ | ⏳ Pending |
-| 3 | Tables | 6 | 0 | 0 | ❌ | ⏳ Pending |
-| 4 | Reservations | 4 | 1 | 0 | ❌ | 🔄 In Progress |
-| 5 | Menu Management | 12 | 0 | 0 | ❌ | ⏳ Pending |
-| 6 | Inventory | 10 | 0 | 0 | ❌ | ⏳ Pending |
-| 7 | Procurement | 6 | 0 | 0 | ❌ | ⏳ Pending |
-| 8 | QR Ordering | 5 | 0 | 0 | ❌ | ⏳ Pending |
-| 9 | Payments | 8 | 0 | 0 | ❌ | ⏳ Pending |
-| 10 | Reports & Analytics | 7 | 0 | 0 | ❌ | ⏳ Pending |
-| 11 | AI Features | 4 | 0 | 0 | ❌ | ⏳ Pending |
-| 12 | Staff & Roles | 4 | 0 | 0 | ❌ | ⏳ Pending |
-| 13 | Business Settings | 6 | 0 | 0 | ❌ | ⏳ Pending |
-| 14 | Administration | 3 | 0 | 0 | ❌ | ⏳ Pending |
-| 15 | Supplier Marketplace | 3 | 0 | 0 | ❌ | ⏳ Pending |
-| 16 | Imboni Partner Program | 2 | 0 | 0 | ❌ | ⏳ Pending |
-| 17 | Business Discovery | 2 | 0 | 0 | ❌ | ⏳ Pending |
-| 18 | Travel Integration | 1 | 0 | 0 | ❌ | ⏳ Pending |
-| 19 | Remaining Commercial APIs | TBD | 0 | 0 | ❌ | ⏳ Pending |
+| # | Domain | Capabilities | Endpoints | Protected | Tested | Certified | Status |
+|---|--------|--------------|-----------|-----------|--------|-----------|--------|
+| 1 | Orders | 8 | 14 | 0 | 0 | ❌ | ⏳ Ready |
+| 2 | Kitchen Operations | 5 | 8 | 0 | 0 | ❌ | ⏳ Ready |
+| 3 | Tables | 4 | 6 | 0 | 0 | ❌ | ⏳ Ready |
+| 4 | Reservations | 5 | 4 | 1 | 0 | ❌ | 🔄 In Progress |
+| 5 | Menu Management | 7 | 12 | 0 | 0 | ❌ | ⏳ Ready |
+| 6 | Inventory | 6 | 10 | 0 | 0 | ❌ | ⏳ Ready |
+| 7 | Procurement | 4 | 6 | 0 | 0 | ❌ | ⏳ Ready |
+| 8 | QR Ordering | 3 | 5 | 0 | 0 | ❌ | ⏳ Ready |
+| 9 | Payments | 6 | 7 | 0 | 0 | ❌ | ⏳ Ready |
+| 10 | Reports & Analytics | 6 | 7 | 0 | 0 | ❌ | ⏳ Ready |
+| 11 | AI Features | 4 | 4 | 0 | 0 | ❌ | ⏳ Ready |
+| 12 | Staff & Roles | 3 | 4 | 0 | 0 | ❌ | ⏳ Ready |
+| 13 | Business Settings | 5 | 6 | 0 | 0 | ❌ | ⏳ Ready |
+| 14 | Administration | 3 | 3 | 0 | 0 | ❌ | ⏳ Ready |
+| 15 | Supplier Marketplace | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
+| 16 | Imboni Partner Program | 2 | 2 | 0 | 0 | ❌ | ⚠️ Needs Review |
+| 17 | Business Discovery | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
+| 18 | Travel Integration | 1 | 1 | 0 | 0 | ❌ | ⏳ Ready |
+| 19 | Remaining Commercial APIs | TBD | TBD | 0 | 0 | ❌ | ⏳ Pending |
 
-**Total:** 103+ endpoints across 19 business domains
+**Total:** 92 capabilities, 103+ endpoints across 19 business domains
 
 ---
 
