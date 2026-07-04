@@ -16,8 +16,9 @@ import { TicketEventService } from '@/lib/services/ticket-event.service'
 import { SaleItemStatusService } from '@/lib/services/sale-item-status.service'
 import type { ItemStatus } from '@prisma/client'
 import { ingestKDSShadowEvent } from '@/lib/die/business-as-plugin/kds/kds.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -279,5 +280,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Failed to update status' })
   }
 }
+
+// Apply commercial enforcement: Kitchen Tickets require Starter plan or higher
+const handler = requiresFeature('hasKitchenTickets')(baseHandler)
 
 export default requirePermission('orders.update')(handler)
