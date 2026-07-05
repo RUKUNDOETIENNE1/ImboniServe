@@ -108,7 +108,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// Apply commercial enforcement: AI Credits purchase requires AI features enabled
-const handler = requiresFeature('hasAIFeatures')(baseHandler);
+// Apply commercial enforcement: AI Credits purchase requires active subscription
+// Note: AI credits are an add-on available to all active subscribers
+const handler = requiresActiveSubscription(baseHandler);
 
 export default withErrorHandler(handler);
