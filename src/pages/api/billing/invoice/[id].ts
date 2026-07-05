@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { ReceiptGeneratorService } from '@/lib/services/receipt-generator.service'
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
@@ -63,3 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   res.setHeader('Content-Disposition', `inline; filename="invoice-${payment.invoiceNumber}.html"`)
   return res.status(200).send(html)
 }
+
+// Apply commercial enforcement: Invoice access requires active subscription
+export default requiresActiveSubscription(baseHandler)
