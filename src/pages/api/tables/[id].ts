@@ -5,8 +5,9 @@ import { resolveBusinessContext } from '@/lib/api/business-context'
 import { TableManagementPluginAdapter } from '@/lib/die/business-as-plugin/table-management/table.adapter'
 import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
 import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 

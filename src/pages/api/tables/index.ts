@@ -4,8 +4,9 @@ import { authOptions } from '../auth/[...nextauth]'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { hasPermission } from '@/lib/permissions/staff'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session) {
     return res.status(401).json({ error: 'Unauthorized' })
