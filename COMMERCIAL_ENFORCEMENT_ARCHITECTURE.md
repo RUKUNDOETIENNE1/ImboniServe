@@ -579,6 +579,76 @@ export default requiresFeature('hasPaymentAnalytics')(handler)
 
 ---
 
+## BUSINESS SYSTEM CERTIFICATION REQUIREMENTS
+
+**Effective Date:** 2026-07-05  
+**Authority:** Founder Directive  
+**Scope:** All Business Systems and Platform Modules  
+
+Every Business System must demonstrate that the complete customer outcome—not only the protected endpoints—can be successfully achieved end-to-end.
+
+### Mandatory Certification Gates
+
+Each Business System certification must include:
+
+1. ✅ **Business Outcome Statement**
+   - Clear statement of customer value delivered
+   - Measurable business outcomes
+   - Customer workflow description
+
+2. ✅ **End-to-End Workflow Verification**
+   - Complete customer journey tested
+   - All integration points verified
+   - Cross-domain workflows validated
+
+3. ✅ **Commercial Truth Verification**
+   - All endpoints enforce centralized policy
+   - No commercial logic bypasses
+   - Constitutional compliance maintained
+
+4. ✅ **Constitutional Compliance**
+   - All decisions trace to Constitution
+   - Plan entitlements correctly enforced
+   - Trial user access verified
+
+5. ✅ **Regression Testing**
+   - No existing functionality broken
+   - All middleware chains intact
+   - API contracts maintained
+
+6. ✅ **Build Verification**
+   - TypeScript compilation success
+   - Zero build errors
+   - Zero type errors
+
+7. ✅ **Production Readiness**
+   - Performance verified
+   - Security verified
+   - Documentation synchronized
+
+### Certification Process
+
+1. **Domain-Level Certification**: Each domain within a Business System must be individually certified
+2. **System-Level Certification**: After all domains are certified, the complete Business System must be certified
+3. **Founder Review**: System certification requires Founder approval before proceeding to next Business System
+
+### Certification Documentation
+
+Each Business System must produce:
+- Individual domain certification reports
+- System certification report (e.g., `RESTAURANT_OPERATIONS_SYSTEM_CERTIFICATION.md`)
+- Updated governance matrices (Coverage, Capability, Domain Certification)
+
+### Quality Standard
+
+A Business System is not considered complete until:
+- All constituent domains are certified
+- All certification gates pass
+- Customer workflow is verified end-to-end
+- Documentation is synchronized with production reality
+
+---
+
 ## CONCLUSION
 
 The centralized commercial enforcement architecture ensures that Commercial Truth is technically enforceable at the backend, with no API bypass possible. All commercial decisions flow through a single policy layer, making the system easy to understand, maintain, and scale.
@@ -590,9 +660,10 @@ The centralized commercial enforcement architecture ensures that Commercial Trut
 ---
 
 **Prepared By:** Engineering  
-**Date:** 2026-07-03  
+**Date:** 2026-07-03 (Updated 2026-07-05)  
 **Milestone:** 2 (Commercial Enforcement - Backend)  
-**Status:** Architecture implemented and documented
+**Status:** Architecture implemented and documented  
+**Last Updated:** 2026-07-05 - Added Business System Certification Requirements
 
 ---
 
