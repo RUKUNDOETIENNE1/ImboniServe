@@ -11,15 +11,15 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-05 14:00 UTC
+**Last Updated:** 2026-07-05 14:30 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 15 / 20 | 20 | 🔄 In Progress |
-| **Business Capabilities** | 45 / 92 | 92 | 🔄 In Progress |
-| **Commercial Endpoints** | 68 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 48.9% | 100% | 🔄 In Progress |
-| **Endpoint Coverage** | 66.0% | 100% | 🔄 In Progress |
+| **Business Domains** | 16 / 20 | 20 | 🔄 In Progress |
+| **Business Capabilities** | 48 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 71 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 52.2% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 68.9% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -44,7 +44,7 @@
 | 11 | Reports & Analytics | 3 | 5 | 5 | 5 | ✅ | ✅ Certified |
 | 12 | AI Features | 3 | 3 | 3 | 3 | ✅ | ✅ Certified |
 | 13 | Staff & Roles | 3 | 4 | 3 | 3 | ✅ | ✅ Certified |
-| 14 | Business Settings | 5 | 6 | 0 | 0 | ❌ | ⏳ Ready |
+| 14 | Business Settings | 3 | 3 | 3 | 3 | ✅ | ✅ Certified |
 | 15 | Administration | 3 | 3 | 0 | 0 | ❌ | ⏳ Ready |
 | 16 | Supplier Marketplace | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
 | 17 | Imboni Partner Program | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
