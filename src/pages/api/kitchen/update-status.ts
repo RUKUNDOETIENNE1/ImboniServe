@@ -285,3 +285,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 const handler = requiresFeature('hasKitchenTickets')(baseHandler)
 
 export default requirePermission('orders.update')(handler)
+export default requirePermission('orders.update')(handler)

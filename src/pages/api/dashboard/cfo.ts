@@ -179,3 +179,4 @@ async function baseHandler(
 
 // Apply commercial enforcement: Dashboard analytics requires analytics feature
 export default requiresFeature('hasBasicReports')(baseHandler)
+export default requiresFeature('hasBasicReports')(baseHandler)

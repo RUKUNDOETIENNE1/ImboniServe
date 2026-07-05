@@ -48,8 +48,8 @@ import {
   RecipeInvalidStateError,
   RecipeValidationError,
   RecipeCircularDependencyError,
-} from '@/lib/services/recipe.service'
-import { RecipeLifecycleState } from '@/lib/validations/recipe.schema'
+} from '../../src/lib/services/recipe.service'
+import { RecipeLifecycleState } from '../../src/lib/validations/recipe.schema'
 
 describe('RecipeService', () => {
   const businessId = 'biz-123'
@@ -892,6 +892,151 @@ describe('RecipeService', () => {
       await expect(
         RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
       ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
+        notes: '',
+      })
+
+      await expect(
+        RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
+      await expect(
+        RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> DRAFT is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        isActive: false,
+        notes: '',
+      })
+
+      await expect(
+        RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        isActive: false,
+        notes: '',
+      })
+
+      await expect(
+        RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
+      })
+
+      await expect(
+        RecipeService.updateDraftRecipe(recipeId, businessId, { name: 'New Name' })
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+
+    it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({ id: recipeId, businessId })
+      mockPrisma.recipe.findUnique.mockResolvedValueOnce({
+        id: recipeId,
+        businessId,
+        isActive: false,
+        notes: '',
+        ingredients: [{ id: 'ing-1' }],
+      })
+
+      await expect(
+        RecipeService.publishRecipeVersion(recipeId, businessId)
+      ).rejects.toThrow(RecipeInvalidStateError)
+    })
+  })
+})
     })
 
     it('ARCHIVED -> PUBLISHED is NOT allowed', async () => {

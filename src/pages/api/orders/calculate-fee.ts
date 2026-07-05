@@ -28,3 +28,6 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Failed to calculate fee' });
   }
 }
+
+// Apply commercial enforcement: Orders require Starter plan or higher
+export default requiresFeature('hasOrders')(baseHandler);

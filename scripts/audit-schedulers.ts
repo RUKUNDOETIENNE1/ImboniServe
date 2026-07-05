@@ -73,7 +73,7 @@ interface SchedulerAuditReport {
   jobs: ScheduledJob[]
   summary: {
     totalJobs: number
-    verc elCronJobs: number
+    vercelCronJobs: number
     nodeCronJobs: number
     bullmqJobs: number
     unknownJobs: number

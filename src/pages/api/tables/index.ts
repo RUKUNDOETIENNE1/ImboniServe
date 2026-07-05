@@ -114,4 +114,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+// Apply commercial enforcement: Tables require Starter plan or higher
+const handler = requiresFeature('hasTables')(baseHandler)
+
 export default requirePermission('tables.read')(handler)

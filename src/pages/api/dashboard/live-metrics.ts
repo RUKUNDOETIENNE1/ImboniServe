@@ -104,4 +104,3 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
 // Apply commercial enforcement: Dashboard analytics requires analytics feature
 export default requiresFeature('hasBasicReports')(baseHandler)
-
