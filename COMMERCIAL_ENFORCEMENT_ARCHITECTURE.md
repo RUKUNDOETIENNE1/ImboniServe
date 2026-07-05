@@ -585,43 +585,61 @@ export default requiresFeature('hasPaymentAnalytics')(handler)
 **Authority:** Founder Directive  
 **Scope:** All Business Systems and Platform Modules  
 
-Every Business System must demonstrate that the complete customer outcome—not only the protected endpoints—can be successfully achieved end-to-end.
+### Engineering Philosophy
+
+**We are not certifying APIs. We are not certifying pages. We are not certifying features.**
+
+**We are certifying complete business capabilities that deliver measurable customer value.**
+
+Engineering success is measured by customer capability—not code volume.
+
+---
 
 ### Mandatory Certification Gates
 
 Each Business System certification must include:
 
-1. ✅ **Business Outcome Statement**
-   - Clear statement of customer value delivered
-   - Measurable business outcomes
-   - Customer workflow description
+1. ✅ **Business Purpose**
+   - Why does this Business System exist for the customer?
+   - Written in business language, not technical language
+   - One clear statement of customer value
 
-2. ✅ **End-to-End Workflow Verification**
+2. ✅ **Customer Workflow Verification**
    - Complete customer journey tested
    - All integration points verified
    - Cross-domain workflows validated
 
-3. ✅ **Commercial Truth Verification**
+3. ✅ **Business Outcome Verification**
+   - Clear statement of customer value delivered
+   - Measurable business outcomes
+   - Demonstrable customer benefit
+
+4. ✅ **Operational Reality Verification**
+   - Could a real business depend on this Business System every day?
+   - Proves the workflow is usable in real business operations
+   - Demonstrates practical, daily operational value
+
+5. ✅ **Commercial Truth Verification**
    - All endpoints enforce centralized policy
    - No commercial logic bypasses
    - Constitutional compliance maintained
 
-4. ✅ **Constitutional Compliance**
+6. ✅ **Constitutional Compliance**
    - All decisions trace to Constitution
    - Plan entitlements correctly enforced
    - Trial user access verified
 
-5. ✅ **Regression Testing**
+7. ✅ **Regression Testing**
    - No existing functionality broken
    - All middleware chains intact
    - API contracts maintained
 
-6. ✅ **Build Verification**
+8. ✅ **Build Verification**
    - TypeScript compilation success
    - Zero build errors
    - Zero type errors
 
-7. ✅ **Production Readiness**
+9. ✅ **Production Readiness**
    - Performance verified
    - Security verified
    - Documentation synchronized
@@ -639,12 +657,29 @@ Each Business System must produce:
 - System certification report (e.g., `RESTAURANT_OPERATIONS_SYSTEM_CERTIFICATION.md`)
 - Updated governance matrices (Coverage, Capability, Domain Certification)
 
+### System Certification Template
+
+Every Business System certification must include:
+
+1. **Business Purpose** - Why this system exists for the customer
+2. **Certified Domains** - Complete domain coverage
+3. **Customer Workflow Verification** - End-to-end journey validation
+4. **Business Outcome Verification** - Measurable customer value
+5. **Operational Reality Verification** - Real-world daily usability
+6. **Commercial Truth Verification** - Centralized enforcement
+7. **Constitutional Compliance** - Policy adherence
+8. **Production Readiness** - Build, regression, security
+9. **Platform Progress** - Overall milestone status
+10. **Founder Review** - Approval checkpoint
+
 ### Quality Standard
 
 A Business System is not considered complete until:
 - All constituent domains are certified
 - All certification gates pass
 - Customer workflow is verified end-to-end
+- Business outcome is measurable and verified
+- Operational reality is proven for daily business use
 - Documentation is synchronized with production reality
 
 ---
@@ -663,7 +698,7 @@ The centralized commercial enforcement architecture ensures that Commercial Trut
 **Date:** 2026-07-03 (Updated 2026-07-05)  
 **Milestone:** 2 (Commercial Enforcement - Backend)  
 **Status:** Architecture implemented and documented  
-**Last Updated:** 2026-07-05 - Added Business System Certification Requirements
+**Last Updated:** 2026-07-05 - Enhanced Business System Certification Requirements with Business Purpose and Operational Reality Verification
 
 ---
 
