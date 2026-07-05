@@ -11,15 +11,15 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-05 15:00 UTC
+**Last Updated:** 2026-07-05 15:30 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 17 / 20 | 20 | 🔄 In Progress |
-| **Business Capabilities** | 49 / 92 | 92 | 🔄 In Progress |
-| **Commercial Endpoints** | 72 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 53.3% | 100% | 🔄 In Progress |
-| **Endpoint Coverage** | 69.9% | 100% | 🔄 In Progress |
+| **Business Domains** | 18 / 20 | 20 | 🔄 In Progress |
+| **Business Capabilities** | 51 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 74 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 55.4% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 71.8% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -46,7 +46,7 @@
 | 13 | Staff & Roles | 3 | 4 | 3 | 3 | ✅ | ✅ Certified |
 | 14 | Business Settings | 3 | 3 | 3 | 3 | ✅ | ✅ Certified |
 | 15 | Administration | 1 | 1 | 1 | 1 | ✅ | ✅ Certified |
-| 16 | Supplier Marketplace | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
+| 16 | Supplier Marketplace | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
 | 17 | Imboni Partner Program | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
 | 18 | Business Discovery | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
 | 19 | Travel Integration | 1 | 1 | 0 | 0 | ❌ | ⏳ Ready |
