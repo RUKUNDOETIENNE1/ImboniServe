@@ -42,7 +42,6 @@ import { CfoNarrativeService } from '@/lib/services/intelligence/cfo-narrative.s
 
 // Cache Service
 import { CacheService, CacheKeys, CacheTTL } from '@/lib/services/cache.service'
-import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 async function baseHandler(
   req: NextApiRequest,
