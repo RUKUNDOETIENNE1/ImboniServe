@@ -579,6 +579,34 @@ export default requiresFeature('hasPaymentAnalytics')(handler)
 
 ---
 
+## IMBONI ARCHITECTURE STANDARD (IAS)
+
+**Effective Date:** 2026-07-05  
+**Authority:** Founder Directive  
+**Scope:** All Imboni Platforms and Products  
+
+### Engineering Hierarchy
+
+The Imboni Architecture Standard defines the following engineering hierarchy:
+
+```
+Platform
+    ↓
+Business Pillars
+    ↓
+Business Systems
+    ↓
+Domains
+    ↓
+Capabilities
+    ↓
+Endpoints
+```
+
+This hierarchy is reusable across every Imboni platform and product.
+
+---
+
 ## BUSINESS SYSTEM CERTIFICATION REQUIREMENTS
 
 **Effective Date:** 2026-07-05  
@@ -619,7 +647,12 @@ Each Business System certification must include:
    - Proves the workflow is usable in real business operations
    - Demonstrates practical, daily operational value
 
-5. ✅ **Commercial Truth Verification**
+5. ✅ **Strategic Value**
+   - Why is this Business System strategically important to the customer's business?
+   - Written in executive business language
+   - Explains contribution to long-term business success
+
+6. ✅ **Commercial Truth Verification**
    - All endpoints enforce centralized policy
    - No commercial logic bypasses
    - Constitutional compliance maintained
@@ -666,11 +699,12 @@ Every Business System certification must include:
 3. **Customer Workflow Verification** - End-to-end journey validation
 4. **Business Outcome Verification** - Measurable customer value
 5. **Operational Reality Verification** - Real-world daily usability
-6. **Commercial Truth Verification** - Centralized enforcement
-7. **Constitutional Compliance** - Policy adherence
-8. **Production Readiness** - Build, regression, security
-9. **Platform Progress** - Overall milestone status
-10. **Founder Review** - Approval checkpoint
+6. **Strategic Value** - Long-term business importance (executive language)
+7. **Commercial Truth Verification** - Centralized enforcement
+8. **Constitutional Compliance** - Policy adherence
+9. **Production Readiness** - Build, regression, security
+10. **Platform Progress** - Overall milestone status
+11. **Founder Review** - Approval checkpoint
 
 ### Quality Standard
 
@@ -698,7 +732,7 @@ The centralized commercial enforcement architecture ensures that Commercial Trut
 **Date:** 2026-07-03 (Updated 2026-07-05)  
 **Milestone:** 2 (Commercial Enforcement - Backend)  
 **Status:** Architecture implemented and documented  
-**Last Updated:** 2026-07-05 - Enhanced Business System Certification Requirements with Business Purpose and Operational Reality Verification
+**Last Updated:** 2026-07-05 - Formalized Imboni Architecture Standard (IAS) with engineering hierarchy and Strategic Value certification requirement
 
 ---
 
