@@ -5,8 +5,9 @@ import { InventoryService } from '@/lib/services/inventory.service'
 import { inventoryUpdateSchema } from '@/lib/validations/inventory.schema'
 import { prisma } from '@/lib/prisma'
 import { ingestInventoryShadowEvent } from '@/lib/die/business-as-plugin/inventory/inventory.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 
@@ -143,5 +144,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 }
+
+// Apply commercial enforcement: Inventory requires Starter plan or higher
+const handler = requiresFeature('hasInventory')(baseHandler)
 
 export default requirePermission('inventory.update')(handler)
