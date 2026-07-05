@@ -4,8 +4,9 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { successResponse, unauthorizedResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
 
@@ -53,5 +54,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).json(successResponse(favoritesWithDetails))
 }
+
+// Apply commercial enforcement: Customer favorites requires CRM feature
+const handler = requiresFeature('hasCRM')(baseHandler)
 
 export default withErrorHandler(handler)
