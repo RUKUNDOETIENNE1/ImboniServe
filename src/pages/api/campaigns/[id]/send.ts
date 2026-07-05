@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { sendCampaignMessages } from '@/lib/whatsapp/campaign-scheduler'
 import { ingestCampaignShadowEvent } from '@/lib/die/business-as-plugin/campaigns/campaigns.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -55,3 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+// Apply commercial enforcement: Campaign execution requires marketing feature
+export default requiresFeature('hasMarketing')(baseHandler)
