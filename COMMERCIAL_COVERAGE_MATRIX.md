@@ -11,15 +11,15 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-05 10:00 UTC
+**Last Updated:** 2026-07-05 10:30 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 7 / 19 | 19 | 🔄 In Progress |
-| **Business Capabilities** | 24 / 92 | 92 | 🔄 In Progress |
-| **Commercial Endpoints** | 40 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 26.1% | 100% | 🔄 In Progress |
-| **Endpoint Coverage** | 38.8% | 100% | 🔄 In Progress |
+| **Business Domains** | 8 / 19 | 19 | 🔄 In Progress |
+| **Business Capabilities** | 26 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 43 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 28.3% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 41.7% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -38,7 +38,7 @@
 | 5 | Menu Management | 3 | 8 | 8 | 8 | ✅ | ✅ Certified |
 | 6 | Inventory | 3 | 6 | 6 | 6 | ✅ | ✅ Certified |
 | 7 | Procurement | 3 | 6 | 6 | 6 | ✅ | ✅ Certified |
-| 8 | QR Ordering | 3 | 5 | 0 | 0 | ❌ | ⏳ Ready |
+| 8 | Supplier Marketplace | 2 | 3 | 3 | 3 | ✅ | ✅ Certified |
 | 9 | Payments | 6 | 7 | 0 | 0 | ❌ | ⏳ Ready |
 | 10 | Reports & Analytics | 6 | 7 | 0 | 0 | ❌ | ⏳ Ready |
 | 11 | AI Features | 4 | 4 | 0 | 0 | ❌ | ⏳ Ready |

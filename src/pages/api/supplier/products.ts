@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/middleware/auth.middleware'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await requireAuth(req, res)
     if (!session) return
@@ -75,3 +76,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+// Apply commercial enforcement: Supplier Marketplace requires Business plan or higher
+export default requiresFeature('hasSupplierMarketplace')(baseHandler)
