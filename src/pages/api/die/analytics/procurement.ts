@@ -7,8 +7,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { ProcurementIntelligenceService } from '@/lib/die/analytics/procurement-intelligence.service'
 import { getDateRange } from '@/lib/die/analytics/analytics-utils'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
@@ -32,3 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Failed to generate procurement intelligence report' })
   }
 }
+
+// Apply commercial enforcement: Procurement Analytics require Premium plan or higher
+export default requiresFeature('hasProcurementAnalytics')(baseHandler)
