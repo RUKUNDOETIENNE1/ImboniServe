@@ -11,15 +11,15 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-05 13:00 UTC
+**Last Updated:** 2026-07-05 13:15 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 13 / 20 | 20 | 🔄 In Progress |
-| **Business Capabilities** | 40 / 92 | 92 | 🔄 In Progress |
-| **Commercial Endpoints** | 63 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 43.5% | 100% | 🔄 In Progress |
-| **Endpoint Coverage** | 61.2% | 100% | 🔄 In Progress |
+| **Business Domains** | 14 / 20 | 20 | 🔄 In Progress |
+| **Business Capabilities** | 42 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 65 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 45.7% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 63.1% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -47,7 +47,7 @@
 | 14 | Business Settings | 5 | 6 | 0 | 0 | ❌ | ⏳ Ready |
 | 15 | Administration | 3 | 3 | 0 | 0 | ❌ | ⏳ Ready |
 | 16 | Supplier Marketplace | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
-| 17 | Imboni Partner Program | 2 | 2 | 0 | 0 | ❌ | ⚠️ Needs Review |
+| 17 | Imboni Partner Program | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
 | 18 | Business Discovery | 2 | 2 | 2 | 2 | ✅ | ✅ Certified |
 | 19 | Travel Integration | 1 | 1 | 0 | 0 | ❌ | ⏳ Ready |
 | 20 | Remaining Commercial APIs | TBD | TBD | 0 | 0 | ❌ | ⏳ Pending |
