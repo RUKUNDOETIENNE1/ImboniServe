@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getBusinessPayoutSummary } from '@/lib/services/business-payout.service';
 import { requirePermission } from '@/lib/middleware/permission.middleware';
 import { resolveBusinessContext } from '@/lib/api/business-context';
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -36,4 +37,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('reports.view')(handler)
+// Apply commercial enforcement: Payout summary requires active subscription
+export default requiresActiveSubscription(requirePermission('reports.view')(handler))

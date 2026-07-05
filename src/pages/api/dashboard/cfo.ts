@@ -25,6 +25,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 // Financial Intelligence Services
 import { FinancialHealthService } from '@/lib/services/intelligence/financial-health.service'
@@ -41,8 +42,9 @@ import { CfoNarrativeService } from '@/lib/services/intelligence/cfo-narrative.s
 
 // Cache Service
 import { CacheService, CacheKeys, CacheTTL } from '@/lib/services/cache.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(
+async function baseHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -175,3 +177,6 @@ export default async function handler(
     })
   }
 }
+
+// Apply commercial enforcement: Dashboard analytics requires analytics feature
+export default requiresFeature('hasBasicReports')(baseHandler)

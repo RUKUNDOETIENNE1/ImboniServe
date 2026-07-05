@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 
 /**
  * Setup Status API
@@ -14,7 +15,7 @@ import { resolveBusinessContext } from '@/lib/api/business-context'
  * Percent complete counts hasMenu + hasTables + hasStaff (0-3 steps) equally.
  * First value is reported separately as `firstValueAchieved`.
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -76,3 +77,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Failed to compute setup status' })
   }
 }
+
+// Apply commercial enforcement: Setup status requires active subscription
+export default requiresActiveSubscription(baseHandler)

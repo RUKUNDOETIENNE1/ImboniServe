@@ -18,6 +18,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { startOfDay, subDays, startOfMonth, endOfMonth } from 'date-fns'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 // Import existing services
 import { PaymentWatchdogService } from '@/lib/services/watchdog/payment-watchdog.service'
@@ -30,7 +31,7 @@ import { BranchHealthScoreService } from '@/lib/services/intelligence/branch-hea
 import { CustomerHealthScoreService } from '@/lib/services/intelligence/customer-health-score.service'
 import { ExecutiveSummaryService } from '@/lib/services/intelligence/executive-summary.service'
 
-export default async function handler(
+async function baseHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -689,3 +690,6 @@ async function getExecutiveInsightData() {
     }
   }
 }
+
+// Apply commercial enforcement: Dashboard analytics requires analytics feature
+export default requiresFeature('hasBasicReports')(baseHandler)
