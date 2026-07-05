@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { MenuAIService } from '@/lib/services/menu-ai.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
   const userId = (session?.user as any)?.id
@@ -32,3 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).end()
 }
+
+// Apply commercial enforcement: AI Menu Builder requires Professional plan or higher
+export default requiresFeature('hasAIMenuBuilder')(baseHandler)

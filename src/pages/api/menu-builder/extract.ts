@@ -4,8 +4,9 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { SmartMenuBuilderService } from '@/lib/services/smart-menu-builder.service'
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
 
@@ -37,5 +38,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const result = await SmartMenuBuilderService.extractMenuFromImage(imageUrl, businessId)
   return res.status(200).json(successResponse(result, 'Menu extracted successfully'))
 }
+
+// Apply commercial enforcement: AI Menu Builder requires Professional plan or higher
+const handler = requiresFeature('hasAIMenuBuilder')(baseHandler)
 
 export default withErrorHandler(handler)
