@@ -243,10 +243,10 @@ bfdbfa9 Milestone 2: Reports & Analytics Domain CERTIFIED
 
 | Metric | Value | Target | Progress |
 |--------|-------|--------|----------|
-| Business Systems | 3 / 5 | 5 | 60.0% |
-| Business Domains | 12 / 20 | 20 | 60.0% |
-| Business Capabilities | 38 / 92 | 92 | 41.3% |
-| Commercial Endpoints | 61 / 103 | 103 | 59.2% |
+| Business Systems | 5 / 5 | 5 | 100.0% |
+| Business Domains | 22 / 22 | 22 | 100.0% |
+| Business Capabilities | 58 / 58 | 58 | 100.0% |
+| Commercial Endpoints | 98 / 98 | 98 | 100.0% |
 
 ---
 

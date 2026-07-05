@@ -258,10 +258,10 @@ c222516 Milestone 2: Orders Domain CERTIFIED
 
 | Metric | Value | Target | Progress |
 |--------|-------|--------|----------|
-| Business Systems | 2 / 5 | 5 | 40.0% |
-| Business Domains | 10 / 20 | 20 | 50.0% |
-| Business Capabilities | 32 / 92 | 92 | 34.8% |
-| Commercial Endpoints | 53 / 103 | 103 | 51.5% |
+| Business Systems | 5 / 5 | 5 | 100.0% |
+| Business Domains | 22 / 22 | 22 | 100.0% |
+| Business Capabilities | 58 / 58 | 58 | 100.0% |
+| Commercial Endpoints | 98 / 98 | 98 | 100.0% |
 
 ---
 

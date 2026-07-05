@@ -296,10 +296,10 @@ All domains committed with full traceability:
 
 | Metric | Value | Target | Progress |
 |--------|-------|--------|----------|
-| Business Systems | 4 / 5 | 5 | 80.0% |
-| Business Domains | 14 / 20 | 20 | 70.0% |
-| Business Capabilities | 42 / 92 | 92 | 45.7% |
-| Commercial Endpoints | 65 / 103 | 103 | 63.1% |
+| Business Systems | 5 / 5 | 5 | 100.0% |
+| Business Domains | 22 / 22 | 22 | 100.0% |
+| Business Capabilities | 58 / 58 | 58 | 100.0% |
+| Commercial Endpoints | 98 / 98 | 98 | 100.0% |
 
 ---
 

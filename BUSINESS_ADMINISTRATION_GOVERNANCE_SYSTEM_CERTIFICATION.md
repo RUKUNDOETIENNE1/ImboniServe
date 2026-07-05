@@ -356,9 +356,9 @@ db4db64 Milestone 2: Business Settings Domain CERTIFIED
 | Metric | Value | Target | Progress |
 |--------|-------|--------|----------|
 | Business Systems | 5 / 5 | 5 | 100.0% |
-| Business Domains | 17 / 20 | 20 | 85.0% |
-| Business Capabilities | 49 / 92 | 92 | 53.3% |
-| Commercial Endpoints | 72 / 103 | 103 | 69.9% |
+| Business Domains | 22 / 22 | 22 | 100.0% |
+| Business Capabilities | 58 / 58 | 58 | 100.0% |
+| Commercial Endpoints | 98 / 98 | 98 | 100.0% |
 
 ---
 
