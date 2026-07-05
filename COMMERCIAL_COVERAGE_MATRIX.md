@@ -11,15 +11,15 @@
 
 ## COMMERCIAL ENFORCEMENT COVERAGE DASHBOARD
 
-**Last Updated:** 2026-07-05 13:15 UTC
+**Last Updated:** 2026-07-05 14:00 UTC
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Business Domains** | 14 / 20 | 20 | 🔄 In Progress |
-| **Business Capabilities** | 42 / 92 | 92 | 🔄 In Progress |
-| **Commercial Endpoints** | 65 / 103 | 103 | 🔄 In Progress |
-| **Capability Coverage** | 45.7% | 100% | 🔄 In Progress |
-| **Endpoint Coverage** | 63.1% | 100% | 🔄 In Progress |
+| **Business Domains** | 15 / 20 | 20 | 🔄 In Progress |
+| **Business Capabilities** | 45 / 92 | 92 | 🔄 In Progress |
+| **Commercial Endpoints** | 68 / 103 | 103 | 🔄 In Progress |
+| **Capability Coverage** | 48.9% | 100% | 🔄 In Progress |
+| **Endpoint Coverage** | 66.0% | 100% | 🔄 In Progress |
 | **Constitution Compliance** | ✅ PASS | PASS | ✅ Pass |
 | **Regression Status** | ✅ PASS | PASS | ✅ Pass |
 | **Commercial Truth** | ✅ Maintained | Maintained | ✅ Pass |
@@ -43,7 +43,7 @@
 | 10 | Payments | 3 | 5 | 5 | 5 | ✅ | ✅ Certified |
 | 11 | Reports & Analytics | 3 | 5 | 5 | 5 | ✅ | ✅ Certified |
 | 12 | AI Features | 3 | 3 | 3 | 3 | ✅ | ✅ Certified |
-| 13 | Staff & Roles | 3 | 4 | 0 | 0 | ❌ | ⏳ Ready |
+| 13 | Staff & Roles | 3 | 4 | 3 | 3 | ✅ | ✅ Certified |
 | 14 | Business Settings | 5 | 6 | 0 | 0 | ❌ | ⏳ Ready |
 | 15 | Administration | 3 | 3 | 0 | 0 | ❌ | ⏳ Ready |
 | 16 | Supplier Marketplace | 2 | 2 | 0 | 0 | ❌ | ⏳ Ready |
