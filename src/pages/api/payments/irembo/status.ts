@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -76,5 +77,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 }
+
+// Apply commercial enforcement: Payments require Starter plan or higher
+const handler = requiresFeature('hasPayments')(baseHandler)
 
 export default requirePermission('payments.read')(handler)

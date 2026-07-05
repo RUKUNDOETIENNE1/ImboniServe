@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' })
   }
@@ -104,5 +105,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Failed to fetch payment stats' })
   }
 }
+
+// Apply commercial enforcement: Payment Monitor requires Professional plan or higher
+const handler = requiresFeature('hasPaymentMonitor')(baseHandler)
 
 export default requirePermission('reports.view')(handler)
