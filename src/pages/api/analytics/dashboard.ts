@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { AnalyticsService } from '@/lib/services/analytics.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
     
@@ -31,3 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+// Apply commercial enforcement: Basic Reports require Starter plan or higher
+export default requiresFeature('hasBasicReports')(baseHandler)
