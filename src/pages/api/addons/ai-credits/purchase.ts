@@ -5,6 +5,7 @@ import { IremboPayService } from '@/lib/services/irembopay.service';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse, unauthorizedResponse } from '@/lib/api/response-helpers';
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
 const CREDIT_PACKS = {
   small: { credits: 20, price: 1000000 },   // 10,000 RWF for 20 credits
@@ -12,7 +13,7 @@ const CREDIT_PACKS = {
   large: { credits: 100, price: 4500000 }   // 45,000 RWF for 100 credits (10% discount)
 };
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
   const businessId = (session?.user as any)?.businessId;
 
@@ -106,5 +107,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 }
+
+// Apply commercial enforcement: AI Credits purchase requires AI features enabled
+const handler = requiresFeature('hasAIFeatures')(baseHandler);
 
 export default withErrorHandler(handler);

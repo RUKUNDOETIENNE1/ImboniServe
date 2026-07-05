@@ -5,10 +5,11 @@ import { IremboPayService } from '@/lib/services/irembopay.service';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers';
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
 const SITE_BUILDER_PRO_PRICE = 1200000; // 12,000 RWF/month
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
   const businessId = (session?.user as any)?.businessId;
 
@@ -99,5 +100,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 }
+
+// Apply commercial enforcement: Site Builder addon purchase requires site builder feature
+const handler = requiresFeature('hasSiteBuilder')(baseHandler);
 
 export default withErrorHandler(handler);
