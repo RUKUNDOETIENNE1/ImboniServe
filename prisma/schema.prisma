@@ -4638,7 +4638,3 @@ model PluginAlertEvent {
   @@index([severity, firedAt])
   @@index([firedAt])
 }
-  @@index([firedAt])
-}
-  @@index([firedAt])
-}

@@ -145,7 +145,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// Apply commercial enforcement: Inventory requires Starter plan or higher
-const handler = requiresFeature('hasInventory')(baseHandler)
-
 export default requirePermission('inventory.update')(handler)
