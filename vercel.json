@@ -1,5 +1,42 @@
 {
-  "crons": [],
+  "crons": [
+    {
+      "path": "/api/cron/addon-renewals",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/reconciliation",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/tap-leave-sweep",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/tap-leave-reconcile",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/watchdog-payment",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/watchdog-customer",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/watchdog-revenue",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/watchdog-subscription",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/summary-daily",
+      "schedule": "0 6 * * *"
+    }
+  ],
   "buildCommand": "npx prisma generate && next build",
   "functions": {
     "src/pages/api/cron/reconciliation.ts": { "maxDuration": 300 },
