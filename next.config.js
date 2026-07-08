@@ -74,6 +74,7 @@ const hasSentry = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENT
 
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   i18n: {
     locales: ['en', 'fr', 'rw'],
     defaultLocale: 'en',
