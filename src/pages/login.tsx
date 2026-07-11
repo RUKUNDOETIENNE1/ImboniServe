@@ -18,6 +18,7 @@ export default function Login() {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [maskedEmail, setMaskedEmail] = useState('')
   const [otpChannel, setOtpChannel] = useState<string>('')
+  const [pendingToken, setPendingToken] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,6 +58,7 @@ export default function Login() {
 
       setMaskedEmail(data.maskedEmail || email)
       setOtpChannel(data.channel || 'email')
+      setPendingToken(data.pendingToken || '')
       setStep('otp')
     } catch {
       setError(t('auth.login_error', 'Login service unavailable. Please try again.'))
@@ -87,7 +89,13 @@ export default function Login() {
       const verifyData = await verifyRes.json()
 
       if (!verifyRes.ok) {
-        setError(verifyData.error || 'Invalid or expired code.')
+        if (verifyRes.status === 429) {
+          setError('Too many attempts. Please wait a few minutes, then request a new code.')
+        } else if (verifyData.error?.toLowerCase().includes('expired') || verifyData.error?.toLowerCase().includes('not found')) {
+          setError('Your code has expired. Click "Resend code" below to get a new one.')
+        } else {
+          setError(verifyData.error || 'Invalid or expired code.')
+        }
         return
       }
 
@@ -97,6 +105,9 @@ export default function Login() {
         email,
         confirmToken: verifyData.confirmToken,
       })
+
+      // [DIAG] Log full signIn result — remove after login fix is confirmed
+      console.log('[login] signIn result:', JSON.stringify({ ok: result?.ok, error: result?.error, status: result?.status, url: result?.url }))
 
       if (result?.ok) {
         const session = await fetch('/api/auth/session').then(r => r.json()).catch(() => null)
@@ -146,14 +157,20 @@ export default function Login() {
     setError(null)
     setOtp(['', '', '', '', '', ''])
     try {
-      const res = await fetch('/api/auth/pre-login', {
+      const res = await fetch('/api/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, pendingToken }),
       })
+      // Update pendingToken with the newly issued one
       const data = await res.json()
+      if (res.ok && data.pendingToken) setPendingToken(data.pendingToken)
       if (!res.ok) {
-        setError(data.error || 'Could not resend code.')
+        if (res.status === 429) {
+          setError('Too many resend requests. Please wait a few minutes and try again.')
+        } else {
+          setError(data.error || 'Could not resend code.')
+        }
       }
     } catch {
       setError('Could not resend code. Try again.')

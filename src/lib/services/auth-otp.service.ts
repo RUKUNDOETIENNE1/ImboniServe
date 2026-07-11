@@ -13,7 +13,7 @@ import { prisma } from '@/lib/prisma'
 import { EmailService } from './email.service'
 import { NotificationService } from './notification.service'
 
-const OTP_TTL_MINUTES = 10
+const OTP_TTL_MINUTES = 15
 const MAX_VERIFY_ATTEMPTS = 5
 const CONFIRM_TOKEN_TTL_MINUTES = 5
 
@@ -23,6 +23,11 @@ function generateNumericOTP(): string {
 
 function hashOTP(otp: string): string {
   return crypto.createHash('sha256').update(otp + (process.env.NEXTAUTH_SECRET || '')).digest('hex')
+}
+
+/** Hash an opaque token before storing in the database. Raw value is returned to client only. */
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token + (process.env.NEXTAUTH_SECRET || '')).digest('hex')
 }
 
 function generateConfirmToken(): string {
@@ -38,11 +43,13 @@ export const AuthOTPService = {
     userId: string
     ip?: string
     deviceId?: string
-  }): Promise<string> {
+  }): Promise<{ otp: string; pendingToken: string }> {
     const { userId, ip, deviceId } = opts
     const otp = generateNumericOTP()
     const hashedOtp = hashOTP(otp)
     const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000)
+    const pendingToken = crypto.randomBytes(32).toString('hex')
+    const hashedPendingToken = hashToken(pendingToken)
 
     // Invalidate all previous unused OTPs for this user
     await prisma.userLoginOtp.updateMany({
@@ -51,10 +58,10 @@ export const AuthOTPService = {
     })
 
     await prisma.userLoginOtp.create({
-      data: { userId, hashedOtp, expiresAt, ip: ip ?? null, deviceId: deviceId ?? null },
+      data: { userId, hashedOtp, expiresAt, pendingToken: hashedPendingToken, ip: ip ?? null, deviceId: deviceId ?? null },
     })
 
-    return otp
+    return { otp, pendingToken }
   },
 
   /**
@@ -67,9 +74,9 @@ export const AuthOTPService = {
     phone?: string | null
     ip?: string
     deviceId?: string
-  }): Promise<{ success: boolean; channel: 'email' | 'whatsapp' | 'both' | 'failed'; reason?: string }> {
+  }): Promise<{ success: boolean; channel: 'email' | 'whatsapp' | 'both' | 'failed'; pendingToken?: string; reason?: string }> {
     const { email, name, phone, ip, deviceId, userId } = opts
-    const otp = await AuthOTPService.issue({ userId, ip, deviceId })
+    const { otp, pendingToken } = await AuthOTPService.issue({ userId, ip, deviceId })
 
     let emailSent = false
     let whatsappSent = false
@@ -109,13 +116,13 @@ export const AuthOTPService = {
       // Last resort: log to console (development only)
       if (process.env.NODE_ENV !== 'production') {
         console.info(`[AuthOTP] DEV OTP for user ${userId}: ${otp}`)
-        return { success: true, channel: 'email' }
+        return { success: true, channel: 'email', pendingToken }
       }
       return { success: false, channel: 'failed', reason: 'no_channel_succeeded' }
     }
 
     const channel = emailSent && whatsappSent ? 'both' : emailSent ? 'email' : 'whatsapp'
-    return { success: true, channel }
+    return { success: true, channel, pendingToken }
   },
 
   /**
@@ -130,6 +137,17 @@ export const AuthOTPService = {
     const hashedOtp = hashOTP(otp)
     const now = new Date()
 
+    // [DIAG] Log incoming verify attempt
+    console.log(`[AuthOTP:verify] userId=${userId} now=${now.toISOString()}`)
+
+    const allRecords = await prisma.userLoginOtp.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      select: { id: true, used: true, expiresAt: true, createdAt: true },
+    })
+    console.log(`[AuthOTP:verify] DB records for user (newest 3):`, JSON.stringify(allRecords))
+
     const record = await prisma.userLoginOtp.findFirst({
       where: {
         userId,
@@ -140,8 +158,11 @@ export const AuthOTPService = {
     })
 
     if (!record) {
+      console.log(`[AuthOTP:verify] FAIL — no unused unexpired record found`)
       return { ok: false, error: 'Code not found or expired. Request a new one.' }
     }
+
+    console.log(`[AuthOTP:verify] Record found id=${record.id} hashedOtp matches=${record.hashedOtp === hashedOtp}`)
 
     if (record.hashedOtp !== hashedOtp) {
       return { ok: false, error: 'Invalid code. Check and try again.' }
@@ -149,18 +170,22 @@ export const AuthOTPService = {
 
     // Issue a confirm token (one-time, short-lived) for NextAuth to consume
     const confirmToken = generateConfirmToken()
+    const hashedConfirmToken = hashToken(confirmToken)
     const confirmExpiry = new Date(Date.now() + CONFIRM_TOKEN_TTL_MINUTES * 60 * 1000)
+
+    console.log(`[AuthOTP:verify] OTP matched — storing hashedConfirmToken, confirmExpiry=${confirmExpiry.toISOString()}`)
 
     await prisma.userLoginOtp.update({
       where: { id: record.id },
       data: {
         used: true,
-        confirmToken,
+        confirmToken: hashedConfirmToken,
         // Reuse expiresAt field as the confirmToken expiry window
         expiresAt: confirmExpiry,
       },
     })
 
+    console.log(`[AuthOTP:verify] SUCCESS — returning raw confirmToken to caller`)
     return { ok: true, confirmToken }
   },
 
@@ -170,15 +195,26 @@ export const AuthOTPService = {
    */
   async consumeConfirmToken(token: string): Promise<string | null> {
     const now = new Date()
+    const hashedToken = hashToken(token)
+
+    // [DIAG] Log incoming consume attempt
+    console.log(`[AuthOTP:consume] Incoming token length=${token?.length} now=${now.toISOString()}`)
+    console.log(`[AuthOTP:consume] Hashed to lookup: ${hashedToken.slice(0, 12)}...`)
+
     const record = await prisma.userLoginOtp.findUnique({
-      where: { confirmToken: token },
+      where: { confirmToken: hashedToken },
       select: { id: true, userId: true, used: true, expiresAt: true },
     })
+
+    console.log(`[AuthOTP:consume] DB lookup result: ${record ? `found id=${record.id} expiresAt=${record.expiresAt.toISOString()} used=${record.used}` : 'NOT FOUND'}`)
 
     if (!record) return null
     // Confirm tokens are stored with used=true (OTP was verified), confirmToken must still be present
     // and the expiresAt (repurposed as confirmToken TTL) must be in the future
-    if (record.expiresAt < now) return null
+    if (record.expiresAt < now) {
+      console.log(`[AuthOTP:consume] FAIL — token expired (expiresAt ${record.expiresAt.toISOString()} < now ${now.toISOString()})`)
+      return null
+    }
 
     // Nullify confirmToken so it can't be replayed
     await prisma.userLoginOtp.update({
@@ -186,6 +222,7 @@ export const AuthOTPService = {
       data: { confirmToken: null },
     })
 
+    console.log(`[AuthOTP:consume] SUCCESS — userId=${record.userId}`)
     return record.userId
   },
 

@@ -36,10 +36,17 @@ export const authOptions: NextAuthOptions = {
         const email = credentials?.email?.toLowerCase().trim()
         const confirmToken = credentials?.confirmToken
 
-        if (!email || !confirmToken) return null
+        // [DIAG]
+        console.log(`[mfa-confirm:authorize] email=${email} confirmToken length=${confirmToken?.length ?? 'MISSING'}`)
+
+        if (!email || !confirmToken) {
+          console.log(`[mfa-confirm:authorize] FAIL — missing email or confirmToken`)
+          return null
+        }
 
         // Consume the one-time confirm token issued after OTP verification
         const userId = await AuthOTPService.consumeConfirmToken(confirmToken)
+        console.log(`[mfa-confirm:authorize] consumeConfirmToken result: userId=${userId ?? 'NULL'}`)
         if (!userId) return null
 
         const user = await prisma.user.findUnique({
@@ -63,7 +70,12 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        if (!user || !user.isActive || user.email !== email) return null
+        console.log(`[mfa-confirm:authorize] user lookup: found=${!!user} isActive=${user?.isActive} emailMatch=${user?.email === email}`)
+
+        if (!user || !user.isActive || user.email !== email) {
+          console.log(`[mfa-confirm:authorize] FAIL — user check failed`)
+          return null
+        }
 
         await SecurityEventService.log({ userId: user.id, eventType: 'LOGIN_SUCCESS', metadata: { via: 'mfa_confirm' } })
 

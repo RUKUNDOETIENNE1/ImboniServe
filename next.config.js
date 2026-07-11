@@ -26,7 +26,7 @@ const securityHeadersDev = [
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://sentry.io ws://localhost:* http://localhost:*",
+      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://sentry.io ws://localhost:* http://localhost:*",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -56,7 +56,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://sentry.io",
+      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://sentry.io",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -80,9 +80,13 @@ const nextConfig = {
     defaultLocale: 'en',
     localeDetection: false,
   },
-  // Ensure clean NEXTAUTH_URL is available at build/runtime even if env has stray spaces
+  // Ensure clean NEXTAUTH_URL is available at build/runtime even if env has stray spaces.
+  // On Vercel preview deployments NEXTAUTH_URL is not set, so fall back to VERCEL_URL
+  // (which is the actual preview hostname) before falling back to the production domain.
   env: {
-    NEXTAUTH_URL: (process.env.NEXTAUTH_URL || '').trim() || 'https://imboniserve.com',
+    NEXTAUTH_URL: (process.env.NEXTAUTH_URL || '').trim()
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+      || 'https://imboniserve.com',
   },
   eslint: {
     ignoreDuringBuilds: !isCI,
