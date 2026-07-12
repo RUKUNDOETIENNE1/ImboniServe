@@ -10,6 +10,7 @@
 
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
+import { logAuthDebug } from '@/lib/utils/auth-debug'
 import { EmailService } from './email.service'
 import { NotificationService } from './notification.service'
 
@@ -34,6 +35,11 @@ function generateConfirmToken(): string {
   return crypto.randomBytes(32).toString('hex')
 }
 
+type DebugContext = {
+  requestId?: string | null
+  emailHash?: string | null
+}
+
 export const AuthOTPService = {
   /**
    * Invalidates old unused OTPs for a user and issues a new one.
@@ -43,8 +49,11 @@ export const AuthOTPService = {
     userId: string
     ip?: string
     deviceId?: string
+    debugContext?: DebugContext
   }): Promise<{ otp: string; pendingToken: string }> {
-    const { userId, ip, deviceId } = opts
+    const { userId, ip, deviceId, debugContext } = opts
+    const requestId = debugContext?.requestId ?? null
+    logAuthDebug(requestId, 'otp_generation', 'start', { userId })
     const otp = generateNumericOTP()
     const hashedOtp = hashOTP(otp)
     const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000)
@@ -52,13 +61,22 @@ export const AuthOTPService = {
     const hashedPendingToken = hashToken(pendingToken)
 
     // Invalidate all previous unused OTPs for this user
+    logAuthDebug(requestId, 'otp_invalidate_previous', 'start', { userId })
     await prisma.userLoginOtp.updateMany({
       where: { userId, used: false },
       data: { used: true },
     })
+    logAuthDebug(requestId, 'otp_invalidate_previous', 'success', { userId })
 
-    await prisma.userLoginOtp.create({
+    const record = await prisma.userLoginOtp.create({
       data: { userId, hashedOtp, expiresAt, pendingToken: hashedPendingToken, ip: ip ?? null, deviceId: deviceId ?? null },
+      select: { id: true },
+    })
+
+    logAuthDebug(requestId, 'otp_storage', 'success', {
+      userId,
+      userLoginOtpId: record.id,
+      expiresAt: expiresAt.toISOString(),
     })
 
     return { otp, pendingToken }
@@ -74,9 +92,12 @@ export const AuthOTPService = {
     phone?: string | null
     ip?: string
     deviceId?: string
+    debugContext?: DebugContext
   }): Promise<{ success: boolean; channel: 'email' | 'whatsapp' | 'both' | 'failed'; pendingToken?: string; reason?: string }> {
-    const { email, name, phone, ip, deviceId, userId } = opts
-    const { otp, pendingToken } = await AuthOTPService.issue({ userId, ip, deviceId })
+    const { email, name, phone, ip, deviceId, userId, debugContext } = opts
+    const requestId = debugContext?.requestId ?? null
+    logAuthDebug(requestId, 'otp_delivery_start', 'start', { userId, channelRequested: phone ? 'email+whatsapp' : 'email' })
+    const { otp, pendingToken } = await AuthOTPService.issue({ userId, ip, deviceId, debugContext })
 
     let emailSent = false
     let whatsappSent = false
@@ -92,10 +113,10 @@ export const AuthOTPService = {
       })
       emailSent = emailResult.success
       if (!emailResult.success) {
-        console.error('[AuthOTP] Email send failed:', emailResult.error)
+        logAuthDebug(requestId, 'otp_delivery_email', 'fail', { userId, error: emailResult.error || 'unknown_error' })
       }
     } catch (e: any) {
-      console.error('[AuthOTP] Email exception:', e?.message || e)
+      logAuthDebug(requestId, 'otp_delivery_email', 'fail', { userId, exception: e?.message || String(e) })
     }
 
     // Fallback / parallel: WhatsApp if phone is set
@@ -105,23 +126,25 @@ export const AuthOTPService = {
         const waResult = await NotificationService.sendWhatsApp(phone, msg)
         whatsappSent = waResult.success
         if (!waResult.success) {
-          console.error('[AuthOTP] WhatsApp send failed:', waResult.error || waResult.message)
+          logAuthDebug(requestId, 'otp_delivery_whatsapp', 'fail', { userId, error: waResult.error || waResult.message })
         }
       } catch (e: any) {
-        console.error('[AuthOTP] WhatsApp exception:', e?.message || e)
+        logAuthDebug(requestId, 'otp_delivery_whatsapp', 'fail', { userId, exception: e?.message || String(e) })
       }
     }
 
     if (!emailSent && !whatsappSent) {
+      logAuthDebug(requestId, 'otp_delivery_complete', 'fail', { userId, reason: 'no_channel_succeeded' })
       // Last resort: log to console (development only)
       if (process.env.NODE_ENV !== 'production') {
-        console.info(`[AuthOTP] DEV OTP for user ${userId}: ${otp}`)
+        logAuthDebug(requestId, 'otp_delivery_dev_fallback', 'success', { userId })
         return { success: true, channel: 'email', pendingToken }
       }
       return { success: false, channel: 'failed', reason: 'no_channel_succeeded' }
     }
 
     const channel = emailSent && whatsappSent ? 'both' : emailSent ? 'email' : 'whatsapp'
+    logAuthDebug(requestId, 'otp_delivery_complete', 'success', { userId, channel })
     return { success: true, channel, pendingToken }
   },
 
@@ -132,21 +155,14 @@ export const AuthOTPService = {
   async verify(opts: {
     userId: string
     otp: string
+    debugContext?: DebugContext
   }): Promise<{ ok: true; confirmToken: string } | { ok: false; error: string }> {
-    const { userId, otp } = opts
+    const { userId, otp, debugContext } = opts
+    const requestId = debugContext?.requestId ?? null
     const hashedOtp = hashOTP(otp)
     const now = new Date()
 
-    // [DIAG] Log incoming verify attempt
-    console.log(`[AuthOTP:verify] userId=${userId} now=${now.toISOString()}`)
-
-    const allRecords = await prisma.userLoginOtp.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 3,
-      select: { id: true, used: true, expiresAt: true, createdAt: true },
-    })
-    console.log(`[AuthOTP:verify] DB records for user (newest 3):`, JSON.stringify(allRecords))
+    logAuthDebug(requestId, 'otp_verification_request', 'start', { userId })
 
     const record = await prisma.userLoginOtp.findFirst({
       where: {
@@ -158,13 +174,14 @@ export const AuthOTPService = {
     })
 
     if (!record) {
-      console.log(`[AuthOTP:verify] FAIL — no unused unexpired record found`)
+      logAuthDebug(requestId, 'otp_lookup', 'fail', { userId, reason: 'no_unused_record' })
       return { ok: false, error: 'Code not found or expired. Request a new one.' }
     }
 
-    console.log(`[AuthOTP:verify] Record found id=${record.id} hashedOtp matches=${record.hashedOtp === hashedOtp}`)
+    logAuthDebug(requestId, 'otp_lookup', 'success', { userId, userLoginOtpId: record.id, expiresAt: record.expiresAt.toISOString() })
 
     if (record.hashedOtp !== hashedOtp) {
+      logAuthDebug(requestId, 'otp_match', 'fail', { userId, userLoginOtpId: record.id })
       return { ok: false, error: 'Invalid code. Check and try again.' }
     }
 
@@ -173,7 +190,7 @@ export const AuthOTPService = {
     const hashedConfirmToken = hashToken(confirmToken)
     const confirmExpiry = new Date(Date.now() + CONFIRM_TOKEN_TTL_MINUTES * 60 * 1000)
 
-    console.log(`[AuthOTP:verify] OTP matched — storing hashedConfirmToken, confirmExpiry=${confirmExpiry.toISOString()}`)
+    logAuthDebug(requestId, 'confirm_token_creation', 'start', { userId, userLoginOtpId: record.id, confirmExpiry: confirmExpiry.toISOString() })
 
     await prisma.userLoginOtp.update({
       where: { id: record.id },
@@ -185,7 +202,7 @@ export const AuthOTPService = {
       },
     })
 
-    console.log(`[AuthOTP:verify] SUCCESS — returning raw confirmToken to caller`)
+    logAuthDebug(requestId, 'confirm_token_creation', 'success', { userId, userLoginOtpId: record.id })
     return { ok: true, confirmToken }
   },
 
@@ -193,26 +210,30 @@ export const AuthOTPService = {
    * Called by NextAuth authorize() — consumes the confirmToken to create a real session.
    * Returns the userId if token is valid; null otherwise.
    */
-  async consumeConfirmToken(token: string): Promise<string | null> {
+  async consumeConfirmToken(token: string, debugContext?: DebugContext): Promise<string | null> {
     const now = new Date()
     const hashedToken = hashToken(token)
+    const requestId = debugContext?.requestId ?? null
 
-    // [DIAG] Log incoming consume attempt
-    console.log(`[AuthOTP:consume] Incoming token length=${token?.length} now=${now.toISOString()}`)
-    console.log(`[AuthOTP:consume] Hashed to lookup: ${hashedToken.slice(0, 12)}...`)
+    logAuthDebug(requestId, 'confirm_token_lookup', 'start', {})
 
     const record = await prisma.userLoginOtp.findUnique({
       where: { confirmToken: hashedToken },
       select: { id: true, userId: true, used: true, expiresAt: true },
     })
 
-    console.log(`[AuthOTP:consume] DB lookup result: ${record ? `found id=${record.id} expiresAt=${record.expiresAt.toISOString()} used=${record.used}` : 'NOT FOUND'}`)
-
-    if (!record) return null
+    if (!record) {
+      logAuthDebug(requestId, 'confirm_token_lookup', 'fail', { reason: 'not_found' })
+      return null
+    }
     // Confirm tokens are stored with used=true (OTP was verified), confirmToken must still be present
     // and the expiresAt (repurposed as confirmToken TTL) must be in the future
     if (record.expiresAt < now) {
-      console.log(`[AuthOTP:consume] FAIL — token expired (expiresAt ${record.expiresAt.toISOString()} < now ${now.toISOString()})`)
+      logAuthDebug(requestId, 'confirm_token_expired', 'fail', {
+        userLoginOtpId: record.id,
+        expiresAt: record.expiresAt.toISOString(),
+        now: now.toISOString(),
+      })
       return null
     }
 
@@ -222,7 +243,7 @@ export const AuthOTPService = {
       data: { confirmToken: null },
     })
 
-    console.log(`[AuthOTP:consume] SUCCESS — userId=${record.userId}`)
+    logAuthDebug(requestId, 'confirm_token_consumed', 'success', { userLoginOtpId: record.id, userId: record.userId })
     return record.userId
   },
 

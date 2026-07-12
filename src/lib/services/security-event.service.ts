@@ -23,6 +23,7 @@ export type SecurityEventType =
   | 'STAFF_SUSPEND'
   | 'PERMISSION_DENIED'
   | 'BRUTE_FORCE_DETECTED'
+  | 'OTP_RESEND_REQUESTED'
 
 export const SecurityEventService = {
   async log(opts: {

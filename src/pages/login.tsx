@@ -1,4 +1,4 @@
-﻿import { useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
+﻿import { useState, useRef, useMemo, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useRouter } from 'next/router'
 import { signIn } from 'next-auth/react'
 import { Mail, Lock, ShieldCheck, Globe, ArrowLeft, RefreshCw } from 'lucide-react'
@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 
 type Step = 'credentials' | 'otp'
+
+const AUTH_DEBUG = process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true'
 
 export default function Login() {
   const { t, changeLocale, locale } = useTranslation()
@@ -23,6 +25,16 @@ export default function Login() {
   const [resending, setResending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showLangMenu, setShowLangMenu] = useState(false)
+  const debugRequestId = useMemo(() => {
+    if (!AUTH_DEBUG || typeof crypto === 'undefined' || typeof crypto.randomUUID !== 'function') {
+      return null
+    }
+    try {
+      return crypto.randomUUID()
+    } catch {
+      return `auth-debug-${Date.now()}`
+    }
+  }, [])
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const languages = [
@@ -44,14 +56,20 @@ export default function Login() {
     setError(null)
 
     try {
+      const payload: Record<string, unknown> = { email, password }
+      if (debugRequestId) payload.debugRequestId = debugRequestId
+
       const res = await fetch('/api/auth/pre-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
 
       if (!res.ok) {
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] pre-login failure', { debugRequestId, status: res.status, error: data.error })
+        }
         setError(data.error || t('auth.invalid_credentials', 'Invalid email or password'))
         return
       }
@@ -59,6 +77,13 @@ export default function Login() {
       setMaskedEmail(data.maskedEmail || email)
       setOtpChannel(data.channel || 'email')
       setPendingToken(data.pendingToken || '')
+      if (AUTH_DEBUG) {
+        console.log('[auth-debug] pre-login success', {
+          debugRequestId,
+          channel: data.channel,
+          maskedEmail: data.maskedEmail,
+        })
+      }
       setStep('otp')
     } catch {
       setError(t('auth.login_error', 'Login service unavailable. Please try again.'))
@@ -81,14 +106,24 @@ export default function Login() {
 
     try {
       // Verify OTP → get confirmToken
+      const verifyPayload: Record<string, unknown> = { email, otp: code }
+      if (debugRequestId) verifyPayload.debugRequestId = debugRequestId
+
       const verifyRes = await fetch('/api/auth/verify-mfa-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: code }),
+        body: JSON.stringify(verifyPayload),
       })
       const verifyData = await verifyRes.json()
 
       if (!verifyRes.ok) {
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] verify-mfa-otp failure', {
+            debugRequestId,
+            status: verifyRes.status,
+            error: verifyData.error,
+          })
+        }
         if (verifyRes.status === 429) {
           setError('Too many attempts. Please wait a few minutes, then request a new code.')
         } else if (verifyData.error?.toLowerCase().includes('expired') || verifyData.error?.toLowerCase().includes('not found')) {
@@ -104,13 +139,24 @@ export default function Login() {
         redirect: false,
         email,
         confirmToken: verifyData.confirmToken,
+        debugRequestId: debugRequestId || undefined,
       })
 
-      // [DIAG] Log full signIn result — remove after login fix is confirmed
-      console.log('[login] signIn result:', JSON.stringify({ ok: result?.ok, error: result?.error, status: result?.status, url: result?.url }))
+      if (AUTH_DEBUG) {
+        console.log('[auth-debug] signIn result', {
+          debugRequestId,
+          ok: result?.ok,
+          status: result?.status,
+          error: result?.error,
+          url: result?.url,
+        })
+      }
 
       if (result?.ok) {
         const session = await fetch('/api/auth/session').then(r => r.json()).catch(() => null)
+        if (AUTH_DEBUG) {
+          console.log('[auth-debug] session fetch after sign-in', { debugRequestId, session })
+        }
         const roles = (session?.user?.roles as string[]) || []
         // Admins first
         if (roles.includes('ADMIN')) {
@@ -131,6 +177,9 @@ export default function Login() {
         await router.push('/dashboard')
       } else {
         setError('Login could not be completed. The code may have expired — request a new one.')
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] signIn failure', { debugRequestId, result })
+        }
       }
     } catch {
       setError('Verification failed. Please try again.')
@@ -144,20 +193,30 @@ export default function Login() {
     setError(null)
     setOtp(['', '', '', '', '', ''])
     try {
+      const payload: Record<string, unknown> = { email, pendingToken }
+      if (debugRequestId) payload.debugRequestId = debugRequestId
+
       const res = await fetch('/api/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, pendingToken }),
+        body: JSON.stringify(payload),
       })
       // Update pendingToken with the newly issued one
       const data = await res.json()
-      if (res.ok && data.pendingToken) setPendingToken(data.pendingToken)
+      if (res.ok && data.pendingToken) {
+        setPendingToken(data.pendingToken)
+      }
       if (!res.ok) {
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] resend-otp failure', { debugRequestId, status: res.status, error: data.error })
+        }
         if (res.status === 429) {
           setError('Too many resend requests. Please wait a few minutes and try again.')
         } else {
           setError(data.error || 'Could not resend code.')
         }
+      } else if (AUTH_DEBUG) {
+        console.log('[auth-debug] resend-otp success', { debugRequestId })
       }
     } catch {
       setError('Could not resend code. Try again.')
