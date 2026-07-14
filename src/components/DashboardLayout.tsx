@@ -71,6 +71,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Menu Performance', href: '/dashboard/analytics/menu-performance', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.menuPerformance' },
     { name: 'Peak Hours', href: '/dashboard/analytics/peak-hours', icon: Clock, i18nKey: 'dashboard.nav.peakHours' },
     { name: 'Instruction Insights', href: '/dashboard/analytics/instruction-insights', icon: Sparkles, i18nKey: 'dashboard.nav.instructionInsights' },
+    // Operations Section
+    { name: 'Operations', section: true, i18nKey: 'dashboard.nav.operations' },
+    { name: 'Service Replay', href: '/dashboard/operations/service-replay', icon: RotateCcw, rolesAllowed: ['OWNER','MANAGER','ADMIN','SUPERVISOR'], i18nKey: 'dashboard.nav.serviceReplay' },
     // Payments Section
     { name: 'Payments', section: true, i18nKey: 'dashboard.nav.payments' },
     { name: 'Payment Analytics', href: '/dashboard/analytics/payments', icon: DollarSign, rolesAllowed: ['OWNER','MANAGER','ADMIN'], i18nKey: 'dashboard.nav.paymentAnalytics' },
