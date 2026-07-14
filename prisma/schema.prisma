@@ -267,6 +267,10 @@ model Business {
   ScannedDocument ScannedDocument[]
   AnomalyAlert    AnomalyAlert[]
 
+  // Kitchen Consumption Phase 0
+  recipes               Recipe[]
+  inventoryConsumptions InventoryConsumption[]
+
   @@map("Restaurant")
 }
 
@@ -451,6 +455,7 @@ model SaleItem {
   sale            Sale                    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   diningSlipItems DiningSessionSlipItem[] @relation("SaleItemDiningSlipItems")
   ticketEvents    TicketEvent[]
+  consumptions    InventoryConsumption[]
 
   @@index([itemStatus])
   @@index([stationId])
@@ -476,6 +481,8 @@ model InventoryItem {
   updates             InventoryUpdate[]
   ScannedDocumentItem ScannedDocumentItem[]
   ProductAlias        ProductAlias[]
+  recipeIngredients   RecipeIngredient[]
+  consumptions        InventoryConsumption[]
 }
 
 model InventoryUpdate {
@@ -4382,4 +4389,90 @@ enum AnomalySeverity {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Kitchen Consumption Phase 0: Recipe and Inventory Consumption Tracking
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Recipe {
+  id                String   @id @default(cuid())
+  businessId        String
+  name              String
+  yieldQuantity     Float
+  yieldUnit         String
+  version           Int      @default(1)
+  isActive          Boolean  @default(true)
+  costCentsCached   Int?
+  costCalculatedAt  DateTime?
+  costStale         Boolean  @default(true)
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  ingredients       RecipeIngredient[] @relation("RecipeIngredients")
+  subRecipeUsages   RecipeIngredient[] @relation("SubRecipeUsages")
+  consumptions      InventoryConsumption[]
+
+  @@index([businessId])
+  @@index([businessId, isActive])
+}
+
+model RecipeIngredient {
+  id              String  @id @default(cuid())
+  recipeId        String
+  inventoryItemId String?
+  subRecipeId     String?
+  quantity        Float
+  unit            String
+  yieldFactor     Float   @default(1.0)
+  isOptional      Boolean @default(false)
+  displayOrder    Int     @default(0)
+
+  recipe          Recipe         @relation("RecipeIngredients", fields: [recipeId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+  subRecipe       Recipe?        @relation("SubRecipeUsages", fields: [subRecipeId], references: [id], onDelete: SetNull)
+  consumptions    InventoryConsumption[]
+
+  @@index([recipeId])
+  @@index([inventoryItemId])
+  @@index([subRecipeId])
+}
+
+model InventoryConsumption {
+  id                         String   @id @default(cuid())
+  businessId                 String
+  saleItemId                 String
+  inventoryItemId            String
+  recipeId                   String?
+  recipeIngredientId         String?
+  quantityConsumed           Float
+  unit                       String
+  unitCostAtConsumptionCents Int
+  totalCostCents             Int
+  inventoryUpdateId          String?
+  state                      ConsumptionState @default(PENDING)
+  reversedByConsumptionId    String?
+  reasonCode                 String?
+  actorUserId                String?
+  createdAt                  DateTime @default(now())
+
+  business         Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  saleItem         SaleItem          @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  inventoryItem    InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  recipe           Recipe?           @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  recipeIngredient RecipeIngredient? @relation(fields: [recipeIngredientId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([saleItemId])
+  @@index([inventoryItemId])
+  @@index([recipeId])
+  @@index([state])
+}
+
+enum ConsumptionState {
+  PENDING
+  COMMITTED
+  REVERSED
 }
