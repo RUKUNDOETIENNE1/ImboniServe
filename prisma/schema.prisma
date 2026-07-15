@@ -4476,3 +4476,73 @@ enum ConsumptionState {
   COMMITTED
   REVERSED
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Intelligence Platform Models
+// ═══════════════════════════════════════════════════════════════════════════
+
+model IntelligenceReport {
+  id              String   @id @default(cuid())
+  businessId      String
+  type            String
+  reportingPeriod Json
+  data            Json
+  confidence      Float
+  evidenceCount   Int      @default(0)
+  generatedAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([businessId, type, generatedAt(sort: Desc)])
+  @@index([type, generatedAt(sort: Desc)])
+  @@index([businessId, generatedAt(sort: Desc)])
+}
+
+model KnowledgeEntry {
+  id         String   @id @default(cuid())
+  businessId String
+  category   String
+  content    Json
+  confidence Float
+  sources    Json
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId, category, createdAt(sort: Desc)])
+  @@index([category, createdAt(sort: Desc)])
+  @@index([businessId, createdAt(sort: Desc)])
+}
+
+model ReplayEvent {
+  id         String   @id @default(cuid())
+  businessId String
+  eventType  String
+  eventData  Json
+  timestamp  DateTime
+  replayable Boolean  @default(true)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([businessId, timestamp(sort: Desc)])
+  @@index([eventType, timestamp(sort: Desc)])
+  @@index([businessId, eventType, timestamp(sort: Desc)])
+  @@index([replayable, timestamp(sort: Desc)])
+}
+
+model ConversationHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  businessId    String
+  messages      Json
+  context       Json
+  metadata      Json?
+  startedAt     DateTime @default(now())
+  lastMessageAt DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, lastMessageAt(sort: Desc)])
+  @@index([businessId, lastMessageAt(sort: Desc)])
+  @@index([userId, businessId])
+}

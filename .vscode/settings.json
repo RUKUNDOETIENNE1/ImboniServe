@@ -1,0 +1,6 @@
+{
+  "js/ts.preferences.includePackageJsonAutoImports": "on",
+  "js/ts.suggest.autoImports": true,
+  "js/ts.workspaceSymbols.scope": "allOpenProjects",
+  "js/ts.tsc.autoDetect": "on"
+}
