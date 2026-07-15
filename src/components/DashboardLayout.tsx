@@ -104,6 +104,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Kitchen', href: '/dashboard/kitchen', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.kitchen', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3 },
     { name: 'Tables', href: '/dashboard/tables', icon: Home, i18nKey: 'dashboard.nav.tables', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 4 },
     { name: 'Reservations', href: '/dashboard/reservations', icon: Calendar, i18nKey: 'dashboard.nav.reservations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 5 },
+    { name: 'Service Replay', href: '/dashboard/operations/service-replay', icon: RotateCcw, i18nKey: 'dashboard.nav.serviceReplay', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 6 },
 
     // === MENU & INVENTORY (4 items) ===
     { name: 'Menu', href: '/dashboard/menu', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.menu', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 1 },

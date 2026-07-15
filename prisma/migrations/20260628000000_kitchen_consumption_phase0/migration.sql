@@ -89,6 +89,7 @@ CREATE INDEX "MenuItem_recipeId_idx" ON "MenuItem"("recipeId");
 CREATE INDEX "SaleItem_consumptionState_idx" ON "SaleItem"("consumptionState");
 
 -- Recipe indexes
+CREATE INDEX "Recipe_businessId_idx" ON "Recipe"("businessId");
 CREATE INDEX "Recipe_businessId_isActive_idx" ON "Recipe"("businessId", "isActive");
 
 -- RecipeIngredient indexes
@@ -158,3 +159,11 @@ ALTER TABLE "InventoryConsumption" ADD CONSTRAINT "InventoryConsumption_reversed
 -- Add new enum values for Kitchen Consumption Engine
 ALTER TYPE "TicketEventType" ADD VALUE 'INGREDIENTS_CONSUMED';
 ALTER TYPE "TicketEventType" ADD VALUE 'CONSUMPTION_REVERSED';
+
+-- ============================================
+-- 7. Enable row level security
+-- ============================================
+
+ALTER TABLE "Recipe" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "RecipeIngredient" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "InventoryConsumption" ENABLE ROW LEVEL SECURITY;

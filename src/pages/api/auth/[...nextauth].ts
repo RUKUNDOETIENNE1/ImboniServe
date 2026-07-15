@@ -7,10 +7,38 @@ import type { JWT } from 'next-auth/jwt'
 import { prisma } from '@/lib/prisma'
 import { AuthOTPService } from '@/lib/services/auth-otp.service'
 import { SecurityEventService } from '@/lib/services/security-event.service'
+import { logAuthDebug, redactedEmail } from '@/lib/utils/auth-debug'
 
-type AppUser = User & { roles: string[]; role?: string; businessId: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null }
-type AppJWT = JWT & { roles?: string[]; role?: string; businessId?: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null }
-type AppSession = Session & { user?: Session['user'] & { roles?: string[]; role?: string; businessId?: string | null; planCode?: string; subscriptionStatus?: string; trialEndDate?: Date | null } }
+type AppUser = User & {
+  roles: string[]
+  role?: string
+  businessId: string | null
+  planCode?: string
+  subscriptionStatus?: string
+  trialEndDate?: Date | null
+  debugRequestId?: string | null
+}
+
+type AppJWT = JWT & {
+  roles?: string[]
+  role?: string
+  businessId?: string | null
+  planCode?: string
+  subscriptionStatus?: string
+  trialEndDate?: Date | null
+  debugRequestId?: string | null
+}
+
+type AppSession = Session & {
+  user?: Session['user'] & {
+    roles?: string[]
+    role?: string
+    businessId?: string | null
+    planCode?: string
+    subscriptionStatus?: string
+    trialEndDate?: Date | null
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -35,49 +63,64 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const email = credentials?.email?.toLowerCase().trim()
         const confirmToken = credentials?.confirmToken
+        const requestId = (credentials as any)?.debugRequestId ?? null
 
-        // [DIAG]
-        console.log(`[mfa-confirm:authorize] email=${email} confirmToken length=${confirmToken?.length ?? 'MISSING'}`)
+        logAuthDebug(requestId, 'nextauth_authorize_start', 'start', {
+          provider: 'mfa-confirm',
+          email: redactedEmail(email),
+        })
 
         if (!email || !confirmToken) {
-          console.log(`[mfa-confirm:authorize] FAIL — missing email or confirmToken`)
+          logAuthDebug(requestId, 'nextauth_authorize_start', 'fail', { reason: 'missing_credentials' })
           return null
         }
 
         // Consume the one-time confirm token issued after OTP verification
-        const userId = await AuthOTPService.consumeConfirmToken(confirmToken)
-        console.log(`[mfa-confirm:authorize] consumeConfirmToken result: userId=${userId ?? 'NULL'}`)
-        if (!userId) return null
-
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { 
-            id: true, 
-            name: true, 
-            email: true, 
-            roles: true, 
-            businessId: true, 
-            isActive: true,
-            business: {
-              select: {
-                plan: {
-                  select: { code: true }
-                },
-                subscriptionStatus: true,
-                trialEndDate: true
-              }
-            }
-          },
-        })
-
-        console.log(`[mfa-confirm:authorize] user lookup: found=${!!user} isActive=${user?.isActive} emailMatch=${user?.email === email}`)
-
-        if (!user || !user.isActive || user.email !== email) {
-          console.log(`[mfa-confirm:authorize] FAIL — user check failed`)
+        const userId = await AuthOTPService.consumeConfirmToken(confirmToken, { requestId })
+        if (!userId) {
+          logAuthDebug(requestId, 'nextauth_confirm_token', 'fail', { reason: 'token_invalid' })
           return null
         }
 
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            roles: true,
+            businessId: true,
+            isActive: true,
+            business: {
+              select: {
+                plan: { select: { code: true } },
+                subscriptionStatus: true,
+                trialEndDate: true,
+              },
+            },
+          },
+        })
+
+        if (!user || !user.isActive || user.email !== email) {
+          logAuthDebug(requestId, 'nextauth_authorize_user_check', 'fail', {
+            userFound: !!user,
+            isActive: user?.isActive ?? false,
+            emailMatch: user?.email === email,
+          })
+          return null
+        }
+
+        logAuthDebug(requestId, 'nextauth_authorize_user_check', 'success', {
+          userId: user.id,
+        })
+
         await SecurityEventService.log({ userId: user.id, eventType: 'LOGIN_SUCCESS', metadata: { via: 'mfa_confirm' } })
+
+        const businessMeta = (user as any).business as {
+          plan?: { code?: string | null } | null
+          subscriptionStatus?: string | null
+          trialEndDate?: Date | null
+        } | null
 
         const roles = (user.roles as string[]) || []
         const authUser: AppUser = {
@@ -87,10 +130,12 @@ export const authOptions: NextAuthOptions = {
           roles,
           role: roles[0],
           businessId: user.businessId ?? null,
-          planCode: user.business?.plan?.code,
-          subscriptionStatus: user.business?.subscriptionStatus,
-          trialEndDate: user.business?.trialEndDate
+          planCode: businessMeta?.plan?.code ?? undefined,
+          subscriptionStatus: businessMeta?.subscriptionStatus ?? undefined,
+          trialEndDate: businessMeta?.trialEndDate ?? null,
+          debugRequestId: requestId,
         }
+        logAuthDebug(requestId, 'nextauth_authorize_complete', 'success', { userId: user.id })
         return authUser
       },
     })
@@ -117,14 +162,12 @@ export const authOptions: NextAuthOptions = {
               include: {
                 business: {
                   select: {
-                    plan: {
-                      select: { code: true }
-                    },
+                    plan: { select: { code: true } },
                     subscriptionStatus: true,
-                    trialEndDate: true
-                  }
-                }
-              }
+                    trialEndDate: true,
+                  },
+                },
+              },
             })
 
             if (!user || !user.isActive) return null
@@ -141,9 +184,10 @@ export const authOptions: NextAuthOptions = {
               roles,
               role: primaryRole,
               businessId: (user as any).businessId ?? null,
-              planCode: user.business?.plan?.code,
-              subscriptionStatus: user.business?.subscriptionStatus,
-              trialEndDate: user.business?.trialEndDate
+              planCode: user.business?.plan?.code ?? undefined,
+              subscriptionStatus: user.business?.subscriptionStatus ?? undefined,
+              trialEndDate: user.business?.trialEndDate ?? null,
+              debugRequestId: null,
             }
 
             return authUser
@@ -162,9 +206,11 @@ export const authOptions: NextAuthOptions = {
         t.roles = u.roles
         t.role = u.role
         t.businessId = u.businessId
-        t.planCode = u.planCode
-        t.subscriptionStatus = u.subscriptionStatus
-        t.trialEndDate = u.trialEndDate
+        t.planCode = u.planCode ?? t.planCode
+        t.subscriptionStatus = u.subscriptionStatus ?? t.subscriptionStatus
+        t.trialEndDate = u.trialEndDate ?? t.trialEndDate
+        t.debugRequestId = u.debugRequestId ?? t.debugRequestId ?? null
+        logAuthDebug(t.debugRequestId, 'nextauth_jwt_callback', 'success', { userId: u.id })
       }
       return t
     },
@@ -178,19 +224,23 @@ export const authOptions: NextAuthOptions = {
         s.user.businessId = t.businessId
         s.user.planCode = t.planCode
         s.user.subscriptionStatus = t.subscriptionStatus
-        s.user.trialEndDate = t.trialEndDate
+        s.user.trialEndDate = t.trialEndDate ?? null
+        logAuthDebug(t.debugRequestId, 'nextauth_session_callback', 'success', { userId: t.sub })
       }
       return s
     },
     async redirect({ url, baseUrl }) {
       // After sign in, redirect admins to /admin, others to /dashboard
       if (url === baseUrl || url.startsWith(baseUrl)) {
+        logAuthDebug(null, 'nextauth_redirect', 'success', { destination: baseUrl + '/dashboard' })
         return baseUrl + '/dashboard'
       }
       // Allow callback URLs
       if (url.startsWith(baseUrl)) {
+        logAuthDebug(null, 'nextauth_redirect', 'success', { destination: url })
         return url
       }
+      logAuthDebug(null, 'nextauth_redirect', 'success', { destination: baseUrl + '/dashboard', reason: 'fallback' })
       return baseUrl + '/dashboard'
     },
   },
