@@ -10,27 +10,27 @@
     },
     {
       "path": "/api/cron/tap-leave-sweep",
-      "schedule": "0 * * * *"
+      "schedule": "0 4 * * *"
     },
     {
       "path": "/api/cron/tap-leave-reconcile",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 5 * * *"
     },
     {
       "path": "/api/cron/watchdog-payment",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/cron/watchdog-customer",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/watchdog-revenue",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/api/cron/watchdog-subscription",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cron/summary-daily",
