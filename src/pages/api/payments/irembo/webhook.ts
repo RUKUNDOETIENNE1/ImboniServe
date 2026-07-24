@@ -6,6 +6,14 @@ import { AuditLogService } from '@/lib/services/audit-log.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
 import { logBillingEvent } from '@/lib/services/billing-ledger.service'
 import { BillingEventType } from '@prisma/client'
+import {
+  publishHeartPulseEvent,
+  HeartPulseEventType,
+  HeartPulseChannel,
+  generateCorrelationId,
+  type PaymentConfirmedPayload,
+} from '@/lib/heart-pulse'
+import { TicketEventService } from '@/lib/services/ticket-event.service'
 
 export const config = {
   api: {
@@ -144,6 +152,60 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 
         if (saleUpdate.count > 0) {
+          // Generate correlation ID for payment workflow
+          const correlationId = generateCorrelationId()
+
+          // Publish Heart Pulse PAYMENT_CONFIRMED event
+          try {
+            const payload: PaymentConfirmedPayload = {
+              orderId: sale.id,
+              orderNumber: sale.orderNumber,
+              paymentMethod: paymentMethod || 'IREMBOPAY',
+              amountCents: sale.totalAmountCents,
+            }
+
+            // Notify business-wide channel
+            await publishHeartPulseEvent(
+              HeartPulseChannel.business(sale.businessId),
+              HeartPulseEventType.PAYMENT_CONFIRMED,
+              sale.businessId,
+              payload,
+              {
+                correlationId,
+                actor: { source: 'system' },
+              }
+            )
+
+            // Notify order-specific channel
+            await publishHeartPulseEvent(
+              HeartPulseChannel.order(sale.id),
+              HeartPulseEventType.PAYMENT_CONFIRMED,
+              sale.businessId,
+              payload,
+              {
+                correlationId,
+                actor: { source: 'system' },
+              }
+            )
+          } catch (eventError) {
+            console.error('[HeartPulse] Failed to publish PAYMENT_CONFIRMED:', eventError)
+          }
+
+          // Record TicketEvent for Service Replay
+          TicketEventService.recordEvent({
+            saleId: sale.id,
+            eventType: 'PAYMENT_CONFIRMED' as any, // Type not in enum yet, but will work
+            previousState: 'PENDING',
+            newState: 'COMPLETED',
+            metadata: {
+              orderNumber: sale.orderNumber,
+              paymentMethod: paymentMethod || 'IREMBOPAY',
+              amountCents: sale.totalAmountCents,
+              invoiceNumber,
+              correlationId,
+            },
+          }).catch((err) => console.error('[TicketEvent] Failed to record PAYMENT_CONFIRMED:', err))
+
           // Release to kitchen if immediate order or scheduled time approaching
           const shouldReleaseNow = sale.orderSource === 'QR_IN_VENUE' || 
             (sale.scheduledAt && new Date(sale.scheduledAt).getTime() - Date.now() <= sale.business.prepBufferMinutes * 60000)

@@ -107,16 +107,16 @@ export default function OTPVerification({
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
       <div>
-        <h3 className="text-lg font-semibold text-slate-800 mb-1">Verify Your Phone</h3>
-        <p className="text-sm text-slate-600">
+        <h3 className="text-lg font-semibold text-imboni-dark mb-1">Verify Your Phone</h3>
+        <p className="text-sm text-gray-500">
           For remote orders, we need to verify your phone number
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2" role="alert" aria-live="assertive">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-red-700">{error}</p>
         </div>
@@ -125,18 +125,20 @@ export default function OTPVerification({
       {!otpSent ? (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-gray-600 mb-2" htmlFor="otp-phone">
               Phone Number
             </label>
             <input
+              id="otp-phone"
               type="tel"
               value={phone}
               onChange={(e) => onPhoneChange(e.target.value)}
               placeholder="07XX XXX XXX"
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue transition-colors"
               disabled={loading}
+              aria-label="Phone number for verification"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Rwanda numbers start with 078, 079, 072, or 073
             </p>
           </div>
@@ -144,7 +146,7 @@ export default function OTPVerification({
           <button
             onClick={requestOTP}
             disabled={loading || !phone}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-imboni-dark hover:bg-imboni-blue disabled:bg-gray-200 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-imboni-blue/30"
           >
             {loading ? (
               <>
@@ -165,25 +167,27 @@ export default function OTPVerification({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-gray-600 mb-2" htmlFor="otp-code">
               Verification Code
             </label>
             <input
+              id="otp-code"
               type="text"
               inputMode="numeric"
               maxLength={6}
               value={otpCode}
               onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
               placeholder="000000"
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg text-center text-2xl font-mono tracking-widest focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue transition-colors"
               disabled={loading}
+              aria-label="6-digit verification code"
             />
           </div>
 
           <button
             onClick={verifyOTP}
             disabled={loading || otpCode.length !== 6}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-imboni-dark hover:bg-imboni-blue disabled:bg-gray-200 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-imboni-blue/30"
           >
             {loading ? (
               <>
@@ -197,7 +201,7 @@ export default function OTPVerification({
 
           <div className="text-center">
             {resendCooldown > 0 ? (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-gray-500">
                 Resend code in {resendCooldown}s
               </p>
             ) : (
@@ -208,7 +212,7 @@ export default function OTPVerification({
                   requestOTP();
                 }}
                 disabled={loading}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-imboni-blue hover:text-primary-700 font-medium focus:outline-none focus:ring-2 focus:ring-imboni-blue/20 rounded"
               >
                 Resend Code
               </button>
@@ -221,7 +225,7 @@ export default function OTPVerification({
               setOtpCode('');
               setError(null);
             }}
-            className="w-full text-sm text-slate-600 hover:text-slate-800"
+            className="w-full text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-imboni-blue/20 rounded"
           >
             Change Phone Number
           </button>

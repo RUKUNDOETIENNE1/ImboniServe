@@ -22,8 +22,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         address: true,
         city: true,
         phone: true,
+        description: true,
         enableQRInVenue: true,
-        enableQRRemote: true
+        enableQRRemote: true,
+        businessProfile: {
+          select: {
+            tagline: true,
+            description: true,
+            coverImageUrl: true,
+            logoUrl: true,
+            cuisineTypes: true,
+            priceRange: true,
+            openingHours: true,
+            rating: true,
+          }
+        }
       }
     });
 
@@ -73,6 +86,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       address: business.address,
       city: business.city,
       phone: business.phone,
+      description: business.description,
+      businessProfile: business.businessProfile,
       menu: menuItems
     });
   } catch (error) {

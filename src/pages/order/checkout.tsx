@@ -86,12 +86,12 @@ export default function CheckoutPage() {
 
   if (!sessionId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-gray-600">No session found</p>
+          <p className="text-gray-500 text-sm">No session found</p>
           <button
             onClick={() => router.push('/order')}
-            className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+            className="mt-4 text-imboni-blue hover:text-primary-700 font-medium text-sm"
           >
             Back to Menu
           </button>
@@ -101,20 +101,20 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-gray-500" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Checkout</h1>
-              <p className="text-sm text-gray-500">Review and pay</p>
+              <h1 className="text-xl font-bold text-imboni-dark">Settle Up</h1>
+              <p className="text-sm text-gray-400">Review and pay</p>
             </div>
           </div>
         </div>
@@ -127,13 +127,13 @@ export default function CheckoutPage() {
 
         {/* Payment Section */}
         {canCheckout && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 space-y-6">
             <div>
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Payment Details</h2>
+              <h2 className="text-lg font-bold text-imboni-dark mb-4">Payment Details</h2>
               
               {/* Phone Input */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-600 mb-2">
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4" />
                     Mobile Money Number
@@ -145,23 +145,23 @@ export default function CheckoutPage() {
                   value={phone}
                   onChange={handlePhoneChange}
                   placeholder="078 XXX XXXX"
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-imboni-blue/20 transition-colors ${
                     phoneError ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
                 />
                 {phoneError && (
                   <p className="mt-2 text-sm text-red-600">{phoneError}</p>
                 )}
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-gray-400">
                   MTN Mobile Money or Airtel Money
                 </p>
               </div>
             </div>
 
             {/* Fee Information */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
               <p className="text-sm text-blue-800 mb-2">
-                <strong>Payment Fee:</strong> {feePercent}% (RWF {Math.round(total * (feePercent / 100)).toLocaleString()})
+                <strong>Service Fee:</strong> {feePercent}% (RWF {Math.round(total * (feePercent / 100)).toLocaleString()})
               </p>
               <p className="text-xs text-blue-600">
                 Total to pay: <strong>RWF {Math.round(total * (1 + feePercent / 100)).toLocaleString()}</strong>
@@ -181,8 +181,8 @@ export default function CheckoutPage() {
 
             {/* Info */}
             <div className="text-center">
-              <p className="text-xs text-gray-500">
-                You will receive a USSD prompt on your phone to approve the payment
+              <p className="text-xs text-gray-400">
+                You'll receive a USSD prompt on your phone to approve the payment
               </p>
             </div>
           </div>
@@ -190,15 +190,15 @@ export default function CheckoutPage() {
 
         {/* Not Ready for Checkout */}
         {!canCheckout && !isCompleted && (
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 text-center">
-            <p className="text-yellow-800 font-medium">
+          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 text-center">
+            <p className="text-amber-800 font-medium text-sm">
               {slip?.runningTotalCents === 0
                 ? 'No items in your order yet'
                 : 'Checkout is not available at the moment'}
             </p>
             <button
               onClick={() => router.push(`/order?sessionId=${sessionId}`)}
-              className="mt-4 text-yellow-700 hover:text-yellow-800 font-medium"
+              className="mt-4 text-amber-700 hover:text-amber-800 font-medium text-sm"
             >
               Back to Menu
             </button>

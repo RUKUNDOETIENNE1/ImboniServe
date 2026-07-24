@@ -155,6 +155,16 @@ export class DailyBriefingService {
           kitchen: true,
           customerJourney: true,
         },
+        cache: new Map(),
+        config: {},
+        diagnostics: {
+          startTime: 0,
+          stages: [],
+          warnings: [],
+          errors: [],
+          skippedAnalyses: [],
+          confidenceDegradations: [],
+        },
       }
 
       // Get or generate report (with caching)

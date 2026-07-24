@@ -57,12 +57,38 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: {
           id: tableId,
           businessId: branchId
+        },
+        select: {
+          id: true,
+          number: true,
+          capacity: true,
+          assignedWaiterId: true,
+          assignedWaiter: {
+            select: {
+              id: true,
+              name: true,
+            }
+          }
         }
       });
 
       if (!table) {
         return res.status(404).json({ error: 'Table not found' });
       }
+
+      const accessToken = await generateAccessToken(branchId, source, tableId);
+
+      return res.status(200).json({
+        accessToken,
+        branchId,
+        branchName: business.name,
+        tableId: tableId || null,
+        tableNumber: table.number,
+        tableCapacity: table.capacity,
+        serverName: table.assignedWaiter?.name || null,
+        source,
+        expiresIn: 600 // 10 minutes in seconds
+      });
     }
 
     // Generate access token

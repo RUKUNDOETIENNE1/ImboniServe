@@ -57,15 +57,16 @@ export async function getOrGenerateReport(
     }
 
     // Step 2: Generate new report using Intelligence Pipeline
-    const pipeline = createPipeline()
-    const result = await pipeline.process(context, events)
+    const pipelineBuilder = createPipeline()
+    const pipeline = pipelineBuilder.build()
+    const result = await pipeline.execute(events, context)
 
-    if (!result.success || !result.data) {
+    if (!result.success || !result.report) {
       console.error('Failed to generate intelligence report:', result.error)
       return null
     }
 
-    const report = result.data
+    const report = result.report
 
     // Step 3: Cache the report
     await cacheReport(options, report)
@@ -121,7 +122,7 @@ export async function cacheReport(
   try {
     await prisma.intelligenceReport.create({
       data: {
-        id: report.metadata.id,
+        id: report.metadata?.id ?? `report_${Date.now()}`,
         businessId: options.businessId,
         type: options.type,
         reportingPeriod: {
@@ -129,9 +130,9 @@ export async function cacheReport(
           end: options.timeRange.end,
         },
         data: report as any,
-        confidence: report.confidenceMetrics.overall,
-        evidenceCount: Object.keys(report.evidenceRegistry).length,
-        generatedAt: new Date(report.metadata.generatedAt),
+        confidence: report.confidenceMetrics?.overall ?? 0,
+        evidenceCount: report.evidenceRegistry ? Object.keys(report.evidenceRegistry).length : 0,
+        generatedAt: report.metadata?.generatedAt ? new Date(report.metadata.generatedAt) : new Date(),
       },
     })
   } catch (error) {
@@ -301,6 +302,21 @@ export function buildTimeRange(period: string, customRange?: { start: string; en
         start: thirtyDaysAgo.toISOString(),
         end: now.toISOString(),
         label: 'Last 30 Days',
+      }
+
+    case 'specific_date':
+      if (!customRange || !customRange.start) {
+        throw new Error('Specific date required for specific_date period')
+      }
+      const specificDate = new Date(customRange.start)
+      const specificStart = new Date(specificDate)
+      specificStart.setHours(0, 0, 0, 0)
+      const specificEnd = new Date(specificDate)
+      specificEnd.setHours(23, 59, 59, 999)
+      return {
+        start: specificStart.toISOString(),
+        end: specificEnd.toISOString(),
+        label: `Specific Date (${customRange.start})`,
       }
 
     case 'custom':

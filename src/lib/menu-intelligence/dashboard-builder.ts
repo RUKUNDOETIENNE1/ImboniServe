@@ -1,331 +1,380 @@
 /**
- * Menu Intelligence™ - Dashboard Builder
- * Transforms Menu Intelligence Reports into UI-friendly dashboard view models
+ * Menu Intelligence™ (Product Intelligence Engine)
+ * 
+ * Menu Dashboard Builder
+ * 
+ * Extends BaseDashboardBuilder to create product intelligence dashboards.
+ * 
+ * Platform: Hospitality Intelligence Platform v1.0.0
+ * Module: Menu Intelligence™ v1.0
+ * Pattern: Extends BaseDashboardBuilder
  */
 
-import type { MenuIntelligenceReport, MenuDashboard } from './types'
+import { BaseDashboardBuilder } from '@/lib/intelligence/base-dashboard-builder'
+import type {
+  MenuIntelligenceReport,
+  MenuIntelligenceDashboard,
+  ProductHealth,
+  ProductLifecycle,
+} from './types'
 
-export class MenuDashboardBuilder {
-  build(report: MenuIntelligenceReport): MenuDashboard {
+/**
+ * Menu Dashboard Builder
+ * 
+ * Builds product intelligence dashboards using platform utilities.
+ */
+export class MenuDashboardBuilder extends BaseDashboardBuilder<
+  MenuIntelligenceReport,
+  MenuIntelligenceDashboard
+> {
+  /**
+   * Build complete dashboard from report
+   */
+  build(report: MenuIntelligenceReport): MenuIntelligenceDashboard {
     return {
       report,
-      overviewDisplay: {
-        score: report.overview.overallScore,
-        grade: this.calculateGrade(report.overview.overallScore),
-        status: report.overview.status,
-        statusColor: this.getStatusColor(report.overview.status),
-        statusIcon: this.getStatusIcon(report.overview.status),
-        metrics: [
-          { label: 'Popular Items', value: report.overview.popularItems.length.toString() },
-          { label: 'Slow Items', value: report.overview.slowItems.length.toString(), color: 'text-orange-600' },
-          { label: 'Cancelled Items', value: report.overview.cancelledItems.length.toString(), color: 'text-red-600' },
-          { label: 'Avg Prep Impact', value: this.formatDuration(report.overview.averagePreparationImpact) },
-          { label: 'Trend', value: report.overview.operationalTrend, trend: report.overview.operationalTrend },
-        ],
-        popularItems: report.overview.popularItems,
-        slowItems: report.overview.slowItems,
-      },
-      performanceDisplay: {
-        overall: report.performanceScore.overall,
-        dimensions: [
-          { name: 'Popularity', score: report.performanceScore.dimensions.popularity, color: this.getScoreColor(report.performanceScore.dimensions.popularity) },
-          { name: 'Efficiency', score: report.performanceScore.dimensions.efficiency, color: this.getScoreColor(report.performanceScore.dimensions.efficiency) },
-          { name: 'Consistency', score: report.performanceScore.dimensions.consistency, color: this.getScoreColor(report.performanceScore.dimensions.consistency) },
-          { name: 'Completion', score: report.performanceScore.dimensions.completion, color: this.getScoreColor(report.performanceScore.dimensions.completion) },
-          { name: 'Operational', score: report.performanceScore.dimensions.operational, color: this.getScoreColor(report.performanceScore.dimensions.operational) },
-        ],
-        trend: report.performanceScore.trend,
-        trendIcon: report.performanceScore.trend === 'improving' ? 'TrendingUp' : report.performanceScore.trend === 'declining' ? 'TrendingDown' : 'Minus',
-        trendColor: report.performanceScore.trend === 'improving' ? 'text-green-600' : report.performanceScore.trend === 'declining' ? 'text-red-600' : 'text-gray-600',
-        comparison: report.performanceScore.historicalComparison ? {
-          previous: report.performanceScore.historicalComparison.previousScore,
-          change: `${report.performanceScore.historicalComparison.change > 0 ? '+' : ''}${report.performanceScore.historicalComparison.change.toFixed(1)}%`,
-          isImprovement: report.performanceScore.historicalComparison.changeDirection === 'up',
-        } : undefined,
-      },
-      topPerformingDisplay: {
-        mostOrdered: report.topPerforming.mostOrdered.map(d => ({
-          dish: d.dishName,
-          category: d.category,
-          value: d.value.toString(),
-          metric: d.metric,
-          orders: d.orderCount,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-          replayLink: d.replayLink,
-        })),
-        fastestPrep: report.topPerforming.fastestPreparation.map(d => ({
-          dish: d.dishName,
-          value: this.formatDuration(d.value),
-          metric: 'preparation',
-          orders: d.orderCount,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-        })),
-        highestCompletion: report.topPerforming.highestCompletion.map(d => ({
-          dish: d.dishName,
-          value: `${d.value}%`,
-          metric: 'completion',
-          orders: d.orderCount,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-        })),
-        mostEfficient: report.topPerforming.operationallyEfficient.map(d => ({
-          dish: d.dishName,
-          value: `${d.value}/100`,
-          metric: 'efficiency',
-          orders: d.orderCount,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-        })),
-      },
-      lowestPerformingDisplay: {
-        cancelled: report.lowestPerforming.frequentlyCancelled.map(d => ({
-          dish: d.dishName,
-          issue: d.issue,
-          severity: d.severity,
-          severityColor: this.getSeverityColor(d.severity),
-          impact: d.impact,
-          frequency: d.frequency,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-          replayLink: d.replayLink,
-        })),
-        delays: report.lowestPerforming.preparationDelays.map(d => ({
-          dish: d.dishName,
-          issue: d.issue,
-          severity: d.severity,
-          severityColor: this.getSeverityColor(d.severity),
-          impact: d.impact,
-          frequency: d.frequency,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-        })),
-        modifications: report.lowestPerforming.highModification.map(d => ({
-          dish: d.dishName,
-          issue: d.issue,
-          severity: d.severity,
-          severityColor: this.getSeverityColor(d.severity),
-          impact: d.impact,
-          frequency: d.frequency,
-          confidence: d.confidence,
-          evidenceCount: d.evidenceCount,
-        })),
-      },
-      preparationDisplay: {
-        averageByDish: report.preparationImpact.averageByDish.map(d => ({
-          dish: d.dishName,
-          time: this.formatDuration(d.averageTime),
-          consistency: d.maxTime - d.minTime < 60 ? 'High' : d.maxTime - d.minTime < 120 ? 'Medium' : 'Low',
-        })),
-        consistent: report.preparationImpact.consistency.consistent,
-        inconsistent: report.preparationImpact.consistency.inconsistent,
-      },
-      popularityDisplay: {
-        mostPopular: report.popularityTrends.mostPopular.map(d => ({
-          dish: d.dishName,
-          orders: d.orderCount,
-          trend: d.trend === 'increasing' ? '↑' : d.trend === 'decreasing' ? '↓' : '→',
-        })),
-        growing: report.popularityTrends.fastestGrowing.map(d => ({
-          dish: d.dishName,
-          change: `+${d.changePercentage}%`,
-        })),
-        declining: report.popularityTrends.decliningPopularity.map(d => ({
-          dish: d.dishName,
-          change: `${d.changePercentage}%`,
-        })),
-      },
-      cancellationDisplay: {
-        topCancelled: report.cancellationAnalysis.cancelledDishes.map(d => ({
-          dish: d.dishName,
-          count: d.cancellationCount,
-          rate: `${d.cancellationRate}%`,
-        })),
-        reasons: report.cancellationAnalysis.cancellationReasons.map(r => ({
-          reason: r.reason,
-          count: r.count,
-        })),
-      },
-      modificationDisplay: {
-        mostModified: report.modificationAnalysis.mostModified.map(d => ({
-          dish: d.dishName,
-          count: d.modificationCount,
-          rate: `${d.modificationRate}%`,
-        })),
-        commonMods: report.modificationAnalysis.commonModifications.map(m => ({
-          modification: m.modification,
-          count: m.count,
-        })),
-      },
-      consistencyDisplay: {
-        scores: report.menuConsistency.preparationConsistency.map(d => ({
-          dish: d.dishName,
-          score: d.consistencyScore,
-          variability: d.variability,
-        })),
-        trend: report.menuConsistency.historicalComparison ? {
-          direction: report.menuConsistency.historicalComparison.trend,
-          change: `${report.menuConsistency.historicalComparison.change > 0 ? '+' : ''}${report.menuConsistency.historicalComparison.change.toFixed(1)}%`,
-        } : undefined,
-      },
-      crossSellingDisplay: {
-        combinations: report.crossSellingOpportunities.frequentlyOrderedTogether.map(c => ({
-          dishes: c.dishes,
-          frequency: c.frequency,
-        })),
-        bundles: report.crossSellingOpportunities.commonMealBundles.map(b => ({
-          name: b.bundleName,
-          dishes: b.dishes,
-          frequency: b.frequency,
-        })),
-      },
-      highlightsDisplay: report.highlights.map(h => ({
-        id: h.id,
-        title: h.title,
-        description: h.description,
-        category: h.category,
-        categoryIcon: this.getCategoryIcon(h.category),
-        categoryColor: this.getCategoryColor(h.category),
-        dishes: h.dishesInvolved,
-        value: h.value,
-        improvement: h.improvement ? `+${h.improvement}%` : undefined,
-        confidence: h.confidence,
-        evidenceCount: h.evidenceCount,
-        replayLink: h.replayLink,
-      })),
-      issuesDisplay: report.issues.map(i => ({
-        id: i.id,
-        title: i.title,
-        description: i.description,
-        category: i.category,
-        categoryIcon: this.getIssueCategoryIcon(i.category),
-        severity: i.severity,
-        severityColor: this.getSeverityColor(i.severity),
-        impact: i.impact,
-        dishes: i.dishesAffected,
-        frequency: i.historicalRecurrence,
-        confidence: i.confidence,
-        evidenceCount: i.evidenceCount,
-        replayLink: i.replayLink,
-        recommendation: i.recommendation,
-      })),
-      trendsDisplay: {
-        longTerm: report.historicalTrends.longTermPopularity.map(t => ({
-          dish: t.dishName,
-          trend: t.trend,
-          confidence: t.confidence,
-        })),
-        recurring: {
-          issues: report.historicalTrends.recurringIssues.map(i => ({
-            description: i.description,
-            dishes: i.dishesInvolved,
-            frequency: i.frequency,
-          })),
-          successes: report.historicalTrends.recurringSuccesses.map(s => ({
-            description: s.description,
-            dishes: s.dishesInvolved,
-            frequency: s.frequency,
-          })),
-        },
-      },
-      metadata: {
-        id: report.id,
-        generatedAt: report.generatedAt,
-        reportingPeriod: report.reportingPeriod.label,
-        confidence: report.confidence,
-      },
+      executiveSummary: this.buildExecutiveSummary(report),
+      revenuePerformance: this.buildRevenuePerformance(report),
+      profitPerformance: this.buildProfitPerformance(report),
+      productHealth: this.buildProductHealth(report),
+      topMovers: this.buildTopMovers(report),
+      opportunities: this.buildOpportunities(report),
+      lifecycleOverview: this.buildLifecycleOverview(report),
+      availabilityRisks: this.buildAvailabilityRisks(report),
+      actionCenter: this.buildActionCenter(report),
+      morningBriefing: report.morningBriefing,
+      metadata: this.buildMetadata(report),
     }
   }
 
-  private formatDuration(seconds: number): string {
-    if (seconds < 60) return `${seconds}s`
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`
-  }
+  /**
+   * Build executive summary
+   */
+  private buildExecutiveSummary(report: MenuIntelligenceReport) {
+    const healthyProducts = 
+      (report.healthDistribution.excellent || 0) +
+      (report.healthDistribution.healthy || 0)
 
-  private calculateGrade(score: number): string {
-    if (score >= 90) return 'A'
-    if (score >= 80) return 'B'
-    if (score >= 70) return 'C'
-    if (score >= 60) return 'D'
-    return 'F'
-  }
+    const atRiskProducts =
+      (report.healthDistribution.at_risk || 0) +
+      (report.healthDistribution.critical || 0)
 
-  private getStatusColor(status: string): string {
-    const colors = {
-      excellent: 'text-green-600',
-      good: 'text-blue-600',
-      fair: 'text-yellow-600',
-      needs_attention: 'text-orange-600',
-      critical: 'text-red-600',
+    return {
+      totalRevenue: `$${this.formatNumber(report.totalRevenue)}`,
+      totalProfit: `$${this.formatNumber(report.totalProfit)}`,
+      totalProducts: report.totalProducts,
+      healthyProducts,
+      atRiskProducts,
+      topOpportunities: report.opportunities.length,
     }
-    return colors[status as keyof typeof colors] || 'text-gray-600'
   }
 
-  private getStatusIcon(status: string): string {
-    const icons = {
-      excellent: 'CheckCircle',
-      good: 'ThumbsUp',
-      fair: 'AlertCircle',
-      needs_attention: 'AlertTriangle',
-      critical: 'XCircle',
+  /**
+   * Build revenue performance section
+   */
+  private buildRevenuePerformance(report: MenuIntelligenceReport) {
+    const topProducts = this.safeMap(
+      this.safeSlice(report.topByRevenue, 0, 5),
+      (product) => ({
+        name: product.productName,
+        revenue: `$${this.formatNumber(product.revenue)}`,
+        change: `${product.revenueChange > 0 ? '+' : ''}${this.formatPercentage(product.revenueChange)}`,
+        trend: this.getTrendIcon(product.popularityTrend === 'increasing' ? 'up' : product.popularityTrend === 'decreasing' ? 'down' : 'stable'),
+      })
+    )
+
+    const insights = []
+
+    if (report.topByRevenue.length > 0) {
+      const top = report.topByRevenue[0]
+      const revenueShare = report.totalRevenue > 0
+        ? (top.revenue / report.totalRevenue) * 100
+        : 0
+      insights.push(
+        `${top.productName} generates ${this.formatPercentage(revenueShare)} of total revenue`
+      )
     }
-    return icons[status as keyof typeof icons] || 'AlertCircle'
-  }
 
-  private getScoreColor(score: number): string {
-    if (score >= 90) return 'text-green-600'
-    if (score >= 80) return 'text-blue-600'
-    if (score >= 70) return 'text-yellow-600'
-    if (score >= 60) return 'text-orange-600'
-    return 'text-red-600'
-  }
-
-  private getSeverityColor(severity: string): string {
-    const colors = {
-      low: 'text-blue-600',
-      medium: 'text-yellow-600',
-      high: 'text-orange-600',
-      critical: 'text-red-600',
+    if (report.topByRevenue.length >= 3) {
+      const top3Revenue = report.topByRevenue
+        .slice(0, 3)
+        .reduce((sum, p) => sum + p.revenue, 0)
+      const top3Share = report.totalRevenue > 0
+        ? (top3Revenue / report.totalRevenue) * 100
+        : 0
+      insights.push(
+        `Top 3 products account for ${this.formatPercentage(top3Share)} of revenue`
+      )
     }
-    return colors[severity as keyof typeof colors] || 'text-gray-600'
+
+    return {
+      topProducts,
+      insights,
+    }
   }
 
-  private getCategoryIcon(category: string): string {
-    const icons = {
-      popularity: 'TrendingUp',
-      efficiency: 'Zap',
-      preparation: 'ChefHat',
-      completion: 'CheckCircle',
-      improvement: 'Star',
+  /**
+   * Build profit performance section
+   */
+  private buildProfitPerformance(report: MenuIntelligenceReport) {
+    const topProducts = this.safeMap(
+      this.safeSlice(report.topByProfit, 0, 5),
+      (product) => ({
+        name: product.productName,
+        profit: `$${this.formatNumber(product.profit || 0)}`,
+        margin: this.formatPercentage(product.profitMargin || 0),
+        trend: this.getTrendIcon(product.popularityTrend === 'increasing' ? 'up' : product.popularityTrend === 'decreasing' ? 'down' : 'stable'),
+      })
+    )
+
+    const insights = []
+
+    if (report.topByProfit.length > 0) {
+      const top = report.topByProfit[0]
+      insights.push(
+        `${top.productName} is your most profitable product with ${this.formatPercentage(top.profitMargin || 0)} margin`
+      )
     }
-    return icons[category as keyof typeof icons] || 'Star'
+
+    const avgMargin = report.productMetrics.length > 0
+      ? report.productMetrics.reduce((sum, p) => sum + (p.profitMargin || 0), 0) / report.productMetrics.length
+      : 0
+
+    if (avgMargin > 0) {
+      insights.push(
+        `Average profit margin across all products: ${this.formatPercentage(avgMargin)}`
+      )
+    }
+
+    return {
+      topProducts,
+      insights,
+    }
   }
 
-  private getCategoryColor(category: string): string {
-    const colors = {
-      popularity: 'text-blue-600',
-      efficiency: 'text-green-600',
-      preparation: 'text-purple-600',
-      completion: 'text-green-600',
-      improvement: 'text-yellow-600',
+  /**
+   * Build product health section
+   */
+  private buildProductHealth(report: MenuIntelligenceReport) {
+    const distribution = this.safeMap(
+      Object.entries(report.healthDistribution),
+      ([status, count]) => ({
+        status: status as ProductHealth,
+        count,
+        percentage: report.totalProducts > 0
+          ? this.formatPercentage((count / report.totalProducts) * 100)
+          : '0%',
+        color: this.getHealthColor(status as ProductHealth),
+      })
+    ).filter(item => item.count > 0)
+
+    const criticalProducts = this.safeMap(
+      this.safeFilter(
+        report.productMetrics,
+        (p) => p.healthStatus === 'critical' || p.healthStatus === 'at_risk'
+      ).slice(0, 5),
+      (product) => ({
+        name: product.productName,
+        status: product.healthStatus,
+        reasons: product.healthReasons,
+      })
+    )
+
+    return {
+      distribution,
+      criticalProducts,
     }
-    return colors[category as keyof typeof colors] || 'text-gray-600'
   }
 
-  private getIssueCategoryIcon(category: string): string {
-    const icons = {
-      preparation_bottleneck: 'Clock',
-      frequent_cancellation: 'XCircle',
-      high_modification: 'Edit',
-      operational_friction: 'AlertTriangle',
+  /**
+   * Build top movers section
+   */
+  private buildTopMovers(report: MenuIntelligenceReport) {
+    const gainers = this.safeMap(
+      this.safeFilter(
+        report.productMetrics,
+        (p) => p.popularityTrend === 'increasing'
+      )
+        .sort((a, b) => b.quantityChange - a.quantityChange)
+        .slice(0, 5),
+      (product) => ({
+        name: product.productName,
+        change: `+${this.formatPercentage(product.quantityChange)}`,
+        reason: product.healthReasons[0] || 'Growing in popularity',
+      })
+    )
+
+    const decliners = this.safeMap(
+      this.safeFilter(
+        report.productMetrics,
+        (p) => p.popularityTrend === 'decreasing'
+      )
+        .sort((a, b) => a.quantityChange - b.quantityChange)
+        .slice(0, 5),
+      (product) => ({
+        name: product.productName,
+        change: `${this.formatPercentage(product.quantityChange)}`,
+        reason: product.healthReasons[0] || 'Declining in popularity',
+      })
+    )
+
+    return {
+      gainers,
+      decliners,
     }
-    return icons[category as keyof typeof icons] || 'AlertTriangle'
+  }
+
+  /**
+   * Build opportunities section
+   */
+  private buildOpportunities(report: MenuIntelligenceReport) {
+    const items = this.safeMap(
+      this.safeSlice(report.opportunities, 0, 10),
+      (opportunity) => ({
+        type: this.formatOpportunityType(opportunity.type),
+        product: opportunity.productName,
+        description: opportunity.description,
+        impact: opportunity.estimatedImpact,
+        action: opportunity.recommendedAction,
+        priority: opportunity.priority,
+      })
+    )
+
+    return { items }
+  }
+
+  /**
+   * Build lifecycle overview section
+   */
+  private buildLifecycleOverview(report: MenuIntelligenceReport) {
+    const distribution = this.safeMap(
+      Object.entries(report.lifecycleDistribution),
+      ([stage, count]) => ({
+        stage: stage as ProductLifecycle,
+        count,
+        percentage: report.totalProducts > 0
+          ? this.formatPercentage((count / report.totalProducts) * 100)
+          : '0%',
+      })
+    ).filter(item => item.count > 0)
+
+    const insights = []
+
+    const growing = report.lifecycleDistribution.growing || 0
+    const declining = report.lifecycleDistribution.declining || 0
+    const mature = report.lifecycleDistribution.mature || 0
+
+    if (growing > 0) {
+      insights.push(`${growing} product(s) in growth stage`)
+    }
+
+    if (mature > 0) {
+      insights.push(`${mature} product(s) in mature stage`)
+    }
+
+    if (declining > 0) {
+      insights.push(`${declining} product(s) declining - review recommended`)
+    }
+
+    return {
+      distribution,
+      insights,
+    }
+  }
+
+  /**
+   * Build availability risks section
+   */
+  private buildAvailabilityRisks(report: MenuIntelligenceReport) {
+    const items = this.safeMap(
+      this.safeSlice(report.availabilityRisks, 0, 5),
+      (risk) => ({
+        product: risk.productName,
+        risk: risk.riskLevel,
+        reason: risk.reason,
+        action: risk.recommendedAction,
+      })
+    )
+
+    return { items }
+  }
+
+  /**
+   * Build action center section
+   */
+  private buildActionCenter(report: MenuIntelligenceReport) {
+    const highPriority: string[] = []
+    const mediumPriority: string[] = []
+    const lowPriority: string[] = []
+
+    // Add opportunity actions
+    for (const opportunity of report.opportunities) {
+      const action = `${opportunity.productName}: ${opportunity.recommendedAction}`
+      if (opportunity.priority === 'high') {
+        highPriority.push(action)
+      } else if (opportunity.priority === 'medium') {
+        mediumPriority.push(action)
+      } else {
+        lowPriority.push(action)
+      }
+    }
+
+    // Add critical product actions
+    const criticalProducts = this.safeFilter(
+      report.productMetrics,
+      (p) => p.healthStatus === 'critical'
+    )
+
+    for (const product of criticalProducts.slice(0, 3)) {
+      highPriority.push(`Review ${product.productName} - ${product.healthReasons[0]}`)
+    }
+
+    // Add risk actions
+    for (const risk of report.availabilityRisks.slice(0, 3)) {
+      mediumPriority.push(`${risk.productName}: ${risk.recommendedAction}`)
+    }
+
+    return {
+      highPriority: highPriority.slice(0, 5),
+      mediumPriority: mediumPriority.slice(0, 5),
+      lowPriority: lowPriority.slice(0, 5),
+    }
+  }
+
+  /**
+   * Get health status color
+   */
+  private getHealthColor(status: ProductHealth): string {
+    const colorMap: Record<ProductHealth, string> = {
+      excellent: 'green',
+      healthy: 'blue',
+      watch: 'yellow',
+      at_risk: 'orange',
+      critical: 'red',
+    }
+    return colorMap[status] || 'gray'
+  }
+
+  /**
+   * Format opportunity type
+   */
+  private formatOpportunityType(type: string): string {
+    const typeMap: Record<string, string> = {
+      cross_selling: 'Cross-Selling',
+      upselling: 'Upselling',
+      bundling: 'Bundling',
+      promotion: 'Promotion',
+      price_optimization: 'Price Optimization',
+      menu_redesign: 'Menu Redesign',
+      operational_simplification: 'Operational Simplification',
+    }
+    return typeMap[type] || type
   }
 }
 
-export function createDashboardBuilder(): MenuDashboardBuilder {
+/**
+ * Factory function to create MenuDashboardBuilder
+ */
+export function createMenuDashboardBuilder(): MenuDashboardBuilder {
   return new MenuDashboardBuilder()
 }

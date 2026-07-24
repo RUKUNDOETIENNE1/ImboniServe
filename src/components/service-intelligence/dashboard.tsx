@@ -11,8 +11,19 @@ import { KeyMetrics } from './key-metrics'
 import { HighlightsSection } from './highlights-section'
 import { IssuesSection } from './issues-section'
 import { RecommendationsSection } from './recommendations-section'
-import { HistoricalContext, Timeline, StaffInsights, KitchenInsights, CustomerJourney, PatternsSection, ComparisonsSection, DiagnosticsPanel, SearchBar, ExportButton } from './simple-components'
 import { EvidencePanel } from './evidence-panel'
+import { 
+  HistoricalContext,
+  Timeline,
+  StaffInsights,
+  KitchenInsights,
+  CustomerJourney,
+  PatternsSection,
+  ComparisonsSection,
+  DiagnosticsPanel,
+  SearchBar,
+  ExportButton
+} from './simple-components'
 import type { ServiceIntelligenceDashboard as DashboardData, EvidencePanel as EvidencePanelData } from '@/lib/service-intelligence/v2'
 
 interface Props {

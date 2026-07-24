@@ -16,7 +16,8 @@ const LiveMetricsTicker = dynamic(
 )
 import { 
   DollarSign, Package, TrendingUp, Smartphone, WifiOff, ChevronDown,
-  ShoppingCart, ArrowUpRight, MoreVertical, Zap, UtensilsCrossed, ScanLine
+  ShoppingCart, ArrowUpRight, MoreVertical, Zap, UtensilsCrossed, ScanLine,
+  Sparkles, Activity, ChefHat, ArrowRight
 } from 'lucide-react'
 
 const SalesChart = dynamic(() => import('@/components/SalesChart'), { 
@@ -192,6 +193,77 @@ export default function Dashboard() {
       )}
 
       <SetupProgressBanner />
+
+      {/* Intelligence Quick Access */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link href="/dashboard/daily-briefings">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
+                <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <ArrowRight className="w-4 h-4 text-blue-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
+              {t('dashboard.daily_briefings', 'Daily Briefings')}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t('dashboard.daily_briefings_desc', 'Your daily operational summary')}
+            </p>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/service-intelligence">
+          <div className="bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 bg-green-100 dark:bg-green-800 rounded-lg">
+                <Activity className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
+              <ArrowRight className="w-4 h-4 text-green-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
+              {t('dashboard.service_intelligence', 'Service Intelligence')}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t('dashboard.service_intelligence_desc', 'Service performance insights')}
+            </p>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/kitchen-intelligence">
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-lg">
+                <ChefHat className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <ArrowRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
+              {t('dashboard.kitchen_intelligence', 'Kitchen Intelligence')}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t('dashboard.kitchen_intelligence_desc', 'Kitchen performance analysis')}
+            </p>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/menu-intelligence">
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 bg-purple-100 dark:bg-purple-800 rounded-lg">
+                <UtensilsCrossed className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <ArrowRight className="w-4 h-4 text-purple-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">
+              {t('dashboard.menu_intelligence', 'Menu Intelligence')}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t('dashboard.menu_intelligence_desc', 'Menu optimization insights')}
+            </p>
+          </div>
+        </Link>
+      </div>
 
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">

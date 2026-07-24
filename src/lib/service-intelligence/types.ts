@@ -1,500 +1,391 @@
 /**
  * Service Intelligence™ - Type Definitions
  * 
- * Comprehensive types for operational intelligence generation.
- * Every insight is traceable back to real Heart Pulse events.
+ * Domain model for service-focused operational intelligence
  */
 
+import type { TimeRange, OperationalEvent } from '../intelligence/types'
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Core Intelligence Types
+// Core Service Metrics
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ServiceMetrics {
+  // Duration Metrics (in seconds)
+  avgServiceDuration: number
+  avgWaitTime: number
+  avgPreparationTime: number
+  avgPaymentTime: number
+  
+  // Throughput Metrics
+  totalOrders: number
+  completedOrders: number
+  cancelledOrders: number
+  orderThroughput: number // orders per hour
+  
+  // Performance Metrics
+  completionRate: number // percentage
+  cancellationRate: number // percentage
+  onTimeDeliveryRate: number // percentage
+  
+  // Quality Metrics
+  serviceQualityScore: number // 0-100
+  operationalEfficiency: number // 0-100
+  customerSatisfactionProxy: number // 0-100
+}
+
+export interface WaiterMetrics {
+  waiterId: string
+  waiterName: string
+  
+  // Performance
+  ordersHandled: number
+  avgServiceTime: number
+  completionRate: number
+  
+  // Efficiency
+  ordersPerHour: number
+  multitaskingScore: number
+  
+  // Quality
+  errorRate: number
+  customerFeedbackScore?: number
+  
+  // Trends
+  trend: 'improving' | 'stable' | 'declining'
+  trendPercent: number
+}
+
+export interface StationMetrics {
+  stationId: string
+  stationName: string
+  
+  // Performance
+  ordersProcessed: number
+  avgProcessingTime: number
+  queueLength: number
+  
+  // Bottleneck Indicators
+  isBottleneck: boolean
+  bottleneckSeverity?: 'low' | 'medium' | 'high' | 'critical'
+  delayImpact: number // minutes
+  
+  // Trends
+  trend: 'improving' | 'stable' | 'worsening'
+}
+
+export interface FlowPattern {
+  pattern: string
+  description: string
+  frequency: number
+  avgDuration: number
+  efficiency: number
+}
+
+export interface PeakPeriod {
+  startTime: string
+  endTime: string
+  orderVolume: number
+  avgServiceTime: number
+  staffUtilization: number
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Service Intelligence Insights
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ServiceInsight {
+  id: string
+  type: 'opportunity' | 'warning' | 'achievement'
+  category: 'speed' | 'quality' | 'efficiency' | 'staff' | 'customer'
+  
+  title: string
+  description: string
+  impact: 'low' | 'medium' | 'high' | 'critical'
+  
+  // Evidence
+  confidence: number
+  evidenceCount: number
+  replayLink?: string
+  
+  // Metrics
+  currentValue?: number
+  targetValue?: number
+  improvement?: number
+}
+
+export interface ServiceBottleneck {
+  id: string
+  location: 'kitchen' | 'service' | 'payment' | 'station'
+  stationId?: string
+  stationName?: string
+  
+  // Impact
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  avgDelay: number // seconds
+  ordersAffected: number
+  revenueImpact?: number
+  
+  // Analysis
+  rootCause?: string
+  recommendation?: string
+  
+  // Evidence
+  confidence: number
+  evidenceCount: number
+  replayLink?: string
+}
+
+export interface ServiceImprovement {
+  id: string
+  area: 'speed' | 'quality' | 'efficiency' | 'staff'
+  
+  title: string
+  description: string
+  improvement: number // percentage
+  
+  // Context
+  baseline: number
+  current: number
+  trend: 'improving' | 'stable' | 'declining'
+  
+  // Evidence
+  confidence: number
+  evidenceCount: number
+}
+
+export interface ServiceTrend {
+  metric: string
+  unit: string
+  
+  currentValue: number
+  previousValue?: number
+  change: number // percentage
+  changeDirection: 'up' | 'down' | 'stable'
+  
+  trend: 'improving' | 'stable' | 'declining'
+  sparkline: number[]
+  
+  historicalAverage?: number
+  benchmark?: number
+}
+
+export interface ServiceComparison {
+  metric: string
+  current: number
+  previous: number
+  change: number // percentage
+  changeDirection: 'up' | 'down' | 'stable'
+  isImprovement: boolean
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Service Intelligence Report
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface ServiceIntelligenceReport {
   id: string
   businessId: string
+  reportingPeriod: TimeRange
   generatedAt: string
-  timeRange: TimeRange
   
-  // Overall Assessment
-  serviceScore: ServiceScore
-  executiveSummary: string
-  operationalGrade: OperationalGrade
+  // Core Metrics
+  metrics: ServiceMetrics
+  
+  // Staff Analysis
+  waiterPerformance: WaiterMetrics[]
+  topPerformers: WaiterMetrics[]
+  needsAttention: WaiterMetrics[]
+  
+  // Station Analysis
+  stationMetrics: StationMetrics[]
+  bottlenecks: ServiceBottleneck[]
+  
+  // Customer Journey
+  flowPatterns: FlowPattern[]
+  peakPeriods: PeakPeriod[]
   
   // Insights
-  highlights: Highlight[]
-  problems: Problem[]
-  successes: Success[]
-  recommendations: Recommendation[]
+  insights: ServiceInsight[]
+  improvements: ServiceImprovement[]
+  trends: ServiceTrend[]
   
-  // Timeline
-  criticalMoments: CriticalMoment[]
-  
-  // Detailed Analysis
-  staffInsights: StaffInsights
-  kitchenInsights: KitchenInsights
-  customerJourney: CustomerJourneyInsights
-  patterns: Pattern[]
-  
-  // Comparison (if available)
-  comparison?: ComparisonResult
+  // Comparisons
+  comparisons?: ServiceComparison[]
   
   // Metadata
-  eventCount: number
-  orderCount: number
   confidence: number
-  processingTimeMs: number
-}
-
-export interface TimeRange {
-  start: string
-  end: string
-  label: string
-  durationMinutes: number
+  evidenceCount: number
+  eventsAnalyzed: number
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Service Score
+// Service Intelligence Request/Response
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface ServiceScore {
-  overall: number // 0-100
-  breakdown: ScoreBreakdown
-  trend: 'improving' | 'stable' | 'declining'
-  previousScore?: number
+export interface ServiceIntelligenceRequest {
+  businessId: string
+  selection: {
+    period: 'today' | 'yesterday' | 'this_week' | 'last_7_days' | 'last_30_days' | 'custom' | 'specific_date'
+    label: string
+    customRange?: {
+      start: string
+      end: string
+    }
+    specificDate?: string
+  }
+  includeComparison?: boolean
+  includeHistorical?: boolean
+  forceRegenerate?: boolean
 }
 
-export interface ScoreBreakdown {
-  preparationTime: ScoreComponent
-  serviceTime: ScoreComponent
-  kitchenEfficiency: ScoreComponent
-  orderCompletion: ScoreComponent
-  cancellationRate: ScoreComponent
-  paymentSuccess: ScoreComponent
-  staffWorkload: ScoreComponent
-  customerWaiting: ScoreComponent
-}
-
-export interface ScoreComponent {
-  score: number // 0-100
-  weight: number // Weight in overall calculation
-  value: number // Actual measured value
-  benchmark: number // Expected/target value
-  unit: string
-  description: string
-}
-
-export type OperationalGrade = 'A+' | 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D' | 'F'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Highlights & Successes
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface Highlight {
-  id: string
-  type: HighlightType
-  title: string
-  description: string
-  value: string | number
-  unit?: string
-  timestamp?: string
-  eventIds: string[]
-  replayTimestamp?: string
-  confidence: number
-  icon: string
-}
-
-export type HighlightType =
-  | 'fastest_order'
-  | 'fastest_waiter'
-  | 'best_station'
-  | 'most_efficient_period'
-  | 'most_productive_hour'
-  | 'best_completion_streak'
-  | 'payment_success_streak'
-  | 'reservation_success'
-  | 'peak_throughput'
-  | 'kitchen_recovery'
-
-export interface Success {
-  id: string
-  type: SuccessType
-  title: string
-  description: string
-  evidence: Evidence
-  impact: string
-  replayTimestamp?: string
-}
-
-export type SuccessType =
-  | 'fast_service'
-  | 'excellent_waiter'
-  | 'low_payment_time'
-  | 'kitchen_recovery'
-  | 'high_throughput'
-  | 'zero_cancellations'
-  | 'perfect_completion'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Problems & Root Causes
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface Problem {
-  id: string
-  type: ProblemType
-  severity: ProblemSeverity
-  title: string
-  description: string
-  rootCause?: RootCause
-  evidence: Evidence
-  impact: string
-  affectedOrders: number
-  affectedTables: number
-  startTime: string
-  endTime?: string
-  duration?: number
-  replayTimestamp: string
-}
-
-export type ProblemType =
-  | 'kitchen_bottleneck'
-  | 'long_customer_wait'
-  | 'repeated_cancellations'
-  | 'delayed_preparation'
-  | 'delayed_payment'
-  | 'repeated_modifications'
-  | 'station_overload'
-  | 'staff_imbalance'
-  | 'large_order_congestion'
-  | 'traffic_spike'
-  | 'sla_breach'
-  | 'payment_failure'
-
-export type ProblemSeverity = 'low' | 'medium' | 'high' | 'critical'
-
-export interface RootCause {
-  description: string
-  factors: string[]
-  evidence: Evidence
-  confidence: number
-}
-
-export interface Evidence {
-  eventCount: number
-  eventIds: string[]
-  orderIds: string[]
-  summary: string
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Recommendations
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface Recommendation {
-  id: string
-  type: RecommendationType
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  title: string
-  description: string
-  reasoning: string
-  expectedImpact: string
-  evidence: Evidence
-  actionable: boolean
-  timeframe?: string
-}
-
-export type RecommendationType =
-  | 'staffing'
-  | 'kitchen_workflow'
-  | 'menu_optimization'
-  | 'scheduling'
-  | 'training'
-  | 'equipment'
-  | 'process_improvement'
-  | 'capacity_planning'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Critical Moments Timeline
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface CriticalMoment {
-  id: string
-  timestamp: string
-  type: CriticalMomentType
-  title: string
-  description: string
-  severity: 'info' | 'warning' | 'critical' | 'success'
-  eventIds: string[]
-  replayTimestamp: string
-  metrics?: Record<string, number>
-}
-
-export type CriticalMomentType =
-  | 'rush_start'
-  | 'rush_end'
-  | 'congestion_start'
-  | 'congestion_end'
-  | 'largest_order'
-  | 'payment_peak'
-  | 'sla_warning'
-  | 'recovery'
-  | 'milestone'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Staff Insights
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface StaffInsights {
-  summary: string
-  totalStaff: number
-  staffMetrics: StaffMetric[]
-  workloadDistribution: WorkloadDistribution
-  topPerformer?: StaffMetric
-  busiestStaff?: StaffMetric
-  potentialOverload?: StaffMetric[]
-}
-
-export interface StaffMetric {
-  staffId: string
-  staffName: string
-  ordersHandled: number
-  averageResponseTimeSeconds: number
-  completionRate: number
-  averageServiceDurationSeconds: number
-  tableCoverage: number
-  totalRevenueCents: number
-  efficiency: number // 0-100
-}
-
-export interface WorkloadDistribution {
-  balanced: boolean
-  variance: number
-  recommendation?: string
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Kitchen Insights
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface KitchenInsights {
-  summary: string
-  stationMetrics: StationMetric[]
-  overallUtilization: number
-  peakLoad: PeakLoad
-  queueAnalysis: QueueAnalysis
-  recoveryEvents: RecoveryEvent[]
-}
-
-export interface StationMetric {
-  stationId: string
-  stationName: string
-  itemsProcessed: number
-  averagePrepTimeSeconds: number
-  utilizationPercent: number
-  peakQueueSize: number
-  idleTimePercent: number
-  efficiency: number
-}
-
-export interface PeakLoad {
-  timestamp: string
-  queueSize: number
-  activeOrders: number
-  duration: number
-}
-
-export interface QueueAnalysis {
-  averageQueueSize: number
-  maxQueueSize: number
-  queueGrowthEvents: number
-  queueReductionEvents: number
-  averageWaitTimeSeconds: number
-}
-
-export interface RecoveryEvent {
-  timestamp: string
-  description: string
-  recoveryTimeSeconds: number
-  eventIds: string[]
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Customer Journey Insights
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface CustomerJourneyInsights {
-  summary: string
-  averageJourneyDurationMinutes: number
-  stages: JourneyStage[]
-  bottlenecks: JourneyBottleneck[]
-}
-
-export interface JourneyStage {
-  name: 'arrival' | 'ordering' | 'preparation' | 'serving' | 'payment' | 'completion'
-  averageDurationSeconds: number
-  percentOfTotal: number
-  variance: number
-}
-
-export interface JourneyBottleneck {
-  stage: string
-  description: string
-  averageDelaySeconds: number
-  affectedOrders: number
-  replayTimestamp?: string
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Pattern Detection
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface Pattern {
-  id: string
-  type: PatternType
-  title: string
-  description: string
-  frequency: string
-  confidence: number
-  evidence: Evidence
-  trend: 'increasing' | 'stable' | 'decreasing'
-  recommendation?: string
-}
-
-export type PatternType =
-  | 'recurring_rush'
-  | 'item_popularity'
-  | 'time_based_demand'
-  | 'recurring_bottleneck'
-  | 'cancellation_pattern'
-  | 'prep_time_trend'
-  | 'staff_pattern'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Comparison Engine
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type ComparisonPeriod = 
-  | 'yesterday'
-  | 'last_week'
-  | 'last_month'
-  | 'previous_lunch'
-  | 'previous_dinner'
-
-export interface ComparisonResult {
-  period: ComparisonPeriod
-  periodLabel: string
-  metrics: ComparisonMetric[]
-  improvements: string[]
-  regressions: string[]
-  summary: string
-}
-
-export interface ComparisonMetric {
-  name: string
-  current: number
-  previous: number
-  change: number
-  changePercent: number
-  trend: 'improved' | 'same' | 'declined'
-  unit: string
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// API Types
-// ─────────────────────────────────────────────────────────────────────────────
-
-export interface GenerateIntelligenceRequest {
-  startTime: string
-  endTime: string
-  comparisonPeriod?: ComparisonPeriod
-  includeStaffInsights?: boolean
-  includeKitchenInsights?: boolean
-  includePatterns?: boolean
-}
-
-export interface GenerateIntelligenceResponse {
+export interface ServiceIntelligenceResponse {
   success: boolean
   report?: ServiceIntelligenceReport
   error?: string
-  cached?: boolean
-}
-
-export interface IntelligenceSearchRequest {
-  query: string
-  reportId: string
-}
-
-export interface IntelligenceSearchResult {
-  type: 'highlight' | 'problem' | 'recommendation' | 'moment'
-  item: Highlight | Problem | Recommendation | CriticalMoment
-  matchScore: number
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Export Types
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type ExportFormat = 'pdf' | 'markdown' | 'json' | 'csv'
-
-export interface ExportRequest {
-  reportId: string
-  format: ExportFormat
-  sections?: string[]
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Scoring Model Configuration
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const SCORE_WEIGHTS: Record<keyof ScoreBreakdown, number> = {
-  preparationTime: 0.20,
-  serviceTime: 0.15,
-  kitchenEfficiency: 0.15,
-  orderCompletion: 0.15,
-  cancellationRate: 0.10,
-  paymentSuccess: 0.10,
-  staffWorkload: 0.08,
-  customerWaiting: 0.07,
-}
-
-export const SCORE_BENCHMARKS = {
-  preparationTime: { target: 12 * 60, unit: 'seconds', description: 'Average preparation time' },
-  serviceTime: { target: 3 * 60, unit: 'seconds', description: 'Average service/delivery time' },
-  kitchenEfficiency: { target: 85, unit: 'percent', description: 'Kitchen utilization efficiency' },
-  orderCompletion: { target: 98, unit: 'percent', description: 'Order completion rate' },
-  cancellationRate: { target: 2, unit: 'percent', description: 'Order cancellation rate' },
-  paymentSuccess: { target: 99, unit: 'percent', description: 'Payment success rate' },
-  staffWorkload: { target: 75, unit: 'percent', description: 'Staff workload balance' },
-  customerWaiting: { target: 5 * 60, unit: 'seconds', description: 'Average customer wait time' },
-}
-
-export function calculateGrade(score: number): OperationalGrade {
-  if (score >= 97) return 'A+'
-  if (score >= 93) return 'A'
-  if (score >= 90) return 'A-'
-  if (score >= 87) return 'B+'
-  if (score >= 83) return 'B'
-  if (score >= 80) return 'B-'
-  if (score >= 77) return 'C+'
-  if (score >= 73) return 'C'
-  if (score >= 70) return 'C-'
-  if (score >= 60) return 'D'
-  return 'F'
-}
-
-export function getSeverityColor(severity: ProblemSeverity): string {
-  switch (severity) {
-    case 'critical': return 'red'
-    case 'high': return 'orange'
-    case 'medium': return 'yellow'
-    case 'low': return 'blue'
+  
+  diagnostics: {
+    reportsRetrieved: number
+    historicalQueriesExecuted: number
+    comparisonPerformed: boolean
+    totalTime: number
+    reportRetrievalTime: number
+    historicalRetrievalTime: number
+    comparisonTime: number
+    buildTime: number
   }
 }
 
-export function getPriorityColor(priority: Recommendation['priority']): string {
-  switch (priority) {
-    case 'critical': return 'red'
-    case 'high': return 'orange'
-    case 'medium': return 'yellow'
-    case 'low': return 'green'
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard View Models
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ServiceDashboard {
+  report: ServiceIntelligenceReport
+  
+  // Summary Cards
+  metricsDisplay: MetricsDisplay
+  
+  // Performance Views
+  waiterDisplay: WaiterDisplay
+  stationDisplay: StationDisplay
+  
+  // Insights
+  insightsDisplay: InsightCard[]
+  bottlenecksDisplay: BottleneckCard[]
+  improvementsDisplay: ImprovementCard[]
+  
+  // Trends
+  trendsDisplay: TrendCard[]
+  
+  // Customer Journey
+  flowDisplay: FlowCard[]
+  peakDisplay: PeakCard[]
+  
+  // Metadata
+  metadata: {
+    id: string
+    generatedAt: string
+    reportingPeriod: string
+    confidence: number
   }
+}
+
+export interface MetricsDisplay {
+  duration: Array<{ label: string; value: string }>
+  throughput: Array<{ label: string; value: string }>
+  quality: Array<{ label: string; value: string; grade: string }>
+}
+
+export interface WaiterDisplay {
+  topPerformers: Array<{
+    name: string
+    ordersHandled: number
+    avgServiceTime: string
+    completionRate: string
+    trend: string
+  }>
+  needsAttention: Array<{
+    name: string
+    issue: string
+    severity: string
+  }>
+  performance: Array<{
+    name: string
+    metric: string
+    value: string
+    trend: string
+  }>
+}
+
+export interface StationDisplay {
+  stations: Array<{
+    name: string
+    status: 'normal' | 'busy' | 'bottleneck' | 'critical'
+    ordersProcessed: number
+    avgTime: string
+    queueLength: number
+  }>
+  bottlenecks: Array<{
+    name: string
+    severity: string
+    delay: string
+    ordersAffected: number
+  }>
+}
+
+export interface InsightCard {
+  id: string
+  type: 'opportunity' | 'warning' | 'achievement'
+  title: string
+  description: string
+  impact: string
+  confidence: number
+  icon: string
+  color: string
+}
+
+export interface BottleneckCard {
+  id: string
+  location: string
+  severity: string
+  delay: string
+  ordersAffected: number
+  recommendation?: string
+  icon: string
+  color: string
+}
+
+export interface ImprovementCard {
+  id: string
+  area: string
+  title: string
+  improvement: string
+  trend: string
+  icon: string
+  color: string
+}
+
+export interface TrendCard {
+  metric: string
+  currentValue: string
+  change: string
+  trend: string
+  sparkline: number[]
+  icon: string
+  color: string
+}
+
+export interface FlowCard {
+  pattern: string
+  description: string
+  frequency: number
+  efficiency: string
+}
+
+export interface PeakCard {
+  period: string
+  orderVolume: number
+  avgServiceTime: string
+  staffUtilization: string
 }

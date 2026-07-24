@@ -69,25 +69,36 @@ export class DashboardBuilder {
       critical: 'XCircle',
     }
 
+    const header = briefing.header
+    const overallStatus = header?.overallStatus ?? 'fair'
+
     return {
       greeting,
-      date: new Date(briefing.header.date).toLocaleDateString('en-US', {
+      date: header?.date ? new Date(header.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }) : new Date().toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       }),
-      businessName: briefing.header.businessName,
-      restaurantName: briefing.header.restaurantName,
-      generatedTime: new Date(briefing.header.generatedTime).toLocaleTimeString('en-US', {
+      businessName: header?.businessName ?? 'Restaurant',
+      restaurantName: header?.restaurantName ?? 'Restaurant',
+      generatedTime: header?.generatedTime ? new Date(header.generatedTime).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }) : new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
       }),
-      reportingPeriod: briefing.header.reportingPeriod,
-      overallStatus: briefing.header.overallStatus,
-      statusMessage: briefing.header.statusMessage,
-      statusColor: statusColors[briefing.header.overallStatus],
-      statusIcon: statusIcons[briefing.header.overallStatus],
+      reportingPeriod: header?.reportingPeriod ?? briefing.reportingPeriod?.label ?? 'Today',
+      overallStatus,
+      statusMessage: header?.statusMessage ?? 'No data available',
+      statusColor: statusColors[overallStatus],
+      statusIcon: statusIcons[overallStatus],
     }
   }
 
@@ -95,31 +106,36 @@ export class DashboardBuilder {
     const snapshot = briefing.snapshot
 
     return {
-      orders: [
-        { label: 'Total Orders', value: snapshot.orders.total.toString() },
-        { label: 'Completed', value: snapshot.orders.completed.toString() },
-        { label: 'Cancelled', value: snapshot.orders.cancelled.toString() },
-        { label: 'Completion Rate', value: `${snapshot.orders.completionRate.toFixed(1)}%` },
-      ],
-      revenue: snapshot.revenue ? [
-        { label: 'Total Revenue', value: `${snapshot.revenue.currency} ${snapshot.revenue.total.toLocaleString()}` },
-        { label: 'Avg Order Value', value: `${snapshot.revenue.currency} ${snapshot.revenue.averageOrderValue.toFixed(2)}` },
+      orders: snapshot?.orders ? [
+        { label: 'Total Orders', value: (snapshot.orders.total ?? 0).toString() },
+        { label: 'Completed', value: (snapshot.orders.completed ?? 0).toString() },
+        { label: 'Cancelled', value: (snapshot.orders.cancelled ?? 0).toString() },
+        { label: 'Completion Rate', value: `${(snapshot.orders.completionRate ?? 0).toFixed(1)}%` },
+      ] : [],
+      revenue: snapshot?.revenue ? [
+        { label: 'Total Revenue', value: `${snapshot.revenue.currency ?? 'RWF'} ${(snapshot.revenue.total ?? 0).toLocaleString()}` },
+        { label: 'Avg Order Value', value: `${snapshot.revenue.currency ?? 'RWF'} ${(snapshot.revenue.averageOrderValue ?? 0).toFixed(2)}` },
       ] : undefined,
-      timing: [
-        { label: 'Avg Preparation', value: this.formatDuration(snapshot.timing.avgPreparationTime) },
-        { label: 'Avg Service', value: this.formatDuration(snapshot.timing.avgServiceTime) },
-        { label: 'Avg Payment', value: this.formatDuration(snapshot.timing.avgPaymentTime) },
-      ],
-      customerFlow: [
-        { label: 'Peak Hour', value: snapshot.customerFlow.peakHour },
-        { label: 'Total Customers', value: snapshot.customerFlow.totalCustomers.toString() },
-        { label: 'Avg Wait Time', value: this.formatDuration(snapshot.customerFlow.avgWaitTime) },
-      ],
-      score: {
-        value: snapshot.operationalScore.overall,
-        grade: this.calculateGrade(snapshot.operationalScore.overall),
-        trend: snapshot.operationalScore.trend,
-        confidence: snapshot.operationalScore.confidence,
+      timing: snapshot?.timing ? [
+        { label: 'Avg Preparation', value: this.formatDuration(snapshot.timing.avgPreparationTime ?? 0) },
+        { label: 'Avg Service', value: this.formatDuration(snapshot.timing.avgServiceTime ?? 0) },
+        { label: 'Avg Payment', value: this.formatDuration(snapshot.timing.avgPaymentTime ?? 0) },
+      ] : [],
+      customerFlow: snapshot?.customerFlow ? [
+        { label: 'Peak Hour', value: snapshot.customerFlow.peakHour ?? 'N/A' },
+        { label: 'Total Customers', value: (snapshot.customerFlow.totalCustomers ?? 0).toString() },
+        { label: 'Avg Wait Time', value: this.formatDuration(snapshot.customerFlow.avgWaitTime ?? 0) },
+      ] : [],
+      score: snapshot?.operationalScore ? {
+        value: snapshot.operationalScore.overall ?? 0,
+        grade: this.calculateGrade(snapshot.operationalScore.overall ?? 0),
+        trend: snapshot.operationalScore.trend ?? 'stable',
+        confidence: snapshot.operationalScore.confidence ?? 0,
+      } : {
+        value: 0,
+        grade: 'F',
+        trend: 'stable',
+        confidence: 0,
       },
     }
   }
@@ -174,15 +190,15 @@ export class DashboardBuilder {
   }
 
   private buildHighlightCards(briefing: DailyBriefing): HighlightCard[] {
-    return briefing.highlights.map(highlight => ({
+    return (briefing.highlights ?? []).map(highlight => ({
       id: highlight.id,
       title: highlight.title,
       description: highlight.description,
       category: highlight.category,
       value: highlight.value,
-      improvement: `+${highlight.improvement.toFixed(1)}%`,
-      confidence: highlight.confidence,
-      evidenceCount: highlight.evidenceCount,
+      improvement: `+${(highlight.improvement ?? 0).toFixed(1)}%`,
+      confidence: highlight.confidence ?? 0,
+      evidenceCount: highlight.evidenceCount ?? 0,
       replayLink: highlight.replayLink,
       icon: this.getCategoryIcon(highlight.category),
       color: 'text-green-600',
@@ -190,7 +206,7 @@ export class DashboardBuilder {
   }
 
   private buildAttentionCards(briefing: DailyBriefing): AttentionCard[] {
-    return briefing.attention.map(item => ({
+    return (briefing.attention ?? []).map(item => ({
       id: item.id,
       title: item.title,
       description: item.description,
@@ -198,7 +214,7 @@ export class DashboardBuilder {
       severity: item.severity,
       impact: item.impact,
       historicalComparison: item.historicalComparison,
-      evidenceCount: item.evidenceCount,
+      evidenceCount: item.evidenceCount ?? 0,
       replayLink: item.replayLink,
       icon: this.getCategoryIcon(item.category),
       color: this.getSeverityColor(item.severity),
@@ -206,7 +222,7 @@ export class DashboardBuilder {
   }
 
   private buildHistoricalCards(briefing: DailyBriefing): HistoricalCard[] {
-    return briefing.historicalChanges.map(change => ({
+    return (briefing.historicalChanges ?? []).map(change => ({
       id: change.id,
       title: change.title,
       description: change.description,
@@ -221,13 +237,13 @@ export class DashboardBuilder {
   }
 
   private buildTrendCards(briefing: DailyBriefing): TrendCard[] {
-    return briefing.performanceTrends.map(trend => ({
+    return (briefing.performanceTrends ?? []).map(trend => ({
       metric: trend.metric,
-      currentValue: `${trend.currentValue} ${trend.unit}`,
+      currentValue: `${trend.currentValue ?? 0} ${trend.unit ?? ''}`,
       trend: trend.trend,
-      changePercent: trend.changePercent,
-      sparkline: trend.sparkline,
-      historicalAverage: trend.historicalAverage ? `${trend.historicalAverage} ${trend.unit}` : undefined,
+      changePercent: trend.changePercent ?? 0,
+      sparkline: trend.sparkline ?? [],
+      historicalAverage: trend.historicalAverage ? `${trend.historicalAverage} ${trend.unit ?? ''}` : undefined,
       icon: this.getTrendIcon(trend.trend),
       color: this.getTrendColor(trend.trend),
     }))
@@ -236,29 +252,39 @@ export class DashboardBuilder {
   private buildStaffDisplay(briefing: DailyBriefing): StaffSummaryDisplay {
     const staff = briefing.staffSummary
 
+    if (!staff) {
+      return {
+        improvements: [],
+        workload: { balanced: true, message: 'No data available', chart: [] },
+        overload: [],
+        trends: [],
+        evidenceCount: 0,
+      }
+    }
+
     return {
-      improvements: staff.topImprovements.map(imp => ({
+      improvements: (staff.topImprovements ?? []).map(imp => ({
         name: imp.staffName,
         improvement: imp.improvement,
-        confidence: imp.confidence,
+        confidence: imp.confidence ?? 0,
       })),
-      workload: {
-        balanced: staff.workloadBalance.balanced,
-        message: staff.workloadBalance.message,
-        chart: staff.workloadBalance.distribution,
-      },
-      overload: staff.potentialOverload.map(ol => ({
+      workload: staff.workloadBalance ? {
+        balanced: staff.workloadBalance.balanced ?? true,
+        message: staff.workloadBalance.message ?? 'No data',
+        chart: staff.workloadBalance.distribution ?? [],
+      } : { balanced: true, message: 'No data available', chart: [] },
+      overload: (staff.potentialOverload ?? []).map(ol => ({
         name: ol.staffName,
-        orderCount: ol.orderCount,
-        overloadPercent: ol.overloadPercent,
+        orderCount: ol.orderCount ?? 0,
+        overloadPercent: ol.overloadPercent ?? 0,
       })),
-      trends: staff.responseTrends.map(trend => ({
+      trends: (staff.responseTrends ?? []).map(trend => ({
         name: trend.staffName,
         metric: trend.metric,
         trend: trend.trend,
-        value: trend.value.toString(),
+        value: (trend.value ?? 0).toString(),
       })),
-      evidenceCount: staff.evidenceCount,
+      evidenceCount: staff.evidenceCount ?? 0,
       replayLink: staff.replayLink,
     }
   }
@@ -266,29 +292,39 @@ export class DashboardBuilder {
   private buildKitchenDisplay(briefing: DailyBriefing): KitchenSummaryDisplay {
     const kitchen = briefing.kitchenSummary
 
+    if (!kitchen) {
+      return {
+        stations: [],
+        queues: [],
+        preparation: [],
+        recovery: { hasRecovered: false, message: 'No data available' },
+        evidenceCount: 0,
+      }
+    }
+
     return {
-      stations: kitchen.stationPerformance.map(station => ({
+      stations: (kitchen.stationPerformance ?? []).map(station => ({
         name: station.stationName,
         performance: station.performance,
-        avgPrepTime: this.formatDuration(station.avgPrepTime),
+        avgPrepTime: this.formatDuration(station.avgPrepTime ?? 0),
         trend: station.trend,
       })),
-      queues: kitchen.queueChanges.map(queue => ({
+      queues: (kitchen.queueChanges ?? []).map(queue => ({
         name: queue.stationName,
         change: queue.change,
-        changePercent: queue.changePercent,
+        changePercent: queue.changePercent ?? 0,
       })),
-      preparation: kitchen.preparationTrends.map(prep => ({
+      preparation: (kitchen.preparationTrends ?? []).map(prep => ({
         category: prep.category,
         trend: prep.trend,
-        changePercent: prep.changePercent,
+        changePercent: prep.changePercent ?? 0,
       })),
-      recovery: {
-        hasRecovered: kitchen.recovery.hasRecovered,
-        message: kitchen.recovery.message,
-      },
+      recovery: kitchen.recovery ? {
+        hasRecovered: kitchen.recovery.hasRecovered ?? false,
+        message: kitchen.recovery.message ?? 'No data',
+      } : { hasRecovered: false, message: 'No data available' },
       historicalComparison: kitchen.historicalComparison,
-      evidenceCount: kitchen.evidenceCount,
+      evidenceCount: kitchen.evidenceCount ?? 0,
       replayLink: kitchen.replayLink,
     }
   }
@@ -296,26 +332,35 @@ export class DashboardBuilder {
   private buildMenuDisplay(briefing: DailyBriefing): MenuSummaryDisplay {
     const menu = briefing.menuSummary
 
+    if (!menu) {
+      return {
+        popular: [],
+        preparation: [],
+        cancellations: [],
+        modified: [],
+      }
+    }
+
     return {
-      popular: menu.popularDishes.map(dish => ({
+      popular: (menu.popularDishes ?? []).map(dish => ({
         name: dish.dishName,
-        orderCount: dish.orderCount,
+        orderCount: dish.orderCount ?? 0,
         trend: dish.trend,
       })),
-      preparation: menu.preparationChanges.map(change => ({
+      preparation: (menu.preparationChanges ?? []).map(change => ({
         name: change.dishName,
         change: change.change,
-        changePercent: change.changePercent,
+        changePercent: change.changePercent ?? 0,
       })),
-      cancellations: menu.cancellationTrends.map(trend => ({
+      cancellations: (menu.cancellationTrends ?? []).map(trend => ({
         name: trend.dishName,
-        rate: trend.cancellationRate,
+        rate: trend.cancellationRate ?? 0,
         trend: trend.trend,
       })),
-      modified: menu.frequentlyModified.map(dish => ({
+      modified: (menu.frequentlyModified ?? []).map(dish => ({
         name: dish.dishName,
-        modificationCount: dish.modificationCount,
-        rate: dish.modificationRate,
+        modificationCount: dish.modificationCount ?? 0,
+        rate: dish.modificationRate ?? 0,
       })),
       historicalComparison: menu.historicalComparison,
       replayLink: menu.replayLink,
@@ -323,7 +368,7 @@ export class DashboardBuilder {
   }
 
   private buildMomentCards(briefing: DailyBriefing): MomentCard[] {
-    return briefing.replayMoments.map(moment => ({
+    return (briefing.replayMoments ?? []).map(moment => ({
       id: moment.id,
       title: moment.title,
       timestamp: moment.timestamp,

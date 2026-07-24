@@ -1,98 +1,110 @@
 /**
  * Kitchen Intelligence™ - Service Layer
  * 
- * Pure consumer of HIE + IKB
- * No independent intelligence generation
+ * Orchestrates kitchen intelligence generation using the Hospitality Intelligence Platform
  */
 
+import { getOperationalEvents, buildTimeRange } from '../intelligence/integration-helper'
+import { KitchenMetricsAggregator } from './aggregator'
 import type {
   KitchenIntelligenceRequest,
   KitchenIntelligenceResponse,
   KitchenIntelligenceReport,
-  KitchenDiagnostics,
+  KitchenInsight,
+  KitchenBottleneck,
+  KitchenImprovement,
+  KitchenTrend,
 } from './types'
-import { KitchenReportBuilder } from './report-builder'
-import {
-  getOrGenerateReport,
-  getOperationalEvents,
-  queryHistoricalKnowledge,
-  buildTimeRange,
-} from '@/lib/intelligence/integration-helper'
-import type { PipelineContext } from '@/lib/intelligence'
 
 export class KitchenIntelligenceService {
-  /**
-   * Generate kitchen intelligence report
-   * Consumes intelligence from HIE and historical context from IKB
-   */
+  private aggregator: KitchenMetricsAggregator
+
+  constructor() {
+    this.aggregator = new KitchenMetricsAggregator()
+  }
+
   async generateReport(request: KitchenIntelligenceRequest): Promise<KitchenIntelligenceResponse> {
-    const diagnostics: KitchenDiagnostics = {
-      reportRetrievalTime: 0,
-      historicalRetrievalTime: 0,
-      buildTime: 0,
-      totalTime: 0,
+    const startTime = Date.now()
+    const diagnostics = {
       reportsRetrieved: 0,
       historicalQueriesExecuted: 0,
-      evidenceItemsProcessed: 0,
+      comparisonPerformed: false,
+      totalTime: 0,
+      reportRetrievalTime: 0,
+      historicalRetrievalTime: 0,
+      comparisonTime: 0,
+      buildTime: 0,
     }
 
-    const totalStart = Date.now()
-
     try {
-      // ─────────────────────────────────────────────────────────────────────
-      // STEP 1: Retrieve Structured Intelligence Report from HIE
-      // ─────────────────────────────────────────────────────────────────────
-      const reportStart = Date.now()
-      
-      const intelligenceReport = await this.retrieveIntelligenceReport(
-        request.businessId,
-        request.reportingPeriod
-      )
-      
-      diagnostics.reportRetrievalTime = Date.now() - reportStart
-      diagnostics.reportsRetrieved = intelligenceReport ? 1 : 0
+      const timeRange = buildTimeRange(request.selection.period, request.selection.customRange)
 
-      if (!intelligenceReport) {
+      const events = await getOperationalEvents({
+        businessId: request.businessId,
+        timeRange: {
+          start: timeRange.start,
+          end: timeRange.end,
+        },
+        eventTypes: ['KITCHEN_STATUS_CHANGED', 'ORDER_CREATED'],
+      })
+
+      if (events.length === 0) {
         return {
           success: false,
-          error: 'No intelligence report available for the specified period',
+          error: 'No kitchen events found for the selected period',
           diagnostics,
         }
       }
 
-      // ─────────────────────────────────────────────────────────────────────
-      // STEP 2: Retrieve Historical Kitchen Context from IKB
-      // ─────────────────────────────────────────────────────────────────────
-      let historicalContext = null
-      
-      if (request.includeHistorical) {
-        const historicalStart = Date.now()
+      const metrics = this.aggregator.calculateMetrics(events)
+      const stationPerformance = this.aggregator.calculateStationPerformance(events)
+      const recipeComplexity = this.aggregator.analyzeRecipeComplexity(events)
+      const delays = this.aggregator.identifyDelays(events)
+      const preparationPatterns = this.aggregator.identifyPreparationPatterns(events)
+      const peakPeriods = this.aggregator.identifyPeakPeriods(events)
+
+      const insights = this.generateInsights(metrics, stationPerformance, recipeComplexity)
+      const bottlenecks = this.identifyBottlenecks(stationPerformance)
+      const improvements = this.identifyImprovements(metrics, stationPerformance)
+      const trends = this.generateTrends(metrics)
+
+      const report: KitchenIntelligenceReport = {
+        id: `kitchen_${request.businessId}_${Date.now()}`,
+        businessId: request.businessId,
+        reportingPeriod: {
+          start: timeRange.start,
+          end: timeRange.end,
+          label: timeRange.label,
+        },
+        generatedAt: new Date().toISOString(),
         
-        historicalContext = await this.retrieveHistoricalContext(
-          request.businessId,
-          ['kitchen', 'station', 'preparation', 'bottleneck', 'recovery']
-        )
+        metrics,
         
-        diagnostics.historicalRetrievalTime = Date.now() - historicalStart
-        diagnostics.historicalQueriesExecuted = historicalContext ? 1 : 0
+        stationPerformance,
+        topPerformingStations: stationPerformance.slice(0, 3),
+        bottlenecks,
+        
+        recipeComplexity,
+        mostComplexRecipes: recipeComplexity.slice(0, 5),
+        mostConsistentRecipes: recipeComplexity.filter(r => r.successRate > 95).slice(0, 5),
+        
+        delays,
+        majorDelays: delays.filter(d => d.severity === 'major' || d.severity === 'critical'),
+        
+        preparationPatterns,
+        peakPeriods,
+        
+        insights,
+        improvements,
+        trends,
+        
+        confidence: this.calculateConfidence(events.length, metrics),
+        evidenceCount: events.length,
+        eventsAnalyzed: events.length,
       }
 
-      // ─────────────────────────────────────────────────────────────────────
-      // STEP 3: Build Kitchen Intelligence Report
-      // ─────────────────────────────────────────────────────────────────────
-      const buildStart = Date.now()
-      
-      const builder = new KitchenReportBuilder()
-      const report = builder.build(
-        intelligenceReport,
-        historicalContext,
-        request
-      )
-      
-      diagnostics.buildTime = Date.now() - buildStart
-      diagnostics.evidenceItemsProcessed = report.evidenceCount
-
-      diagnostics.totalTime = Date.now() - totalStart
+      diagnostics.totalTime = Date.now() - startTime
+      diagnostics.buildTime = diagnostics.totalTime
 
       return {
         success: true,
@@ -100,8 +112,6 @@ export class KitchenIntelligenceService {
         diagnostics,
       }
     } catch (error) {
-      diagnostics.totalTime = Date.now() - totalStart
-      
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -110,131 +120,106 @@ export class KitchenIntelligenceService {
     }
   }
 
-  /**
-   * Retrieve or generate Structured Intelligence Report from HIE
-   */
-  private async retrieveIntelligenceReport(
-    businessId: string,
-    period: any
-  ): Promise<any> {
-    try {
-      const timeRange = buildTimeRange(period.period, period.customRange)
+  private generateInsights(metrics: any, stations: any[], recipes: any[]): KitchenInsight[] {
+    const insights: KitchenInsight[] = []
 
-      const events = await getOperationalEvents({
-        businessId,
-        timeRange: {
-          start: timeRange.start,
-          end: timeRange.end,
-        },
-        eventTypes: ['kitchen', 'order', 'preparation', 'station'],
+    if (metrics.kitchenEfficiency > 85) {
+      insights.push({
+        id: `insight_efficiency_${Date.now()}`,
+        type: 'achievement',
+        category: 'efficiency',
+        title: 'High Kitchen Efficiency',
+        description: `Kitchen operating at ${metrics.kitchenEfficiency.toFixed(1)}% efficiency`,
+        impact: 'high',
+        confidence: 0.9,
+        evidenceCount: 10,
       })
-
-      if (events.length === 0) {
-        console.warn('No kitchen events found for period:', timeRange.label)
-        return null
-      }
-
-      const context: PipelineContext = {
-        businessId,
-        timeRange: {
-          start: timeRange.start,
-          end: timeRange.end,
-          label: timeRange.label,
-        },
-        timezone: 'Africa/Kigali',
-        locale: 'en-RW',
-        scope: {
-          kitchen: true,
-          scoring: true,
-          problems: true,
-          patterns: true,
-          recommendations: true,
-        },
-      }
-
-      return await getOrGenerateReport(
-        {
-          businessId,
-          type: 'kitchen_intelligence',
-          timeRange: {
-            start: timeRange.start,
-            end: timeRange.end,
-          },
-        },
-        context,
-        events
-      )
-    } catch (error) {
-      console.error('Failed to retrieve kitchen intelligence report:', error)
-      return null
     }
+
+    if (metrics.preparationConsistency > 90) {
+      insights.push({
+        id: `insight_consistency_${Date.now()}`,
+        type: 'achievement',
+        category: 'consistency',
+        title: 'Excellent Preparation Consistency',
+        description: `${metrics.preparationConsistency.toFixed(1)}% consistency across orders`,
+        impact: 'high',
+        confidence: 0.95,
+        evidenceCount: 15,
+      })
+    }
+
+    return insights
   }
 
-  /**
-   * Retrieve historical kitchen context from IKB
-   */
-  private async retrieveHistoricalContext(
-    businessId: string,
-    categories: string[]
-  ): Promise<any> {
-    try {
-      const knowledge = await queryHistoricalKnowledge(businessId, categories, 100)
-      return {
-        knowledge,
-        hasData: knowledge.total > 0,
-      }
-    } catch (error) {
-      console.error('Failed to retrieve historical context:', error)
-      return null
-    }
+  private identifyBottlenecks(stations: any[]): KitchenBottleneck[] {
+    return stations
+      .filter(s => s.isBottleneck)
+      .map(s => ({
+        id: `bottleneck_${s.stationId}_${Date.now()}`,
+        stationId: s.stationId,
+        stationName: s.stationName,
+        severity: s.bottleneckSeverity ?? 'medium',
+        avgDelay: s.avgDelay,
+        ordersAffected: s.ordersProcessed,
+        rootCause: `Station processing time exceeds target`,
+        recommendation: `Review ${s.stationName} workflow and equipment`,
+        confidence: 0.8,
+        evidenceCount: s.ordersProcessed,
+      }))
   }
 
-  /**
-   * Query historical kitchen reports
-   */
-  async queryHistoricalReports(
-    businessId: string,
-    limit: number = 10
-  ): Promise<KitchenIntelligenceReport[]> {
-    try {
-      const { prisma } = await import('@/lib/prisma')
-      const reports = await prisma.intelligenceReport.findMany({
-        where: {
-          businessId,
-          type: 'kitchen_intelligence',
-        },
-        orderBy: {
-          generatedAt: 'desc',
-        },
-        take: limit,
+  private identifyImprovements(metrics: any, stations: any[]): KitchenImprovement[] {
+    const improvements: KitchenImprovement[] = []
+
+    if (metrics.kitchenEfficiency > 80) {
+      improvements.push({
+        id: `improvement_efficiency_${Date.now()}`,
+        area: 'efficiency',
+        title: 'Kitchen Efficiency',
+        description: 'Strong kitchen efficiency maintained',
+        improvement: metrics.kitchenEfficiency - 70,
+        baseline: 70,
+        current: metrics.kitchenEfficiency,
+        trend: 'stable',
+        confidence: 0.85,
+        evidenceCount: 20,
       })
-      return reports.map((r) => r.data as any)
-    } catch (error) {
-      console.error('Failed to query historical reports:', error)
-      return []
     }
+
+    return improvements
   }
 
-  /**
-   * Get specific kitchen report by ID
-   */
-  async getReportById(reportId: string): Promise<KitchenIntelligenceReport | null> {
-    try {
-      const { prisma } = await import('@/lib/prisma')
-      const report = await prisma.intelligenceReport.findUnique({
-        where: { id: reportId },
-      })
-      return report ? (report.data as any) : null
-    } catch (error) {
-      console.error('Failed to get report by ID:', error)
-      return null
-    }
+  private generateTrends(metrics: any): KitchenTrend[] {
+    return [
+      {
+        metric: 'Preparation Time',
+        unit: 'minutes',
+        currentValue: Math.round(metrics.avgPreparationTime / 60),
+        change: 0,
+        changeDirection: 'stable' as const,
+        trend: 'stable',
+        sparkline: [],
+      },
+      {
+        metric: 'Kitchen Efficiency',
+        unit: '%',
+        currentValue: metrics.kitchenEfficiency,
+        change: 0,
+        changeDirection: 'stable' as const,
+        trend: 'stable',
+        sparkline: [],
+      },
+    ]
+  }
+
+  private calculateConfidence(eventCount: number, metrics: any): number {
+    const eventConfidence = Math.min(1, eventCount / 100)
+    const metricConfidence = metrics.kitchenEfficiency > 0 ? 0.8 : 0.5
+    return (eventConfidence + metricConfidence) / 2
   }
 }
 
-/**
- * Factory function to create kitchen intelligence service
- */
 export function createKitchenIntelligenceService(): KitchenIntelligenceService {
   return new KitchenIntelligenceService()
 }

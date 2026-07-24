@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Settings, AlertTriangle, Info, Clock, TrendingUp, Share2 } from 'lucide-react';
+import { Settings, Share2, AlertTriangle, Loader2, Utensils } from 'lucide-react';
 import CurrencyDisplay from '@/components/CurrencyDisplay';
-import MenuItemDetailModal from '@/components/MenuItemDetailModal';
 import PreferencesSettings from '@/components/PreferencesSettings';
 import CallWaiterButton from '@/components/CallWaiterButton';
 import OTPVerification from '@/components/order/OTPVerification';
-import UpsellRecommendations from '@/components/order/UpsellRecommendations';
 import SeatSelectionModal from '@/components/SeatSelectionModal';
+import HospitalityHero from '@/components/order/HospitalityHero';
+import MenuCard from '@/components/order/MenuCard';
+import CartPanel from '@/components/order/CartPanel';
+import OrderTimeline from '@/components/order/OrderTimeline';
+import PaymentOptions from '@/components/order/PaymentOptions';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useToast } from '@/components/Toast';
+import type { BusinessProfileData } from '@/components/order/HospitalityHero';
 import { getUserPreferences, isMenuItemSafe, detectUserLanguage } from '@/lib/userPreferences';
 import { abServeForMenuItem, abTrackEvent } from '@/lib/ab-testing/client';
 import type { MenuItemDetail } from '@/components/MenuItemDetailModal';
@@ -31,6 +37,7 @@ type CartItem = {
 
 export default function OrderPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const { branchId, tableId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
 
   const [loading, setLoading] = useState(true);
@@ -40,6 +47,12 @@ export default function OrderPage() {
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [branchName, setBranchName] = useState<string | null>(null);
+  const [businessProfile, setBusinessProfile] = useState<BusinessProfileData | null>(null);
+  const [businessCity, setBusinessCity] = useState<string | null>(null);
+  const [businessAddress, setBusinessAddress] = useState<string | null>(null);
+  const [tableNumber, setTableNumber] = useState<string | null>(null);
+  const [tableCapacity, setTableCapacity] = useState<number | null>(null);
+  const [serverName, setServerName] = useState<string | null>(null);
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [abAssignments, setAbAssignments] = useState<Record<string, { testId: string; variantId: string }>>({});
   const [visitorId, setVisitorId] = useState<string>('');
@@ -54,11 +67,8 @@ export default function OrderPage() {
   const [draftOrderId, setDraftOrderId] = useState<string | null>(null);
 
   // Smart menu intelligence state
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState(getUserPreferences());
-  const [recommendations, setRecommendations] = useState<MenuItem[]>([]);
-  const [popularItems, setPopularItems] = useState<string[]>([]);
   const [userLanguage, setUserLanguage] = useState<'en' | 'rw' | 'fr'>('en');
 
   // Table session & analytics state
@@ -69,7 +79,6 @@ export default function OrderPage() {
   const [lastOrderId, setLastOrderId] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<any | null>(null);
   const [showAddMore, setShowAddMore] = useState(false);
-  const [addingItems, setAddingItems] = useState(false);
   const [kitchenMessages, setKitchenMessages] = useState<Array<{ id: string; message: string | null; createdAt: string }>>([]);
 
   // Seat selection state
@@ -188,6 +197,9 @@ export default function OrderPage() {
       const data = await resp.json();
       setAccessToken(data.accessToken);
       setBranchName(data.branchName || null);
+      setTableNumber(data.tableNumber || null);
+      setTableCapacity(data.tableCapacity || null);
+      setServerName(data.serverName || null);
     } catch (e: any) {
       setError(e.message || 'Failed to obtain access token');
       setLoading(false);
@@ -204,6 +216,9 @@ export default function OrderPage() {
       }
       const menuData = await m.json();
       const rawMenu: MenuItem[] = menuData.menu || [];
+      setBusinessProfile(menuData.businessProfile || null);
+      setBusinessCity(menuData.city || null);
+      setBusinessAddress(menuData.address || null);
       // Establish stable visitor id for A/B assignment
       try {
         const stored = localStorage.getItem('ab_visitor_id');
@@ -352,24 +367,6 @@ export default function OrderPage() {
     setUserLanguage(detectUserLanguage());
   }, []);
 
-  useEffect(() => {
-    // Fetch recommendations when item is selected
-    if (selectedItem && branchId) {
-      fetchRecommendations(selectedItem.id);
-    }
-  }, [selectedItem, branchId]);
-
-  // Track menu item views when modal is opened
-  useEffect(() => {
-    if (!selectedItem) return;
-    trackIfAllowed({
-      type: 'view_item',
-      entityType: 'MenuItem',
-      entityId: selectedItem.id,
-      sessionId: session?.sessionId,
-    })
-  }, [selectedItem, session?.sessionId]);
-
   // Poll order status after confirmation
   useEffect(() => {
     if (!lastOrderId) return;
@@ -410,52 +407,6 @@ export default function OrderPage() {
       clearInterval(msgInterval);
     };
   }, [lastOrderId]);
-
-  async function fetchRecommendations(excludeItemId: string) {
-    try {
-      const response = await fetch('/api/menu/recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          branchId,
-          excludeItemId,
-          userPreferences: {
-            allergies: preferences.allergies,
-            dietaryPreferences: preferences.dietaryPreferences,
-          },
-          limit: 3,
-        }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRecommendations(data.recommendations || []);
-        try {
-          const ids = (data.recommendations || []).map((r: any) => r.id);
-          if (ids.length > 0) {
-            trackIfAllowed({
-              type: 'recommendation_shown',
-              metadata: { menuItemIds: ids, context: 'modal_recommendations' },
-              sessionId: session?.sessionId,
-            })
-          }
-        } catch {}
-      }
-    } catch (error) {
-      console.error('Failed to fetch recommendations:', error);
-    }
-  }
-
-  function getLocalizedName(item: MenuItem): string {
-    if (!item.translations || item.translations.length === 0) return item.name;
-    const translation = item.translations.find(t => t.locale === userLanguage);
-    return translation?.name || item.name;
-  }
-
-  function getLocalizedDescription(item: MenuItem): string | null | undefined {
-    if (!item.translations || item.translations.length === 0) return item.description;
-    const translation = item.translations.find(t => t.locale === userLanguage);
-    return translation?.description || item.description;
-  }
 
   // Seat selection handlers
   const handleSeatSelected = (seatId: string, sessionToken: string, seatLabel: string) => {
@@ -568,7 +519,7 @@ export default function OrderPage() {
         return;
       }
 
-      alert('Order confirmed and sent to kitchen!');
+      showToast('success', 'Order confirmed and sent to kitchen!');
       setShowConfirmation(false);
       setCart({});
     } catch (e: any) {
@@ -598,50 +549,76 @@ export default function OrderPage() {
     }
   }
 
-  function formatRwf(cents: number) {
-    // Deprecated: kept for compatibility; use <CurrencyDisplay inCents /> instead
-    return `${Math.round(cents).toLocaleString()}`;
-  }
-
   if (showConfirmation) {
     return (
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: 16 }}>
-        <h1 style={{ marginBottom: 16 }}>Confirm Your Order</h1>
-        <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Order Summary</h2>
-          <div style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
-            {cartItems.map(ci => (
-              <div key={ci.menuItemId} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{ci.name}</div>
-                  <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay amount={ci.priceCents} inCents /></div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            {businessProfile?.logoUrl && (
+              <img
+                src={businessProfile.logoUrl}
+                alt={branchName || ''}
+                className="w-12 h-12 rounded-full object-cover mx-auto mb-3 shadow-md"
+              />
+            )}
+            <h1 className="text-2xl font-bold text-imboni-dark">Review Your Selections</h1>
+            <p className="text-sm text-gray-400 mt-1">{branchName}</p>
+          </div>
+
+          {/* Order Summary */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 mb-6">
+            <h3 className="font-bold text-imboni-dark text-sm mb-4">Your Selections</h3>
+            <div className="space-y-3">
+              {cartItems.map(ci => (
+                <div key={ci.menuItemId} className="flex items-center justify-between text-sm">
+                  <div>
+                    <span className="font-medium text-imboni-dark">{ci.quantity}×</span>
+                    <span className="text-gray-600 ml-1.5">{ci.name}</span>
+                  </div>
+                  <span className="font-semibold text-imboni-dark">
+                    <CurrencyDisplay amount={ci.priceCents * ci.quantity} inCents />
+                  </span>
                 </div>
-                <div style={{ fontWeight: 700 }}><CurrencyDisplay amount={ci.priceCents * ci.quantity} inCents /></div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
+              <span className="text-sm text-gray-500">Total</span>
+              <span className="text-xl font-bold text-imboni-dark">
+                <CurrencyDisplay amount={cartTotalCents} inCents />
+              </span>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: '2px solid #e5e7eb', fontSize: 18, fontWeight: 700 }}>
-            <div>Total</div>
-            <div><CurrencyDisplay amount={cartTotalCents} inCents /></div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 20 }}>
-            <button
-              onClick={cancelOrder}
-              disabled={loading}
-              style={{ padding: 12, background: '#f3f4f6', color: '#374151', borderRadius: 8, fontWeight: 600 }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmOrder}
-              disabled={loading}
-              style={{ padding: 12, background: '#111827', color: 'white', borderRadius: 8, fontWeight: 600 }}
-            >
-              {loading ? 'Confirming...' : 'Confirm & Pay'}
-            </button>
-          </div>
+
+          {/* Payment Options */}
+          <PaymentOptions
+            totalCents={cartTotalCents}
+            onMoMo={() => {
+              confirmOrder();
+            }}
+            onCash={() => {
+              confirmOrder();
+            }}
+            onOnline={() => {
+              confirmOrder();
+            }}
+            loading={loading}
+            businessName={branchName || undefined}
+          />
+
+          {/* Cancel */}
+          <button
+            onClick={cancelOrder}
+            disabled={loading}
+            className="w-full mt-4 py-2.5 text-sm text-gray-500 hover:text-gray-700 font-medium transition-colors"
+          >
+            Back to Menu
+          </button>
+
           {error && (
-            <div style={{ color: '#b91c1c', marginTop: 12, fontSize: 14 }}>{error}</div>
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 text-center">
+              {error}
+            </div>
           )}
         </div>
       </div>
@@ -669,16 +646,9 @@ export default function OrderPage() {
   }, [filteredMenu]);
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
+    <ErrorBoundary>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Modals */}
-      {selectedItem && (
-        <MenuItemDetailModal
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-          onAddToCart={(item) => addToCart(item)}
-          recommendations={recommendations}
-        />
-      )}
       {showPreferences && (
         <PreferencesSettings
           onClose={() => setShowPreferences(false)}
@@ -695,443 +665,325 @@ export default function OrderPage() {
           onClose={() => setShowSeatSelection(false)}
         />
       )}
-      {lastOrderId && kitchenMessages.length > 0 && (
-        <div style={{ marginTop: 8, marginBottom: 8 }}>
-          <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', padding: 10, borderRadius: 8, fontSize: 14 }}>
-            <strong>Kitchen update:</strong> {kitchenMessages[0].message}
+
+      {/* Loading State — Hospitality Skeleton */}
+      {loading && (
+        <div className="min-h-screen">
+          <div className="w-full h-[42dvh] min-h-[280px] max-h-[420px] bg-gradient-to-br from-imboni-blue via-imboni-dark to-accent animate-pulse" />
+          <div className="max-w-3xl mx-auto px-4 -mt-6 relative z-10">
+            <div className="bg-white rounded-2xl shadow-xl p-5 border border-gray-100 animate-pulse">
+              <div className="h-4 bg-gray-100 rounded w-1/4 mb-3" />
+              <div className="h-6 bg-gray-100 rounded w-1/3" />
+            </div>
+          </div>
+          <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
+            <div className="h-6 bg-gray-100 rounded w-1/3 animate-pulse" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse">
+                  <div className="w-full h-32 bg-gray-100 rounded-xl mb-3" />
+                  <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="text-center pb-8">
+            <Loader2 className="w-6 h-6 animate-spin text-imboni-blue mx-auto" />
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h1 style={{ margin: 0 }}>Order{branchName ? ` @ ${branchName}` : ''}</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={async () => {
-              if (navigator.share) {
-                try {
-                  await navigator.share({
-                    title: `Menu${branchName ? ` @ ${branchName}` : ''}`,
-                    text: `Check out this menu! Order now and we both earn 500 RWF:`,
-                    url: window.location.href,
-                  });
-                } catch {}
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copied! Share it to earn 500 RWF when friends order.');
-              }
-            }}
-            style={{
-              padding: '8px 14px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              color: 'white',
-              fontWeight: 600,
-              fontSize: 14,
-            }}
-          >
-            <Share2 size={18} />
-            Share & Earn 500 RWF
-          </button>
-          <button
-            onClick={() => setShowPreferences(true)}
-            style={{
-              padding: '8px 12px',
-              background: '#f3f4f6',
-              border: '1px solid #d1d5db',
-              borderRadius: 8,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <Settings size={18} />
-            Preferences
-          </button>
-        </div>
-      </div>
-
-      {/* Table Session Banner */}
-      {tableId && session && (
-        <div style={{ background: '#ecfeff', border: '1px solid #a5f3fc', borderRadius: 8, padding: 12, marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ fontSize: 14, color: '#0c4a6e' }}>
-              Joined table session <strong>{session.tableName || session.tableId}</strong>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input
-                type="text"
-                placeholder="Your name (optional)"
-                value={participantInput}
-                onChange={(e) => setParticipantInput(e.target.value)}
-                style={{ padding: 6, border: '1px solid #bae6fd', borderRadius: 6 }}
-              />
-              <button
-                onClick={() => {
-                  setParticipantName(participantInput);
-                  if (session) setSession({ ...session, participantName: participantInput });
-                }}
-                style={{ padding: '6px 10px', background: '#0369a1', color: 'white', borderRadius: 6 }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {loading && <p>Loading...</p>}
+      {/* Error State */}
       {!loading && error && (
-        <div style={{ color: 'white', background: '#b91c1c', padding: 12, borderRadius: 6, marginBottom: 12 }}>
-          {error}
-        </div>
-      )}
-
-      {/* Active Preferences Banner */}
-      {!loading && !error && (preferences.allergies.length > 0 || preferences.dietaryPreferences.length > 0) && (
-        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 8, padding: 12, marginBottom: 12 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Active Preferences:</div>
-          <div style={{ fontSize: 13, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {preferences.allergies.map(a => (
-              <span key={a} style={{ background: '#fee2e2', color: '#991b1b', padding: '2px 8px', borderRadius: 999 }}>
-                {a}
-              </span>
-            ))}
-            {preferences.dietaryPreferences.map(p => (
-              <span key={p} style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: 999 }}>
-                {p}
-              </span>
-            ))}
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-lg font-bold text-imboni-dark mb-2">Something went wrong</h2>
+            <p className="text-sm text-gray-500 mb-6">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2.5 bg-imboni-dark text-white rounded-xl text-sm font-medium hover:bg-imboni-blue transition-colors focus:outline-none focus:ring-2 focus:ring-imboni-blue/30"
+            >
+              Try Again
+            </button>
           </div>
         </div>
       )}
 
+      {/* Main Experience */}
       {!loading && !error && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ padding: '4px 8px', background: '#f1f5f9', borderRadius: 999 }}>
-                {isRemote ? 'Remote Pre-Order' : 'In-Venue QR'}
+        <>
+          {/* Hospitality Hero */}
+          <HospitalityHero
+            restaurantName={branchName || ''}
+            profile={businessProfile}
+            city={businessCity}
+            address={businessAddress}
+            tableNumber={tableNumber}
+            tableCapacity={tableCapacity}
+            serverName={serverName || undefined}
+            isRemote={isRemote}
+          />
+
+          {/* Body */}
+          <div className="max-w-3xl mx-auto px-4 py-6">
+            {/* Top Action Bar */}
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-xs text-gray-400 px-3 py-1 bg-gray-100 rounded-full" aria-label="Order mode">
+                {isRemote ? 'Pre-Order' : 'In-Venue'}
+                {tokenLoading || menuLoading ? ' · Syncing...' : ''}
               </span>
-              {tokenLoading || menuLoading ? <small>Syncing...</small> : null}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({
+                          title: `Menu${branchName ? ` @ ${branchName}` : ''}`,
+                          text: `Check out this menu! Order now and we both earn 500 RWF:`,
+                          url: window.location.href,
+                        });
+                      } catch {}
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      showToast('info', 'Link copied! Share it to earn 500 RWF when friends order.');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-imboni-dark bg-white border border-gray-200 rounded-full hover:border-imboni-blue/30 transition-all focus:outline-none focus:ring-2 focus:ring-imboni-blue/20"
+                  aria-label="Share menu and earn rewards"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  Share & Earn
+                </button>
+                <button
+                  onClick={() => setShowPreferences(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-full hover:border-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-imboni-blue/20"
+                  aria-label="Set dietary preferences"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Preferences
+                </button>
+              </div>
             </div>
 
-            {/* Menu Items by Category */}
-            {Object.entries(menuByCategory).map(([category, items]) => (
-              <div key={category} style={{ marginBottom: 24 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#111827' }}>{category}</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  {items.map(item => {
-                    const safety = isMenuItemSafe(item, preferences);
-                    const localizedName = getLocalizedName(item);
-                    const localizedDesc = getLocalizedDescription(item);
-                    
-                    return (
-                      <div
-                        key={item.id}
-                        style={{
-                          border: safety.safe ? '1px solid #e5e7eb' : '2px solid #fca5a5',
-                          borderRadius: 8,
-                          padding: 12,
-                          background: safety.safe ? 'white' : '#fef2f2',
-                          position: 'relative',
-                        }}
-                      >
-                        {/* Image */}
-                        {item.imageReal && (
-                          <img
-                            src={item.imageReal}
-                            alt={localizedName}
-                            style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 6, marginBottom: 8 }}
-                          />
-                        )}
-
-                        {/* Safety Warning */}
-                        {!safety.safe && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#b91c1c', fontSize: 12, marginBottom: 6 }}>
-                            <AlertTriangle size={14} />
-                            <span>Not suitable for you</span>
-                          </div>
-                        )}
-
-                        {/* Name */}
-                        <div style={{ fontWeight: 600, marginBottom: 4 }}>{localizedName}</div>
-
-                        {/* Dietary Tags */}
-                        {item.dietaryTags && item.dietaryTags.length > 0 && (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
-                            {item.dietaryTags.slice(0, 2).map(tag => (
-                              <span
-                                key={tag}
-                                style={{
-                                  fontSize: 11,
-                                  padding: '2px 6px',
-                                  background: '#dcfce7',
-                                  color: '#166534',
-                                  borderRadius: 999,
-                                }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Description */}
-                        {localizedDesc && (
-                          <div style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, lineHeight: 1.4 }}>
-                            {localizedDesc.length > 60 ? `${localizedDesc.substring(0, 60)}...` : localizedDesc}
-                          </div>
-                        )}
-
-                        {/* Prep Time & Spice Level */}
-                        <div style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
-                          {item.prepTimeMinutes && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <Clock size={12} />
-                              {item.prepTimeMinutes}min
-                            </div>
-                          )}
-                          {item.spiceLevel && item.spiceLevel !== 'none' && (
-                            <div>
-                              {item.spiceLevel === 'mild' && '🌶️'}
-                              {item.spiceLevel === 'medium' && '🌶️🌶️'}
-                              {item.spiceLevel === 'hot' && '🌶️🌶️🌶️'}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Price & Actions */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                          <div style={{ fontWeight: 600 }}><CurrencyDisplay amount={item.priceCents} inCents /></div>
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button
-                              onClick={() => {
-                                setSelectedItem(item)
-                                try {
-                                  const ab = abAssignments[item.id]
-                                  if (ab && visitorId) {
-                                    abTrackEvent({ testId: ab.testId, variantId: ab.variantId, type: 'CLICK', metadata: { action: 'learn_more' }, visitorId })
-                                  }
-                                } catch {}
-                              }}
-                              style={{
-                                padding: '6px 10px',
-                                background: 'white',
-                                border: '1px solid #d1d5db',
-                                borderRadius: 6,
-                                cursor: 'pointer',
-                                fontSize: 13,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 4,
-                              }}
-                            >
-                              <Info size={14} />
-                              Learn More
-                            </button>
-                            <button
-                              onClick={() => addToCart(item)}
-                              style={{
-                                padding: '6px 12px',
-                                background: '#111827',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: 6,
-                                cursor: 'pointer',
-                                fontSize: 13,
-                              }}
-                            >
-                              Add
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+            {/* Active Preferences */}
+            {(preferences.allergies.length > 0 || preferences.dietaryPreferences.length > 0) && (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-4" role="status">
+                <p className="text-xs font-medium text-blue-700 mb-1.5">Active Preferences</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {preferences.allergies.map(a => (
+                    <span key={a} className="px-2 py-0.5 bg-red-50 text-red-700 rounded-full text-xs">{a}</span>
+                  ))}
+                  {preferences.dietaryPreferences.map(p => (
+                    <span key={p} className="px-2 py-0.5 bg-green-50 text-green-700 rounded-full text-xs">{p}</span>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
+            )}
 
-          <div>
-            <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>Your Order</div>
-
-              {cartItems.length === 0 ? (
-                <div style={{ color: '#6b7280' }}>No items yet. Add from the menu.</div>
-              ) : (
-                <>
-                  <div style={{ display: 'grid', gap: 8 }}>
-                    {cartItems.map(ci => (
-                      <div key={ci.menuItemId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{ci.name}</div>
-                          <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay amount={ci.priceCents} inCents /></div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                          <button onClick={() => decFromCart(ci.menuItemId)}>-</button>
-                          <div>{ci.quantity}</div>
-                          <button onClick={() => incInCart(ci.menuItemId)}>+</button>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, borderTop: '1px solid #e5e7eb', paddingTop: 8 }}>
-                      <div>Total</div>
-                      <div style={{ fontWeight: 700 }}><CurrencyDisplay amount={cartTotalCents} inCents /></div>
-                    </div>
-                  </div>
-
-                  {/* Upsell Recommendations */}
-                  {!showConfirmation && !lastOrderId && (
-                    <UpsellRecommendations
-                      cartItems={cartItems}
-                      menu={menu}
-                      onAddToCart={addToCart}
-                    />
-                  )}
-                </>
-              )}
-
-              {isRemote && (
-                <div style={{ marginTop: 12, display: 'grid', gap: 12 }}>
-                  {!phoneVerified ? (
-                    <OTPVerification
-                      branchId={branchId || ''}
-                      phone={phone}
-                      onVerified={() => setPhoneVerified(true)}
-                      onPhoneChange={setPhone}
-                    />
-                  ) : (
-                    <>
-                      <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: 8, fontSize: 13, color: '#166534' }}>
-                        ✓ Phone verified: {phone}
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Your name"
-                        value={customerName}
-                        onChange={e => setCustomerName(e.target.value)}
-                        style={{ padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
-                      />
-                      <label style={{ fontSize: 14, color: '#374151' }}>Schedule pickup time (optional)</label>
-                      <input
-                        type="datetime-local"
-                        value={scheduledAt}
-                        onChange={e => setScheduledAt(e.target.value)}
-                        style={{ padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
-                      />
-                    </>
-                  )}
-                </div>
-              )}
-
-              <button
-                disabled={cartItems.length === 0 || loading || !!lastOrderId || (isRemote && !phoneVerified)}
-                onClick={createDraftOrder}
-                style={{ marginTop: 12, width: '100%', padding: 10, background: (isRemote && !phoneVerified) ? '#9ca3af' : '#111827', color: 'white', borderRadius: 6, cursor: (isRemote && !phoneVerified) ? 'not-allowed' : 'pointer' }}
-              >
-                {lastOrderId ? 'Order Submitted' : loading ? 'Processing...' : (isRemote && !phoneVerified) ? 'Verify phone to continue' : 'Review Order'}
-              </button>
-
-              <div style={{ marginTop: 8, color: '#6b7280', fontSize: 12 }}>
-                Digital orders include a platform fee shown at checkout. Pricing is finalized server-side.
+            {/* Kitchen Messages */}
+            {lastOrderId && kitchenMessages.length > 0 && kitchenMessages[0]?.message && (
+              <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3 mb-4 text-sm text-indigo-800" role="alert" aria-live="polite">
+                <strong>Kitchen update:</strong> {kitchenMessages[0].message}
               </div>
+            )}
 
-              {/* Group Order Summary */}
-              {session && (
-                <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed #e5e7eb' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontWeight: 700 }}>Group Order Summary</div>
-                    <button
-                      onClick={async () => {
-                        if (!session) return;
-                        setSummaryLoading(true);
-                        const data = await getGroupOrderSummary(session.sessionId);
-                        setSummary(data);
-                        setSummaryLoading(false);
-                      }}
-                      style={{ padding: '4px 8px', border: '1px solid #d1d5db', borderRadius: 6, background: 'white', fontSize: 12 }}
-                    >
-                      {summaryLoading ? 'Refreshing...' : 'Refresh'}
-                    </button>
+            {/* Table Session */}
+            {tableId && session && (
+              <div className="bg-cyan-50 border border-cyan-100 rounded-xl p-3 mb-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs text-cyan-800">
+                    Joined table session <strong>{session.tableName || session.tableId}</strong>
                   </div>
-                  {!summary && <div style={{ color: '#6b7280', fontSize: 13 }}>No group orders yet.</div>}
-                  {summary && (
-                    <div style={{ display: 'grid', gap: 8 }}>
-                      {(summary.ordersByParticipant || []).map((p: any) => (
-                        <div key={p.participantId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, background: '#f8fafc', padding: 8, borderRadius: 6 }}>
-                          <div>{p.participantName || 'Guest'}</div>
-                          <div style={{ fontWeight: 700 }}>RWF {Math.round((p.totalSpent || 0)).toLocaleString()}</div>
-                        </div>
-                      ))}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid #e5e7eb' }}>
-                        <div>Total</div>
-                        <div style={{ fontWeight: 700 }}>RWF {Math.round((summary.totalAmountCents || 0)).toLocaleString()}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Track My Order */}
-              {lastOrderId && (
-                <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed #e5e7eb' }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Track My Order</div>
-                  <div style={{ fontSize: 13, color: '#374151' }}>
-                    <div>Order #{orderStatus?.orderNumber || lastOrderId}</div>
-                    <div style={{ marginTop: 4 }}>ETA: {orderStatus?.eta || '—'}</div>
-                    <div style={{ marginTop: 4 }}>Payment: {orderStatus?.paymentStatus || '—'}</div>
-                    <div style={{ marginTop: 4 }}>Prep started: {orderStatus?.prepStarted ? 'Yes' : 'No'}</div>
-                    <div style={{ marginTop: 4 }}>Ready: {orderStatus?.readyForPickup ? 'Yes' : 'No'}</div>
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (!lastOrderId) return;
-                      try {
-                        const r = await fetch(`/api/public/order/status?orderId=${lastOrderId}`);
-                        if (r.ok) setOrderStatus(await r.json());
-                      } catch {}
-                    }}
-                    style={{ marginTop: 8, width: '100%', padding: 8, border: '1px solid #d1d5db', borderRadius: 6, background: 'white' }}
-                  >
-                    Refresh Status
-                  </button>
-                  
-                  {/* Add More Items Button */}
-                  {!showAddMore && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Your name (optional)"
+                      value={participantInput}
+                      onChange={(e) => setParticipantInput(e.target.value)}
+                      className="px-2 py-1 text-xs border border-cyan-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                      aria-label="Your name"
+                    />
                     <button
                       onClick={() => {
-                        setShowAddMore(true);
-                        setLastOrderId(null); // Allow adding to cart again
+                        setParticipantName(participantInput);
+                        if (session) setSession({ ...session, participantName: participantInput });
                       }}
-                      style={{ marginTop: 8, width: '100%', padding: 10, background: '#f97316', color: 'white', borderRadius: 6, fontWeight: 600 }}
+                      className="px-2.5 py-1 text-xs bg-cyan-700 text-white rounded-lg hover:bg-cyan-800 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                      aria-label="Save your name"
                     >
-                      ➕ Add More Items
+                      Save
                     </button>
-                  )}
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
+
+            {/* Order Timeline (when order submitted) */}
+            {lastOrderId && orderStatus && (
+              <div className="mb-6" role="region" aria-label="Order status timeline">
+                <OrderTimeline
+                  kitchenStatus={orderStatus.kitchenStatus}
+                  receivedAt={orderStatus.receivedAt}
+                  acceptedAt={orderStatus.acceptedAt}
+                  preparingAt={orderStatus.preparingAt}
+                  almostReadyAt={orderStatus.almostReadyAt}
+                  readyAt={orderStatus.readyAt}
+                  servedAt={orderStatus.servedAt}
+                  estimatedMinutes={orderStatus.eta}
+                  orderNumber={orderStatus.orderNumber}
+                />
+                {!showAddMore && (
+                  <button
+                    onClick={() => {
+                      setShowAddMore(true);
+                      setLastOrderId(null);
+                    }}
+                    className="w-full mt-3 py-2.5 bg-imboni-orange text-white rounded-xl text-sm font-semibold hover:bg-accent-dark transition-colors focus:outline-none focus:ring-2 focus:ring-imboni-orange/30"
+                    aria-label="Add more items to your order"
+                  >
+                    Add More Items
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Menu + Cart Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+              {/* Menu */}
+              <div>
+                {/* Empty Menu State */}
+                {menu.length === 0 && !menuLoading && (
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                    <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                      <Utensils className="w-7 h-7 text-gray-300" />
+                    </div>
+                    <h3 className="text-base font-semibold text-imboni-dark mb-1">Menu Coming Soon</h3>
+                    <p className="text-sm text-gray-400">The restaurant is preparing their menu. Please check back shortly or ask your server for today's selections.</p>
+                  </div>
+                )}
+
+                {Object.entries(menuByCategory).map(([category, items]) => (
+                  <div key={category} className="mb-8">
+                    <h2 className="text-lg font-bold text-imboni-dark mb-4 flex items-center gap-2">
+                      <span className="w-1 h-5 bg-imboni-orange rounded-full" />
+                      {category}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {items.map(item => (
+                        <MenuCard
+                          key={item.id}
+                          item={item}
+                          userLanguage={userLanguage}
+                          onAddToCart={addToCart}
+                          inCart={cart[item.id]?.quantity || 0}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Cart Sidebar */}
+              <div className="lg:sticky lg:top-4 lg:self-start">
+                <CartPanel
+                  cartItems={cartItems}
+                  cartTotalCents={cartTotalCents}
+                  menu={menu}
+                  onAddToCart={addToCart}
+                  onInc={incInCart}
+                  onDec={decFromCart}
+                  onSubmit={createDraftOrder}
+                  loading={loading}
+                  submitted={!!lastOrderId}
+                  disabled={isRemote && !phoneVerified}
+                  disabledReason={isRemote && !phoneVerified ? 'Verify phone to continue' : undefined}
+                  showUpsell={!showConfirmation && !lastOrderId}
+                  footerNote="Digital orders include a platform fee shown at checkout. Pricing is finalized server-side."
+                />
+
+                {/* Remote Pre-Order Fields */}
+                {isRemote && (
+                  <div className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+                    {!phoneVerified ? (
+                      <OTPVerification
+                        branchId={branchId || ''}
+                        phone={phone}
+                        onVerified={() => setPhoneVerified(true)}
+                        onPhoneChange={setPhone}
+                      />
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                          ✓ Phone verified: {phone}
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Your name"
+                          value={customerName}
+                          onChange={e => setCustomerName(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-imboni-blue/20"
+                          aria-label="Your name"
+                        />
+                        <label className="text-xs text-gray-500" htmlFor="scheduledAt">Schedule pickup time (optional)</label>
+                        <input
+                          id="scheduledAt"
+                          type="datetime-local"
+                          value={scheduledAt}
+                          onChange={e => setScheduledAt(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-imboni-blue/20"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Group Order Summary */}
+                {session && (
+                  <div className="mt-4 bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-bold text-imboni-dark">Group Order</span>
+                      <button
+                        onClick={async () => {
+                          if (!session) return;
+                          setSummaryLoading(true);
+                          const data = await getGroupOrderSummary(session.sessionId);
+                          setSummary(data);
+                          setSummaryLoading(false);
+                        }}
+                        className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white text-gray-600 hover:border-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-imboni-blue/20"
+                        aria-label="Refresh group order summary"
+                      >
+                        {summaryLoading ? 'Refreshing...' : 'Refresh'}
+                      </button>
+                    </div>
+                    {!summary && <p className="text-xs text-gray-400">No group orders yet.</p>}
+                    {summary && (
+                      <div className="space-y-2">
+                        {(summary.ordersByParticipant || []).map((p: any) => (
+                          <div key={p.participantId} className="flex justify-between text-xs bg-gray-50 rounded-lg px-3 py-2">
+                            <span className="text-gray-600">{p.participantName || 'Guest'}</span>
+                            <span className="font-semibold text-imboni-dark">RWF {Math.round((p.totalSpent || 0)).toLocaleString()}</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between pt-2 border-t border-gray-100 text-xs">
+                          <span className="text-gray-500">Total</span>
+                          <span className="font-bold text-imboni-dark">RWF {Math.round((summary.totalAmountCents || 0)).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Call Waiter — Always visible for in-venue orders */}
+          {tableId && <CallWaiterButton tableId={tableId} sessionId={session?.sessionId} />}
+        </>
       )}
-      
-      {/* Call Waiter Button - Always visible for in-venue orders */}
-      {tableId && <CallWaiterButton tableId={tableId} sessionId={session?.sessionId} />}
-      
-      {/* Footer Branding */}
-      <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid #e5e7eb', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>
-        Powered by <a href="https://imboniserve.com" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>ImboniServe</a>
-      </div>
     </div>
+    </ErrorBoundary>
   );
 }

@@ -17,6 +17,14 @@ import { SaleItemStatusService } from '@/lib/services/sale-item-status.service'
 import type { ItemStatus } from '@prisma/client'
 import { ingestKDSShadowEvent } from '@/lib/die/business-as-plugin/kds/kds.shadow'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import {
+  publishHeartPulseEvent,
+  HeartPulseEventType,
+  HeartPulseChannel,
+  generateCorrelationId,
+  extractCorrelationId,
+  type KitchenStatusChangedPayload,
+} from '@/lib/heart-pulse'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -160,7 +168,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
           // Skip items that have progressed beyond the target state
           // (e.g., don't move DELIVERED back to READY)
           const stateOrder: ItemStatus[] = ['NEW', 'PREPARING', 'READY', 'DELIVERED']
-          const currentIndex = stateOrder.indexOf(item.itemStatus)
+          const currentIndex = item.itemStatus ? stateOrder.indexOf(item.itemStatus as ItemStatus) : -1
           const targetIndex = stateOrder.indexOf(itemStatus)
           if (currentIndex >= targetIndex && currentIndex !== -1) {
             continue
@@ -200,6 +208,9 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       return orderResult
     })
 
+    // Generate correlation ID for this workflow
+    const correlationId = generateCorrelationId()
+
     // Record event (async, non-blocking)
     TicketEventService.recordEvent({
       saleId: orderId,
@@ -211,10 +222,57 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       metadata: {
         orderNumber: updatedOrder.orderNumber,
         itemCount: updatedOrder.items.length,
+        correlationId,
       },
     }).catch((err) => console.error('[TicketEvent] Record failed:', err))
 
-    // Emit real-time events (single emit, no duplicates)
+    // Publish Heart Pulse KITCHEN_STATUS_CHANGED event
+    try {
+      const payload: KitchenStatusChangedPayload = {
+        kitchenStatus: newStatus,
+        previousStatus: currentStatus,
+      }
+
+      // Notify business-wide channel
+      await publishHeartPulseEvent(
+        HeartPulseChannel.business(updatedOrder.businessId),
+        HeartPulseEventType.KITCHEN_STATUS_CHANGED,
+        updatedOrder.businessId,
+        payload,
+        {
+          correlationId,
+          actor: { userId: ctx.userId, source: 'user' },
+        }
+      )
+
+      // Notify kitchen channel
+      await publishHeartPulseEvent(
+        HeartPulseChannel.kitchen(updatedOrder.businessId),
+        HeartPulseEventType.KITCHEN_STATUS_CHANGED,
+        updatedOrder.businessId,
+        payload,
+        {
+          correlationId,
+          actor: { userId: ctx.userId, source: 'user' },
+        }
+      )
+
+      // Notify order-specific channel
+      await publishHeartPulseEvent(
+        HeartPulseChannel.order(updatedOrder.id),
+        HeartPulseEventType.KITCHEN_STATUS_CHANGED,
+        updatedOrder.businessId,
+        payload,
+        {
+          correlationId,
+          actor: { userId: ctx.userId, source: 'user' },
+        }
+      )
+    } catch (eventError) {
+      console.error('[HeartPulse] Failed to publish KITCHEN_STATUS_CHANGED:', eventError)
+    }
+
+    // Emit real-time events (legacy Pusher, kept for backward compatibility)
     try {
       const businessId = updatedOrder.businessId
 

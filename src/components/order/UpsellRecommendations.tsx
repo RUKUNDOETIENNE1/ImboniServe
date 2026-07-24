@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp, Plus } from 'lucide-react'
+import CurrencyDisplay from '@/components/CurrencyDisplay'
 
 interface CartItem {
   menuItemId: string
@@ -33,34 +34,24 @@ export default function UpsellRecommendations({ cartItems, menu, onAddToCart }: 
       return
     }
 
-    // Simple collaborative filtering
     const cartItemIds = new Set(cartItems.map(i => i.menuItemId))
     const cartCategories = cartItems
       .map(i => menu.find(m => m.id === i.menuItemId)?.category)
       .filter(Boolean) as string[]
 
-    // Find complementary items from same or related categories
     const related = menu.filter(item => {
       if (item.isAvailable === false) return false
       if (cartItemIds.has(item.id)) return false
-      
-      // Prefer items from same categories
-      if (item.category && cartCategories.includes(item.category)) {
-        return true
-      }
-      
-      // Also include popular categories that complement meals
+      if (item.category && cartCategories.includes(item.category)) return true
       const complementaryCategories = ['Drinks', 'Beverages', 'Sides', 'Desserts', 'Appetizers']
-      if (item.category && complementaryCategories.some(cat => 
+      if (item.category && complementaryCategories.some(cat =>
         item.category?.toLowerCase().includes(cat.toLowerCase())
       )) {
         return true
       }
-      
       return false
     })
 
-    // Sort by price (prefer affordable add-ons) and limit to 3
     const sorted = related
       .sort((a, b) => a.priceCents - b.priceCents)
       .slice(0, 3)
@@ -71,8 +62,7 @@ export default function UpsellRecommendations({ cartItems, menu, onAddToCart }: 
   const handleAdd = (item: MenuItem) => {
     onAddToCart(item)
     setAddedItems(prev => new Set(prev).add(item.id))
-    
-    // Track upsell conversion
+
     try {
       fetch('/api/analytics/track', {
         method: 'POST',
@@ -86,7 +76,6 @@ export default function UpsellRecommendations({ cartItems, menu, onAddToCart }: 
       }).catch(() => {})
     } catch {}
 
-    // Remove from suggestions after adding
     setTimeout(() => {
       setSuggestions(prev => prev.filter(s => s.id !== item.id))
     }, 500)
@@ -95,73 +84,47 @@ export default function UpsellRecommendations({ cartItems, menu, onAddToCart }: 
   if (suggestions.length === 0) return null
 
   return (
-    <div style={{ 
-      marginTop: 16, 
-      padding: 16, 
-      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', 
-      borderRadius: 12, 
-      border: '2px solid #fbbf24',
-      boxShadow: '0 4px 6px rgba(251, 191, 36, 0.1)'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <TrendingUp style={{ width: 20, height: 20, color: '#78350f' }} />
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#78350f' }}>
+    <div className="mt-4 p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border-2 border-amber-300 shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="w-5 h-5 text-amber-900" />
+        <h3 className="text-base font-bold text-amber-900">
           Complete Your Meal
         </h3>
       </div>
-      <p style={{ fontSize: 13, color: '#92400e', marginBottom: 12, marginTop: 0 }}>
-        ⭐ Popular add-ons with your order:
+      <p className="text-sm text-amber-800 mb-3">
+        Popular add-ons with your order:
       </p>
-      <div style={{ display: 'grid', gap: 8 }}>
+      <div className="grid gap-2">
         {suggestions.map(item => {
           const isAdded = addedItems.has(item.id)
           return (
-            <div 
-              key={item.id} 
-              style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                padding: 12,
-                background: 'white',
-                borderRadius: 8,
-                border: '1px solid #fbbf24',
-                transition: 'all 0.2s',
-                opacity: isAdded ? 0.6 : 1
-              }}
+            <div
+              key={item.id}
+              className={`flex items-center justify-between gap-2 p-3 bg-white rounded-lg border border-amber-200 transition-all ${isAdded ? 'opacity-60' : ''}`}
             >
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: '#1f2937' }}>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm text-imboni-dark truncate">
                   {item.name}
                 </div>
-                <div style={{ fontSize: 12, color: '#78350f', marginTop: 2 }}>
-                  +RWF {(item.priceCents / 100).toLocaleString()}
+                <div className="text-xs text-amber-800 mt-0.5">
+                  +<CurrencyDisplay amount={item.priceCents} inCents />
                 </div>
               </div>
               <button
                 onClick={() => handleAdd(item)}
                 disabled={isAdded}
-                style={{
-                  padding: '8px 16px',
-                  background: isAdded ? '#d1d5db' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 6,
-                  fontWeight: 600,
-                  fontSize: 13,
-                  cursor: isAdded ? 'default' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  transition: 'all 0.2s',
-                  boxShadow: isAdded ? 'none' : '0 2px 4px rgba(245, 158, 11, 0.3)'
-                }}
+                className={`flex items-center gap-1 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/30 ${
+                  isAdded
+                    ? 'bg-gray-300 cursor-default'
+                    : 'bg-gradient-to-br from-amber-500 to-amber-600 hover:shadow-md active:scale-95'
+                }`}
+                aria-label={`Add ${item.name} to cart`}
               >
                 {isAdded ? (
                   '✓ Added'
                 ) : (
                   <>
-                    <Plus style={{ width: 14, height: 14 }} />
+                    <Plus className="w-3.5 h-3.5" />
                     Add
                   </>
                 )}
@@ -170,15 +133,8 @@ export default function UpsellRecommendations({ cartItems, menu, onAddToCart }: 
           )
         })}
       </div>
-      <p style={{ 
-        fontSize: 11, 
-        color: '#92400e', 
-        marginTop: 10, 
-        marginBottom: 0,
-        textAlign: 'center',
-        fontStyle: 'italic'
-      }}>
-        💡 Tip: Adding sides or drinks often saves on delivery fees
+      <p className="text-xs text-amber-800 mt-2.5 text-center italic">
+        Tip: Adding sides or drinks often saves on delivery fees
       </p>
     </div>
   )

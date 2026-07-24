@@ -6,7 +6,8 @@ import {
   FileText, ShoppingCart, Bell, Search, ChevronDown, 
   LogOut, Menu, X, Home, Sparkles, MapPin, Gift, 
   UtensilsCrossed, BarChart2, Hotel, Flag, Tag, Globe, Receipt, Store, Trophy, Palette, Clock,
-  Video, UserPlus, DollarSign, CreditCard, QrCode, MessageSquare, Calendar, ShieldCheck, UserCircle, RotateCcw
+  Video, UserPlus, DollarSign, CreditCard, QrCode, MessageSquare, Calendar, ShieldCheck, UserCircle, RotateCcw,
+  Activity, ChefHat
 } from 'lucide-react'
 import OfflineIndicator from './OfflineIndicator'
 import PWAInstallPrompt from './PWAInstallPrompt'
@@ -24,17 +25,18 @@ import CookieConsentBanner from '@/components/CookieConsentBanner'
 import LiveClock from '@/components/LiveClock'
 
 // V1 Navigation Section Configuration
-type V1SectionKey = 'OPERATIONS' | 'MENU_INVENTORY' | 'QR_DIGITAL' | 'REPORTS' | 'TEAM' | 'FINANCIAL' | 'SETTINGS' | 'ADMIN'
+type V1SectionKey = 'OPERATIONS' | 'MENU_INVENTORY' | 'QR_DIGITAL' | 'INTELLIGENCE' | 'REPORTS' | 'TEAM' | 'FINANCIAL' | 'SETTINGS' | 'ADMIN'
 
 const V1_SECTIONS: Record<V1SectionKey, { name: string; order: number }> = {
   OPERATIONS: { name: 'Operations', order: 1 },
   MENU_INVENTORY: { name: 'Menu & Inventory', order: 2 },
   QR_DIGITAL: { name: 'QR & Digital', order: 3 },
-  REPORTS: { name: 'Reports', order: 4 },
-  TEAM: { name: 'Team', order: 5 },
-  FINANCIAL: { name: 'Financial', order: 6 },
-  SETTINGS: { name: 'Settings', order: 7 },
-  ADMIN: { name: 'Admin', order: 8 },
+  INTELLIGENCE: { name: 'Intelligence', order: 4 },
+  REPORTS: { name: 'Reports', order: 5 },
+  TEAM: { name: 'Team', order: 6 },
+  FINANCIAL: { name: 'Financial', order: 7 },
+  SETTINGS: { name: 'Settings', order: 8 },
+  ADMIN: { name: 'Admin', order: 9 },
 }
 
 // V1 Navigation Item Interface
@@ -115,6 +117,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // === QR & DIGITAL (2 items) ===
     { name: 'QR Builder', href: '/dashboard/qr-builder', icon: QrCode, i18nKey: 'dashboard.nav.qrBuilder', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 1 },
     { name: 'QR Analytics', href: '/dashboard/qr-analytics', icon: QrCode, i18nKey: 'dashboard.nav.qrAnalytics', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 2 },
+
+    // === INTELLIGENCE (4 items) ===
+    { name: 'Daily Briefings', href: '/dashboard/daily-briefings', icon: Sparkles, i18nKey: 'dashboard.nav.dailyBriefings', v1Visible: true, v1Section: 'INTELLIGENCE', v1Order: 1 },
+    { name: 'Service Intelligence', href: '/dashboard/service-intelligence', icon: Activity, i18nKey: 'dashboard.nav.serviceIntelligence', v1Visible: true, v1Section: 'INTELLIGENCE', v1Order: 2 },
+    { name: 'Kitchen Intelligence', href: '/dashboard/kitchen-intelligence', icon: ChefHat, i18nKey: 'dashboard.nav.kitchenIntelligence', v1Visible: true, v1Section: 'INTELLIGENCE', v1Order: 3 },
+    { name: 'Menu Intelligence', href: '/dashboard/menu-intelligence', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.menuIntelligence', v1Visible: true, v1Section: 'INTELLIGENCE', v1Order: 4 },
 
     // === REPORTS (4 items) ===
     { name: 'Reports', href: '/dashboard/reports', icon: TrendingUp, i18nKey: 'dashboard.nav.reports', v1Visible: true, v1Section: 'REPORTS', v1Order: 1 },
