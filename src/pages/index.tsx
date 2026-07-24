@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
+import PublicLayout from '@/components/PublicLayout'
 import { useTranslation } from '@/lib/i18n'
 import {
   Check,
@@ -19,7 +19,6 @@ import {
   Star,
   ArrowRight,
   ChevronRight,
-  ChevronDown,
   TrendingUp,
   Users,
   Clock,
@@ -39,19 +38,9 @@ import {
   Mic,
   ChevronLeft,
   Bell,
-  Moon,
-  Sun,
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/currency'
 import { PRICING_PLANS } from '@/config/pricing'
-import { useTheme } from '@/hooks/useTheme'
-import { usePWAInstall } from '@/hooks/usePWAInstall'
-import InstallAppButton from '@/components/InstallAppButton'
-import PublicSupportWidget from '@/components/PublicSupportWidget'
-import PWAInstallPrompt from '@/components/PWAInstallPrompt'
-import CookieConsentBanner from '@/components/CookieConsentBanner'
-import NewsletterSignup from '@/components/NewsletterSignup'
-import SocialShare from '@/components/SocialShare'
 
 // Use unified pricing config (show all plans on homepage)
 const plans = PRICING_PLANS.map(p => ({
@@ -200,12 +189,7 @@ const heroSlides = [
 export default function HomePage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
-  const { darkMode, toggleDarkMode } = useTheme()
-  const { isInstalled } = usePWAInstall()
   const [billing, setBilling] = React.useState<'monthly' | 'annual'>('annual')
-  const [solutionsOpen, setSolutionsOpen] = React.useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
-  const [scrolled, setScrolled] = React.useState(false)
   const [currentSlide, setCurrentSlide] = React.useState(0)
   const rtRef = React.useRef<HTMLDivElement>(null)
   const growthRef = React.useRef<HTMLDivElement>(null)
@@ -215,19 +199,6 @@ export default function HomePage() {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 10000)
     return () => clearInterval(timer)
-  }, [])
-
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(typeof window !== 'undefined' && window.scrollY > 4)
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', onScroll)
-      onScroll()
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('scroll', onScroll)
-      }
-    }
   }, [])
 
   const scrollCarousel = (ref: React.RefObject<HTMLDivElement>, dir: -1 | 1) => {
@@ -322,45 +293,11 @@ export default function HomePage() {
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://imboniserve.com'
   const displayCurrency = process.env.NEXT_PUBLIC_DISPLAY_CURRENCY || 'RWF'
   const supportWhatsAppUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || 'https://wa.me/250735214496'
-  const navClass = `bg-imboni-blue/95 dark:bg-gray-800/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10 dark:border-gray-700 transition-colors transition-shadow ${scrolled ? 'shadow-md' : ''}`
 
   return (
-    <>
+    <PublicLayout title="Imboni Serve — Restaurant & Hotel Management Platform">
     <Head>
-      <title>Imboni Serve — Restaurant & Hotel Management Platform</title>
-      <meta name="description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
       <meta name="robots" content="index,follow" />
-      {siteUrl && <link rel="canonical" href={`${siteUrl}${router.asPath.split('?')[0]}`} />}
-
-      {/* Open Graph */}
-      <meta property="og:type" content="website" />
-      <meta property="og:title" content="Imboni Serve — Restaurant & Hotel Management Platform" />
-      <meta property="og:description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
-      {siteUrl && <meta property="og:url" content={`${siteUrl}${router.asPath.split('?')[0]}`} />}
-      <meta property="og:image" content={(siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'} />
-
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Imboni Serve — Restaurant & Hotel Management Platform" />
-      <meta name="twitter:description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
-      <meta name="twitter:image" content={(siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'} />
-
-      
-
-      {/* JSON-LD: Organization */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: 'Imboni Serve',
-          url: `${siteUrl}/`,
-          logo: `${siteUrl}/imgs/logo2.png`,
-          sameAs: [],
-        }) }}
-      />
-
-      {/* JSON-LD: SoftwareApplication */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -378,141 +315,7 @@ export default function HomePage() {
         }) }}
       />
     </Head>
-    <div key={locale} className="min-h-screen bg-imboni-light dark:bg-gray-900 font-sans transition-colors">
-
-      {/* ── NAV ── */}
-      <nav className={navClass}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[56px] md:min-h-[60px] lg:min-h-[64px] py-0.5 md:py-1 flex items-center justify-between md:grid md:grid-cols-[max-content,1fr,max-content] md:items-center md:gap-6">
-          <div className="flex items-center gap-3 md:justify-self-start">
-            <div className="flex flex-col items-center md:items-start">
-              <Image src="/imgs/logo2.png" alt="Imboni Serve" width={120} height={48} className="h-10 w-auto md:h-12" priority />
-              <span className="hidden xl:block mt-1 text-xs lg:text-sm text-white/90 font-medium tracking-wide leading-tight" suppressHydrationWarning>
-                {t('homepage.nav_tagline', 'Run Smarter. Serve Better.')}
-              </span>
-            </div>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 text-[13px] xl:text-sm text-white/80 md:justify-self-center" aria-label="Primary">
-            <Link href="/#features" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
-            <Link href="/#pricing" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
-            <div className="relative">
-              <button
-                onClick={() => setSolutionsOpen(!solutionsOpen)}
-                onBlur={() => setTimeout(() => setSolutionsOpen(false), 200)}
-                className="flex items-center gap-1 hover:text-white transition whitespace-nowrap"
-                suppressHydrationWarning
-                aria-haspopup="menu"
-                aria-expanded={solutionsOpen}
-              >
-                {t('public.nav.solutions', 'Solutions')} <ChevronDown className="w-3 h-3" />
-              </button>
-              {solutionsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50" role="menu">
-                  <Link href="/discover" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.discover', 'Discover')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.discover_restaurants', 'Find restaurants powered by ImboniServe')}</div>
-                  </Link>
-                  <Link href="/store" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.supplier_marketplace', 'Supplier Marketplace')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.coming_soon', 'Coming Soon')}</div>
-                  </Link>
-                </div>
-              )}
-            </div>
-            <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
-            <a href={supportWhatsAppUrl} className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
-          </div>
-          
-          {/* Right side actions */}
-          <div className="flex items-center gap-2 md:gap-3 md:justify-self-end flex-nowrap">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-white/20 transition"
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
-            >
-              {darkMode ? (
-                <Sun size={20} className="text-yellow-300" />
-              ) : (
-                <Moon size={20} className="text-white" />
-              )}
-            </button>
-            <LanguageSwitcher />
-            {isInstalled && (
-              <span className="hidden md:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
-                {t('public.cta.installed', 'Installed')}
-              </span>
-            )}
-            
-            {/* Desktop CTA */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/login" className="text-white/80 text-sm hover:text-white transition">{t('public.cta.sign_in', 'Sign in')}</Link>
-              <Link
-                href="/signup"
-                className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap shrink-0 text-xs px-3 py-1.5 md:text-sm md:px-4 md:py-2"
-              >
-                <span className="hidden lg:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
-                <span className="lg:hidden">{t('public.cta.free_trial', 'Free Trial')}</span>
-              </Link>
-            </div>
-            
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/20 transition text-white"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-
-
-        {/* Mobile Navigation Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10">
-            <div className="px-4 py-3 space-y-2">
-              <Link href="/#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
-              <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
-              <div className="py-2">
-                <div className="text-white/80 font-medium mb-2">{t('public.nav.solutions', 'Solutions')}</div>
-                <div className="pl-4 space-y-1">
-                  <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.discover', 'Discover')}</Link>
-                  <Link href="/store" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.supplier_marketplace', 'Supplier Marketplace')} <span className="text-xs">({t('public.nav.coming_soon', 'Coming Soon')})</span></Link>
-                </div>
-              </div>
-              <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.discover', 'Discover')}</Link>
-              <a href={supportWhatsAppUrl} onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
-              
-              <div className="pt-3 mt-3 border-t border-white/10 space-y-2">
-                {isInstalled && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
-                    {t('public.cta.installed', 'Installed')}
-                  </span>
-                )}
-                <InstallAppButton className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-colors text-sm" label={t('public.cta.install', 'Install App')} />
-                <Link href="/login" className="block w-full text-center py-2 text-white/80 hover:text-white transition text-sm">{t('public.cta.sign_in', 'Sign in')}</Link>
-                <Link
-                  href="/signup"
-                  className="block w-full text-center bg-imboni-orange text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-dark transition"
-                >
-                  {t('public.cta.start_trial', 'Start Free Trial')}
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div key={locale}>
 
       {/* ── HERO WITH CAROUSEL ── */}
       <section className="bg-gradient-imboni text-white py-20 px-4 relative overflow-hidden">
@@ -612,7 +415,6 @@ export default function HomePage() {
             >
               {t('homepage.hero.cta_secondary', 'View Pricing')}
             </Link>
-            <InstallAppButton className="inline-flex items-center gap-2 px-4 py-3.5 rounded-xl border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-all text-base" label={t('homepage.hero.cta_install', 'Install App')} />
           </div>
         </div>
       </section>
@@ -1439,75 +1241,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="bg-imboni-dark text-white/50 text-sm py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Newsletter & Social Share */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-white/10">
-            <div>
-              <NewsletterSignup sourcePage="homepage-footer" variant="footer" />
-            </div>
-            <div>
-              <SocialShare 
-                title="ImboniServe" 
-                text="Discover ImboniServe – Smart Dining for Restaurants in Rwanda"
-                variant="compact"
-              />
-            </div>
-          </div>
-
-          <div className="text-center mb-4">
-            <div className="flex justify-center mb-3">
-              <Image src="/imgs/logo2.png" alt="Imboni Serve Logo" width={100} height={32} className="h-8 w-auto opacity-90" />
-            </div>
-            <p className="mb-3" suppressHydrationWarning>© {new Date().getFullYear()} {t('homepage.footer.copyright', 'Imboni Serve. Built for the hospitality industry.')}</p>
-            <div className="flex justify-center gap-6 flex-wrap">
-              <a href="/login" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.sign_in', 'Sign In')}</a>
-              <a href="/signup" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.sign_up', 'Sign Up')}</a>
-              <a href="#pricing" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.pricing', 'Pricing')}</a>
-              {isInstalled ? (
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm">
-                  {t('homepage.footer.installed', 'Installed')}
-                </span>
-              ) : (
-                <span className="inline-flex">
-                  <InstallAppButton className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-colors text-sm" label={t('homepage.footer.install', 'Install App')} />
-                </span>
-              )}
-              <a href="#store" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.store', 'Store')}</a>
-              <a href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.discover', 'Discover')}</a>
-              <a href="/faq" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.faqs', 'FAQs')}</a>
-              <a href={supportWhatsAppUrl} className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.contact', 'Contact')}</a>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-4 text-center">
-            <div className="flex justify-center gap-6 flex-wrap text-xs">
-              <a href="/terms" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.terms', 'Terms & Conditions')}</a>
-              <a href="/privacy" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.privacy', 'Privacy Policy')}</a>
-              <a href="/cookies" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.cookies', 'Cookie Policy')}</a>
-              <button
-                type="button"
-                onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new Event('im:consent:open-preferences'))}
-                className="hover:text-white transition underline underline-offset-4"
-              >
-                {t('public.footer.cookie_prefs', 'Cookie Preferences')}
-              </button>
-              <a href="/service-terms" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.service_terms', 'Service Terms')}</a>
-            </div>
-            <div className="mt-3 text-xs text-white/40">
-              <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-white/60">
-                Powered by ICTHubs
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      <PublicSupportWidget />
-      <PWAInstallPrompt />
-      <CookieConsentBanner />
     </div>
-    </>
+    </PublicLayout>
   )
 }

@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useTranslation } from '@/lib/i18n'
-import { Store, Search, ShoppingCart, MapPin, Star, Sparkles, Map, Moon, Sun, Globe } from 'lucide-react'
+import { Store, Search, ShoppingCart, MapPin, Star, Sparkles, Map } from 'lucide-react'
 import { getTagline } from '@/utils/taglines'
 import AISupplierRecommendations from '@/components/AISupplierRecommendations'
 import RecentlyViewedSuppliers from '@/components/RecentlyViewedSuppliers'
 import { useCart } from '@/contexts/CartContext'
-import { useTheme } from '@/hooks/useTheme'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
+import PublicLayout from '@/components/PublicLayout'
 import dynamic from 'next/dynamic'
 
 const SupplierMap = dynamic(() => import('@/components/SupplierMap'), { ssr: false })
@@ -16,16 +16,14 @@ const SupplierMap = dynamic(() => import('@/components/SupplierMap'), { ssr: fal
 export default function Marketplace() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const { t, locale, changeLocale } = useTranslation()
+  const { t, locale } = useTranslation()
   const { cartCount } = useCart()
-  const { darkMode, toggleDarkMode } = useTheme()
   const [products, setProducts] = useState<any[]>([])
   const [suppliers, setSuppliers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<'browse' | 'ai-recommendations' | 'map'>('browse')
   const [businessLocation, setBusinessLocation] = useState<{ lat: number; lon: number } | null>(null)
-  const [showLangMenu, setShowLangMenu] = useState(false)
 
   useEffect(() => {
     // Allow browsing without login, but features require authentication
@@ -38,12 +36,6 @@ export default function Marketplace() {
       fetchBusinessLocation()
     }
   }, [status, locale]) // Refetch when locale changes for localized data
-
-  const handleLanguageChange = (newLocale: typeof locale) => {
-    changeLocale(newLocale)
-    setShowLangMenu(false)
-    router.push({ pathname: router.pathname, query: router.query }, undefined, { locale: newLocale })
-  }
 
   const fetchProducts = async () => {
     try {
@@ -87,99 +79,44 @@ export default function Marketplace() {
 
   if (loading || status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>{t('loading', 'Loading...')}</p>
-      </div>
+      <PublicLayout title="Marketplace — Imboni Serve">
+        <div className="min-h-screen flex items-center justify-center">
+          <p>{t('loading', 'Loading...')}</p>
+        </div>
+      </PublicLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors">
-      {/* Header Bar */}
-      <div className="bg-gradient-to-r from-imboni-blue to-blue-600 dark:from-gray-800 dark:to-gray-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-5">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <img src="/imgs/logo2.png" alt="Imboni Serve" className="h-14 w-auto drop-shadow-lg" />
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Marketplace</h1>
-                <p className="text-blue-100 text-sm">{getTagline('hero')}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg hover:bg-white/20 transition"
-                title={darkMode ? 'Light Mode' : 'Dark Mode'}
-              >
-                {darkMode ? (
-                  <Sun size={20} className="text-yellow-300" />
-                ) : (
-                  <Moon size={20} className="text-white" />
-                )}
-              </button>
-
-              {/* Language Switcher */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowLangMenu(!showLangMenu)}
-                  className="px-4 py-2 rounded-lg hover:bg-white/20 transition flex items-center gap-2 min-w-[100px]"
-                  title="Change Language"
-                >
-                  <Globe size={20} className="text-white" />
-                  <span className="text-white text-sm font-medium">
-                    {locale === 'en' ? 'EN' : locale === 'rw' ? 'RW' : 'FR'}
-                  </span>
-                </button>
-                
-                {showLangMenu && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                    <button
-                      onClick={() => handleLanguageChange('en')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-t-lg flex items-center gap-2"
-                    >
-                      <span className="text-lg">🇬🇧</span> English
-                    </button>
-                    <button
-                      onClick={() => handleLanguageChange('rw')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white flex items-center gap-2"
-                    >
-                      <span className="text-lg">🇷🇼</span> Kinyarwanda
-                    </button>
-                    <button
-                      onClick={() => handleLanguageChange('fr')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-b-lg flex items-center gap-2"
-                    >
-                      <span className="text-lg">🇫🇷</span> Français
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={() => router.push('/store/cart')}
-                className="relative p-2 text-white hover:text-blue-200"
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-imboni-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
+    <PublicLayout title="Marketplace — Imboni Serve">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{t('marketplace.store_title', 'Marketplace')}</h1>
+            <p className="text-sm text-gray-500">{getTagline('hero')}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push('/store/cart')}
+              className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-imboni-blue"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-imboni-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+            {status === 'authenticated' && (
               <button
                 onClick={() => router.push('/dashboard')}
-                className="text-sm text-white hover:text-blue-200"
+                className="text-sm text-gray-700 dark:text-gray-300 hover:text-imboni-blue"
               >
                 {t('dashboard', 'Dashboard')}
               </button>
-            </div>
+            )}
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -338,6 +275,6 @@ export default function Marketplace() {
           </>
         )}
       </div>
-    </div>
+    </PublicLayout>
   )
 }

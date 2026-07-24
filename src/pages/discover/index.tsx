@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Search, Star, MapPin, Utensils, Filter, TrendingUp, Sparkles } from 'lucide-react'
+import { Search, Star, MapPin, Filter, TrendingUp, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
+import PublicLayout from '@/components/PublicLayout'
 
 export default function DiscoverPage() {
   const { t } = useTranslation()
@@ -42,17 +43,14 @@ export default function DiscoverPage() {
   function doSearch() { setQuery(search) }
 
   return (
-    <div className="min-h-screen bg-imboni-light font-sans flex flex-col">
-      {/* NAV */}
-      <nav className="bg-imboni-blue/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-imboni-orange rounded-lg flex items-center justify-center">
-              <Utensils className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">Imboni Serve</span>
-          </Link>
-          <div className="flex-1 flex items-center gap-2 max-w-2xl">
+    <PublicLayout title="Discover Restaurants — Imboni Serve">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-imboni-blue mb-2">{t('discovery.title')}</h1>
+            <p className="text-gray-600">{t('discovery.subtitle')}</p>
+          </div>
+          <div className="flex items-center gap-2">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -68,16 +66,7 @@ export default function DiscoverPage() {
               <Filter className="w-4 h-4" /> {t('discovery.filters')}
             </button>
           </div>
-          <div className="hidden md:flex items-center gap-3">
-            <Link href="/login" className="text-white/80 text-sm hover:text-white transition">Sign in</Link>
-            <Link href="/signup" className="bg-white text-imboni-blue text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-100 transition">Start Free Trial</Link>
-          </div>
         </div>
-      </nav>
-
-      <div className="max-w-6xl mx-auto px-4 py-8 flex-1">
-        <h1 className="text-3xl font-bold text-imboni-blue mb-2">{t('discovery.title')}</h1>
-        <p className="text-gray-600 mb-6">{t('discovery.subtitle')}</p>
 
         {showFilters && (
           <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6 shadow-sm">
@@ -193,16 +182,6 @@ export default function DiscoverPage() {
           {t('discovery.poweredBy')} <a href="/" className="hover:underline font-medium text-imboni-blue">Imboni Serve</a>
         </p>
       </div>
-      {/* FOOTER */}
-      <footer className="bg-imboni-dark text-white/50 text-sm py-6 px-4 text-center mt-auto">
-        <p>© {new Date().getFullYear()} Imboni Serve. Built for the hospitality industry.</p>
-        <div className="flex justify-center gap-6 mt-2 flex-wrap">
-          <Link href="/" className="hover:text-white transition">Home</Link>
-          <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-          <Link href="/signup" className="hover:text-white transition">Sign Up</Link>
-          <a href="https://wa.me/250735214496" className="hover:text-white transition">Contact</a>
-        </div>
-      </footer>
-    </div>
+    </PublicLayout>
   )
 }
