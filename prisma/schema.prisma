@@ -233,6 +233,7 @@ model Business {
 
   // Relations for new monetization features
   aiUsageLogs             AIUsageLog[]
+  aiCreditWallet          AICreditWallet?
   siteBuilderSubscription SiteBuilderSubscription?
   discoverySubscription   DiscoverySubscription?
   businessScans           BusinessScan[]
@@ -4707,4 +4708,190 @@ model PluginAlertEvent {
   @@index([alertType, firedAt])
   @@index([severity, firedAt])
   @@index([firedAt])
+}
+
+// ============================================
+// AI CREDITS PLATFORM
+// The economic engine for all AI capabilities
+// ============================================
+
+enum AICreditLedgerEntryType {
+  ALLOCATION          // Monthly subscription credits granted
+  PURCHASE            // One-time credit purchase
+  BONUS               // Promotional / manual bonus
+  CONSUMPTION         // Credits consumed by an AI operation
+  REFUND              // Credits refunded for failed operations
+  RESERVATION         // Credits reserved pending operation
+  RESERVATION_RELEASE // Reservation released (operation failed/cancelled)
+  ADJUSTMENT          // Manual admin adjustment (grant/revoke)
+  EXPIRY              // Credits expired per policy
+}
+
+enum AICreditReservationStatus {
+  PENDING    // Reserved, awaiting operation result
+  COMMITTED  // Operation succeeded, credits deducted
+  RELEASED   // Operation failed/cancelled, credits returned
+  EXPIRED    // Reservation timed out without commit
+}
+
+/// AI Credit Wallet — one per business, tracks all credit balances
+model AICreditWallet {
+  id                   String   @id @default(cuid())
+  businessId           String   @unique
+
+  // Balances
+  balance              Int      @default(0)    // Current spendable balance
+  reservedBalance      Int      @default(0)    // Credits held in pending reservations
+  monthlyAllocation    Int      @default(0)    // Credits granted by subscription plan
+  purchasedCredits     Int      @default(0)    // Lifetime purchased credits remaining
+  bonusCredits         Int      @default(0)    // Promotional / granted credits remaining
+
+  // Lifetime totals
+  lifetimeConsumed     Int      @default(0)
+  lifetimePurchased    Int      @default(0)
+  lifetimeAllocated    Int      @default(0)
+
+  // Renewal cycle
+  lastRenewalAt        DateTime?
+  nextRenewalAt        DateTime?
+
+  // Limits
+  maxBalance           Int?    // null = no limit
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  business             Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  ledgerEntries        AICreditLedgerEntry[]
+  reservations         AICreditReservation[]
+
+  @@index([nextRenewalAt])
+}
+
+/// AI Credit Ledger — immutable source of truth for all credit movements
+model AICreditLedgerEntry {
+  id              String                  @id @default(cuid())
+  walletId        String
+  businessId      String
+
+  entryType       AICreditLedgerEntryType
+  feature         String?   // e.g. 'scanner', 'site_builder', 'menu_description'
+  operation       String?   // Specific operation description
+
+  credits         Int       // Positive for credits in, negative for credits out
+  balanceBefore   Int       // Wallet balance before this entry
+  balanceAfter    Int       // Wallet balance after this entry
+
+  requestId       String?   // Correlates to AICreditReservation
+  userId          String?   // Who triggered the operation
+  aiProvider      String?   // 'openai', 'anthropic', etc.
+  tokensUsed      Int?
+  costUSD         Float?
+  metadata        Json?     // Additional context
+
+  idempotencyKey  String?   @unique  // Prevents duplicate entries
+
+  createdAt       DateTime  @default(now())
+
+  wallet          AICreditWallet  @relation(fields: [walletId], references: [id])
+
+  @@index([walletId, createdAt])
+  @@index([businessId, createdAt])
+  @@index([entryType, createdAt])
+  @@index([feature, createdAt])
+  @@index([requestId])
+}
+
+/// AI Credit Reservation — holds credits during async AI operations
+model AICreditReservation {
+  id              String                    @id @default(cuid())
+  walletId        String
+  businessId      String
+
+  feature         String
+  operation       String?
+  creditsReserved Int
+  status          AICreditReservationStatus @default(PENDING)
+
+  requestId       String                    @unique  // Idempotency key for the operation
+  userId          String?
+
+  expiresAt       DateTime   // Auto-release if not committed in time
+  committedAt     DateTime?
+  releasedAt      DateTime?
+
+  metadata        Json?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  wallet          AICreditWallet  @relation(fields: [walletId], references: [id])
+
+  @@index([walletId, status])
+  @@index([businessId, status])
+  @@index([status, expiresAt])
+  @@index([feature])
+}
+
+/// AI Feature Cost Registry — configurable cost per AI capability
+model AIFeatureCost {
+  id              String   @id @default(cuid())
+  featureKey      String   @unique  // 'scanner', 'site_builder', 'menu_description', etc.
+  featureName     String   // Human-readable name
+  description     String?
+
+  creditsCost     Int      @default(1)   // Base credit cost
+  isDynamic       Boolean  @default(false) // If true, cost computed at runtime
+  minCredits      Int?     // For dynamic features: minimum cost
+  maxCredits      Int?     // For dynamic features: maximum cost
+
+  category        String?  // 'translation', 'generation', 'analysis', etc.
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+}
+
+/// AI Credit Package — purchasable credit bundles
+model AICreditPackage {
+  id              String   @id @default(cuid())
+  code            String   @unique  // 'pack_500', 'pack_2000', etc.
+  name            String
+  description     String?
+
+  credits         Int      // Credits included in this package
+  priceCents      Int      // Price in RWF cents
+  currency        String   @default("RWF")
+
+  bonusCredits    Int      @default(0)  // Promotional bonus credits
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+/// AI Credit Policy — data-driven rules for credit management
+model AICreditPolicy {
+  id              String   @id @default(cuid())
+  policyKey       String   @unique  // 'max_balance', 'credit_expiry_days', etc.
+  policyName      String
+  description     String?
+
+  value           String   // Stored as string, parsed by service layer
+  dataType        String   @default("string")  // 'string', 'int', 'boolean', 'json'
+
+  appliesTo       String   @default("all")  // 'all', 'plan:STARTER', 'plan:PROFESSIONAL', etc.
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([policyKey])
+  @@index([appliesTo, isActive])
 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { upgradeToPro } from '@/lib/services/site-builder-subscription.service';
 import { upgradeDiscoveryTier } from '@/lib/services/discovery-subscription.service';
 import { purchaseExtraCredits } from '@/lib/services/ai-credit.service';
+import { fulfillPurchase } from '@/lib/services/credits/credit-purchase.service';
 import { logger } from '@/lib/logger';
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service';
 
@@ -61,9 +62,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break;
 
       case 'ai_credits':
-        const credits = metadata.credits;
-        await purchaseExtraCredits(businessId, credits);
-        log.info('AI credits purchased', { businessId, credits, transactionId });
+        // Use the new AI Credits Platform fulfillment
+        if (metadata.packageCode) {
+          await fulfillPurchase(businessId, metadata.packageCode, transaction.id);
+          log.info('AI credits purchased via platform', { businessId, packageCode: metadata.packageCode, transactionId });
+        } else {
+          // Fallback for legacy purchases without packageCode
+          const credits = metadata.credits;
+          await purchaseExtraCredits(businessId, credits);
+          log.info('AI credits purchased (legacy)', { businessId, credits, transactionId });
+        }
         break;
 
       default:

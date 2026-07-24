@@ -48,6 +48,14 @@ next-env.d.ts
 .vscode/
 .idea/
 
+# Temporary test/verification scripts (root level)
+/verify-db.ts
+/check_tables.sql
+/check-data.ts
+/check-reports.ts
+/test-*.ts
+/populate-replay-events.ts
+
 # Prisma
 /prisma/migrations/dev.db
 /prisma/migrations/dev.db-journal
