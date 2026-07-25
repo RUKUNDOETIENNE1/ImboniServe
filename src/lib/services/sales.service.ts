@@ -4,6 +4,7 @@ import { calculateConvenienceFee } from '@/lib/pricing/fee-calculator'
 import type { PaymentMethod } from '@/lib/pricing/fee-config'
 import { SmartDiningSlipService } from './smart-dining-slip.service'
 import { FinancialTruthService, CostSource } from './financial-truth.service'
+import { GuestRecognitionService } from './guest-recognition.service'
 
 export class SalesService {
   static async createSale(userId: string, input: CreateSaleInput) {
@@ -22,11 +23,27 @@ export class SalesService {
     
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
+    // Upsert customer if phone provided
+    let customerId: string | undefined
+    if (input.clientPhone) {
+      try {
+        const result = await GuestRecognitionService.registerOrRecognize(
+          input.clientPhone,
+          input.businessId,
+        )
+        customerId = result.customerId
+      } catch (error) {
+        console.error('Failed to upsert customer for sale:', error)
+      }
+    }
+
     const sale = await prisma.sale.create({
       data: {
         orderNumber,
         businessId: input.businessId,
         userId,
+        customerId: customerId || null,
+        customerPhone: input.clientPhone || null,
         totalAmountCents,
         paymentMethod: input.paymentMethod,
         paymentStatus: input.paymentMethod === 'CASH' ? 'COMPLETED' : 'PENDING',
@@ -70,6 +87,20 @@ export class SalesService {
         })
       } catch (error) {
         console.error('Failed to generate Smart Dining Slip™:', error)
+      }
+
+      // Visit completion for immediately-paid CASH orders
+      if (customerId) {
+        try {
+          await GuestRecognitionService.onOrderCompleted(
+            customerId,
+            totalAmountCents,
+            sale.id,
+            input.businessId
+          )
+        } catch (error) {
+          console.error('Failed to update guest stats after CASH sale:', error)
+        }
       }
     }
 

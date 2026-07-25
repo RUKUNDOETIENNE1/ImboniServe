@@ -6,6 +6,7 @@ import { AuditLogService } from '@/lib/services/audit-log.service'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { triggerEvent } from '@/lib/pusher-server'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -102,6 +103,20 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
       return updated
     })
+
+    // Visit completion — update customer stats, preferences, and VIP tier
+    if (updatedSale.customerId) {
+      try {
+        await GuestRecognitionService.onOrderCompleted(
+          updatedSale.customerId,
+          sale.totalAmountCents,
+          sale.id,
+          sale.businessId
+        )
+      } catch (error) {
+        console.error('Error updating guest stats:', error)
+      }
+    }
 
     try {
       const { NotificationService } = await import('@/lib/services/notification.service')

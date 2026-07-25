@@ -7,6 +7,7 @@ import PreferencesSettings from '@/components/PreferencesSettings';
 import CallWaiterButton from '@/components/CallWaiterButton';
 import OTPVerification from '@/components/order/OTPVerification';
 import UpsellRecommendations from '@/components/order/UpsellRecommendations';
+import WelcomeBackBanner from '@/components/order/WelcomeBackBanner';
 import SeatSelectionModal from '@/components/SeatSelectionModal';
 import { getUserPreferences, isMenuItemSafe, detectUserLanguage } from '@/lib/userPreferences';
 import { abServeForMenuItem, abTrackEvent } from '@/lib/ab-testing/client';
@@ -423,6 +424,7 @@ export default function OrderPage() {
             allergies: preferences.allergies,
             dietaryPreferences: preferences.dietaryPreferences,
           },
+          customerPhone: phone || undefined,
           limit: 3,
         }),
       });
@@ -1015,6 +1017,10 @@ export default function OrderPage() {
                       <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: 8, fontSize: 13, color: '#166534' }}>
                         ✓ Phone verified: {phone}
                       </div>
+                      <WelcomeBackBanner
+                        phone={phone}
+                        businessId={branchId || ''}
+                      />
                       <input
                         type="text"
                         placeholder="Your name"

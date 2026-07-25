@@ -5,6 +5,7 @@ import { AuditLogService } from '@/lib/services/audit-log.service'
 import { NotificationService } from '@/lib/services/notification.service'
 import { broadcast } from '@/lib/realtime'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -91,7 +92,7 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
   try {
     const now = new Date()
 
-    await prisma.$transaction(async (tx) => {
+    const sale = await prisma.$transaction(async (tx) => {
       // Update payment transaction
       await tx.paymentTransaction.update({
         where: { id: paymentTxId },
@@ -102,7 +103,7 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
         }
       })
       // Update sale/order
-      const sale = await tx.sale.update({
+      const updatedSale = await tx.sale.update({
         where: { id: orderId },
         data: {
           paymentStatus: 'COMPLETED',
@@ -123,8 +124,8 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
         entityId: orderId,
         metadata: {
           paymentTxId,
-          orderNumber: sale.orderNumber,
-          amountCents: sale.totalAmountCents,
+          orderNumber: updatedSale.orderNumber,
+          amountCents: updatedSale.totalAmountCents,
           confirmedAt: now.toISOString()
         }
       })
@@ -138,22 +139,37 @@ async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
 
       // Broadcast real-time update
       try {
-        await broadcast(`business:${sale.businessId}:orders`, 'ORDER_PAYMENT_CONFIRMED', {
+        await broadcast(`business:${updatedSale.businessId}:orders`, 'ORDER_PAYMENT_CONFIRMED', {
           type: 'ORDER_PAYMENT_CONFIRMED',
           orderId: orderId,
-          orderNumber: sale.orderNumber,
-          paymentMethod: sale.paymentMethod,
+          orderNumber: updatedSale.orderNumber,
+          paymentMethod: updatedSale.paymentMethod,
           timestamp: now.toISOString(),
         })
       } catch (error) {
         console.error('[MoMo] Broadcast error:', error)
       }
 
+      return updatedSale
     })
     await ensurePaymentLedgerEvent(paymentTxId, 'SUCCESS', {
       source: 'payments/momo/status',
       mode: 'poll',
     })
+
+    // Visit completion — update customer stats, preferences, and VIP tier
+    if (sale.customerId) {
+      try {
+        await GuestRecognitionService.onOrderCompleted(
+          sale.customerId,
+          sale.totalAmountCents,
+          sale.id,
+          sale.businessId
+        )
+      } catch (error) {
+        console.error('[MoMo] Error updating guest stats:', error)
+      }
+    }
 
     console.log('[MoMo] Payment successfully processed:', orderId)
   } catch (error) {

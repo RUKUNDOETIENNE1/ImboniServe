@@ -7,6 +7,7 @@ import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 
 /**
  * GET /api/payments/intouch/status/[id]
@@ -87,12 +88,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // Update order if payment completed
       if (newStatus === 'SUCCESS' && payment.referenceId) {
-        await prisma.sale
+        const updatedSale = await prisma.sale
           .update({
             where: { id: payment.referenceId },
             data: { paymentStatus: 'COMPLETED', isPaid: true, paymentTransactionId: payment.id },
           })
           .catch((err: any) => console.log('[InTouch Status] Sale update failed:', err.message))
+
+        // Visit completion — update customer stats
+        if (updatedSale?.customerId) {
+          try {
+            await GuestRecognitionService.onOrderCompleted(
+              updatedSale.customerId,
+              updatedSale.totalAmountCents,
+              updatedSale.id,
+              updatedSale.businessId
+            )
+          } catch (error) {
+            console.error('[InTouch Status] Error updating guest stats:', error)
+          }
+        }
       }
     }
 

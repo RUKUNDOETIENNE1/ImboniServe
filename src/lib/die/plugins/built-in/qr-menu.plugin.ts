@@ -269,7 +269,7 @@ async function runExtraction(buffer: Buffer, mimeType: string): Promise<string> 
   for (const provider of providerChain) {
     try {
       if (!provider.supportsMime(mimeType)) continue
-      const result = await provider.extract({ buffer, mime: mimeType, documentType: 'MENU' as any })
+      const result = await provider.extract({ buffer, mime: mimeType, documentType: 'MENU' })
 
       if (Array.isArray(result?.lines) && result.lines.length > 0) {
         return result.lines

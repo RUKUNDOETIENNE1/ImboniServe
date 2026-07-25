@@ -7,6 +7,7 @@ export type PlanCode = 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'EN
 
 export interface PlanEntitlements {
   // Core Operations
+  hasMenu: boolean
   hasKitchenTickets: boolean
   hasKDS: boolean
   hasKDSAdvanced: boolean
@@ -100,6 +101,7 @@ export interface PlanEntitlements {
  */
 export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
   const baseEntitlements: PlanEntitlements = {
+    hasMenu: true,
     hasKitchenTickets: false,
     hasKDS: false,
     hasKDSAdvanced: false,

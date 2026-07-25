@@ -16,13 +16,27 @@ export type ProviderResult = {
   fields: ProviderField[]
   lines?: ProviderLine[]
   bboxes?: any
+  /**
+   * Name of the provider that actually produced this result.
+   * Set by ProviderRouter when it selects a provider internally.
+   * Individual providers (Azure, OpenAI) do not set this — their `name`
+   * property is used instead.  This field is additive and backward-compatible.
+   */
+  providerUsed?: string
 }
+
+export type DocumentType =
+  | 'SUPPLIER_INVOICE'
+  | 'DELIVERY_NOTE'
+  | 'GENERIC'
+  | 'MENU'
+  | 'RECEIPT'
 
 export type ExtractInput = {
   buffer: Buffer
   mime: string
   fileName?: string
-  documentType?: 'SUPPLIER_INVOICE' | 'DELIVERY_NOTE' | 'GENERIC'
+  documentType?: DocumentType
 }
 
 export interface ProviderGateway {

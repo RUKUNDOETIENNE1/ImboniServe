@@ -4,7 +4,6 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { SmartMenuBuilderService } from '@/lib/services/smart-menu-builder.service'
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
-import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -34,7 +33,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(successResponse(result, `Imported ${result.summary.successful} items`))
 }
 
-// Apply commercial enforcement: AI Menu Builder requires Professional plan or higher
-const handler = requiresFeature('hasAIMenuBuilder')(baseHandler)
-
-export default withErrorHandler(handler)
+export default withErrorHandler(baseHandler)

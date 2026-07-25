@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { MenuAIService } from '@/lib/services/menu-ai.service'
-import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { SmartMenuBuilderService } from '@/lib/services/smart-menu-builder.service'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -12,7 +11,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     const status = (req.query.status as string) || 'PENDING'
-    const candidates = await MenuAIService.getCandidates(businessId, status)
+    const candidates = await SmartMenuBuilderService.getCandidates(businessId, status)
     return res.status(200).json({ candidates })
   }
 
@@ -21,11 +20,11 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!candidateId) return res.status(400).json({ error: 'candidateId required' })
 
     if (action === 'publish') {
-      await MenuAIService.publishCandidate(candidateId, userId)
+      await SmartMenuBuilderService.publishCandidate(candidateId, userId)
       return res.status(200).json({ ok: true })
     }
     if (action === 'reject') {
-      await MenuAIService.rejectCandidate(candidateId, userId)
+      await SmartMenuBuilderService.rejectCandidate(candidateId, userId)
       return res.status(200).json({ ok: true })
     }
     return res.status(400).json({ error: 'Unknown action. Use publish or reject.' })
@@ -34,5 +33,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(405).end()
 }
 
-// Apply commercial enforcement: AI Menu Builder requires Professional plan or higher
-export default requiresFeature('hasAIMenuBuilder')(baseHandler)
+export default baseHandler

@@ -6,6 +6,7 @@ import { AuditLogService } from '@/lib/services/audit-log.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
 import { logBillingEvent } from '@/lib/services/billing-ledger.service'
 import { BillingEventType } from '@prisma/client'
+import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 
 export const config = {
   api: {
@@ -177,6 +178,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             await NotificationService.sendOrderNotification(sale.id)
           } catch (error) {
             console.error('Error sending order notification:', error)
+          }
+
+          // Visit completion — update customer stats, preferences, and VIP tier
+          if (sale.customerId) {
+            try {
+              await GuestRecognitionService.onOrderCompleted(
+                sale.customerId,
+                sale.totalAmountCents,
+                sale.id,
+                sale.businessId
+              )
+            } catch (error) {
+              console.error('Error updating guest stats:', error)
+            }
           }
         }
       }

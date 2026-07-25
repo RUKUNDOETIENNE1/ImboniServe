@@ -104,7 +104,9 @@ export const extractWorker = new Worker<ExtractJobData>(
       try {
         if (!prov.supportsMime(mime)) continue
         result = await prov.extract({ buffer, mime, documentType: documentType as any })
-        providerUsed = prov.name
+        // ProviderRouter stamps `providerUsed` on the result; fall back to
+        // prov.name for backward compat with direct (non-router) providers.
+        providerUsed = result?.providerUsed ?? prov.name
         break
       } catch (e) {
         lastError = e

@@ -94,8 +94,12 @@ export const authOptions: NextAuthOptions = {
             business: {
               select: {
                 plan: { select: { code: true } },
-                subscriptionStatus: true,
                 trialEndDate: true,
+                subscriptions: {
+                  orderBy: { createdAt: 'desc' },
+                  take: 1,
+                  select: { status: true },
+                },
               },
             },
           },
@@ -118,11 +122,12 @@ export const authOptions: NextAuthOptions = {
 
         const businessMeta = (user as any).business as {
           plan?: { code?: string | null } | null
-          subscriptionStatus?: string | null
+          subscriptions?: { status?: string | null }[] | null
           trialEndDate?: Date | null
         } | null
 
         const roles = (user.roles as string[]) || []
+        const latestSub = businessMeta?.subscriptions?.[0]
         const authUser: AppUser = {
           id: user.id,
           name: user.name,
@@ -131,7 +136,7 @@ export const authOptions: NextAuthOptions = {
           role: roles[0],
           businessId: user.businessId ?? null,
           planCode: businessMeta?.plan?.code ?? undefined,
-          subscriptionStatus: businessMeta?.subscriptionStatus ?? undefined,
+          subscriptionStatus: (latestSub?.status as string) ?? undefined,
           trialEndDate: businessMeta?.trialEndDate ?? null,
           debugRequestId: requestId,
         }
@@ -163,8 +168,12 @@ export const authOptions: NextAuthOptions = {
                 business: {
                   select: {
                     plan: { select: { code: true } },
-                    subscriptionStatus: true,
                     trialEndDate: true,
+                    subscriptions: {
+                      orderBy: { createdAt: 'desc' },
+                      take: 1,
+                      select: { status: true },
+                    },
                   },
                 },
               },
@@ -177,6 +186,7 @@ export const authOptions: NextAuthOptions = {
 
             const roles = (user as any).roles || []
             const primaryRole = roles && roles.length > 0 ? roles[0] : undefined
+            const latestSub = user.business?.subscriptions?.[0]
             const authUser: AppUser = {
               id: user.id,
               name: user.name,
@@ -185,7 +195,7 @@ export const authOptions: NextAuthOptions = {
               role: primaryRole,
               businessId: (user as any).businessId ?? null,
               planCode: user.business?.plan?.code ?? undefined,
-              subscriptionStatus: user.business?.subscriptionStatus ?? undefined,
+              subscriptionStatus: latestSub?.status ?? undefined,
               trialEndDate: user.business?.trialEndDate ?? null,
               debugRequestId: null,
             }

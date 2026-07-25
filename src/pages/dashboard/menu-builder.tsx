@@ -73,22 +73,53 @@ export default function MenuBuilderPage() {
     if (!file) return
 
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
     if (!validTypes.includes(file.type)) {
-      showToast('error', 'Please upload a valid image (JPG, PNG) or PDF file')
+      showToast('error', 'Please upload a valid image (JPG, PNG, WebP) or PDF file')
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('error', 'File size must be less than 10MB')
+    // Validate file size (max 25MB)
+    if (file.size > 25 * 1024 * 1024) {
+      showToast('error', 'File size must be less than 25MB')
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     setUploading(true)
     try {
-      // Upload API not enabled yet. Guide user to URL flow.
-      showToast('error', 'Local upload not yet enabled. Paste a public image/PDF URL and click "Use Image URL".')
+      // Upload file to the server using multipart form data
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/menu-builder/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Upload failed')
+      }
+
+      // Check if extraction succeeded
+      if (data.data?.status === 'FAILED') {
+        throw new Error(data.data?.error || 'AI extraction failed. Please try again with a clearer image.')
+      }
+
+      const count = data.data?.candidatesCount || 0
+      showToast('success', `Upload successful! AI extracted ${count} menu item${count === 1 ? '' : 's'}. Review below.`)
+
+      // Reset file input
+      if (fileInputRef.current) fileInputRef.current.value = ''
+
+      // Refresh candidates to show the new ones
+      setStatus('PENDING')
+      setTimeout(() => fetchCandidates(), 500)
+    } catch (err: any) {
+      showToast('error', err.message || 'Failed to upload menu')
       if (fileInputRef.current) fileInputRef.current.value = ''
     } finally {
       setUploading(false)
@@ -178,6 +209,15 @@ export default function MenuBuilderPage() {
 
   return (
     <DashboardLayout>
+      {uploading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-imboni-orange" />
+            <p className="text-slate-700 font-medium">AI is reading your menu...</p>
+            <p className="text-sm text-slate-500">Extracting items, prices, and categories</p>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -189,7 +229,7 @@ export default function MenuBuilderPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,application/pdf"
+            accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -198,8 +238,8 @@ export default function MenuBuilderPage() {
             disabled={uploading}
             className="flex items-center gap-2 px-4 py-2 bg-imboni-orange text-white rounded-lg hover:bg-accent-dark transition font-medium disabled:opacity-50"
           >
-            <Upload className="w-4 h-4" />
-            {uploading ? 'Uploading...' : 'Upload Menu'}
+            <Upload className={`w-4 h-4 ${uploading ? 'animate-pulse' : ''}`} />
+            {uploading ? 'Processing with AI...' : 'Upload Menu'}
           </button>
           <div className="flex items-center gap-2">
             <input
@@ -249,10 +289,10 @@ export default function MenuBuilderPage() {
                 disabled={uploading}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-imboni-blue text-white rounded-lg hover:bg-imboni-blue/90 transition font-medium disabled:opacity-50"
               >
-                <Upload className="w-5 h-5" />
-                {uploading ? 'Uploading...' : 'Upload Menu Document'}
+                <Upload className={`w-5 h-5 ${uploading ? 'animate-pulse' : ''}`} />
+                {uploading ? 'Processing with AI...' : 'Upload Menu Document'}
               </button>
-              <p className="text-xs text-slate-400 mt-3">Supported: JPG, PNG, PDF (max 10MB)</p>
+              <p className="text-xs text-slate-400 mt-3">Supported: JPG, PNG, WebP, PDF (max 25MB)</p>
             </div>
           ) : (
             <p className="text-sm text-slate-400 mt-1">No {status.toLowerCase()} items found</p>

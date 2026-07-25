@@ -29,6 +29,7 @@ export class CustomerService {
       where: { id: customerId },
       data: {
         totalSpent: { increment: orderAmount },
+        lifetimeSpendCents: { increment: orderAmount },
         visitCount: { increment: 1 },
         loyaltyPoints: { increment: loyaltyPoints },
         lastVisit: new Date(),

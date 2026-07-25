@@ -16,14 +16,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
-import { 
-  checkFeatureAccess, 
+import {
+  checkFeatureAccess,
   checkResourceLimit,
-  createCommercialContext, 
+  createCommercialContext,
   logCommercialEvent,
   isInTrial,
   type CommercialContext,
-  type ResourceType
+  type ResourceType,
+  type SubscriptionStatus as AppSubscriptionStatus
 } from '@/lib/commercial/commercial-policy'
 import type { PlanEntitlements } from '@/lib/plan-entitlements'
 
@@ -71,33 +72,35 @@ export function requiresFeature(feature: keyof PlanEntitlements) {
         const business = await prisma.business.findUnique({
           where: { id: businessId },
           include: {
-            plan: true
+            plan: true,
+            subscriptions: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true, endDate: true } },
           }
         })
-        
+
         if (!business) {
-          return res.status(404).json({ 
+          return res.status(404).json({
             error: 'Not Found',
-            message: 'Business not found' 
+            message: 'Business not found'
           })
         }
-        
+
         if (!business.plan) {
-          return res.status(500).json({ 
+          return res.status(500).json({
             error: 'Internal Server Error',
-            message: 'Business has no plan assigned' 
+            message: 'Business has no plan assigned'
           })
         }
-        
+
         // Step 4: Create commercial context
         const userRoles = (session.user as any)?.roles || []
         const isAdmin = userRoles.includes('ADMIN')
-        
+
+        const latestSub = business.subscriptions?.[0]
         const context: CommercialContext = createCommercialContext({
           planCode: business.plan.code as any, // Type assertion safe because we control plan codes
-          subscriptionStatus: business.subscriptionStatus || 'ACTIVE',
+          subscriptionStatus: (latestSub?.status as AppSubscriptionStatus) || 'ACTIVE',
           trialEndDate: business.trialEndDate,
-          subscriptionEndDate: business.subscriptionEndDate,
+          subscriptionEndDate: latestSub?.endDate,
           isAdmin
         })
         
@@ -176,26 +179,31 @@ export function requiresActiveSubscription(handler: ApiHandler): ApiHandler {
       // Step 3: Load business data
       const business = await prisma.business.findUnique({
         where: { id: businessId },
-        include: { plan: true }
+        include: {
+          plan: true,
+          subscriptions: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true, endDate: true } },
+        }
       })
-      
+
       if (!business || !business.plan) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           error: 'Not Found',
-          message: 'Business or plan not found' 
+          message: 'Business or plan not found'
         })
       }
-      
+
       // Step 4: Check subscription status
       const now = new Date()
       const inTrial = business.trialEndDate && now < business.trialEndDate
-      const isActive = business.subscriptionStatus === 'ACTIVE'
-      
+      const latestSub = business.subscriptions?.[0]
+      const subStatus = (latestSub?.status as AppSubscriptionStatus) || 'ACTIVE'
+      const isActive = subStatus === 'ACTIVE'
+
       if (!inTrial && !isActive) {
         return res.status(402).json({
           error: 'Payment Required',
           message: 'Active subscription required',
-          subscriptionStatus: business.subscriptionStatus,
+          subscriptionStatus: subStatus,
           trialEndDate: business.trialEndDate
         })
       }
@@ -253,32 +261,36 @@ export function requiresResourceLimit(
         // Step 3: Load business and plan data
         const business = await prisma.business.findUnique({
           where: { id: businessId },
-          include: { plan: true }
+          include: {
+            plan: true,
+            subscriptions: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true, endDate: true } },
+          }
         })
-        
+
         if (!business) {
-          return res.status(404).json({ 
+          return res.status(404).json({
             error: 'Not Found',
-            message: 'Business not found' 
+            message: 'Business not found'
           })
         }
-        
+
         if (!business.plan) {
-          return res.status(500).json({ 
+          return res.status(500).json({
             error: 'Internal Server Error',
-            message: 'Business has no plan assigned' 
+            message: 'Business has no plan assigned'
           })
         }
-        
+
         // Step 4: Create commercial context
         const userRoles = (session.user as any)?.roles || []
         const isAdmin = userRoles.includes('ADMIN')
-        
+
+        const latestSub = business.subscriptions?.[0]
         const context: CommercialContext = createCommercialContext({
           planCode: business.plan.code as any,
-          subscriptionStatus: business.subscriptionStatus || 'ACTIVE',
+          subscriptionStatus: (latestSub?.status as AppSubscriptionStatus) || 'ACTIVE',
           trialEndDate: business.trialEndDate,
-          subscriptionEndDate: business.subscriptionEndDate,
+          subscriptionEndDate: latestSub?.endDate,
           isAdmin
         })
         
@@ -353,7 +365,7 @@ export function requiresAnyFeature(...features: (keyof PlanEntitlements)[]) {
             // Log successful access (ENHANCEMENT 3: includes endpoint)
             logCommercialEvent({
               userId: (await getServerSession(req, res, authOptions))?.user?.id || 'unknown',
-              businessId: (await getServerSession(req, res, authOptions))?.user?.businessId || 'unknown',
+              businessId: ((await getServerSession(req, res, authOptions))?.user as any)?.businessId || 'unknown',
               planCode: context.planCode,
               feature: feature,
               allowed: true,
@@ -402,7 +414,7 @@ export function requiresAllFeatures(...features: (keyof PlanEntitlements)[]) {
         
         const session = await getServerSession(req, res, authOptions)
         const userId = session?.user?.id || 'unknown'
-        const businessId = session?.user?.businessId || 'unknown'
+        const businessId = (session?.user as any)?.businessId || 'unknown'
         
         // Check each feature - all must be allowed
         for (const feature of features) {
@@ -490,22 +502,26 @@ export async function getCommercialContext(
     
     const business = await prisma.business.findUnique({
       where: { id: businessId },
-      include: { plan: true }
+      include: {
+        plan: true,
+        subscriptions: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true, endDate: true } },
+      }
     })
-    
+
     if (!business || !business.plan) {
       res.status(404).json({ error: 'Business or plan not found' })
       return null
     }
-    
+
     const userRoles = (session.user as any)?.roles || []
     const isAdmin = userRoles.includes('ADMIN')
-    
+
+    const latestSub = business.subscriptions?.[0]
     return createCommercialContext({
       planCode: business.plan.code as any,
-      subscriptionStatus: business.subscriptionStatus || 'ACTIVE',
+      subscriptionStatus: (latestSub?.status as AppSubscriptionStatus) || 'ACTIVE',
       trialEndDate: business.trialEndDate,
-      subscriptionEndDate: business.subscriptionEndDate,
+      subscriptionEndDate: latestSub?.endDate,
       isAdmin
     })
     
