@@ -276,7 +276,7 @@ async function getRevenueData() {
     // Per KPI_CATALOG_V2.md line 235: Requires metadata.subscriptionStatus = 'GRACE_PERIOD'
     // Current schema does not support metadata.subscriptionStatus field
     // Using Subscription table proxy would violate governance
-    // TODO: Re-implement when schema supports FinancialLedgerEntry.metadata.subscriptionStatus
+    // Deferred post-v1: Re-implement when schema supports FinancialLedgerEntry.metadata.subscriptionStatus
     const revenueAtRisk = 0
     const revenueAtRiskPercent = 0
 
@@ -482,7 +482,7 @@ async function getOperationsData() {
     // Per KPI_CATALOG_V2.md line 439: Requires reconciliationStatus field
     // Current schema does not support FinancialLedgerEntry.reconciliationStatus
     // Using createdAt proxy would be unreliable (old entries may be reconciled)
-    // TODO: Re-implement when schema supports reconciliationStatus field
+    // Deferred post-v1: Re-implement when schema supports reconciliationStatus field
     const reconciliationBacklog = 0
 
     // DLQ count from queue watchdog

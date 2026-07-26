@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Imboni Serve - Hospitality Intelligence Platform',
-  description: 'AI-powered restaurant operations and intelligence platform',
+  description: 'AI-powered hospitality operations and intelligence platform',
 }
 
 export default function RootLayout({

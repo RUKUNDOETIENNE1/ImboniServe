@@ -69,7 +69,7 @@ export default function AdminDashboard() {
 
   const stats = [
     {
-      label: t('total_restaurants', 'Total Restaurants'),
+      label: t('total_restaurants', 'Total Businesses'),
       value: overview?.totalRestaurants || 0,
       icon: Building2,
       color: 'blue'
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
               {t('manage_tenants', 'Manage Tenants')}
             </h3>
             <p className="text-gray-600 mb-4">
-              {t('total_restaurants', 'Total Restaurants')}: {overview?.totalRestaurants || 0}
+              {t('total_restaurants', 'Total Businesses')}: {overview?.totalRestaurants || 0}
             </p>
             <button
               onClick={() => router.push('/admin/restaurants')}

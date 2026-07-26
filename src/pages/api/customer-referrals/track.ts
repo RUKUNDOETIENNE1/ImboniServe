@@ -1,13 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 
+const MINIMUM_QUALIFYING_ORDER_CENTS = 500000 // 5,000 RWF — per service terms section 7.1
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const { referralCode, businessId } = req.body
+    const { referralCode, businessId, orderAmountCents } = req.body
 
     if (!referralCode || !businessId) {
       return res.status(400).json({ error: 'Referral code and business ID are required' })
@@ -25,7 +27,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Referral already used' })
     }
 
-    const rewardCents = 5000
+    // Enforce minimum qualifying order value per service terms
+    if (orderAmountCents !== undefined && orderAmountCents < MINIMUM_QUALIFYING_ORDER_CENTS) {
+      return res.status(200).json({
+        message: 'Order recorded but below minimum qualifying value for referral reward',
+        minimumRequiredCents: MINIMUM_QUALIFYING_ORDER_CENTS,
+        orderAmountCents,
+        qualified: false,
+      })
+    }
+
+    const rewardCents = 100000 // 1,000 RWF — matches advertised reward in service terms
 
     const updated = await prisma.customerReferral.update({
       where: { referralCode },
@@ -39,7 +51,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       message: 'Referral tracked successfully',
-      referral: updated
+      referral: updated,
+      qualified: true,
     })
   } catch (error) {
     console.error('Customer referral tracking error:', error)

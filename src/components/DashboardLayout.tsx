@@ -24,7 +24,7 @@ import CookieConsentBanner from '@/components/CookieConsentBanner'
 import LiveClock from '@/components/LiveClock'
 
 // V1 Navigation Section Configuration
-type V1SectionKey = 'OPERATIONS' | 'MENU_INVENTORY' | 'QR_DIGITAL' | 'REPORTS' | 'TEAM' | 'FINANCIAL' | 'SETTINGS' | 'ADMIN'
+type V1SectionKey = 'OPERATIONS' | 'MENU_INVENTORY' | 'QR_DIGITAL' | 'REPORTS' | 'TEAM' | 'FINANCIAL' | 'GROWTH' | 'SETTINGS' | 'ADMIN'
 
 const V1_SECTIONS: Record<V1SectionKey, { name: string; order: number }> = {
   OPERATIONS: { name: 'Operations', order: 1 },
@@ -33,8 +33,9 @@ const V1_SECTIONS: Record<V1SectionKey, { name: string; order: number }> = {
   REPORTS: { name: 'Reports', order: 4 },
   TEAM: { name: 'Team', order: 5 },
   FINANCIAL: { name: 'Financial', order: 6 },
-  SETTINGS: { name: 'Settings', order: 7 },
-  ADMIN: { name: 'Admin', order: 8 },
+  GROWTH: { name: 'Growth', order: 7 },
+  SETTINGS: { name: 'Settings', order: 8 },
+  ADMIN: { name: 'Admin', order: 9 },
 }
 
 // V1 Navigation Item Interface
@@ -101,26 +102,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // === OPERATIONS (5 items) ===
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, i18nKey: 'dashboard.nav.dashboard', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 1 },
     { name: 'Orders', href: '/dashboard/orders/unified', icon: ShoppingCart, i18nKey: 'dashboard.nav.orders', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 2 },
-    { name: 'Kitchen', href: '/dashboard/kitchen', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.kitchen', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3 },
-    { name: 'Tables', href: '/dashboard/tables', icon: Home, i18nKey: 'dashboard.nav.tables', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 4 },
-    { name: 'Reservations', href: '/dashboard/reservations', icon: Calendar, i18nKey: 'dashboard.nav.reservations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 5 },
-    { name: 'Service Replay', href: '/dashboard/operations/service-replay', icon: RotateCcw, i18nKey: 'dashboard.nav.serviceReplay', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 6 },
+    { name: 'Kitchen', href: '/dashboard/kitchen', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.kitchen', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'CHEF', 'KITCHEN_STAFF', 'SUPERVISOR'] },
+    { name: 'Tables', href: '/dashboard/tables', icon: Home, i18nKey: 'dashboard.nav.tables', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 4, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK'] },
+    { name: 'Reservations', href: '/dashboard/reservations', icon: Calendar, i18nKey: 'dashboard.nav.reservations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'FRONT_DESK', 'SUPERVISOR'] },
+    { name: 'Waiter', href: '/dashboard/waiter', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.waiter', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 6, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK'] },
+    { name: 'Service Replay', href: '/dashboard/operations/service-replay', icon: RotateCcw, i18nKey: 'dashboard.nav.serviceReplay', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 7, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'] },
 
-    // === MENU & INVENTORY (4 items) ===
+    // === MENU & INVENTORY (5 items) ===
     { name: 'Menu', href: '/dashboard/menu', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.menu', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 1 },
-    { name: 'Inventory', href: '/dashboard/inventory', icon: Package, i18nKey: 'dashboard.nav.inventory', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 2 },
-    { name: 'Inventory Alerts', href: '/dashboard/inventory-alerts', icon: Bell, i18nKey: 'dashboard.nav.inventoryAlerts', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 3 },
-    { name: 'OCR Documents', href: '/dashboard/die', icon: FileText, i18nKey: 'dashboard.nav.ocrDocuments', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 4 },
+    { name: 'AI Menu Builder', href: '/dashboard/menu-builder', icon: Sparkles, i18nKey: 'dashboard.nav.menuBuilder', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 2 },
+    { name: 'Inventory', href: '/dashboard/inventory', icon: Package, i18nKey: 'dashboard.nav.inventory', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 3 },
+    { name: 'Inventory Alerts', href: '/dashboard/inventory-alerts', icon: Bell, i18nKey: 'dashboard.nav.inventoryAlerts', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 4 },
+    { name: 'Auto-Reorder', href: '/dashboard/auto-reorder', icon: Package, i18nKey: 'dashboard.nav.autoReorder', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
+    { name: 'OCR Documents', href: '/dashboard/die', icon: FileText, i18nKey: 'dashboard.nav.ocrDocuments', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 6 },
 
     // === QR & DIGITAL (2 items) ===
     { name: 'QR Builder', href: '/dashboard/qr-builder', icon: QrCode, i18nKey: 'dashboard.nav.qrBuilder', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 1 },
     { name: 'QR Analytics', href: '/dashboard/qr-analytics', icon: QrCode, i18nKey: 'dashboard.nav.qrAnalytics', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 2 },
 
-    // === REPORTS (4 items) ===
+    // === REPORTS (5 items) ===
     { name: 'Reports', href: '/dashboard/reports', icon: TrendingUp, i18nKey: 'dashboard.nav.reports', v1Visible: true, v1Section: 'REPORTS', v1Order: 1 },
-    { name: 'Menu Performance', href: '/dashboard/analytics/menu-performance', icon: BarChart2, i18nKey: 'dashboard.nav.menuPerformance', v1Visible: true, v1Section: 'REPORTS', v1Order: 2 },
-    { name: 'Peak Hours', href: '/dashboard/analytics/peak-hours', icon: Clock, i18nKey: 'dashboard.nav.peakHours', v1Visible: true, v1Section: 'REPORTS', v1Order: 3 },
-    { name: 'Payment Analytics', href: '/dashboard/analytics/payments', icon: DollarSign, i18nKey: 'dashboard.nav.paymentAnalytics', v1Visible: true, v1Section: 'REPORTS', v1Order: 4 },
+    { name: 'Close Day / Z-Report', href: '/dashboard/close-day', icon: Receipt, i18nKey: 'dashboard.nav.closeDay', v1Visible: true, v1Section: 'REPORTS', v1Order: 2 },
+    { name: 'Menu Performance', href: '/dashboard/analytics/menu-performance', icon: BarChart2, i18nKey: 'dashboard.nav.menuPerformance', v1Visible: true, v1Section: 'REPORTS', v1Order: 3 },
+    { name: 'Peak Hours', href: '/dashboard/analytics/peak-hours', icon: Clock, i18nKey: 'dashboard.nav.peakHours', v1Visible: true, v1Section: 'REPORTS', v1Order: 4 },
+    { name: 'Payment Analytics', href: '/dashboard/analytics/payments', icon: DollarSign, i18nKey: 'dashboard.nav.paymentAnalytics', v1Visible: true, v1Section: 'REPORTS', v1Order: 5 },
 
     // === TEAM (1 item) ===
     { name: 'Staff', href: '/dashboard/staff', icon: Users, i18nKey: 'dashboard.nav.staff', v1Visible: true, v1Section: 'TEAM', v1Order: 1 },
@@ -135,6 +140,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Profile', href: '/dashboard/profile', icon: Globe, i18nKey: 'dashboard.nav.profile', v1Visible: true, v1Section: 'SETTINGS', v1Order: 2 },
     { name: 'Security', href: '/dashboard/security', icon: ShieldCheck, i18nKey: 'dashboard.nav.security', v1Visible: true, v1Section: 'SETTINGS', v1Order: 3 },
 
+    // === GROWTH (3 items) ===
+    { name: 'Invite & Earn', href: '/dashboard/invite', icon: Gift, i18nKey: 'dashboard.nav.invite', v1Visible: true, v1Section: 'GROWTH', v1Order: 1, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
+    { name: 'Referral Leaderboard', href: '/dashboard/referrals', icon: Trophy, i18nKey: 'dashboard.nav.referrals', v1Visible: true, v1Section: 'GROWTH', v1Order: 2, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
+    { name: 'Promotions', href: '/dashboard/promotions', icon: Tag, i18nKey: 'dashboard.nav.promotions', v1Visible: true, v1Section: 'GROWTH', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
+
     // === ADMIN ONLY (visible only to admins) ===
     { name: 'Payment Monitor', href: '/dashboard/payments/monitor', icon: CreditCard, i18nKey: 'dashboard.nav.paymentMonitor', v1AdminOnly: true, v1Section: 'ADMIN', v1Order: 1 },
     { name: 'Payment Feedback', href: '/dashboard/feedback/payments', icon: MessageSquare, i18nKey: 'dashboard.nav.paymentFeedback', v1AdminOnly: true, v1Section: 'ADMIN', v1Order: 2 },
@@ -145,9 +155,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     // === FEATURE FLAGGED (controlled by database flags) ===
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, i18nKey: 'dashboard.nav.analytics', featureFlag: 'advanced_analytics' },
-    { name: 'Menu Builder', href: '/dashboard/menu-builder', icon: Flag, i18nKey: 'dashboard.nav.menuBuilder', featureFlag: 'ai_menu_builder' },
     { name: 'Loyalty', href: '/dashboard/loyalty', icon: Gift, i18nKey: 'dashboard.nav.loyalty', featureFlag: 'loyalty_system' },
-    { name: 'Promotions', href: '/dashboard/promotions', icon: Tag, i18nKey: 'dashboard.nav.promotions', featureFlag: 'promotions_engine' },
     { name: 'Hotel', href: '/dashboard/hotel', icon: Hotel, i18nKey: 'dashboard.nav.hotel', featureFlag: 'hotel_mode' },
     { name: 'Branches', href: '/dashboard/branches', icon: MapPin, i18nKey: 'dashboard.nav.branches', featureFlag: 'multi_branch' },
     { name: 'Outlets', href: '/dashboard/outlets', icon: Store, i18nKey: 'dashboard.nav.outlets', featureFlag: 'multi_branch' },
@@ -169,8 +177,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const getV1Navigation = (): V1NavigationItem[] => {
     return navigation
       .filter(item => {
-        // V1 Visible items always show
-        if (item.v1Visible) return true
+        // V1 Visible items always show (subject to role filter)
+        if (item.v1Visible) {
+          // Role-based filtering: if rolesAllowed is defined, check user has at least one
+          if (item.rolesAllowed && !hasAnyRole(item.rolesAllowed)) return false
+          return true
+        }
         
         // Admin-only items show for admins
         if (item.v1AdminOnly && isAdmin) return true
@@ -180,6 +192,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         
         // Feature-flagged items show if flag is enabled
         if (item.featureFlag && enabledFlags.includes(item.featureFlag)) {
+          // Also check role filter for feature-flagged items
+          if (item.rolesAllowed && !hasAnyRole(item.rolesAllowed)) return false
           return true
         }
         

@@ -7,7 +7,7 @@ import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
-import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 /**
  * GET /api/payments/intouch/status/[id]
@@ -86,27 +86,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         responsecode: statusResponse.responsecode,
       })
 
-      // Update order if payment completed
+      // Update order if payment completed — delegate all side effects to PaymentCompletionService
       if (newStatus === 'SUCCESS' && payment.referenceId) {
-        const updatedSale = await prisma.sale
-          .update({
-            where: { id: payment.referenceId },
-            data: { paymentStatus: 'COMPLETED', isPaid: true, paymentTransactionId: payment.id },
-          })
-          .catch((err: any) => console.log('[InTouch Status] Sale update failed:', err.message))
-
-        // Visit completion — update customer stats
-        if (updatedSale?.customerId) {
-          try {
-            await GuestRecognitionService.onOrderCompleted(
-              updatedSale.customerId,
-              updatedSale.totalAmountCents,
-              updatedSale.id,
-              updatedSale.businessId
-            )
-          } catch (error) {
-            console.error('[InTouch Status] Error updating guest stats:', error)
-          }
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            payment.id,
+            payment.referenceId,
+            { source: 'intouch-status-polling' }
+          )
+        } catch (error) {
+          console.error('[InTouch Status] Error in PaymentCompletionService:', error)
+        }
+      } else if (newStatus === 'FAILED' && payment.referenceId) {
+        try {
+          await PaymentCompletionService.onPaymentFailure(
+            payment.id,
+            payment.referenceId,
+            'InTouch payment failed',
+            { source: 'intouch-status-polling' }
+          )
+        } catch (error) {
+          console.error('[InTouch Status] Error in PaymentCompletionService failure:', error)
         }
       }
     }

@@ -77,14 +77,14 @@ export function ConversationInterface({ conversation, onConversationUpdate }: Pr
             <Sparkles className="w-16 h-16 text-blue-600 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to AI Copilot™</h3>
             <p className="text-gray-600 mb-6 max-w-md">
-              Ask me anything about your restaurant operations. I'll provide evidence-based answers from your platform intelligence.
+              Ask me anything about your business operations. I'll provide evidence-based answers from your platform intelligence.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl">
               {[
                 'Why was lunch slow today?',
                 'Which waiter improved the most this week?',
                 'What caused the kitchen bottleneck yesterday?',
-                'Show me restaurants with declining service quality',
+                'Show me businesses with declining service quality',
               ].map((q, i) => (
                 <button
                   key={i}

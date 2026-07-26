@@ -34,7 +34,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
   const canonical = siteUrl ? `${siteUrl}${pathname}` : undefined
   const defaultDesc = t(
     'public.meta.description',
-    'Imboni Serve is a modern platform for restaurants and hotels: QR ordering, real-time operations, AI insights, and mobile payments.'
+    'Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments.'
   )
   const shareImage = (siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'
   return (
@@ -108,17 +108,9 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               </button>
               {solutionsOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50">
-                  <Link href="/dashboard/site-builder" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.site_builder', 'Site Builder')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.create_website', 'Create your website')}</div>
-                  </Link>
                   <Link href="/discover" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.marketplace', 'Marketplace')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.find_suppliers', 'Find suppliers & partners')}</div>
-                  </Link>
-                  <Link href="/store" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.store', 'Store')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.procurement_market', 'Procurement marketplace')}</div>
+                    <div className="font-medium">{t('public.nav.discover', 'Discover Hospitality Businesses')}</div>
+                    <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
                   </Link>
                   <Link href="/dashboard/profile" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
                     <div className="font-medium">{t('public.nav.list_business', 'List Your Business')}</div>
@@ -131,7 +123,6 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
                 </div>
               )}
             </div>
-            <Link href="/#store" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.store', 'Store')}</Link>
             <Link
               href="/refer"
               className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
@@ -234,7 +225,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <div>
               <SocialShare
                 title="ImboniServe"
-                text="Discover ImboniServe – Smart Dining for Restaurants in Rwanda"
+                text="Discover ImboniServe – Smart Dining for Hospitality Businesses in Rwanda"
                 variant="compact"
               />
             </div>
@@ -249,7 +240,6 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               <Link href="/signup" className="hover:text-white transition" suppressHydrationWarning>{t('public.footer.sign_up', 'Sign up')}</Link>
               <Link href="/pricing" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
               <Link href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
-              <Link href="/#store" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.store', 'Store')}</Link>
               <Link href="/faq" className="hover:text-white transition" suppressHydrationWarning>{t('public.footer.faqs', 'FAQs')}</Link>
               <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.contact', 'Contact')}</a>
               {isInstalled ? (

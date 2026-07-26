@@ -62,8 +62,8 @@
   },
   "discovery": {
     "title": "Discover Local Businesses",
-    "subtitle": "Find the best restaurants, cafes, and bars near you",
-    "searchPlaceholder": "Search restaurants, cafes, bars...",
+    "subtitle": "Find the best hospitality businesses, cafes, and bars near you",
+    "searchPlaceholder": "Search businesses, cafes, bars...",
     "filters": "Filters",
     "category": "Category",
     "location": "Location",
@@ -118,7 +118,7 @@
       "title": "Turn Every Table Into",
       "title_highlight": "Faster Revenue",
       "subtitle": "Reduce wait times, serve more customers, and streamline your operations—QR ordering, POS, and AI insights in one platform.",
-      "description": "Built for restaurants, hotels, bars, and cafés.",
+      "description": "Built for cafés, hotels, bars, and hospitality businesses.",
       "rt_os": "Real-time OS: see every sale, every table, every customer action — and grow revenue automatically.",
       "cta_primary": "Start 14-Day Free Trial",
       "cta_secondary": "View Pricing",
@@ -262,9 +262,9 @@
     },
     "video": {
       "title": "See Imboni Serve in Action",
-      "subtitle": "Watch how restaurants streamline operations with our all-in-one platform.",
+      "subtitle": "Watch how hospitality businesses streamline operations with our all-in-one platform.",
       "cta": "Click to watch on YouTube",
-      "description": "See how Imboni Serve transforms restaurant operations"
+      "description": "See how Imboni Serve transforms hospitality operations"
     },
     "store": {
       "badge": "Procurement Store",
@@ -524,7 +524,7 @@
       "branding": "Branding",
       "content": "Content",
       "templates_hero_title": "Professional Website Templates",
-      "templates_hero_subtitle": "Launch your restaurant website in minutes with pre-designed templates",
+      "templates_hero_subtitle": "Launch your hospitality business website in minutes with pre-designed templates",
       "benefit_beautiful_designs": "Beautiful Designs",
       "benefit_beautiful_desc": "Professionally crafted templates for every cuisine type",
       "benefit_quick_setup": "Quick Setup",
@@ -532,7 +532,7 @@
       "benefit_mobile_ready": "Mobile Ready",
       "benefit_mobile_desc": "All templates look perfect on any device",
       "choose_template": "Choose Your Template",
-      "choose_template_desc": "Browse professionally designed templates tailored for restaurants, cafés, and food businesses",
+      "choose_template_desc": "Browse professionally designed templates tailored for hospitality businesses, cafés, and food businesses",
       "popular": "Popular",
       "selected": "Selected",
       "use_template_cta": "Use This Template",
@@ -1026,7 +1026,7 @@
       "title1": "Turn Every Table Into",
       "title2": "Faster Revenue",
       "subtitle1": "Reduce wait times, serve more customers, and streamline your operations—QR ordering, POS, and AI insights in one platform.",
-      "subtitle2": "Built for restaurants, hotels, bars, and cafés."
+      "subtitle2": "Built for cafés, hotels, bars, and hospitality businesses."
     },
     "cta": {
       "start_trial_14": "Start 14-Day Free Trial",
@@ -1037,7 +1037,7 @@
   "pricing": {
     "title_page": "Pricing — Imboni Serve",
     "heading": "Simple Pricing for All Hospitality Businesses",
-    "subheading": "Choose the perfect plan for your restaurant, hotel, bar, or café. All plans include WhatsApp integration and mobile money support.",
+    "subheading": "Choose the perfect plan for your hospitality business, hotel, bar, or café. All plans include WhatsApp integration and mobile money support.",
     "tagline": "Unified. Intelligent. Reliable.",
     "launch_badge": "🎉 Launch Special - 50% OFF All Plans!",
     "monthly": "Monthly",
@@ -1059,9 +1059,9 @@
     "plan_starter": "Essentials",
     "plan_starter_desc": "Perfect for small cafés and food stalls",
     "plan_professional": "Professional",
-    "plan_professional_desc": "For established restaurants and cafés",
+    "plan_professional_desc": "For established hospitality businesses and cafés",
     "plan_business": "Business",
-    "plan_business_desc": "For hotels, chains, and high-volume restaurants",
+    "plan_business_desc": "For hotels, chains, and high-volume hospitality businesses",
     "plan_premium": "Premium",
     "plan_premium_desc": "Complete solution with all features included",
     "plan_enterprise": "Enterprise",
@@ -1069,9 +1069,9 @@
     "plan_essentials_name": "Essentials",
     "plan_essentials_desc": "Perfect for small cafés and food stalls getting started",
     "plan_professional_name": "Professional",
-    "plan_professional_desc_full": "For established restaurants and cafés",
+    "plan_professional_desc_full": "For established hospitality businesses and cafés",
     "plan_business_name": "Business",
-    "plan_business_desc_full": "For hotels, chains, and high-volume restaurants",
+    "plan_business_desc_full": "For hotels, chains, and high-volume hospitality businesses",
     "plan_premium_name": "Premium",
     "plan_premium_desc_full": "Complete solution with all features included",
     "plan_enterprise_name": "Enterprise",

@@ -363,7 +363,8 @@ export class IremboPayProvider implements IPaymentProvider {
    * Refund a payment (future implementation)
    */
   async refundPayment(transactionId: string, amount?: number): Promise<PaymentInitiationResponse> {
-    // TODO: Implement refund API when available
+    // IremboPay refund API not available in v1. Refunds are processed manually
+    // via IremboPay merchant portal. Automated refund API deferred post-v1.
     console.warn('[IremboPay] Refund not yet implemented')
     return {
       success: false,

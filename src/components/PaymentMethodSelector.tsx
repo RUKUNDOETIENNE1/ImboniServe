@@ -38,7 +38,7 @@ export function PaymentMethodSelector({
     {
       id: 'CASH' as const,
       icon: Banknote,
-      title: 'Pay at Restaurant',
+      title: 'Pay at Business',
       subtitle: 'Cash payment when you arrive',
       features: [
         'Pay at counter',
@@ -51,7 +51,7 @@ export function PaymentMethodSelector({
       id: 'MTN_MOBILE_MONEY' as const,
       icon: Smartphone,
       title: 'MTN Mobile Money',
-      subtitle: 'Pay at restaurant with MTN MoMo',
+      subtitle: 'Pay at business with MTN MoMo',
       features: [
         'Pay at counter with MoMo',
         'Show order number to staff',
@@ -63,7 +63,7 @@ export function PaymentMethodSelector({
       id: 'AIRTEL_MONEY' as const,
       icon: Smartphone,
       title: 'Airtel Money',
-      subtitle: 'Pay at restaurant with Airtel Money',
+      subtitle: 'Pay at business with Airtel Money',
       features: [
         'Pay at counter with Airtel',
         'Show order number to staff',

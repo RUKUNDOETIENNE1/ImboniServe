@@ -17,6 +17,7 @@
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import { CustomerService } from '@/lib/services/customer.service'
+import { LoyaltyService } from '@/lib/services/loyalty.service'
 
 const log = logger.child({ service: 'guest-recognition' })
 
@@ -79,20 +80,23 @@ export interface RecognitionResult {
 }
 
 // ---------------------------------------------------------------------------
-// VIP Tier Configuration
+// VIP Tier Configuration — Canonical Source
 // ---------------------------------------------------------------------------
+// GuestRecognitionService is the SOLE owner of VIP tier policy.
+// These constants are exported for read-only consumption by other modules.
+// No other service may define VIP tier thresholds or calculate VIP tiers.
 
-const VIP_TIERS = [
+export const VIP_TIER_CONFIG = [
   { tier: 'NONE', label: 'Guest', minVisits: 0, minSpendCents: 0 },
   { tier: 'BRONZE', label: 'Bronze Member', minVisits: 3, minSpendCents: 50000 },
   { tier: 'SILVER', label: 'Silver Member', minVisits: 8, minSpendCents: 150000 },
   { tier: 'GOLD', label: 'Gold Member', minVisits: 15, minSpendCents: 400000 },
   { tier: 'PLATINUM', label: 'Platinum Member', minVisits: 30, minSpendCents: 1000000 },
-]
+] as const
 
-function calculateVIPTier(visitCount: number, lifetimeSpendCents: number): { tier: string; label: string } {
+export function calculateVIPTier(visitCount: number, lifetimeSpendCents: number): { tier: string; label: string } {
   let result = { tier: 'NONE', label: 'Guest' }
-  for (const t of VIP_TIERS) {
+  for (const t of VIP_TIER_CONFIG) {
     if (visitCount >= t.minVisits && lifetimeSpendCents >= t.minSpendCents) {
       result = { tier: t.tier, label: t.label }
     }
@@ -101,12 +105,12 @@ function calculateVIPTier(visitCount: number, lifetimeSpendCents: number): { tie
 }
 
 function getNextTierThreshold(tier: string): { threshold: number | null; label: string; progress: number | null } {
-  const currentIdx = VIP_TIERS.findIndex(t => t.tier === tier)
-  if (currentIdx === -1 || currentIdx === VIP_TIERS.length - 1) {
+  const currentIdx = VIP_TIER_CONFIG.findIndex(t => t.tier === tier)
+  if (currentIdx === -1 || currentIdx === VIP_TIER_CONFIG.length - 1) {
     return { threshold: null, label: '', progress: null }
   }
-  const next = VIP_TIERS[currentIdx + 1]
-  const current = VIP_TIERS[currentIdx]
+  const next = VIP_TIER_CONFIG[currentIdx + 1]
+  const current = VIP_TIER_CONFIG[currentIdx]
   const progress = current.minVisits > 0 ? Math.min(1, 1) : 0 // Will be calculated with actual values
   return { threshold: next.minVisits, label: next.label, progress }
 }
@@ -330,7 +334,11 @@ export class GuestRecognitionService {
 
   /**
    * Called after every completed (paid) order.
-   * Delegates to CustomerService.updateCustomerStats() + preference learning + VIP recalc.
+   * Delegates to CustomerService.updateVisitStats() + LoyaltyService.earnPoints() + preference learning + VIP recalc.
+   *
+   * Architectural Invariant:
+   *   Loyalty points may only be created or modified through LoyaltyService.
+   *   CustomerService.updateVisitStats handles visit/spend stats only.
    */
   static async onOrderCompleted(
     customerId: string,
@@ -340,13 +348,25 @@ export class GuestRecognitionService {
   ): Promise<void> {
     log.info('Order completed — updating guest stats', { customerId, saleId, orderAmountCents })
 
-    // 1. Update visit stats via existing CustomerService
-    await CustomerService.updateCustomerStats(customerId, orderAmountCents)
+    // 1. Update visit stats via CustomerService (visitCount, lifetimeSpendCents, totalSpent, lastVisit)
+    await CustomerService.updateVisitStats(customerId, orderAmountCents)
 
-    // 2. Learn preferences from this order
+    // 2. Earn loyalty points via LoyaltyService (creates PointsLedger entry + updates Customer.loyaltyPoints)
+    try {
+      await LoyaltyService.earnPoints({
+        customerId,
+        businessId,
+        saleId,
+        amountCents: orderAmountCents,
+      })
+    } catch (error) {
+      log.error('Failed to earn loyalty points', { error: String(error), customerId, saleId })
+    }
+
+    // 3. Learn preferences from this order
     await this.learnPreferencesFromOrder(customerId, saleId, businessId)
 
-    // 3. Recalculate VIP tier if needed
+    // 4. Recalculate VIP tier if needed
     await this.recalculateVIPTier(customerId)
 
     log.info('Guest stats updated', { customerId, saleId })

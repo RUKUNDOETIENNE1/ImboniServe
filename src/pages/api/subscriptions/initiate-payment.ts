@@ -72,6 +72,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       amountCents = plan.priceCents * 6
     }
 
+    // Founding Hospitality Business Program — apply lifetime discount
+    let foundingDiscountApplied = false
+    if (business.isFoundingMember) {
+      const discountPercent = business.foundingDiscountPercent || 50
+      amountCents = Math.round(amountCents * (1 - discountPercent / 100))
+      foundingDiscountApplied = true
+    }
+
     // Route to appropriate provider based on payment method
     let providerType: PaymentProviderType
 
@@ -134,6 +142,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               planId,
               billingCycle,
               paymentMethod,
+              foundingDiscountApplied,
             },
           },
         })

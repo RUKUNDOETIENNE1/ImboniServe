@@ -66,7 +66,7 @@ export default function AdminRestaurants() {
   })
 
   const stats = [
-    { label: 'Total Restaurants', value: restaurants.length, color: 'blue' },
+    { label: 'Total Businesses', value: restaurants.length, color: 'blue' },
     { label: 'Active', value: restaurants.filter(r => r.isActive).length, color: 'green' },
     { label: 'Inactive', value: restaurants.filter(r => !r.isActive).length, color: 'red' },
     { label: 'This Month', value: restaurants.filter(r => {
@@ -79,8 +79,8 @@ export default function AdminRestaurants() {
   return (
     <AdminLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Restaurant Management</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage all restaurants on the platform</p>
+        <h1 className="text-2xl font-bold text-slate-800">Business Management</h1>
+        <p className="text-sm text-slate-500 mt-1">Manage all hospitality businesses on the platform</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -131,7 +131,7 @@ export default function AdminRestaurants() {
             <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
               type="text" 
-              placeholder="Search restaurants..." 
+              placeholder="Search businesses..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 w-64"
@@ -145,7 +145,7 @@ export default function AdminRestaurants() {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Restaurant</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Business</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Location</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Owner</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Plan</th>
@@ -203,7 +203,7 @@ export default function AdminRestaurants() {
           {filteredRestaurants.length === 0 && (
             <div className="text-center py-12">
               <Building2 className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600">No restaurants found</p>
+              <p className="text-slate-600">No businesses found</p>
             </div>
           )}
         </div>

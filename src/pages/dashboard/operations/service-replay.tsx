@@ -1,7 +1,7 @@
 /**
  * Service Replay™ - Main Dashboard Page
  * 
- * "Watching restaurant operations like replaying a football match."
+ * "Watching hospitality operations like replaying a football match."
  * 
  * Allows managers to replay any service period and understand exactly what happened.
  */
@@ -215,7 +215,7 @@ export default function ServiceReplayPage({ businessId, timezone }: ServiceRepla
                 Service Replay™
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Replay restaurant operations like watching a football match
+                Replay hospitality operations like watching a football match
               </p>
             </div>
             

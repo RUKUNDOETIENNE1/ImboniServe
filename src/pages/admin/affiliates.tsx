@@ -24,6 +24,8 @@ export default function AdminAffiliates() {
   const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newAffiliate, setNewAffiliate] = useState({ code: '', name: '', commissionRate: 20 })
+  const [approveCode, setApproveCode] = useState<string>('')
+  const [approvingId, setApprovingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -91,6 +93,32 @@ export default function AdminAffiliates() {
       }
     } catch (error) {
       alert('Failed to mark payout as paid')
+    }
+  }
+
+  const approveAffiliate = async (affiliateId: string) => {
+    if (!approveCode) {
+      alert('Please enter an affiliate code for this application')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/admin/affiliates/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ affiliateId, code: approveCode }),
+      })
+      if (res.ok) {
+        alert('Affiliate application approved!')
+        setApprovingId(null)
+        setApproveCode('')
+        loadData()
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Failed to approve affiliate')
+      }
+    } catch {
+      alert('Failed to approve affiliate')
     }
   }
 
@@ -196,7 +224,9 @@ export default function AdminAffiliates() {
                     <td className="py-2">{aff.commissionRatePercent || 20}%</td>
                     <td className="py-2">
                       <span className={`px-2 py-1 rounded text-xs ${
-                        aff.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        aff.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                        aff.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
                       }`}>
                         {aff.status}
                       </span>
@@ -209,6 +239,40 @@ export default function AdminAffiliates() {
                         >
                           Suspend
                         </button>
+                      )}
+                      {aff.status === 'PENDING' && (
+                        <div className="flex items-center gap-2">
+                          {approvingId === aff.id ? (
+                            <>
+                              <input
+                                type="text"
+                                placeholder="Affiliate Code"
+                                value={approveCode}
+                                onChange={(e) => setApproveCode(e.target.value.toUpperCase())}
+                                className="px-2 py-1 border border-slate-300 rounded text-sm w-32"
+                              />
+                              <button
+                                onClick={() => approveAffiliate(aff.id)}
+                                className="text-green-600 hover:underline text-sm font-medium"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => { setApprovingId(null); setApproveCode('') }}
+                                className="text-slate-500 hover:underline text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => { setApprovingId(aff.id); setApproveCode('') }}
+                              className="text-green-600 hover:underline text-sm font-medium"
+                            >
+                              Approve
+                            </button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>

@@ -20,7 +20,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       // Read-only snapshot before update for shadow metrics
       const preItem = await prisma.inventoryItem.findFirst({
         where: { id: input.inventoryItemId, businessId },
-        select: { id: true, name: true, unit: true, currentStock: true, minStockLevel: true },
+        select: { id: true, name: true, unit: true, currentStock: true, minStockLevel: true, reorderLevel: true },
       })
 
       const result = await InventoryService.recordUpdate(userId, businessId, input)
@@ -30,6 +30,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         const previousStock = preItem.currentStock
         const newStock = result.updatedItem.currentStock
         const minStockLevel = preItem.minStockLevel
+        const reorderLevel = preItem.reorderLevel ?? 0
 
         // Always emit STOCK_UPDATED
         ingestInventoryShadowEvent({
@@ -113,6 +114,18 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
             minStockLevel,
             alertLevel,
           }).catch(() => {})
+        } else if (reorderLevel > 0 && newStock <= reorderLevel) {
+          ingestInventoryShadowEvent({
+            type: 'STOCK_LOW',
+            businessId,
+            inventoryItemId: preItem.id,
+            itemName: preItem.name,
+            unit: preItem.unit,
+            previousStock,
+            newStock,
+            minStockLevel,
+            alertLevel: 'LOW',
+          }).catch(() => {})
         }
 
         // Breach detection: crossing minStockLevel boundary
@@ -145,4 +158,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('inventory.update')(handler)
+export default requirePermission('inventory.update')(baseHandler)

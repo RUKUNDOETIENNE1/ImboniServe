@@ -43,7 +43,7 @@ export default function ReferPage() {
     if (!referralCode) return
 
     const referralLink = `${window.location.origin}/signup?ref=${referralCode}`
-    const message = `Join Imboni Serve and transform your restaurant! Use my referral code: ${referralCode}\n\n${referralLink}\n\nGet started with smart QR ordering, inventory management, and more.`
+    const message = `Join Imboni Serve and transform your hospitality business! Use my referral code: ${referralCode}\n\n${referralLink}\n\nGet started with smart QR ordering, inventory management, and more.`
 
     if (navigator.share) {
       navigator.share({
@@ -158,7 +158,7 @@ export default function ReferPage() {
               <div className="bg-gradient-to-br from-imboni-blue to-blue-600 rounded-xl p-6 text-white text-center">
                 <p className="text-sm opacity-90 mb-2">Your Referral Code</p>
                 <p className="text-3xl font-bold tracking-wider mb-4">{referralCode}</p>
-                <p className="text-sm opacity-90">Share this code with restaurant owners</p>
+                <p className="text-sm opacity-90">Share this code with hospitality business owners</p>
               </div>
 
               <button
@@ -224,7 +224,7 @@ export default function ReferPage() {
               <div className="flex-1">
                 <h3 className="font-bold text-slate-800 mb-1 text-lg">Fast Payout</h3>
                 <p className="text-sm text-slate-700 mb-2">
-                  Rewards unlock after 7-day validation period. Withdraw to Mobile Money or use at any restaurant on Imboni Serve.
+                  Rewards unlock after 7-day validation period. Withdraw to Mobile Money or use at any hospitality business on Imboni Serve.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Check className="w-3 h-3" />
@@ -272,14 +272,14 @@ export default function ReferPage() {
                 <div className="w-10 h-10 bg-imboni-orange rounded-full flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-bold text-slate-800">Dine at Partner Restaurants</h3>
+                <h3 className="font-bold text-slate-800">Dine at Partner Businesses</h3>
               </div>
               <p className="text-sm text-slate-700 mb-3">
-                Use your credits to pay for meals at <strong>any restaurant using Imboni Serve</strong>. Just provide your phone number at checkout.
+                Use your credits to pay for meals at <strong>any hospitality business using Imboni Serve</strong>. Just provide your phone number at checkout.
               </p>
               <ul className="text-xs text-slate-600 space-y-1">
                 <li>✓ No minimum spend</li>
-                <li>✓ Works at 500+ locations</li>
+                <li>✓ Works at partner locations</li>
                 <li>✓ Instant redemption</li>
               </ul>
             </div>
@@ -338,7 +338,7 @@ export default function ReferPage() {
         <div className="bg-gradient-to-br from-imboni-blue to-blue-600 rounded-2xl p-6 text-white text-center">
           <h3 className="font-bold text-xl mb-2">Looking for the B2B Affiliate Program?</h3>
           <p className="text-sm opacity-90 mb-4">
-            If you're a professional marketer looking to bring restaurants to Imboni Serve and earn 15% recurring commissions, you can access your affiliate portal here.
+            If you're a professional marketer looking to bring hospitality businesses to Imboni Serve and earn 15% recurring commissions, you can access your affiliate portal here.
           </p>
           <a 
             href="/affiliate" 

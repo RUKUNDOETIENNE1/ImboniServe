@@ -30,7 +30,7 @@ export function MoMoPaymentFlow({
   const [pollingCount, setPollingCount] = useState(0)
   const [statusMessage, setStatusMessage] = useState('')
 
-  const maxPollingAttempts = 60 // 60 attempts × 5 seconds = 5 minutes
+  const maxPollingAttempts = 240 // 240 attempts × 5 seconds = 20 minutes
 
   const formatPhone = (value: string) => {
     // Remove all non-digits
@@ -325,7 +325,7 @@ export function MoMoPaymentFlow({
           <p className="text-xs text-slate-600 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>
-              You'll receive a payment prompt on your phone. Enter your {provider === 'MTN' ? 'MTN' : 'Airtel'} Mobile Money PIN to complete the payment. The payment must be approved within 5 minutes.
+              You'll receive a payment prompt on your phone. Enter your {provider === 'MTN' ? 'MTN' : 'Airtel'} Mobile Money PIN to complete the payment. The payment must be approved within 20 minutes.
             </span>
           </p>
         </div>

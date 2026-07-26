@@ -23,7 +23,7 @@ interface IngestInput {
   previousStock?: number
   newStock?: number
   minStockLevel?: number
-  alertLevel?: 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  alertLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
   breachFromAbove?: boolean
 }
 

@@ -350,7 +350,7 @@ export default function Login() {
                     value={email}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
-                    placeholder="owner@restaurant.rw"
+                    placeholder="owner@business.rw"
                     required
                     autoComplete="email"
                   />

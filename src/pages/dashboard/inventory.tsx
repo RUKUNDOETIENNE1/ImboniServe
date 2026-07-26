@@ -27,6 +27,7 @@ export default function Inventory() {
     unit: '',
     currentStock: 0,
     minStockLevel: 0,
+    reorderLevel: 0,
     unitCostCents: 0
   })
 
@@ -94,7 +95,7 @@ export default function Inventory() {
       if (res.ok) {
         showToast('success', t('inventory.item_added', 'Item added successfully!'))
         setShowAddModal(false)
-        setFormData({ name: '', category: '', unit: '', currentStock: 0, minStockLevel: 0, unitCostCents: 0 })
+        setFormData({ name: '', category: '', unit: '', currentStock: 0, minStockLevel: 0, reorderLevel: 0, unitCostCents: 0 })
         fetchInventory()
       } else {
         const error = await res.json()
@@ -178,6 +179,7 @@ export default function Inventory() {
       unit: item.unit,
       currentStock: item.currentStock,
       minStockLevel: item.minStockLevel,
+      reorderLevel: item.reorderLevel || 0,
       unitCostCents: item.unitCostCents
     })
     setShowEditModal(true)
@@ -461,6 +463,20 @@ export default function Inventory() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Reorder Level</label>
+              <input
+                type="number"
+                value={formData.reorderLevel}
+                onChange={(e) => setFormData({ ...formData, reorderLevel: parseFloat(e.target.value) })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
+                placeholder="e.g., 30 (trigger reorder before min)"
+              />
+              <p className="text-xs text-slate-500 mt-1">Stock level that triggers reorder alerts (should be above minimum)</p>
+            </div>
+          </div>
+
           <div className="flex gap-3 pt-4">
             <button
               onClick={handleAdd}
@@ -545,6 +561,20 @@ export default function Inventory() {
                 onChange={(e) => setFormData({ ...formData, minStockLevel: parseFloat(e.target.value) })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Reorder Level</label>
+              <input
+                type="number"
+                value={formData.reorderLevel}
+                onChange={(e) => setFormData({ ...formData, reorderLevel: parseFloat(e.target.value) })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
+                placeholder="e.g., 30 (trigger reorder before min)"
+              />
+              <p className="text-xs text-slate-500 mt-1">Stock level that triggers reorder alerts (should be above minimum)</p>
             </div>
           </div>
 

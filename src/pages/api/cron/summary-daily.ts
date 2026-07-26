@@ -29,7 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const summary = await ExecutiveSummaryService.generateDailySummary()
     log.info('Daily Executive Summary complete', summary)
 
-    // TODO: Send summary via email/Slack
+    // Executive summary delivery via email/Slack deferred post-v1.
+    // Summary is generated and available via API response and admin dashboard.
     // await AlertDeliveryService.sendExecutiveSummary(summary)
 
     return res.status(200).json({

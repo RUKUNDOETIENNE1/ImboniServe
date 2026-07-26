@@ -42,6 +42,7 @@ export interface ServiceIntelligenceRequest {
   selection: ServiceSelection
   includeHistoricalContext?: boolean
   includeComparison?: boolean
+  businessTimezone?: string
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -61,6 +62,7 @@ export interface HistoricalContext {
   occurrenceFrequency: Map<string, number>
   trendAnalysis: Map<string, 'improving' | 'stable' | 'declining'>
   historicalEvidence: Map<string, any[]>
+  metricChangePercent?: Map<string, number>
 }
 
 export interface ResponseDiagnostics {

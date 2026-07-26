@@ -169,14 +169,18 @@ export class DashboardBuilder {
         pending: 0,
       },
       timing: {
-        avgPrepTime: this.formatDuration(720), // TODO: Extract from report
+        avgPrepTime: report.serviceSummary.averagePrepTimeSeconds
+          ? this.formatDuration(report.serviceSummary.averagePrepTimeSeconds)
+          : '—',
         avgServiceTime: this.formatDuration(report.serviceSummary.averageServiceTimeSeconds),
-        avgPaymentTime: this.formatDuration(180), // TODO: Extract from report
-        peakHour: '12:30 PM', // TODO: Extract from report
+        avgPaymentTime: report.serviceSummary.averagePaymentTimeSeconds
+          ? this.formatDuration(report.serviceSummary.averagePaymentTimeSeconds)
+          : '—',
+        peakHour: report.serviceSummary.peakHour || '—',
       },
       performance: {
         completionRate: report.serviceSummary.completionRate,
-        onTimeRate: 85, // TODO: Extract from report
+        onTimeRate: report.serviceSummary.onTimeRate ?? 0,
         efficiency: report.overallScore.overall,
       },
     }
@@ -253,7 +257,7 @@ export class DashboardBuilder {
       trends.push({
         metric,
         direction: trend,
-        changePercent: 0, // TODO: Calculate from historical data
+        changePercent: context.metricChangePercent?.get(metric) || 0,
         significance: 'medium',
       })
     }

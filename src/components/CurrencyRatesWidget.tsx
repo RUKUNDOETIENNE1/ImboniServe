@@ -89,7 +89,7 @@ export default function CurrencyRatesWidget() {
 
       <div className="mt-4">
         <a
-          href="/dashboard/settings?tab=restaurant"
+          href="/dashboard/settings?tab=business"
           className="text-xs text-blue-600 hover:text-blue-700 font-medium"
         >
           Change base currency →

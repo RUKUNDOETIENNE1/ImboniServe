@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Save, Info } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { useToast } from '@/components/Toast';
 
 interface BusinessSettings {
   id: string;
@@ -20,6 +20,7 @@ interface BusinessSettings {
 
 export default function PaymentSettingsPage() {
   const { data: session } = useSession();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
@@ -53,7 +54,7 @@ export default function PaymentSettingsPage() {
       setSettings(data);
     } catch (error) {
       console.error('Error fetching settings:', error);
-      toast.error('Failed to load settings');
+      showToast('error', 'Failed to load settings');
     } finally {
       setLoading(false);
     }
@@ -68,7 +69,7 @@ export default function PaymentSettingsPage() {
       const businessId = user.businessId;
       
       if (!businessId) {
-        toast.error('No business associated with your account');
+        showToast('error', 'No business associated with your account');
         setSaving(false);
         return;
       }
@@ -89,10 +90,10 @@ export default function PaymentSettingsPage() {
         throw new Error('Failed to save settings');
       }
 
-      toast.success('Settings saved successfully!');
+      showToast('success', 'Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
+      showToast('error', 'Failed to save settings');
     } finally {
       setSaving(false);
     }

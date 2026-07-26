@@ -8,6 +8,7 @@ import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { ReservationService } from '@/lib/services/reservation.service'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -30,14 +31,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     const reservation = await prisma.reservation.findUnique({ where: { id } })
     if (!reservation) return res.status(404).json(errorResponse('Reservation not found'))
 
-    // Cancel reservation
-    await prisma.reservation.update({
-      where: { id },
-      data: {
-        status: 'CANCELLED',
-        specialRequests: reason ? `CANCELLED: ${reason}` : 'CANCELLED',
-      },
-    })
+    // Cancel reservation via canonical ReservationService
+    await ReservationService.cancelReservation(id, reason)
 
     // Shadow tap: BOOKING_CANCELLED (feature-flagged, non-blocking)
     ingestReservationShadowEvent({

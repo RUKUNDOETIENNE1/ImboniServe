@@ -35,8 +35,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'Trial eligibility blocked', reason: evalResult.blockedReason, riskScore: evalResult.riskScore })
     }
     
-    // Read referral cookie for affiliate attribution
-    const refCode = req.cookies.im_ref
+    // Read referral code from cookie or request body for affiliate attribution
+    const refCode = req.cookies.im_ref || (input as any).referralCode || undefined
 
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email },
@@ -118,6 +118,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) 
       : null
 
+    // Founding Hospitality Business Program — first 100 hospitality businesses
+    const FOUNDING_LIMIT = 100
+    const foundingCount = await prisma.business.count({
+      where: { isFoundingMember: true },
+    })
+    const isFoundingMember = isHospitality && foundingCount < FOUNDING_LIMIT
+
     const restaurant = await prisma.business.create({
       data: {
         name: input.businessName,
@@ -140,6 +147,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         duplicateFlags: riskAssessment.duplicateMatches.length > 0 
           ? (riskAssessment.duplicateMatches as any) 
           : undefined,
+        isFoundingMember,
+        foundingJoinedAt: isFoundingMember ? new Date() : null,
       },
     })
 
@@ -167,6 +176,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         id: restaurant.id,
         name: restaurant.name,
       },
+      isFoundingMember,
     })
   } catch (error) {
     console.error('Signup error:', error)

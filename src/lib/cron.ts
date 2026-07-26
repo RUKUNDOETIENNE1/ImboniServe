@@ -14,6 +14,7 @@ import { runAutopilotCheck } from './cron/autopilot-features'
 import { prisma } from './prisma'
 import { logger } from './logger'
 import { PaymentTransactionStatus } from '@prisma/client'
+import { ReservationService } from './services/reservation.service'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -487,7 +488,7 @@ export class CronService {
 
             // Pending too long → timeout
             const ageMs = now.getTime() - new Date(p.createdAt).getTime()
-            if (ageMs > 5 * 60 * 1000) {
+            if (ageMs > 20 * 60 * 1000) {
               await prisma.paymentTransaction.update({ where: { id: p.id }, data: { status: PaymentTransactionStatus.FAILED, rawStatus: { ...(p.rawStatus as any), timeout: true } } })
               await DiningSessionSlipService.markPaymentFailed(slipId, p.id, 'Payment timeout (reconciler)')
             }
@@ -617,15 +618,7 @@ export class CronService {
         })
 
         for (const r of toForfeit) {
-          await prisma.reservation.update({
-            where: { id: r.id },
-            data: {
-              depositStatus: 'FORFEITED' as any,
-              forfeitCents: r.depositCents || 0,
-              noShowReason: 'NO_SHOW',
-              status: 'CANCELLED',
-            },
-          })
+          await ReservationService.forfeitDeposit(r.id, r.depositCents || 0, 'NO_SHOW')
         }
       } catch (err) {
         logger.error('No-show forfeit job error', { error: String(err) })
@@ -662,8 +655,8 @@ export class CronService {
   private static scheduleGenericPaymentWatchdog() {
     const tick = async () => {
       try {
-        const PENDING_THRESHOLD_MINUTES = 10
-        const PROCESSING_THRESHOLD_MINUTES = 15
+        const PENDING_THRESHOLD_MINUTES = 20
+        const PROCESSING_THRESHOLD_MINUTES = 25
         const cutoffPending = new Date(Date.now() - PENDING_THRESHOLD_MINUTES * 60 * 1000)
         const cutoffProcessing = new Date(Date.now() - PROCESSING_THRESHOLD_MINUTES * 60 * 1000)
 

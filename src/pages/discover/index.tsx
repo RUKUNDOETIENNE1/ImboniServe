@@ -15,7 +15,7 @@ export default function DiscoverPage() {
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
 
-  const categories = ['Restaurant', 'Cafe', 'Bar', 'Hotel', 'Fast Food', 'Fine Dining']
+  const categories = ['Restaurant', 'Cafe', 'Bar', 'Hotel', 'Fast Food', 'Fine Dining', 'Bakery', 'Catering']
   const cities = ['Kigali', 'Musanze', 'Rubavu', 'Huye', 'Muhanga']
   const priceRanges = ['$', '$$', '$$$']
 
@@ -43,7 +43,7 @@ export default function DiscoverPage() {
   function doSearch() { setQuery(search) }
 
   return (
-    <PublicLayout title="Discover Restaurants — Imboni Serve">
+    <PublicLayout title="Discover Hospitality Businesses — Imboni Serve">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
           <div className="flex-1">

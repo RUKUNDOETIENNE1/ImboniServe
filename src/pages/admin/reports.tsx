@@ -58,7 +58,7 @@ export default function AdminReports() {
 
   const stats = [
     { label: 'Platform Revenue', value: `RWF ${((reportData?.totalRevenue || 0) / 100).toLocaleString()}`, icon: DollarSign, color: 'green' },
-    { label: 'Total Restaurants', value: reportData?.totalRestaurants || 0, icon: Building2, color: 'blue' },
+    { label: 'Total Businesses', value: reportData?.totalRestaurants || 0, icon: Building2, color: 'blue' },
     { label: 'Active Users', value: reportData?.activeUsers || 0, icon: Users, color: 'purple' },
     { label: 'Growth Rate', value: `${reportData?.growthRate || 0}%`, icon: TrendingUp, color: 'orange' }
   ]

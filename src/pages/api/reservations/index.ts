@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { prisma } from '@/lib/prisma'
+import { ReservationService } from '@/lib/services/reservation.service'
 import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
 import { PaymentTransactionStatus } from '@prisma/client'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
@@ -33,21 +33,10 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse, businessId: 
   const { status = 'all' } = req.query
 
   try {
-    const where: any = { businessId }
-    
-    if (status !== 'all') {
-      where.status = status
-    }
+    const filters: any = {}
+    if (status !== 'all') filters.status = status
 
-    const reservations = await prisma.reservation.findMany({
-      where,
-      orderBy: { reservationDate: 'desc' },
-      include: {
-        table: {
-          select: { number: true }
-        }
-      }
-    })
+    const reservations = await ReservationService.getBusinessReservations(businessId, filters)
 
     const formatted = reservations.map(r => ({
       id: r.id,
@@ -89,22 +78,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, businessId:
   }
 
   try {
-    const reservation = await prisma.reservation.create({
-      data: {
-        businessId,
-        customerName,
-        customerPhone,
-        customerEmail,
-        reservationDate: new Date(date),
-        reservationTime: time,
-        reservedAt: new Date(`${date}T${time}`),
-        confirmationCode: `RES-${Date.now()}`,
-        partySize,
-        depositCents: depositAmount ? depositAmount * 100 : 0,
-        depositStatus: depositAmount > 0 ? 'PENDING' : null,
-        status: 'PENDING',
-        specialRequests
-      }
+    const reservation = await ReservationService.createReservation({
+      businessId,
+      customerName,
+      customerPhone,
+      customerEmail,
+      reservationDate: new Date(date),
+      reservationTime: time,
+      partySize,
+      specialRequests,
     })
 
     // Shadow tap: BOOKING_CREATED (feature-flagged, non-blocking)

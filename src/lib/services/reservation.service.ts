@@ -6,12 +6,17 @@
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import crypto from 'crypto'
+import { CustomerService } from '@/lib/services/customer.service'
+import { normalizePhone } from '@/lib/services/guest-recognition.service'
+import { NotificationService } from '@/lib/services/notification.service'
 
 const log = logger.child({ service: 'reservation' })
 
 export class ReservationService {
   /**
-   * Create a new reservation
+   * Create a new reservation.
+   * Auto-resolves or creates a Customer record from customerPhone.
+   * This is the canonical reservation creation entry point.
    */
   static async createReservation(data: {
     businessId: string
@@ -33,10 +38,35 @@ export class ReservationService {
     const reservedAt = new Date(data.reservationDate);
     reservedAt.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
+    // Auto-resolve customer from phone if not explicitly provided
+    let customerId = data.customerId
+    if (!customerId && data.customerPhone) {
+      try {
+        const normalized = normalizePhone(data.customerPhone)
+        const customer = await CustomerService.findOrCreateByPhone(
+          normalized,
+          data.businessId,
+          data.customerName
+        )
+        customerId = customer.id
+      } catch (error) {
+        log.error('Failed to resolve customer for reservation', { error: String(error), phone: data.customerPhone })
+      }
+    }
+
     const reservation = await prisma.reservation.create({
       data: {
-        ...data,
+        businessId: data.businessId,
+        customerId: customerId || null,
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        customerEmail: data.customerEmail,
+        reservationDate: data.reservationDate,
+        reservationTime: data.reservationTime,
         reservedAt,
+        partySize: data.partySize,
+        tableId: data.tableId,
+        specialRequests: data.specialRequests,
         confirmationCode,
         status: 'PENDING'
       },
@@ -46,10 +76,11 @@ export class ReservationService {
       }
     })
 
-    log.info('Reservation created', { 
-      reservationId: reservation.id, 
+    log.info('Reservation created', {
+      reservationId: reservation.id,
       businessId: data.businessId,
-      confirmationCode 
+      confirmationCode,
+      customerId: customerId || null
     })
 
     // Send confirmation (WhatsApp/SMS/Email)
@@ -129,6 +160,136 @@ export class ReservationService {
   }
 
   /**
+   * Update table assignment for a reservation
+   */
+  static async updateTable(reservationId: string, tableId: string | null) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: { tableId }
+    })
+
+    log.info('Reservation table updated', { reservationId, tableId })
+
+    return reservation
+  }
+
+  /**
+   * Update deposit status for a reservation
+   */
+  static async updateDepositStatus(
+    reservationId: string,
+    depositStatus: string,
+    options?: { depositPaidAt?: Date; paymentTransactionId?: string }
+  ) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        depositStatus,
+        depositPaidAt: options?.depositPaidAt || null,
+        paymentTransactionId: options?.paymentTransactionId || undefined,
+      }
+    })
+
+    log.info('Reservation deposit status updated', { reservationId, depositStatus })
+
+    return reservation
+  }
+
+  /**
+   * Confirm a reservation (mark as CONFIRMED with timestamp)
+   */
+  static async confirmReservation(reservationId: string) {
+    const existing = await prisma.reservation.findUnique({
+      where: { id: reservationId },
+      select: { id: true, confirmedAt: true, status: true }
+    })
+
+    if (!existing) throw new Error('Reservation not found')
+    if (existing.status === 'CANCELLED') throw new Error('Reservation is cancelled')
+    if (existing.confirmedAt) return existing // idempotent
+
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        confirmedAt: new Date(),
+        status: 'CONFIRMED'
+      }
+    })
+
+    log.info('Reservation confirmed', { reservationId })
+
+    return reservation
+  }
+
+  /**
+   * Mark a reservation as no-show with deposit forfeiture
+   */
+  static async markNoShow(reservationId: string, forfeitCents: number, reason: string) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        status: 'NO_SHOW',
+        forfeitCents,
+        noShowReason: reason
+      }
+    })
+
+    log.info('Reservation marked no-show', { reservationId, forfeitCents, reason })
+
+    return reservation
+  }
+
+  /**
+   * Complete a reservation (customer showed up)
+   */
+  static async completeReservation(reservationId: string) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        status: 'COMPLETED',
+        completedAt: new Date()
+      }
+    })
+
+    log.info('Reservation completed', { reservationId })
+
+    return reservation
+  }
+
+  /**
+   * Forfeit deposit for a reservation (cron no-show processing)
+   */
+  static async forfeitDeposit(reservationId: string, forfeitCents: number, reason: string) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        depositStatus: 'FORFEITED' as any,
+        forfeitCents,
+        noShowReason: reason,
+        status: 'CANCELLED',
+      }
+    })
+
+    log.info('Reservation deposit forfeited', { reservationId, forfeitCents, reason })
+
+    return reservation
+  }
+
+  /**
+   * Mark reminder as sent
+   */
+  static async markReminderSent(reservationId: string) {
+    const reservation = await prisma.reservation.update({
+      where: { id: reservationId },
+      data: { reminderSentAt: new Date() }
+    })
+
+    log.info('Reservation reminder marked sent', { reservationId })
+
+    return reservation
+  }
+
+  /**
    * Cancel reservation
    */
   static async cancelReservation(reservationId: string, reason?: string) {
@@ -146,7 +307,7 @@ export class ReservationService {
   }
 
   /**
-   * Send confirmation message
+   * Send confirmation message via NotificationService (WhatsApp)
    */
   private static async sendConfirmation(reservation: any) {
     const message = `✅ Reservation Confirmed!\n\n` +
@@ -158,10 +319,17 @@ export class ReservationService {
       `🔑 Code: ${reservation.confirmationCode}\n\n` +
       `Call ${reservation.business.phone} to modify or cancel.`
 
-    // In production, send via WhatsApp/SMS/Email
-    log.info('Reservation confirmation sent', { 
+    try {
+      if (reservation.customerPhone) {
+        await NotificationService.sendWhatsApp(reservation.customerPhone, message)
+      }
+    } catch (error) {
+      log.error('Failed to send reservation confirmation', { error: String(error), reservationId: reservation.id })
+    }
+
+    log.info('Reservation confirmation sent', {
       reservationId: reservation.id,
-      phone: reservation.customerPhone 
+      phone: reservation.customerPhone
     })
 
     return { success: true, message }

@@ -15,6 +15,7 @@ import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalization.service'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
 import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
+import { ReservationService } from '@/lib/services/reservation.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -208,21 +209,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       if (reservation) {
         if (mappedStatus === PaymentTransactionStatus.SUCCESS) {
-          await prisma.reservation.update({
-            where: { id: reservation.id },
-            data: {
-              depositStatus: PaymentTransactionStatus.SUCCESS,
-              depositPaidAt: new Date(),
-              paymentTransactionId: transaction.id,
-            },
+          await ReservationService.updateDepositStatus(reservation.id, PaymentTransactionStatus.SUCCESS, {
+            depositPaidAt: new Date(),
+            paymentTransactionId: transaction.id,
           })
         } else if (mappedStatus === PaymentTransactionStatus.FAILED || mappedStatus === PaymentTransactionStatus.CANCELLED) {
-          await prisma.reservation.update({
-            where: { id: reservation.id },
-            data: {
-              depositStatus: 'FAILED' as any,
-            },
-          })
+          await ReservationService.updateDepositStatus(reservation.id, 'FAILED')
         }
       }
     }

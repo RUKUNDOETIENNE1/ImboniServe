@@ -9,10 +9,11 @@ import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
  * Steps considered (restaurants only):
  * - hasMenu: at least 1 MenuItem
  * - hasTables: at least 1 Table
+ * - hasPaymentConfig: business has tax/currency settings configured
  * - hasStaff: more than 1 User assigned to the business
  * - hasFirstSale: at least 1 Sale with paymentStatus COMPLETED
  *
- * Percent complete counts hasMenu + hasTables + hasStaff (0-3 steps) equally.
+ * Percent complete counts hasMenu + hasTables + hasPaymentConfig + hasStaff (0-4 steps) equally.
  * First value is reported separately as `firstValueAchieved`.
  */
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -26,22 +27,28 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const { businessId, userId } = ctx
 
   try {
-    const [menuCount, tableCount, userCount, firstSale] = await Promise.all([
+    const [menuCount, tableCount, userCount, firstSale, business] = await Promise.all([
       prisma.menuItem.count({ where: { businessId } }),
       prisma.table.count({ where: { businessId } }),
       prisma.user.count({ where: { businessId } }),
       prisma.sale.findFirst({ where: { businessId, paymentStatus: 'COMPLETED' }, orderBy: { createdAt: 'asc' }, select: { id: true, createdAt: true } }),
+      prisma.business.findUnique({ where: { id: businessId }, select: { taxMode: true, taxRate: true, currency: true, splitPaymentConvenienceFeeEnabled: true } }),
     ])
 
     const hasMenu = menuCount > 0
     const hasTables = tableCount > 0
     const hasStaff = userCount > 1 // owner + at least 1 staff
+    // Payment config is considered done if the business has non-default tax settings
+    // (i.e., the owner has visited the payment settings page and saved)
+    const hasPaymentConfig = business?.taxMode === 'INCLUSIVE' ||
+      (business?.taxRate != null && business.taxRate !== 18.0) ||
+      (business?.splitPaymentConvenienceFeeEnabled === true)
 
-    const steps = [hasMenu, hasTables, hasStaff]
+    const steps = [hasMenu, hasTables, hasPaymentConfig, hasStaff]
     const completedSteps = steps.filter(Boolean).length
     const percentComplete = Math.round((completedSteps / steps.length) * 100)
 
-    const coreSetupComplete = hasMenu && hasTables
+    const coreSetupComplete = hasMenu && hasTables && hasPaymentConfig
     const firstValueAchieved = Boolean(firstSale)
 
     // Pick next action
@@ -49,6 +56,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       ? { code: 'ADD_MENU', label: 'Add your first menu item', href: '/dashboard/menu-builder' }
       : !hasTables
       ? { code: 'ADD_TABLE', label: 'Add your first table', href: '/dashboard/tables' }
+      : !hasPaymentConfig
+      ? { code: 'CONFIGURE_PAYMENTS', label: 'Configure your payment and tax settings', href: '/dashboard/payment-settings' }
       : !hasStaff
       ? { code: 'INVITE_STAFF', label: 'Invite your first staff member', href: '/dashboard/staff' }
       : !firstValueAchieved
@@ -60,6 +69,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       progress: {
         hasMenu,
         hasTables,
+        hasPaymentConfig,
         hasStaff,
         completedSteps,
         totalSteps: steps.length,

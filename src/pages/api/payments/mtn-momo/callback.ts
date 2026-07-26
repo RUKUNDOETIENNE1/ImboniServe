@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { PaymentProviderFactory } from '@/lib/payments/providers'
 import { PaymentProviderType, PaymentTransactionStatus, BillingEventType } from '@prisma/client'
 import { logBillingEvent } from '@/lib/services/billing-ledger.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -45,28 +46,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    // Log to primary ledger writer
-    const eventType = newStatus === PaymentTransactionStatus.SUCCESS 
-      ? BillingEventType.PAYMENT_SUCCESS 
-      : newStatus === PaymentTransactionStatus.FAILED 
-      ? BillingEventType.PAYMENT_FAILED 
-      : BillingEventType.PAYMENT_PENDING
+    if (newStatus === PaymentTransactionStatus.SUCCESS) {
+      // Check if this transaction is associated with a sale (order payment)
+      const sale = await prisma.sale.findFirst({
+        where: { paymentTransactionId: transaction.id },
+      })
 
-    await logBillingEvent({
-      businessId: transaction.businessId,
-      paymentTransactionId: transaction.id,
-      eventType,
-      metadata: { source: 'payments/mtn-momo/callback', referenceId, provider: 'INTOUCH' },
-    })
-
-    if (newStatus === PaymentTransactionStatus.SUCCESS && transaction.subscriptionId) {
-      await prisma.subscription.update({
-        where: { id: transaction.subscriptionId },
-        data: {
-          status: 'ACTIVE',
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      if (sale) {
+        // Delegate all post-payment side effects to canonical PaymentCompletionService
+        // This handles: sale status update, dining slip, guest recognition, notification,
+        // broadcast, ledger entry, audit log, order token
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            transaction.id,
+            sale.id,
+            { source: 'mtn-momo-callback' }
+          )
+        } catch (error) {
+          console.error('MTN MoMo callback: PaymentCompletionService error:', error)
         }
+      } else {
+        // No sale associated — log billing event for subscription/other payments
+        await logBillingEvent({
+          businessId: transaction.businessId,
+          paymentTransactionId: transaction.id,
+          eventType: BillingEventType.PAYMENT_SUCCESS,
+          metadata: { source: 'payments/mtn-momo/callback', referenceId, provider: 'INTOUCH' },
+        })
+
+        // Update subscription if applicable
+        if (transaction.subscriptionId) {
+          await prisma.subscription.update({
+            where: { id: transaction.subscriptionId },
+            data: {
+              status: 'ACTIVE',
+              startDate: new Date(),
+              endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            }
+          })
+        }
+      }
+    } else {
+      // Non-success: log billing event
+      const eventType = newStatus === PaymentTransactionStatus.FAILED
+        ? BillingEventType.PAYMENT_FAILED
+        : BillingEventType.PAYMENT_PENDING
+
+      await logBillingEvent({
+        businessId: transaction.businessId,
+        paymentTransactionId: transaction.id,
+        eventType,
+        metadata: { source: 'payments/mtn-momo/callback', referenceId, provider: 'INTOUCH' },
       })
     }
 

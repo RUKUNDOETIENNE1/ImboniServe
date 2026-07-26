@@ -18,7 +18,7 @@ export function PortfolioDashboard({ dashboard }: { dashboard: PortfolioDashboar
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 max-w-md relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search restaurants..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search businesses..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm" />
         </div>
         <ExportButton reportId={dashboard.metadata.id} />
       </div>
@@ -44,7 +44,7 @@ function OverviewSection({ overview }: { overview: any }) {
         <div className="text-center">
           <Building2 className="w-6 h-6 text-blue-600 mx-auto mb-2" />
           <div className="text-4xl font-bold text-gray-900">{overview.restaurantCount}</div>
-          <div className="text-sm text-gray-600 mt-1">Restaurants</div>
+          <div className="text-sm text-gray-600 mt-1">Businesses</div>
         </div>
         <div className="text-center">
           <Icon className={`w-6 h-6 ${overview.statusColor} mx-auto mb-2`} />
@@ -96,7 +96,7 @@ function PerformanceSection({ performance }: { performance: any }) {
 function RankingSection({ ranking }: { ranking: any }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-xl font-semibold text-gray-900 mb-4">Restaurant Ranking</h3>
+      <h3 className="text-xl font-semibold text-gray-900 mb-4">Business Ranking</h3>
       <div className="space-y-4">
         {ranking.restaurants.map((r: any) => {
           const TrendIcon = r.trendIcon === 'TrendingUp' ? TrendingUp : r.trendIcon === 'TrendingDown' ? TrendingDown : Minus

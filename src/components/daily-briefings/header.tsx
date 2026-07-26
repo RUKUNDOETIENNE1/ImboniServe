@@ -30,7 +30,7 @@ export function BriefingHeader({ header }: Props) {
           <p className="text-lg text-gray-600 mt-1">{header.date}</p>
           <div className="mt-4 space-y-1">
             <p className="text-sm text-gray-500">
-              <span className="font-medium">{header.restaurantName}</span> • {header.businessName}
+              <span className="font-medium">{header.businessName}</span>
             </p>
             <p className="text-sm text-gray-500">
               Generated at {header.generatedTime} • {header.reportingPeriod}

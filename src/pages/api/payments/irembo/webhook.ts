@@ -6,7 +6,7 @@ import { AuditLogService } from '@/lib/services/audit-log.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
 import { logBillingEvent } from '@/lib/services/billing-ledger.service'
 import { BillingEventType } from '@prisma/client'
-import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 export const config = {
   api: {
@@ -95,30 +95,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If became PAID in this call, cascade to Sale and downstream effects
     if (firstProcess) {
-      await logBillingEvent({
-        businessId: transaction.businessId,
-        paymentTransactionId: transaction.id,
-        eventType: BillingEventType.PAYMENT_SUCCESS,
-        metadata: { source: 'payments/irembo/webhook', invoiceNumber, paymentReference, paymentMethod },
-      })
-      await AuditLogService.log({
-        action: 'PAYMENT_PAID',
-        entityType: 'PaymentTransaction',
-        entityId: transaction.id,
-        metadata: {
-          invoiceNumber,
-          paymentReference,
-          paymentMethod,
-          paidAt: txUpdate.paidAt || paidAt || invoiceStatus.updatedAt,
-          amountCents: transaction.amountCents,
-          businessId: transaction.businessId,
-        },
-      })
+      // Note: logBillingEvent and AuditLogService.log for PAYMENT_SUCCESS are handled
+      // by PaymentCompletionService.onPaymentSuccess below — do not duplicate here.
       // Update subscription if applicable
       if (transaction.subscriptionId) {
         await prisma.subscription.update({
           where: { id: transaction.subscriptionId },
-          data: { 
+          data: {
             status: 'ACTIVE',
             endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -138,61 +121,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
       if (sale) {
-        // Atomically set COMPLETED if not already; derive isPaid to avoid drift
-        const saleUpdate = await prisma.sale.updateMany({
-          where: { id: sale.id, paymentStatus: { not: 'COMPLETED' } },
-          data: { paymentStatus: 'COMPLETED', isPaid: true }
-        })
-
-        if (saleUpdate.count > 0) {
-          // Release to kitchen if immediate order or scheduled time approaching
-          const shouldReleaseNow = sale.orderSource === 'QR_IN_VENUE' || 
-            (sale.scheduledAt && new Date(sale.scheduledAt).getTime() - Date.now() <= sale.business.prepBufferMinutes * 60000)
-
-          if (shouldReleaseNow) {
-            await prisma.sale.update({
-              where: { id: sale.id },
-              data: { kitchenReleasedAt: new Date() }
-            })
-          }
-
-          // Mark token as used
-          const orderToken = await prisma.orderToken.findFirst({
-            where: {
-              branchId: sale.businessId,
-              used: false
-            },
-            orderBy: { createdAt: 'desc' }
-          })
-
-          if (orderToken) {
-            await prisma.orderToken.update({
-              where: { id: orderToken.id },
-              data: { used: true, usedAt: new Date() }
-            })
-          }
-
-          // Notify business via WhatsApp about the paid order (kitchen alert)
-          try {
-            const { NotificationService } = await import('@/lib/services/notification.service')
-            await NotificationService.sendOrderNotification(sale.id)
-          } catch (error) {
-            console.error('Error sending order notification:', error)
-          }
-
-          // Visit completion — update customer stats, preferences, and VIP tier
-          if (sale.customerId) {
-            try {
-              await GuestRecognitionService.onOrderCompleted(
-                sale.customerId,
-                sale.totalAmountCents,
-                sale.id,
-                sale.businessId
-              )
-            } catch (error) {
-              console.error('Error updating guest stats:', error)
-            }
-          }
+        // Delegate all post-payment side effects to canonical PaymentCompletionService
+        // This handles: sale status update, dining slip, guest recognition, notification,
+        // broadcast, ledger entry, audit log, order token
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            transaction.id,
+            sale.id,
+            { source: 'irembopay-webhook' }
+          )
+        } catch (error) {
+          console.error('Error in PaymentCompletionService:', error)
         }
       }
 

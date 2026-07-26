@@ -18,6 +18,7 @@ import { Clock, CheckCircle, Package, Truck, UtensilsCrossed, AlertCircle, Refre
 import type { GetServerSideProps } from 'next'
 import { useRealtimeMulti } from '@/lib/realtime'
 import { useTranslation } from '@/lib/i18n'
+import StaffGuestIntelligence from '@/components/staff/StaffGuestIntelligence'
 
 const ALLOWED_ROLES = new Set(['OWNER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK', 'ADMIN', 'MANAGER'])
 
@@ -44,6 +45,8 @@ interface QueueOrder {
   orderNumber: string
   tableNumber?: string
   participantName?: string
+  customerPhone?: string
+  customerId?: string
   kitchenStatus: string
   expoStatus: string | null
   createdAt: string
@@ -64,10 +67,11 @@ interface WaiterQueue {
   delivered: QueueOrder[]
 }
 
-function OrderCard({ order, onPickup, onDeliver }: {
+function OrderCard({ order, onPickup, onDeliver, businessId }: {
   order: QueueOrder
   onPickup?: (id: string) => void
   onDeliver?: (id: string) => void
+  businessId: string
 }) {
   const { t } = useTranslation()
   const isUrgent = order.priority === 'urgent'
@@ -78,6 +82,9 @@ function OrderCard({ order, onPickup, onDeliver }: {
 
   return (
     <div className={`rounded-lg border-2 p-4 transition-all ${borderColor} ${bgColor}`}>
+      {order.customerPhone && (
+        <StaffGuestIntelligence phone={order.customerPhone} businessId={businessId} />
+      )}
       <div className="flex items-start justify-between mb-2">
         <div>
           <span className="font-mono font-bold text-lg">{order.orderNumber}</span>
@@ -296,7 +303,7 @@ export default function WaiterDashboard({ businessId }: { businessId: string }) 
             </div>
             <div className="space-y-3">
               {queue?.readyForPickup.map((order) => (
-                <OrderCard key={order.id} order={order} onPickup={handlePickup} />
+                <OrderCard key={order.id} order={order} onPickup={handlePickup} businessId={businessId} />
               ))}
               {(!queue?.readyForPickup.length) && (
                 <p className="text-sm text-green-700 text-center py-8">No orders ready</p>
@@ -315,7 +322,7 @@ export default function WaiterDashboard({ businessId }: { businessId: string }) 
             </div>
             <div className="space-y-3">
               {queue?.pickedUp.map((order) => (
-                <OrderCard key={order.id} order={order} onDeliver={handleDeliver} />
+                <OrderCard key={order.id} order={order} onDeliver={handleDeliver} businessId={businessId} />
               ))}
               {(!queue?.pickedUp.length) && (
                 <p className="text-sm text-blue-700 text-center py-8">No orders in transit</p>
@@ -334,7 +341,7 @@ export default function WaiterDashboard({ businessId }: { businessId: string }) 
             </div>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {queue?.preparing.map((order) => (
-                <OrderCard key={order.id} order={order} />
+                <OrderCard key={order.id} order={order} businessId={businessId} />
               ))}
               {(!queue?.preparing.length) && (
                 <p className="text-sm text-orange-700 text-center py-8">No orders in preparation</p>

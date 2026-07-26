@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { SmartReorderService } from '@/lib/services/smart-reorder.service'
-import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -71,5 +70,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// Apply commercial enforcement: AI Smart Reorder requires Business plan or higher
-export default requiresFeature('hasAIReorder')(baseHandler)
+export default baseHandler

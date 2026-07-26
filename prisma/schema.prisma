@@ -74,7 +74,6 @@ model User {
   accounts                     Account[]
   affiliate                    Affiliate?                  @relation("AffiliateUser")
   affiliateCommissionsNew      AffiliateCommissionNew[]    @relation("AffiliateCommissions")
-  reservations                 Reservation[]
   whatsappMessages             WhatsAppMessage[]
   staffTipsReceived            StaffTip[]
   ownedBusinesses              Business[]                  @relation("BusinessOwner")
@@ -273,6 +272,11 @@ model Business {
   inventoryDefaultCostingMethod String                 @default("WAVG")
   recipes                       Recipe[]
   inventoryConsumption          InventoryConsumption[]
+
+  // Founding Hospitality Business Program
+  isFoundingMember         Boolean   @default(false)
+  foundingJoinedAt         DateTime?
+  foundingDiscountPercent  Float     @default(50.0)
 
   @@map("Restaurant")
 }
@@ -485,6 +489,7 @@ model InventoryItem {
   unit                String
   currentStock        Float                 @default(0)
   minStockLevel       Float                 @default(10)
+  reorderLevel        Float?                @default(0)
   unitCostCents       Int
   isActive            Boolean               @default(true)
   createdAt           DateTime              @default(now())
@@ -1019,9 +1024,13 @@ model Customer {
   phoneVerifiedAt    DateTime?
   lifetimeSpendCents Int            @default(0)
   vipTier            String         @default("NONE")
+  contactId          String?   @unique
   business           Business       @relation(fields: [businessId], references: [id])
+  contact            Contact?       @relation(fields: [contactId], references: [id])
   pointsLedger       PointsLedger[]
   sales              Sale[]
+  reservations       Reservation[]
+  rooms              Room[]
 
   @@unique([businessId, phone])
 }
@@ -1813,15 +1822,18 @@ model Room {
   status       String    @default("AVAILABLE")
   guestName    String?
   guestPhone   String?
+  customerId   String?
   checkInDate  DateTime?
   checkOutDate DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   branch       Branch?   @relation(fields: [branchId], references: [id])
   business     Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer     Customer? @relation(fields: [customerId], references: [id])
 
   @@unique([businessId, roomNumber])
   @@index([businessId, status])
+  @@index([customerId])
 }
 
 model ServiceArea {
@@ -2034,7 +2046,7 @@ model Reservation {
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
   business             Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  customer             User?               @relation(fields: [customerId], references: [id])
+  customer             Customer?           @relation(fields: [customerId], references: [id])
   table                Table?              @relation(fields: [tableId], references: [id])
   paymentTransaction   PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
 
@@ -2255,6 +2267,7 @@ enum LedgerDomain {
   SUBSCRIPTION
   MARKETPLACE
   PLATFORM
+  SALES
   OTHER
 }
 
@@ -3125,6 +3138,9 @@ model Contact {
   source   String? // "manual", "registration", "order", "whatsapp", "import"
   sourceId String? // ID from source system
 
+  // Link to Customer (bridge between Contact and Customer for hospitality identity)
+  // This is a virtual back-relation — the FK is owned by Customer.contactId
+
   // Analytics fields
   lastContactedAt DateTime?
   lastActivityAt  DateTime?
@@ -3136,6 +3152,7 @@ model Contact {
 
   // Relations
   business Business @relation("BusinessContacts", fields: [businessId], references: [id], onDelete: Cascade)
+  customer Customer?
 
   // Relationships this contact is part of
   relationshipsFrom ContactRelationship[] @relation("RelationshipFrom")

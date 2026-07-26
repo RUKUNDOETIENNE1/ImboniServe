@@ -30,6 +30,8 @@ interface QueueOrder {
   orderNumber: string
   tableNumber?: string
   participantName?: string
+  customerPhone?: string
+  customerId?: string
   kitchenStatus: string
   expoStatus: string | null
   createdAt: string
@@ -87,6 +89,9 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         },
         participant: {
           select: { name: true },
+        },
+        customer: {
+          select: { id: true, phone: true },
         },
       },
       orderBy: {
@@ -156,6 +161,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         orderNumber: order.orderNumber,
         tableNumber: order.table?.number?.toString(),
         participantName: order.participant?.name || undefined,
+        customerPhone: (order as any).customer?.phone || order.customerPhone || undefined,
+        customerId: (order as any).customer?.id || order.customerId || undefined,
         kitchenStatus: order.kitchenStatus || 'pending',
         expoStatus: order.expoStatus,
         createdAt: order.createdAt.toISOString(),

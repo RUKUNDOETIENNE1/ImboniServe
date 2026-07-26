@@ -141,7 +141,7 @@ export function TapAndLeaveButton({
 
     setPollingInterval(interval)
 
-    // Auto-stop after 5 minutes
+    // Auto-stop after 20 minutes
     setTimeout(() => {
       stopPolling()
       if (paymentStatus === 'pending') {
@@ -149,7 +149,7 @@ export function TapAndLeaveButton({
         setErrorMessage('Payment timeout. Please check your phone.')
         setLoading(false)
       }
-    }, 5 * 60 * 1000)
+    }, 20 * 60 * 1000)
   }
 
   const stopPolling = () => {

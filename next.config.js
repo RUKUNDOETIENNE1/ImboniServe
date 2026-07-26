@@ -1,14 +1,13 @@
-﻿// Environment validation disabled - file doesn't exist
-// TODO: Create env-validator if needed
-// if (process.env.NODE_ENV !== 'test') {
-//   try {
-//     require('./src/lib/env-validator').validateEnv()
-//   } catch (error) {
-//     console.error('\nâŒ Environment validation failed:')
-//     console.error(error.message)
-//     process.exit(1)
-//   }
-// }
+﻿// Environment validation — prevents silent runtime failures from missing config
+if (process.env.NODE_ENV !== 'test' && !process.env.SKIP_ENV_VALIDATION) {
+  try {
+    require('./src/lib/env-validator').validateEnv()
+  } catch (error) {
+    console.error('\n\u26A0 Environment validation failed:')
+    console.error(error.message)
+    process.exit(1)
+  }
+}
 
 // Development security headers (relaxed for HMR and debugging)
 const { withSentryConfig } = require('@sentry/nextjs')

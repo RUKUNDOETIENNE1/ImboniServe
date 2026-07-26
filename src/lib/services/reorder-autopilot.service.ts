@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { AISupplierRecommendationService } from './ai-supplier-recommendation.service'
+import { SmartReorderService } from './smart-reorder.service'
 
 interface LowStockItem {
   id: string
@@ -45,20 +46,28 @@ export class ReorderAutopilotService {
         name: true,
         currentStock: true,
         minStockLevel: true,
+        reorderLevel: true,
         unit: true,
         category: true
       }
     })
 
     const lowStockItems: LowStockItem[] = inventory
-      .filter(item => item.currentStock <= item.minStockLevel)
+      .filter(item => {
+        const reorderLevel = item.reorderLevel ?? 0
+        if (reorderLevel > 0) {
+          return item.currentStock <= reorderLevel
+        }
+        return item.currentStock <= item.minStockLevel
+      })
       .map(item => {
-        const stockPercentage = item.currentStock / item.minStockLevel
+        const reorderLevel = item.reorderLevel ?? item.minStockLevel
+        const stockPercentage = item.currentStock / reorderLevel
         let urgency: 'critical' | 'low' | 'warning'
 
-        if (stockPercentage <= this.CRITICAL_THRESHOLD) {
+        if (item.currentStock === 0 || stockPercentage <= this.CRITICAL_THRESHOLD) {
           urgency = 'critical'
-        } else if (stockPercentage <= this.LOW_THRESHOLD) {
+        } else if (item.currentStock <= item.minStockLevel || stockPercentage <= this.LOW_THRESHOLD) {
           urgency = 'low'
         } else {
           urgency = 'warning'
@@ -267,6 +276,158 @@ export class ReorderAutopilotService {
       criticalCount,
       suggestions,
       totalEstimatedCost
+    }
+  }
+
+  static async generateDraftPurchaseOrders(
+    businessId: string,
+    userId: string
+  ): Promise<{
+    created: number
+    skipped: number
+    purchaseOrders: Array<{
+      id: string
+      poNumber: string
+      supplierName: string
+      totalCents: number
+      itemCount: number
+      justification: string
+    }>
+  }> {
+    const dashboard = await this.getAutopilotDashboard(businessId)
+    const suggestions = dashboard.suggestions
+
+    if (suggestions.length === 0) {
+      return { created: 0, skipped: 0, purchaseOrders: [] }
+    }
+
+    const existingDrafts = await prisma.purchaseOrder.findMany({
+      where: {
+        businessId,
+        status: 'DRAFT',
+      },
+      select: { id: true, items: { select: { productName: true } } },
+    })
+
+    const draftedItemNames = new Set<string>()
+    for (const draft of existingDrafts) {
+      for (const item of draft.items) {
+        draftedItemNames.add(item.productName.toLowerCase())
+      }
+    }
+
+    const groupedBySupplier = new Map<string, ReorderSuggestion[]>()
+    for (const suggestion of suggestions) {
+      const supplierId = suggestion.recommendedSupplier.id
+      if (!groupedBySupplier.has(supplierId)) {
+        groupedBySupplier.set(supplierId, [])
+      }
+      groupedBySupplier.get(supplierId)!.push(suggestion)
+    }
+
+    const createdPOs: Array<{
+      id: string
+      poNumber: string
+      supplierName: string
+      totalCents: number
+      itemCount: number
+      justification: string
+    }> = []
+    let skipped = 0
+
+    for (const [supplierId, supplierSuggestions] of groupedBySupplier) {
+      const newSuggestions = supplierSuggestions.filter(
+        s => !draftedItemNames.has(s.item.name.toLowerCase())
+      )
+
+      if (newSuggestions.length === 0) {
+        skipped += supplierSuggestions.length
+        continue
+      }
+
+      const supplier = await prisma.supplier.findUnique({
+        where: { id: supplierId },
+        select: { id: true, name: true, leadTimeDays: true },
+      })
+
+      if (!supplier) {
+        skipped += newSuggestions.length
+        continue
+      }
+
+      const subtotalCents = newSuggestions.reduce(
+        (sum, s) => sum + Math.round(s.estimatedCost * 100),
+        0
+      )
+      const vatCents = Math.round(subtotalCents * 0.18)
+      const totalCents = subtotalCents + vatCents
+
+      const poNumber = `DRAFT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+
+      const justification = newSuggestions
+        .map(s => `${s.item.name}: stock ${s.item.currentStock} ${s.item.unit} (min ${s.item.minStock}), reorder ${s.suggestedQuantity} ${s.item.unit} — ${s.recommendedSupplier.reasoning}`)
+        .join('; ')
+
+      const inventoryImpact = newSuggestions
+        .map(s => `${s.item.name}: +${s.suggestedQuantity} ${s.item.unit} → projected ${s.item.currentStock + s.suggestedQuantity} ${s.item.unit}`)
+        .join('; ')
+
+      const purchaseOrder = await prisma.purchaseOrder.create({
+        data: {
+          poNumber,
+          supplierId,
+          status: 'DRAFT',
+          subtotalCents,
+          vatCents,
+          vatRate: 18.0,
+          totalCents,
+          notes: `Auto-generated from AI reorder. Justification: ${justification}. Inventory impact: ${inventoryImpact}`,
+          createdById: userId,
+          businessId,
+          items: {
+            create: newSuggestions.map(s => ({
+              productName: s.item.name,
+              productId: s.recommendedSupplier.productId,
+              quantity: s.suggestedQuantity,
+              unit: s.item.unit,
+              unitPriceCents: Math.round(s.recommendedSupplier.unitPrice * 100),
+              totalPriceCents: Math.round(s.estimatedCost * 100),
+              notes: `Urgency: ${s.item.urgency}, Stock: ${s.item.currentStock}/${s.item.minStock}`,
+            })),
+          },
+          statusHistory: {
+            create: {
+              status: 'DRAFT',
+              changedById: userId,
+              changedByName: 'AI Reorder Autopilot',
+              notes: 'Auto-generated draft from inventory reorder threshold detection',
+            },
+          },
+        },
+        include: {
+          items: true,
+          statusHistory: true,
+        },
+      })
+
+      for (const s of newSuggestions) {
+        await this.logReorderAction(businessId, s, userId, 'approved')
+      }
+
+      createdPOs.push({
+        id: purchaseOrder.id,
+        poNumber: purchaseOrder.poNumber,
+        supplierName: supplier.name,
+        totalCents: purchaseOrder.totalCents,
+        itemCount: newSuggestions.length,
+        justification,
+      })
+    }
+
+    return {
+      created: createdPOs.length,
+      skipped,
+      purchaseOrders: createdPOs,
     }
   }
 }

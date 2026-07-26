@@ -7,7 +7,7 @@
  * Answers: "What recurring revenue is vulnerable?"
  * 
  * Note: Some metrics (Revenue at Risk, Grace Aging) require schema updates
- * and are marked as TODO until FinancialLedgerEntry.metadata is available
+ * and are deferred post-v1 until FinancialLedgerEntry.metadata is available
  */
 
 import { prisma } from '@/lib/prisma'

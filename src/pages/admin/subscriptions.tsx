@@ -121,7 +121,7 @@ export default function AdminSubscriptions() {
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Restaurant</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Business</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Plan</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Amount</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Status</th>

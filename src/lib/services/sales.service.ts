@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import type { CreateSaleInput, UpdateSaleInput, SalesQueryInput, CancelSaleInput } from '@/lib/validations/sales.schema'
 import { calculateConvenienceFee } from '@/lib/pricing/fee-calculator'
 import type { PaymentMethod } from '@/lib/pricing/fee-config'
-import { SmartDiningSlipService } from './smart-dining-slip.service'
+import { PaymentCompletionService } from './payment-completion.service'
 import { FinancialTruthService, CostSource } from './financial-truth.service'
 import { GuestRecognitionService } from './guest-recognition.service'
 
@@ -77,30 +77,21 @@ export class SalesService {
     })
 
     if (input.paymentMethod === 'CASH') {
+      // Route through canonical PaymentCompletionService for all post-payment side effects
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: sale.id,
-          clientPhone: input.clientPhone,
-          clientEmail: input.clientEmail,
-          clientConsentedWhatsApp: input.clientConsentedWhatsApp,
-          consentCollectedBy: userId,
-        })
+        await PaymentCompletionService.onPaymentSuccess(
+          '', // CASH has no payment transaction
+          sale.id,
+          {
+            clientPhone: input.clientPhone,
+            clientEmail: input.clientEmail,
+            clientConsentedWhatsApp: input.clientConsentedWhatsApp,
+            consentCollectedBy: userId,
+            source: 'cash-sale',
+          }
+        )
       } catch (error) {
-        console.error('Failed to generate Smart Dining Slip™:', error)
-      }
-
-      // Visit completion for immediately-paid CASH orders
-      if (customerId) {
-        try {
-          await GuestRecognitionService.onOrderCompleted(
-            customerId,
-            totalAmountCents,
-            sale.id,
-            input.businessId
-          )
-        } catch (error) {
-          console.error('Failed to update guest stats after CASH sale:', error)
-        }
+        console.error('Failed to process payment completion for CASH sale:', error)
       }
     }
 
@@ -199,16 +190,11 @@ export class SalesService {
     })
 
     if (input.paymentStatus === 'COMPLETED' && input.isPaid) {
+      // Route through canonical PaymentCompletionService
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: sale.id,
-          clientPhone: (input as any).clientPhone,
-          clientEmail: (input as any).clientEmail,
-          clientConsentedWhatsApp: (input as any).clientConsentedWhatsApp,
-          consentCollectedBy: (input as any).consentCollectedBy,
-        })
+        await PaymentCompletionService.onPaymentSuccess('', sale.id, { source: 'sale-update' })
       } catch (error) {
-        console.error('Failed to generate Smart Dining Slip™:', error)
+        console.error('Failed to process payment completion on sale update:', error)
       }
     }
 

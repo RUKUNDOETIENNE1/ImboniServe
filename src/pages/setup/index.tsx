@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/components/DashboardLayout'
-import { CheckCircle2, Circle, ArrowRight, Loader2, UtensilsCrossed, Users, Table2, ShoppingCart } from 'lucide-react'
+import { CheckCircle2, Circle, ArrowRight, Loader2, UtensilsCrossed, Users, Table2, ShoppingCart, CreditCard } from 'lucide-react'
 
 interface SetupProgress {
   progress: {
     hasMenu: boolean
     hasTables: boolean
+    hasPaymentConfig: boolean
     hasStaff: boolean
     completedSteps: number
     totalSteps: number
@@ -106,7 +107,7 @@ export default function SetupWizardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Welcome to ImboniServe! 🎉</h1>
-          <p className="text-slate-600">Let's get your restaurant set up in just a few steps. You'll be taking orders in no time.</p>
+          <p className="text-slate-600">Let's get your business set up in just a few steps. You'll be taking orders in no time.</p>
         </div>
 
         {loading && (
@@ -187,6 +188,14 @@ export default function SetupWizardPage() {
               />
 
               <StepCard
+                done={data.progress.hasPaymentConfig}
+                icon={CreditCard}
+                title="Configure Payment Settings"
+                description="Set up your tax mode (VAT), currency, and split payment options so you're ready to accept payments."
+                href="/dashboard/payment-settings"
+              />
+
+              <StepCard
                 done={data.progress.hasStaff}
                 icon={Users}
                 title="Invite Your Team"
@@ -229,7 +238,7 @@ export default function SetupWizardPage() {
                 <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-3" />
                 <h3 className="text-xl font-bold text-green-900 mb-2">Setup Complete! 🎉</h3>
                 <p className="text-green-800 mb-4">
-                  Your restaurant is ready to go. Head to your dashboard to start managing orders.
+                  Your business is ready to go. Head to your dashboard to start managing orders.
                 </p>
                 <a
                   href="/dashboard"

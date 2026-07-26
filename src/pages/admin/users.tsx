@@ -132,7 +132,7 @@ export default function AdminUsers() {
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">User</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Contact</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Restaurant</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Business</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Role</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Status</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Actions</th>

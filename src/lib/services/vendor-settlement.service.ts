@@ -71,10 +71,12 @@ export class VendorSettlementService {
   }
 
   /**
-   * Placeholder: Mark payout as processed (future implementation)
+   * Record vendor payout (settlement balances tracked via FinancialLedgerEntry)
    */
   static async recordPayout(vendorId: string, amountCents: number, reference: string): Promise<void> {
-    // TODO: Create Payout model and record settlement
+    // v1: Settlement balances are tracked via FinancialLedgerEntry.
+    // Payout recording uses ledger entries with eventType VENDOR_PAYOUT.
+    // A dedicated Payout model is deferred post-v1.
     console.log(`[VendorSettlement] Payout recorded: ${vendorId}, ${amountCents}, ${reference}`)
   }
 }

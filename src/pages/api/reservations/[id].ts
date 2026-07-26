@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { prisma } from '@/lib/prisma'
+import { ReservationService } from '@/lib/services/reservation.service'
 import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
@@ -39,52 +39,55 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
   const { status, depositPaid, tableId } = req.body
 
   try {
-    // Verify reservation belongs to business
-    const existing = await prisma.reservation.findUnique({
-      where: { id }
-    })
+    // Verify reservation belongs to business via service
+    const reservations = await ReservationService.getBusinessReservations(businessId, {})
+    const existing = reservations.find(r => r.id === id)
 
-    if (!existing || existing.businessId !== businessId) {
+    if (!existing) {
       return res.status(404).json({ error: 'Reservation not found' })
     }
 
-    const updateData: any = {}
-    if (status) updateData.status = status
-    if (depositPaid !== undefined) {
-      updateData.depositStatus = depositPaid ? PaymentTransactionStatus.SUCCESS : PaymentTransactionStatus.PENDING
-      if (depositPaid) {
-        updateData.depositPaidAt = new Date()
-      }
+    // Update status if provided
+    if (status) {
+      await ReservationService.updateStatus(id, status)
     }
-    if (tableId) updateData.tableId = tableId
 
-    const reservation = await prisma.reservation.update({
-      where: { id },
-      data: updateData
-    })
+    // Update table if provided
+    if (tableId !== undefined) {
+      await ReservationService.updateTable(id, tableId || null)
+    }
+
+    // Update deposit status if provided
+    if (depositPaid !== undefined) {
+      await ReservationService.updateDepositStatus(
+        id,
+        depositPaid ? String(PaymentTransactionStatus.SUCCESS) : String(PaymentTransactionStatus.PENDING),
+        { depositPaidAt: depositPaid ? new Date() : null }
+      )
+    }
 
     // Shadow tap: BOOKING_UPDATED (+ optional CONFIRMED) (feature-flagged, non-blocking)
     ingestReservationShadowEvent({
       type: 'BOOKING_UPDATED',
       businessId,
-      reservationId: reservation.id,
-      partySize: reservation.partySize,
+      reservationId: id,
+      partySize: existing.partySize,
     }).catch(() => {})
 
     if (status === 'CONFIRMED') {
       ingestReservationShadowEvent({
         type: 'CONFIRMED',
         businessId,
-        reservationId: reservation.id,
-        partySize: reservation.partySize,
+        reservationId: id,
+        partySize: existing.partySize,
       }).catch(() => {})
     }
 
     return res.status(200).json({
       reservation: {
-        id: reservation.id,
-        status: reservation.status,
-        depositPaid: reservation.depositStatus === PaymentTransactionStatus.SUCCESS
+        id,
+        status: status || existing.status,
+        depositPaid: depositPaid !== undefined ? depositPaid : (existing as any).depositStatus === PaymentTransactionStatus.SUCCESS
       }
     })
   } catch (error: any) {
@@ -95,18 +98,15 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
 
 async function handleDelete(req: NextApiRequest, res: NextApiResponse, id: string, businessId: string) {
   try {
-    // Verify reservation belongs to business
-    const existing = await prisma.reservation.findUnique({
-      where: { id }
-    })
+    // Verify reservation belongs to business via service
+    const reservations = await ReservationService.getBusinessReservations(businessId, {})
+    const existing = reservations.find(r => r.id === id)
 
-    if (!existing || existing.businessId !== businessId) {
+    if (!existing) {
       return res.status(404).json({ error: 'Reservation not found' })
     }
 
-    await prisma.reservation.delete({
-      where: { id }
-    })
+    await ReservationService.cancelReservation(id, 'Deleted by user')
 
     return res.status(200).json({ success: true })
   } catch (error: any) {

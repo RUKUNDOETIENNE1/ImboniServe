@@ -34,6 +34,7 @@ export default function Signup() {
     businessType: 'RESTAURANT', // RESTAURANT, HOTEL, CAFE, BAR, SUPPLIER
     latitude: null as number | null,
     longitude: null as number | null,
+    referralCode: '', // Optional referral/affiliate code
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -267,6 +268,24 @@ export default function Signup() {
                   ⚠️ {t('auth.supplier_no_trial', 'Suppliers are not eligible for the 14-day free trial. Paid plan required.')}
                 </p>
               )}
+            </div>
+
+            {/* Referral Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('auth.referral_code', 'Referral Code (optional)')}
+              </label>
+              <input
+                type="text"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
+                placeholder="e.g. IMBONI-XXXX"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {t('auth.referral_code_hint', 'Enter a referral code if you were referred by a partner or friend.')}
+              </p>
             </div>
 
             {/* Terms and Conditions Agreement */}

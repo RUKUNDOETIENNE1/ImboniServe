@@ -203,7 +203,7 @@ export class ServiceIntelligenceService {
         label: request.selection.label,
         durationMinutes: this.calculateDuration(timeRange.start, timeRange.end),
       },
-      timezone: 'Africa/Kigali', // TODO: Get from business settings
+      timezone: request.businessTimezone || 'Africa/Kigali',
       locale: 'en-RW',
       scope: {
         scoring: true,

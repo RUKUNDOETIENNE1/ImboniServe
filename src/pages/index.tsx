@@ -71,14 +71,14 @@ const features = [
   },
   {
     icon: <BrainCircuit className="w-6 h-6" />,
-    title: 'AI-Powered Insights',
-    desc: 'Smart reorder recommendations and cost anomaly alerts that protect your profit margins.',
+    title: 'Smart Analytics',
+    desc: 'Reorder recommendations and cost anomaly alerts that protect your profit margins.',
     color: 'bg-yellow-50 text-imboni-gold',
   },
   {
-    icon: <Rss className="w-6 h-6" />,
-    title: 'Content & Discovery Feed',
-    desc: 'Publish posts, promos, and photos. Let customers discover and order directly from your feed.',
+    icon: <Globe className="w-6 h-6" />,
+    title: 'Discovery Listing',
+    desc: 'Get listed on our public directory where customers find hospitality businesses near them.',
     color: 'bg-indigo-50 text-indigo-700',
   },
   {
@@ -88,15 +88,9 @@ const features = [
     color: 'bg-cyan-50 text-cyan-700',
   },
   {
-    icon: <Gift className="w-6 h-6" />,
-    title: 'Loyalty & Rewards',
-    desc: 'Build customer loyalty with points, tiers, and redemption tracking across visits.',
-    color: 'bg-pink-50 text-pink-700',
-  },
-  {
-    icon: <Tag className="w-6 h-6" />,
-    title: 'Promotions & Happy Hours',
-    desc: 'Set time-based discounts and combo deals that activate and expire automatically.',
+    icon: <Bell className="w-6 h-6" />,
+    title: 'Low-Stock Push Alerts',
+    desc: 'Never run out. Get automatic alerts before inventory drops below reorder points.',
     color: 'bg-amber-50 text-amber-700',
   },
   {
@@ -127,16 +121,6 @@ const features = [
 
 const advancedFeatures = [
   {
-    icon: <Hotel className="w-5 h-5" />,
-    title: 'Hotel Mode',
-    desc: 'Room management, service areas, and front desk operations built-in.',
-  },
-  {
-    icon: <Palette className="w-5 h-5" />,
-    title: 'Site Builder',
-    desc: 'Launch your own website with customizable templates — no code needed.',
-  },
-  {
     icon: <Sparkles className="w-5 h-5" />,
     title: 'AI Menu Builder',
     desc: 'Upload a photo or document and let AI build your menu for you.',
@@ -144,12 +128,27 @@ const advancedFeatures = [
   {
     icon: <Globe className="w-5 h-5" />,
     title: 'Business Discovery',
-    desc: 'Get discovered by customers searching for restaurants powered by ImboniServe.',
+    desc: 'Get discovered by customers searching for hospitality businesses powered by ImboniServe.',
+  },
+  {
+    icon: <Gift className="w-5 h-5" />,
+    title: 'Referral Program',
+    desc: 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.',
   },
   {
     icon: <Users className="w-5 h-5" />,
     title: 'Staff & Roles',
     desc: 'Granular role permissions: waiter, cashier, supervisor, manager, and more.',
+  },
+  {
+    icon: <Package className="w-5 h-5" />,
+    title: 'Inventory Alerts & Auto-Reorder',
+    desc: 'Automatic stock alerts and AI-powered draft purchase orders for your suppliers.',
+  },
+  {
+    icon: <Receipt className="w-5 h-5" />,
+    title: 'Smart Dining Slips',
+    desc: 'Auto-generated digital receipts with shareable links for seamless customer experience.',
   },
 ]
 
@@ -159,7 +158,7 @@ const heroSlides = [
   {
     title: 'The Operating System',
     highlight: 'for Hospitality.',
-    subtitle: 'Run your restaurant, café, hotel, or hospitality business from one intelligent platform.',
+    subtitle: 'Run your café, hotel, bar, or hospitality business from one intelligent platform.',
     description: 'Everything you need to run your business — from orders and inventory to payments and insights — in one platform built for hospitality.',
     image: '/imgs/ideogr1.jpg'
   },
@@ -171,10 +170,10 @@ const heroSlides = [
     image: '/imgs/ideogr 2.jpg'
   },
   {
-    title: 'AI-Powered Insights',
+    title: 'Smart Analytics',
     highlight: 'Data-Driven Growth',
     subtitle: 'Know Your Business Inside Out',
-    description: 'Track sales, predict demand, optimize inventory, and make smarter decisions with actionable AI recommendations.',
+    description: 'Track sales, optimize inventory, and make smarter decisions with actionable recommendations based on your real data.',
     image: '/imgs/ideogr 3.jpg'
   },
   {
@@ -295,7 +294,7 @@ export default function HomePage() {
   const supportWhatsAppUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || 'https://wa.me/250735214496'
 
   return (
-    <PublicLayout title="Imboni Serve — Restaurant & Hotel Management Platform">
+    <PublicLayout title="Imboni Serve — Hospitality Operating System">
     <Head>
       <meta name="robots" content="index,follow" />
       <script
@@ -373,7 +372,7 @@ export default function HomePage() {
                     {slide.description}
                   </p>
                   <p className="text-base text-white/80 font-medium" suppressHydrationWarning>
-                    {t('homepage.hero.description', 'Built for restaurants, hotels, bars, and cafés.')}
+                    {t('homepage.hero.description', 'Built for cafés, hotels, bars, and hospitality businesses.')}
                   </p>
                   <p className="text-sm text-white/80 mb-8" suppressHydrationWarning>
                     {t('homepage.hero.rt_os', 'Real-time OS: see every sale, every table, every customer action — and grow revenue automatically.')}
@@ -460,47 +459,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── AUTO‑GROWTH ENGINES CAROUSEL ── */}
-      <section className="py-12 px-4 bg-imboni-light border-y border-slate-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <div className="inline-block bg-imboni-orange/10 text-imboni-orange text-xs font-semibold px-3 py-1 rounded-full mb-2" suppressHydrationWarning>
-                {t('homepage.growth.badge', 'Auto‑Growth Engines')}
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-imboni-blue" suppressHydrationWarning>
-                {t('homepage.growth.title', 'Grow Revenue on Autopilot')}
-              </h2>
-            </div>
-            <div className="hidden md:flex items-center gap-2">
-              <button onClick={() => scrollCarousel(growthRef, -1)} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-                <ChevronLeft className="w-5 h-5 text-slate-600" />
-              </button>
-              <button onClick={() => scrollCarousel(growthRef, 1)} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-                <ChevronRight className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-          </div>
-
-          <div ref={growthRef} className="snap-x snap-mandatory overflow-x-auto no-scrollbar -mx-4 px-4">
-            <div className="flex gap-4 min-w-full">
-              {growthSlides.map((s, i) => (
-                <div key={i} className="snap-start shrink-0 w-80 bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
-                  <div className="w-10 h-10 rounded-xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-3">
-                    {s.icon}
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-1">{s.title}</h3>
-                  <p className="text-sm text-slate-600 mb-4">{s.desc}</p>
-                  <span className="inline-flex items-center gap-2 text-slate-500 font-medium text-sm" aria-label={s.cta}>
-                    {s.cta}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── SUPPLIER MARKETPLACE ── */}
       <section id="store" className="py-16 px-4 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -532,7 +490,7 @@ export default function HomePage() {
             {t('homepage.video.title', 'See Imboni Serve in Action')}
           </h2>
           <p className="text-gray-600 mb-8 text-lg" suppressHydrationWarning>
-            {t('homepage.video.subtitle', 'Watch how restaurants streamline operations with our all-in-one platform.')}
+            {t('homepage.video.subtitle', 'Watch how hospitality businesses streamline operations with our all-in-one platform.')}
           </p>
           <a 
             href="https://www.youtube.com/watch?v=Pdh2D6uWXQo" 
@@ -554,7 +512,7 @@ export default function HomePage() {
             </div>
             <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-4 py-3 text-left">
               <p className="text-sm font-semibold text-slate-800" suppressHydrationWarning>{t('homepage.video.cta', 'Click to watch on YouTube')}</p>
-              <p className="text-xs text-slate-500 mt-0.5" suppressHydrationWarning>{t('homepage.video.description', 'See how Imboni Serve transforms restaurant operations')}</p>
+              <p className="text-xs text-slate-500 mt-0.5" suppressHydrationWarning>{t('homepage.video.description', 'See how Imboni Serve transforms hospitality operations')}</p>
             </div>
           </a>
         </div>
@@ -571,7 +529,7 @@ export default function HomePage() {
               {t('homepage.how_it_works.title', 'How It Works')}
             </h2>
             <p className="text-white/80 text-lg max-w-2xl mx-auto" suppressHydrationWarning>
-              {t('homepage.how_it_works.subtitle', '6 simple steps to digitize your business & start serving smarter')}
+              {t('homepage.how_it_works.subtitle', '6 simple steps to digitize your hospitality business & start serving smarter')}
             </p>
           </div>
 
@@ -594,7 +552,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-3" suppressHydrationWarning>{t('homepage.how_it_works.step2_title', 'Build Your Menu')}</h3>
               <p className="text-white/80 text-sm leading-relaxed" suppressHydrationWarning>
-                {t('homepage.how_it_works.step2_desc', 'Add dishes and drinks with photos, prices, and descriptions. Use our AI Menu Builder to upload a photo or PDF and auto-generate your menu instantly.')}
+                {t('homepage.how_it_works.step2_desc', 'Add dishes and drinks with photos, prices, and descriptions. Use our AI Menu Builder to upload a photo or PDF and auto-generate your menu in seconds.')}
               </p>
             </div>
 
@@ -668,28 +626,28 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Users className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">500+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.businesses', 'Businesses served')}</div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
-              <ShoppingCart className="w-5 h-5" />
-            </div>
-            <div className="text-2xl font-bold text-imboni-blue">10,000+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.orders', 'Orders processed')}</div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
-              <Clock className="w-5 h-5" />
-            </div>
             <div className="text-2xl font-bold text-imboni-blue">14 days</div>
             <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.trial', 'Free trial, no card needed')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
+              <ShoppingCart className="w-5 h-5" />
+            </div>
+            <div className="text-2xl font-bold text-imboni-blue">No card</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.orders', 'needed to start')}</div>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div className="text-2xl font-bold text-imboni-blue">5 plans</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.plans', 'From Starter to Enterprise')}</div>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Star className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">50+</div>
+            <div className="text-2xl font-bold text-imboni-blue">30+</div>
             <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.features', 'Features included')}</div>
           </div>
         </div>
@@ -706,7 +664,7 @@ export default function HomePage() {
               {t('homepage.features.title', 'Everything you need to run a tight operation')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-2" suppressHydrationWarning>
-              {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your business.')}
+              {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your hospitality business.')}
             </p>
             <p className="text-sm text-imboni-blue/80 font-medium tracking-wide">
               Unified. Intelligent. Reliable.
@@ -809,7 +767,7 @@ export default function HomePage() {
               {t('homepage.pricing_preview.heading', 'Transparent Pricing for Every Business Size')}
             </h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed" suppressHydrationWarning>
-              {t('homepage.pricing_preview.subtitle', 'ImboniServe offers flexible plans designed for restaurants, cafés, hotels, and hospitality businesses of all sizes.')}
+              {t('homepage.pricing_preview.subtitle', 'ImboniServe offers flexible plans designed for hospitality businesses of all sizes.')}
             </p>
           </div>
 
@@ -824,7 +782,7 @@ export default function HomePage() {
                   <span className="text-gray-600 text-xl ml-2" suppressHydrationWarning>{displayCurrency}{t('homepage.pricing_preview.per_month', ' / month')}</span>
                 </div>
                 <p className="text-gray-600 text-lg mb-6" suppressHydrationWarning>
-                  {t('homepage.pricing_preview.starter_desc', 'Perfect for single-location restaurants and cafés getting started with modern operations.')}
+                  {t('homepage.pricing_preview.starter_desc', 'Perfect for single-location hospitality businesses getting started with modern operations.')}
                 </p>
                 <div className="flex items-center gap-2 text-green-600 font-medium mb-2">
                   <Check className="w-5 h-5" />
@@ -853,7 +811,7 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_4', 'AI-powered insights and reporting')}</span>
+                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_4', 'Reporting and analytics')}</span>
                     </li>
                   </ul>
                 </div>
@@ -869,7 +827,7 @@ export default function HomePage() {
           <div className="text-center">
             <div className="bg-gradient-to-r from-imboni-orange/10 to-imboni-blue/10 border border-imboni-orange/20 rounded-2xl p-6 mb-8 max-w-3xl mx-auto">
               <p className="text-gray-700 font-medium text-lg" suppressHydrationWarning>
-                {t('homepage.pricing_preview.founding_note', '🎉 Founding Restaurant Program members receive 50% lifetime discount on all plans')} — <a href="#founding-program" className="text-imboni-orange hover:text-imboni-blue transition font-semibold">{t('homepage.pricing_preview.founding_link', 'Learn more below ↓')}</a>
+                {t('homepage.pricing_preview.founding_note', '🎉 Founding Hospitality Business Program members receive 50% lifetime discount on all plans')} — <a href="#founding-program" className="text-imboni-orange hover:text-imboni-blue transition font-semibold">{t('homepage.pricing_preview.founding_link', 'Learn more below ↓')}</a>
               </p>
             </div>
             <Link
@@ -893,7 +851,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('homepage.product_trust.title', 'Why Restaurant Owners Trust ImboniServe')}
+              {t('homepage.product_trust.title', 'Why Hospitality Businesses Trust ImboniServe')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
               {t('homepage.product_trust.subtitle', 'Built for accuracy, auditability, and control — not marketing promises.')}
@@ -960,7 +918,7 @@ export default function HomePage() {
                 <BrainCircuit className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.ai', 'AI Built on Real Data')}
+                {t('homepage.product_trust.ai', 'Built on Real Operational Data')}
               </h3>
               <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
                 {t('homepage.product_trust.ai_desc', 'Get recommendations that actually work for your business — based on your real sales, not industry guesses.')}
@@ -970,7 +928,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FOUNDING RESTAURANT PROGRAM ── */}
+      {/* ── FOUNDING HOSPITALITY BUSINESS PROGRAM ── */}
       <section id="founding-program" className="py-20 px-4 bg-gradient-to-br from-imboni-blue via-imboni-blue to-indigo-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(231,111,81,0.15),_transparent_60%)]" />
         <div className="max-w-5xl mx-auto relative z-10">
@@ -980,10 +938,10 @@ export default function HomePage() {
               {t('homepage.founding_program.badge', 'Limited Early-Adopter Program')}
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4" suppressHydrationWarning>
-              {t('homepage.founding_program.title', 'Founding Restaurant Program')}
+              {t('homepage.founding_program.title', 'Founding Hospitality Business Program')}
             </h2>
             <p className="text-white/90 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed" suppressHydrationWarning>
-              {t('homepage.founding_program.subtitle', 'Join the first 100 restaurants to shape the future of hospitality operations.')}
+              {t('homepage.founding_program.subtitle', 'Join the first 100 hospitality businesses to shape the future of hospitality operations.')}
             </p>
           </div>
           
@@ -1057,7 +1015,7 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg mb-6">
               <Clock className="w-4 h-4" />
               <span className="text-sm font-medium" suppressHydrationWarning>
-                {t('homepage.founding_program.limited', 'Limited to first 100 restaurants')}
+                {t('homepage.founding_program.limited', 'Limited to first 100 hospitality businesses')}
               </span>
             </div>
             <div className="flex flex-wrap justify-center gap-4">
@@ -1090,60 +1048,17 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Hotel className="w-5 h-5" />
+            {advancedFeatures.map((f, i) => (
+              <div key={i} className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+                <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">{f.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.hotel_mode', 'Hotel Mode')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.hotel_mode_desc', 'Room management, service areas, and front desk operations built-in.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Palette className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.site_builder', 'Site Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.site_builder_desc', 'Launch your own website with customizable templates — no code needed.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.ai_menu', 'AI Menu Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.ai_menu_desc', 'Upload a photo or document and let AI build your menu for you.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Globe className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.marketplace', 'Discovery Marketplace')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.marketplace_desc', 'Get listed on a public directory where customers search for places to eat.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Gift className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.referral', 'Referral Program')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.referral_desc', 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.staff', 'Staff & Roles')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.staff_desc', 'Granular role permissions: waiter, cashier, supervisor, manager, and more.')}</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1206,7 +1121,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-imboni-blue mb-2" suppressHydrationWarning>{t('homepage.payments.title', '🇷🇼 Rwanda-Ready Payments')}</h2>
           <p className="text-gray-600 mb-6" suppressHydrationWarning>{t('homepage.payments.subtitle', 'Accept all major payment methods your customers use every day.')}</p>
           <div className="flex flex-wrap justify-center gap-4">
-            {['MTN MoMo', 'Airtel Money', 'Cash', 'Card / POS', 'IremboPay'].map((m) => (
+            {['MTN MoMo', 'Airtel Money', 'Cash', 'IremboPay'].map((m) => (
               <span
                 key={m}
                 className="bg-white border border-slate-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full shadow-sm"
@@ -1223,7 +1138,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>{t('homepage.final_cta.title', 'Ready to grow your business?')}</h2>
           <p className="text-white/80 text-lg mb-8" suppressHydrationWarning>
-            {t('homepage.final_cta.subtitle', 'Join 500+ hospitality businesses across Rwanda using Imboni Serve. Start your free 14-day trial today — no credit card needed.')}
+            {t('homepage.final_cta.subtitle', 'Start your free 14-day trial today — no credit card needed. Join the Imboni Serve community of hospitality businesses across Rwanda.')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

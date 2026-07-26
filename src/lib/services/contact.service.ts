@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { ContactType, ContactStatus, Prisma } from '@prisma/client'
+import { ContactCustomerBridge } from './contact-customer-bridge.service'
+import { logger } from '@/lib/logger'
+
+const log = logger.child({ service: 'contact' })
 
 export interface CreateContactInput {
   name: string
@@ -74,6 +78,15 @@ export class ContactService {
       source: 'system',
       performedBy: input.createdBy,
     })
+
+    // Bridge: if this is a CUSTOMER type contact, ensure a Customer entity exists
+    if (contact.type === ContactType.CUSTOMER) {
+      try {
+        await ContactCustomerBridge.ensureCustomerForContact(contact.id)
+      } catch (error) {
+        log.error('Failed to bridge contact to customer', { error: String(error), contactId: contact.id })
+      }
+    }
 
     return contact
   }

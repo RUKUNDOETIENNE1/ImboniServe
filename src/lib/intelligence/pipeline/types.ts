@@ -422,6 +422,10 @@ export interface ServiceSummary {
   staffCount: number
   stationCount: number
   averageServiceTimeSeconds: number
+  averagePrepTimeSeconds?: number
+  averagePaymentTimeSeconds?: number
+  peakHour?: string
+  onTimeRate?: number
   completionRate: number
   issueCount: number
   highlightCount: number

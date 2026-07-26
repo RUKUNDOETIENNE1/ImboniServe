@@ -63,7 +63,7 @@ export class IremboPayService {
 
   static async createInvoice(params: CreateInvoiceParams): Promise<InvoiceResponse> {
     const transactionId = `IMBONI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    const expiryAt = new Date(Date.now() + 15 * 60 * 1000).toISOString()
+    const expiryAt = new Date(Date.now() + 20 * 60 * 1000).toISOString()
 
     const payload = {
       transactionId,

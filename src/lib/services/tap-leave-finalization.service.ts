@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
-import { SmartDiningSlipService } from '@/lib/services/smart-dining-slip.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 import { createTipForSale } from '@/lib/services/digital-tipping.service'
 import { InTouchService } from '@/lib/services/intouch.service'
 import { logger } from '@/lib/logger'
@@ -85,17 +85,22 @@ export class TapLeaveFinalizationService {
         try { logger.warn('[Tap&Leave Finalize] tip allocation error', { paymentId: payment.id, err: String(e) }) } catch {}
       }
 
-      // Generate final receipt (idempotent via unique saleId on SmartDiningSlip)
+      // Delegate post-payment side effects to canonical PaymentCompletionService
+      // This handles: sale status update, dining slip, guest recognition, notification,
+      // broadcast, ledger entry, audit log, order token
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: primary.id,
-          clientPhone: payment.payerPhone || undefined,
-          clientEmail: undefined,
-          clientConsentedWhatsApp: false,
-        })
+        await PaymentCompletionService.onPaymentSuccess(
+          payment.id,
+          primary.id,
+          {
+            clientPhone: payment.payerPhone || undefined,
+            clientConsentedWhatsApp: false,
+            source: `tap-leave-${source}`,
+          }
+        )
       } catch (e) {
-        // Ignore duplicate generation errors
-        try { logger.warn('[Tap&Leave Finalize] receipt generation warning', { paymentId: payment.id, err: String(e) }) } catch {}
+        // Idempotent — ignore duplicate processing errors
+        try { logger.warn('[Tap&Leave Finalize] PaymentCompletionService warning', { paymentId: payment.id, err: String(e) }) } catch {}
       }
     }
 
@@ -196,7 +201,7 @@ export class TapLeaveFinalizationService {
         }
 
         const ageMs = now.getTime() - new Date(p.createdAt).getTime()
-        if (ageMs > 5 * 60 * 1000) {
+        if (ageMs > 20 * 60 * 1000) {
           await prisma.paymentTransaction.update({
             where: { id: p.id },
             data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), timeout: true } },
