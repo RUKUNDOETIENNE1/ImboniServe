@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
-import { withRateLimit } from '@/lib/middleware/rate-limit'
+import { withRateLimit } from '@/lib/middleware/withRateLimit'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
