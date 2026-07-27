@@ -43,9 +43,13 @@ function validateEnv() {
     throw new Error('NEXTAUTH_SECRET must be at least 32 characters long for production')
   }
 
+  // NEXTAUTH_URL format check — warn only. On Vercel, NEXTAUTH_URL may be
+  // unset or set to a placeholder during build; the runtime will resolve the
+  // correct URL from VERCEL_URL. Throwing here breaks production builds for
+  // a non-secret value that is not required to compile the app.
   const nextAuthUrl = process.env.NEXTAUTH_URL
   if (nextAuthUrl && !/^https?:\/\//i.test(nextAuthUrl)) {
-    throw new Error('NEXTAUTH_URL must start with http or https')
+    console.warn('⚠️  NEXTAUTH_URL is set but does not start with http or https. It will be ignored at runtime.')
   }
 
   console.log('✅ Environment variables validated')

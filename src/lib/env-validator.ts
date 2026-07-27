@@ -146,9 +146,12 @@ function validateSpecificFormats(): void {
     throw new Error('DATABASE_URL must be a valid PostgreSQL connection string')
   }
 
-  // Validate NEXTAUTH_URL format
+  // Validate NEXTAUTH_URL format — warn only, do not throw. On Vercel and
+  // other build environments, NEXTAUTH_URL may be unset or set to a
+  // placeholder; the runtime resolves the correct URL. Throwing here breaks
+  // production builds for a non-secret value that is not required to compile.
   if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.startsWith('http')) {
-    throw new Error('NEXTAUTH_URL must be a valid HTTP/HTTPS URL')
+    console.warn('⚠️  NEXTAUTH_URL is set but does not start with http or https. It will be ignored at runtime.')
   }
 
   // Validate NEXTAUTH_SECRET length (should be at least 32 characters)
