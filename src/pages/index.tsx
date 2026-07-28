@@ -151,6 +151,7 @@ const advancedFeatures = [
 
 const heroSlides = [
   {
+    key: 'os',
     title: 'The Operating System',
     highlight: 'for Hospitality.',
     subtitle: 'Run your café, hotel, bar, or hospitality business from one intelligent platform.',
@@ -158,6 +159,7 @@ const heroSlides = [
     image: '/imgs/ideogr1.jpg'
   },
   {
+    key: 'replay',
     title: 'Service Replay™',
     highlight: 'See What Really Happened',
     subtitle: 'Rewind Any Service Period',
@@ -165,6 +167,7 @@ const heroSlides = [
     image: '/imgs/ideogr 3.jpg'
   },
   {
+    key: 'qr',
     title: 'Smart QR Ordering',
     highlight: 'Zero Wait Time',
     subtitle: 'Customers Order from Their Phones',
@@ -172,6 +175,7 @@ const heroSlides = [
     image: '/imgs/ideogr 2.jpg'
   },
   {
+    key: 'analytics',
     title: 'Smart Analytics',
     highlight: 'Data-Driven Growth',
     subtitle: 'Know Your Business Inside Out',
@@ -179,6 +183,7 @@ const heroSlides = [
     image: '/imgs/ideogr 3.jpg'
   },
   {
+    key: 'platform',
     title: 'All-in-One Platform',
     highlight: 'Complete Control',
     subtitle: 'POS, QR, Inventory, Analytics',
@@ -326,10 +331,10 @@ export default function HomePage() {
         {heroSlides.map((s, index) => {
           const slide = {
             ...s,
-            title: t(`homepage.hero.slides.${index}.title`, s.title),
-            highlight: t(`homepage.hero.slides.${index}.highlight`, s.highlight),
-            subtitle: t(`homepage.hero.slides.${index}.subtitle`, s.subtitle),
-            description: t(`homepage.hero.slides.${index}.description`, s.description),
+            title: t(`homepage.hero.slides.${s.key}.title`, s.title),
+            highlight: t(`homepage.hero.slides.${s.key}.highlight`, s.highlight),
+            subtitle: t(`homepage.hero.slides.${s.key}.subtitle`, s.subtitle),
+            description: t(`homepage.hero.slides.${s.key}.description`, s.description),
           }
           return (
             <div
@@ -351,10 +356,10 @@ export default function HomePage() {
             {heroSlides.map((s, index) => {
               const slide = {
                 ...s,
-                title: t(`homepage.hero.slides.${index}.title`, s.title),
-                highlight: t(`homepage.hero.slides.${index}.highlight`, s.highlight),
-                subtitle: t(`homepage.hero.slides.${index}.subtitle`, s.subtitle),
-                description: t(`homepage.hero.slides.${index}.description`, s.description),
+                title: t(`homepage.hero.slides.${s.key}.title`, s.title),
+                highlight: t(`homepage.hero.slides.${s.key}.highlight`, s.highlight),
+                subtitle: t(`homepage.hero.slides.${s.key}.subtitle`, s.subtitle),
+                description: t(`homepage.hero.slides.${s.key}.description`, s.description),
               }
               return (
                 <div
