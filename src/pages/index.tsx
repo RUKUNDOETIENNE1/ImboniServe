@@ -158,6 +158,13 @@ const heroSlides = [
     image: '/imgs/ideogr1.jpg'
   },
   {
+    title: 'Service Replay™',
+    highlight: 'See What Really Happened',
+    subtitle: 'Rewind Any Service Period',
+    description: 'Replay events like a match—every order, table, station, and hand-off. Diagnose issues fast, coach teams, and prevent loss.',
+    image: '/imgs/ideogr 3.jpg'
+  },
+  {
     title: 'Smart QR Ordering',
     highlight: 'Zero Wait Time',
     subtitle: 'Customers Order from Their Phones',
