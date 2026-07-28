@@ -95,7 +95,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <img src="/imgs/logo2.png" alt="Imboni Serve" className="h-8 w-auto" />
           </Link>
           <div className="hidden md:flex items-center gap-5 xl:gap-7 text-[13px] xl:text-sm text-white/80 whitespace-nowrap">
-            <Link href="/#features" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
+            <Link href="/features" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
             <Link href="/pricing" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
             <div className="relative">
               <button
@@ -183,13 +183,12 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-white/10">
             <div className="px-4 py-3 space-y-2">
-              <Link href="/#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
+              <Link href="/features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
               <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
               <div className="py-2">
                 <div className="text-white/80 font-medium mb-2" suppressHydrationWarning>{t('public.nav.solutions', 'Solutions')}</div>
                 <div className="pl-4 space-y-1">
                   <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
-                  <Link href="/store" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm" suppressHydrationWarning>{t('public.nav.store', 'Store')}</Link>
                   <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm" suppressHydrationWarning>{t('public.nav.referral', 'Referral Program')}</Link>
                 </div>
               </div>
@@ -239,6 +238,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
               <Link href="/login" className="hover:text-white transition" suppressHydrationWarning>{t('public.cta.sign_in', 'Sign in')}</Link>
               <Link href="/signup" className="hover:text-white transition" suppressHydrationWarning>{t('public.footer.sign_up', 'Sign up')}</Link>
               <Link href="/pricing" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
+              <Link href="/features" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
               <Link href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.discover', 'Discover')}</Link>
               <Link href="/faq" className="hover:text-white transition" suppressHydrationWarning>{t('public.footer.faqs', 'FAQs')}</Link>
               <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.contact', 'Contact')}</a>

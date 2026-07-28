@@ -12,7 +12,6 @@ import {
   Utensils,
   Package,
   BrainCircuit,
-  Building2,
   MessageCircle,
   Smartphone,
   Shield,
@@ -25,7 +24,6 @@ import {
   Receipt,
   Gift,
   Tag,
-  Hotel,
   Palette,
   Sparkles,
   Rss,
@@ -35,7 +33,10 @@ import {
   Calendar,
   Megaphone,
   Beaker,
-  Mic,
+  Play,
+  DollarSign,
+  AlertTriangle,
+  Target,
   ChevronLeft,
   Bell,
 } from 'lucide-react'
@@ -106,12 +107,6 @@ const features = [
     color: 'bg-purple-50 text-purple-700',
   },
   {
-    icon: <Building2 className="w-6 h-6" />,
-    title: 'Multi-Branch Control',
-    desc: 'Manage multiple locations from one dashboard with consolidated and per-branch reporting.',
-    color: 'bg-slate-50 text-slate-700',
-  },
-  {
     icon: <Shield className="w-6 h-6" />,
     title: 'Role-Based Access',
     desc: 'Cashier, waiter, supervisor, manager — each role sees only what they need.',
@@ -136,9 +131,9 @@ const advancedFeatures = [
     desc: 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.',
   },
   {
-    icon: <Users className="w-5 h-5" />,
-    title: 'Staff & Roles',
-    desc: 'Granular role permissions: waiter, cashier, supervisor, manager, and more.',
+    icon: <Play className="w-5 h-5" />,
+    title: 'Service Replay™',
+    desc: 'Replay any service period event-by-event — like a football match. Understand exactly what happened.',
   },
   {
     icon: <Package className="w-5 h-5" />,
@@ -267,11 +262,11 @@ export default function HomePage() {
       cta: t('homepage.growth.ab_cta', 'Run a Test')
     },
     {
-      icon: <Mic className="w-6 h-6" />, 
-      title: t('homepage.growth.voice_title', 'Voice Ordering (WhatsApp AI)'),
-      desc: t('homepage.growth.voice_desc', 'Let customers order by voice in EN / FR / RW.'),
-      href: '/dashboard/ai',
-      cta: t('homepage.growth.voice_cta', 'Explore AI')
+      icon: <Play className="w-6 h-6" />, 
+      title: t('homepage.growth.replay_title', 'Service Replay™'),
+      desc: t('homepage.growth.replay_desc', 'Replay any service period event-by-event — like a football match.'),
+      href: '/dashboard/operations/service-replay',
+      cta: t('homepage.growth.replay_cta', 'Try Service Replay')
     },
     {
       icon: <Bell className="w-6 h-6" />, 
@@ -459,26 +454,142 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SUPPLIER MARKETPLACE ── */}
-      <section id="store" className="py-16 px-4 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="order-2 md:order-1">
-            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
-              {t('homepage.supplier_marketplace.badge', 'Supplier Marketplace')}
+      {/* ── WHY SWITCH? — Capabilities That Solve Problems Competitors Ignore ── */}
+      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-orange/10 text-imboni-orange text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_switch.badge', 'Why Switch?')}
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-3" suppressHydrationWarning>
-              {t('homepage.supplier_marketplace.title', 'Connect with trusted suppliers — all in one place')}
+            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+              {t('homepage.why_switch.title', "You're not just getting a POS. You're getting intelligence.")}
             </h2>
-            <p className="text-gray-600 mb-6 text-lg" suppressHydrationWarning>
-              {t('homepage.supplier_marketplace.subtitle', 'Discover verified suppliers, compare prices, and streamline procurement. Track deliveries and keep costs under control.')}
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
+              {t('homepage.why_switch.subtitle', 'Capabilities that solve problems competitors ignore.')}
             </p>
-            <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-lg border border-amber-200">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm font-medium" suppressHydrationWarning>{t('homepage.supplier_marketplace.coming_soon', 'Coming Soon — Early Access')}</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-5">
+                <Play className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.replay_title', 'Service Replay™')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.replay_desc', 'Replay any service period like a football match. Every order, every station, every table — event by event. Understand exactly what happened and why.')}
+              </p>
+              <Link href="/dashboard/operations/service-replay" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.replay_cta', 'See it in action')} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-5">
+                <Users className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.crm_title', 'Know Your Customers')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.crm_desc', 'Automatic RFM segmentation: Champions, Loyal, At Risk, Lost. Lifetime value and spend analysis — know your customers like an e-commerce brand does.')}
+              </p>
+              <Link href="/dashboard/crm" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.crm_cta', 'Explore CRM')} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-green/10 text-imboni-green flex items-center justify-center mb-5">
+                <Target className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.ab_title', 'Test Menu Prices')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.ab_desc', 'Stop guessing. Start testing. Create price variants, split traffic, measure conversion. Pick winners with real data, not gut feeling.')}
+              </p>
+              <Link href="/dashboard/ab-testing" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.ab_cta', 'Run a Test')} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
-          <div className="order-1 md:order-2 flex justify-center">
-            <Image src="/imgs/imboniserve-marketplace.png" alt="Supplier Marketplace" width={352} height={176} className="h-32 w-auto md:h-44 opacity-60" />
+        </div>
+      </section>
+
+      {/* ── WHY AI? — Where AI Creates Unfair Advantage ── */}
+      <section className="py-20 px-4 bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_ai.badge', 'Why AI?')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+              {t('homepage.why_ai.title', "AI isn't a buzzword. It's working right now in your dashboard.")}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
+              {t('homepage.why_ai.subtitle', 'AI that does real work — not just displays data.')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.menu_builder_title', 'AI Menu Builder')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.menu_builder_desc', 'Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions. No manual entry — from hours to minutes.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Package className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.auto_reorder_title', 'Auto-Reorder AI')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.auto_reorder_desc', 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-green/10 text-imboni-green flex items-center justify-center flex-shrink-0">
+                  <BrainCircuit className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.insight_reports_title', 'AI Insight Reports')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.insight_reports_desc', 'Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.cost_anomaly_title', 'Cost Anomaly Alerts')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.cost_anomaly_desc', 'Automatic detection of supplier price increases with statistical analysis and severity scoring. Catch price creep before it hurts your margins.')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -647,8 +758,8 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Star className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">30+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.features', 'Features included')}</div>
+            <div className="text-2xl font-bold text-imboni-blue">38+</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.features', 'Verified capabilities')}</div>
           </div>
         </div>
       </section>
@@ -714,13 +825,6 @@ export default function HomePage() {
               <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.smart_slips_desc', 'Auto-generated digital receipts with referral links — share & earn rewards for every friend.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-pink-50 text-pink-700">
-                <Gift className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.loyalty', 'Loyalty & Rewards')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.loyalty_desc', 'Build customer loyalty with points, tiers, and redemption tracking across visits.')}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-amber-700">
                 <Tag className="w-6 h-6" />
               </div>
@@ -740,13 +844,6 @@ export default function HomePage() {
               </div>
               <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.mobile_money', 'Mobile Money Payments')}</h3>
               <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.mobile_money_desc', 'Accept mobile money payments natively — no POS terminal required.')}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-slate-50 text-slate-700">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.multi_branch', 'Multi-Branch Control')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.multi_branch_desc', 'Manage multiple locations from one dashboard with consolidated and per-branch reporting.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-red-50 text-red-700">
@@ -846,82 +943,91 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PRODUCT TRUST ── */}
-      <section className="py-16 px-4 bg-white border-t border-slate-100">
+      {/* ── WHY TRUST US? — Executive-Grade Intelligence ── */}
+      <section className="py-20 px-4 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_trust.badge', 'Why Trust Us?')}
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('homepage.product_trust.title', 'Why Hospitality Businesses Trust ImboniServe')}
+              {t('homepage.why_trust.title', "This isn't a basic POS with pretty charts. This is enterprise-grade intelligence.")}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
-              {t('homepage.product_trust.subtitle', 'Built for accuracy, auditability, and control — not marketing promises.')}
-            </p>
+              {t('homepage.why_trust.subtitle', 'Built for decision-makers, not just order-takers.')}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-gradient-to-br from-imboni-blue/5 to-blue-50 rounded-2xl p-8 border border-slate-100">
+                  <div className="w-14 h-14 rounded-2xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-5">
+                    <DollarSign className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                    {t('homepage.why_trust.cfo_title', 'CFO Dashboard')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                    {t('homepage.why_trust.cfo_desc', 'Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times.')}
+                  </p>
+                  <Link href="/dashboard/cfo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.cfo_cta', 'View CFO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <div className="bg-gradient-to-br from-imboni-orange/5 to-orange-50 rounded-2xl p-8 border border-slate-100">
+                  <div className="w-14 h-14 rounded-2xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-5">
+                    <TrendingUp className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                    {t('homepage.why_trust.ceo_title', 'CEO Dashboard')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                    {t('homepage.why_trust.ceo_desc', 'Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes.')}
+                  </p>
+                  <Link href="/dashboard/ceo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.ceo_cta', 'View CEO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+        </div>
+      </section>
+
+      {/* ── WHY NOW? — The Cost of Waiting ── */}
+      <section className="py-16 px-4 bg-gradient-to-br from-slate-50 to-imboni-light border-t border-slate-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-block bg-red-50 text-red-600 text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+            {t('homepage.why_now.badge', 'Why Now?')}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <Package className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.inventory_audit', 'Fully Auditable Inventory')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.inventory_audit_desc', 'Never lose track of stock. Every movement is recorded with who, what, and when — complete accountability.')}
+          <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+            {t('homepage.why_now.title', 'Every day without intelligence is a day of lost revenue.')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 text-left">
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.stockouts', 'Stockouts cost you customers today. AI prevents them before they happen.')}
               </p>
             </div>
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.food_cost', 'Accurate Food Costs')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.food_cost_desc', 'Food costs are calculated from actual ingredient consumption, not estimates or averages.')}
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <Target className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.pricing', "You're pricing your menu blind. Test prices with real conversion data.")}
               </p>
             </div>
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.role_permissions', 'Role-Based Protection')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.role_permissions_desc', 'Role-based permissions protect your operations — each team member sees only what they need.')}
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <Users className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.churn', "You don't know who's about to churn. RFM segmentation reveals it automatically.")}
               </p>
             </div>
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <Utensils className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.integrated', 'Fully Integrated Operations')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.integrated_desc', 'Orders, kitchen, inventory, payments, and reporting operate together — not as disconnected tools.')}
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <DollarSign className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.supplier', 'Supplier prices are creeping up unnoticed. Cost anomaly alerts catch them early.')}
               </p>
             </div>
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.global', 'Global Platform, Local Configuration')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.global_desc', 'Built for global hospitality with configurable localization for every market — not hardcoded assumptions.')}
-              </p>
-            </div>
-            <div className="bg-imboni-light rounded-2xl p-6 border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-4">
-                <BrainCircuit className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-lg" suppressHydrationWarning>
-                {t('homepage.product_trust.ai', 'Built on Real Operational Data')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                {t('homepage.product_trust.ai_desc', 'Get recommendations that actually work for your business — based on your real sales, not industry guesses.')}
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3 md:col-span-2">
+              <Play className="w-5 h-5 text-imboni-blue flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.replay', "You can't reconstruct what went wrong last Friday. Service Replay™ lets you replay any service period event-by-event.")}
               </p>
             </div>
           </div>
