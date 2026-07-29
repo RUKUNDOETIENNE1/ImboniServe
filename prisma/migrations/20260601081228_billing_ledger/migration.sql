@@ -12,145 +12,148 @@
 
 */
 -- CreateEnum
-CREATE TYPE "PaymentTransactionStatus" AS ENUM ('PENDING', 'PROCESSING', 'SUCCESS', 'FAILED', 'CANCELLED', 'REFUNDED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'PaymentTransactionStatus') THEN CREATE TYPE "PaymentTransactionStatus" AS ENUM ('PENDING', 'PROCESSING', 'SUCCESS', 'FAILED', 'CANCELLED', 'REFUNDED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "SubscriptionStatus" AS ENUM ('TRIAL', 'ACTIVE', 'GRACE_PERIOD', 'EXPIRED', 'SUSPENDED', 'CANCELLED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'SubscriptionStatus') THEN CREATE TYPE "SubscriptionStatus" AS ENUM ('TRIAL', 'ACTIVE', 'GRACE_PERIOD', 'EXPIRED', 'SUSPENDED', 'CANCELLED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "BillingEventType" AS ENUM ('PAYMENT_INITIATED', 'PAYMENT_PROCESSING', 'PAYMENT_SUCCESS', 'PAYMENT_FAILED', 'PAYMENT_CANCELLED', 'PAYMENT_REFUNDED', 'SUBSCRIPTION_ACTIVATED', 'SUBSCRIPTION_RENEWED', 'SUBSCRIPTION_EXPIRED', 'SUBSCRIPTION_CANCELLED', 'REMINDER_SENT');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'BillingEventType') THEN CREATE TYPE "BillingEventType" AS ENUM ('PAYMENT_INITIATED', 'PAYMENT_PROCESSING', 'PAYMENT_SUCCESS', 'PAYMENT_FAILED', 'PAYMENT_CANCELLED', 'PAYMENT_REFUNDED', 'SUBSCRIPTION_ACTIVATED', 'SUBSCRIPTION_RENEWED', 'SUBSCRIPTION_EXPIRED', 'SUBSCRIPTION_CANCELLED', 'REMINDER_SENT'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ABTestStatus" AS ENUM ('DRAFT', 'RUNNING', 'PAUSED', 'COMPLETED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ABTestStatus') THEN CREATE TYPE "ABTestStatus" AS ENUM ('DRAFT', 'RUNNING', 'PAUSED', 'COMPLETED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ABEventType" AS ENUM ('VIEW', 'CLICK', 'ORDER', 'REVENUE', 'CUSTOM');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ABEventType') THEN CREATE TYPE "ABEventType" AS ENUM ('VIEW', 'CLICK', 'ORDER', 'REVENUE', 'CUSTOM'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ContactType" AS ENUM ('CLIENT', 'SUPPLIER', 'STAFF', 'CUSTOMER', 'PARTNER', 'LEAD');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ContactType') THEN CREATE TYPE "ContactType" AS ENUM ('CLIENT', 'SUPPLIER', 'STAFF', 'CUSTOMER', 'PARTNER', 'LEAD'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ContactStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'LEAD', 'BLOCKED', 'ARCHIVED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ContactStatus') THEN CREATE TYPE "ContactStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'LEAD', 'BLOCKED', 'ARCHIVED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "OrganizationType" AS ENUM ('RESTAURANT', 'HOTEL', 'SUPPLIER', 'DISTRIBUTOR', 'MANUFACTURER', 'SERVICE_PROVIDER', 'OTHER');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'OrganizationType') THEN CREATE TYPE "OrganizationType" AS ENUM ('RESTAURANT', 'HOTEL', 'SUPPLIER', 'DISTRIBUTOR', 'MANUFACTURER', 'SERVICE_PROVIDER', 'OTHER'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "RelationshipType" AS ENUM ('WORKS_AT', 'OWNS', 'MANAGES', 'SUPPLIES_TO', 'PARTNERS_WITH', 'REPORTS_TO', 'CONTACTS', 'REFERRED_BY', 'CUSTOMER_OF');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'RelationshipType') THEN CREATE TYPE "RelationshipType" AS ENUM ('WORKS_AT', 'OWNS', 'MANAGES', 'SUPPLIES_TO', 'PARTNERS_WITH', 'REPORTS_TO', 'CONTACTS', 'REFERRED_BY', 'CUSTOMER_OF'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ActivityType" AS ENUM ('CALL', 'EMAIL', 'MEETING', 'NOTE', 'ORDER_PLACED', 'ORDER_DELIVERED', 'PAYMENT_RECEIVED', 'WHATSAPP_MESSAGE', 'SYSTEM_EVENT', 'TASK_CREATED', 'TASK_COMPLETED', 'CONTRACT_SIGNED', 'COMPLAINT', 'FEEDBACK');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ActivityType') THEN CREATE TYPE "ActivityType" AS ENUM ('CALL', 'EMAIL', 'MEETING', 'NOTE', 'ORDER_PLACED', 'ORDER_DELIVERED', 'PAYMENT_RECEIVED', 'WHATSAPP_MESSAGE', 'SYSTEM_EVENT', 'TASK_CREATED', 'TASK_COMPLETED', 'CONTRACT_SIGNED', 'COMPLAINT', 'FEEDBACK'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "SupportStatus" AS ENUM ('OPEN', 'PENDING', 'RESOLVED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'SupportStatus') THEN CREATE TYPE "SupportStatus" AS ENUM ('OPEN', 'PENDING', 'RESOLVED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "SupportPriority" AS ENUM ('LOW', 'NORMAL', 'HIGH');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'SupportPriority') THEN CREATE TYPE "SupportPriority" AS ENUM ('LOW', 'NORMAL', 'HIGH'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "SupportSenderType" AS ENUM ('USER', 'STAFF', 'SYSTEM');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'SupportSenderType') THEN CREATE TYPE "SupportSenderType" AS ENUM ('USER', 'STAFF', 'SYSTEM'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "MarketerStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'INACTIVE');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'MarketerStatus') THEN CREATE TYPE "MarketerStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'INACTIVE'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "MarketerCommissionType" AS ENUM ('SIGNUP_BONUS', 'RECURRING_REVENUE');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'MarketerCommissionType') THEN CREATE TYPE "MarketerCommissionType" AS ENUM ('SIGNUP_BONUS', 'RECURRING_REVENUE'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "MarketerCommissionStatus" AS ENUM ('PENDING', 'VALIDATED', 'PAID', 'VOID');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'MarketerCommissionStatus') THEN CREATE TYPE "MarketerCommissionStatus" AS ENUM ('PENDING', 'VALIDATED', 'PAID', 'VOID'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "PayoutMethod" AS ENUM ('MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'PayoutMethod') THEN CREATE TYPE "PayoutMethod" AS ENUM ('MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "PayoutStatus" AS ENUM ('PENDING', 'APPROVED', 'PROCESSING', 'PAID', 'FAILED', 'REJECTED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'PayoutStatus') THEN CREATE TYPE "PayoutStatus" AS ENUM ('PENDING', 'APPROVED', 'PROCESSING', 'PAID', 'FAILED', 'REJECTED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "RiskLevel" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'RiskLevel') THEN CREATE TYPE "RiskLevel" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "RevenueEventType" AS ENUM ('MARKETER_CREATED', 'MARKETER_SUSPENDED', 'ATTRIBUTION_RECORDED', 'COMMISSION_CREATED', 'COMMISSION_VALIDATED', 'COMMISSION_PAID', 'WALLET_UPDATED', 'PAYOUT_REQUESTED', 'PAYOUT_APPROVED', 'PAYOUT_REJECTED', 'PAYOUT_PROCESSING', 'PAYOUT_PAID', 'PAYOUT_FAILED', 'RISK_SCORE_UPDATED', 'ALERT_TRIGGERED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'RevenueEventType') THEN CREATE TYPE "RevenueEventType" AS ENUM ('MARKETER_CREATED', 'MARKETER_SUSPENDED', 'ATTRIBUTION_RECORDED', 'COMMISSION_CREATED', 'COMMISSION_VALIDATED', 'COMMISSION_PAID', 'WALLET_UPDATED', 'PAYOUT_REQUESTED', 'PAYOUT_APPROVED', 'PAYOUT_REJECTED', 'PAYOUT_PROCESSING', 'PAYOUT_PAID', 'PAYOUT_FAILED', 'RISK_SCORE_UPDATED', 'ALERT_TRIGGERED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "AlertSeverity" AS ENUM ('INFO', 'WARNING', 'CRITICAL');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'AlertSeverity') THEN CREATE TYPE "AlertSeverity" AS ENUM ('INFO', 'WARNING', 'CRITICAL'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "DemoRequestStatus" AS ENUM ('PENDING', 'CONTACTED', 'COMPLETED', 'CANCELLED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'DemoRequestStatus') THEN CREATE TYPE "DemoRequestStatus" AS ENUM ('PENDING', 'CONTACTED', 'COMPLETED', 'CANCELLED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "StationType" AS ENUM ('KITCHEN', 'BAR', 'GRILL', 'FRYER', 'PASTRY', 'EXPO', 'OTHER');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'StationType') THEN CREATE TYPE "StationType" AS ENUM ('KITCHEN', 'BAR', 'GRILL', 'FRYER', 'PASTRY', 'EXPO', 'OTHER'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ItemStatus" AS ENUM ('NEW', 'PREPARING', 'READY', 'DELIVERED', 'CANCELED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ItemStatus') THEN CREATE TYPE "ItemStatus" AS ENUM ('NEW', 'PREPARING', 'READY', 'DELIVERED', 'CANCELED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "MutationType" AS ENUM ('CREATED', 'MODIFIED', 'REPLACED', 'CANCELLED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'MutationType') THEN CREATE TYPE "MutationType" AS ENUM ('CREATED', 'MODIFIED', 'REPLACED', 'CANCELLED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "ExpoStatus" AS ENUM ('PENDING', 'READY_FOR_EXPO', 'EXPO_CONFIRMED', 'SERVED_CONFIRMED');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'ExpoStatus') THEN CREATE TYPE "ExpoStatus" AS ENUM ('PENDING', 'READY_FOR_EXPO', 'EXPO_CONFIRMED', 'SERVED_CONFIRMED'); END IF; END $$;
 
 -- CreateEnum
-CREATE TYPE "TicketEventType" AS ENUM ('ORDER_CREATED', 'ORDER_UPDATED', 'ITEM_ROUTED', 'ITEM_ACCEPTED', 'ITEM_PREPARING', 'ITEM_READY', 'ITEM_DELIVERED', 'ITEM_CANCELED', 'SLA_WARNING', 'SLA_BREACH', 'ORDER_COMPLETED', 'ORDER_CANCELED', 'STATION_CHANGED', 'MANUAL_OVERRIDE', 'RECONCILIATION', 'CONFLICT_DETECTED', 'INVALID_TRANSITION');
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'TicketEventType') THEN CREATE TYPE "TicketEventType" AS ENUM ('ORDER_CREATED', 'ORDER_UPDATED', 'ITEM_ROUTED', 'ITEM_ACCEPTED', 'ITEM_PREPARING', 'ITEM_READY', 'ITEM_DELIVERED', 'ITEM_CANCELED', 'SLA_WARNING', 'SLA_BREACH', 'ORDER_COMPLETED', 'ORDER_CANCELED', 'STATION_CHANGED', 'MANUAL_OVERRIDE', 'RECONCILIATION', 'CONFLICT_DETECTED', 'INVALID_TRANSITION'); END IF; END $$;
 
--- AlterEnum
-BEGIN;
-CREATE TYPE "PaymentGateway_new" AS ENUM ('IREMBO_PAY', 'PESAPAL', 'INTOUCH', 'CASH', 'MOBILE_MONEY', 'CARD', 'BANK_TRANSFER');
-ALTER TABLE "PaymentTransaction" ALTER COLUMN "gateway" TYPE "PaymentGateway_new" USING ("gateway"::text::"PaymentGateway_new");
-ALTER TYPE "PaymentGateway" RENAME TO "PaymentGateway_old";
-ALTER TYPE "PaymentGateway_new" RENAME TO "PaymentGateway";
-DROP TYPE "PaymentGateway_old";
-COMMIT;
+-- AlterEnum (idempotent: skip if already swapped)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typname = 'PaymentGateway' AND e.enumlabel = 'INTOUCH') THEN
+    CREATE TYPE "PaymentGateway_new" AS ENUM ('IREMBO_PAY', 'PESAPAL', 'INTOUCH', 'CASH', 'MOBILE_MONEY', 'CARD', 'BANK_TRANSFER');
+    ALTER TABLE "PaymentTransaction" ALTER COLUMN "gateway" TYPE "PaymentGateway_new" USING ("gateway"::text::"PaymentGateway_new");
+    ALTER TYPE "PaymentGateway" RENAME TO "PaymentGateway_old";
+    ALTER TYPE "PaymentGateway_new" RENAME TO "PaymentGateway";
+    DROP TYPE "PaymentGateway_old";
+  END IF;
+END $$;
 
 -- DropForeignKey
-ALTER TABLE "CheckoutEvent" DROP CONSTRAINT "CheckoutEvent_businessId_fkey";
+ALTER TABLE "CheckoutEvent" DROP CONSTRAINT IF EXISTS "CheckoutEvent_businessId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CheckoutEvent" DROP CONSTRAINT "CheckoutEvent_sessionId_fkey";
+ALTER TABLE "CheckoutEvent" DROP CONSTRAINT IF EXISTS "CheckoutEvent_sessionId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CheckoutEvent" DROP CONSTRAINT "CheckoutEvent_slipId_fkey";
+ALTER TABLE "CheckoutEvent" DROP CONSTRAINT IF EXISTS "CheckoutEvent_slipId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT "DiningSessionSlip_businessId_fkey";
+ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT IF EXISTS "DiningSessionSlip_businessId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT "DiningSessionSlip_sessionId_fkey";
+ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT IF EXISTS "DiningSessionSlip_sessionId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT "DiningSessionSlip_tableId_fkey";
+ALTER TABLE "DiningSessionSlip" DROP CONSTRAINT IF EXISTS "DiningSessionSlip_tableId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT "DiningSessionSlipItem_saleId_fkey";
+ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT IF EXISTS "DiningSessionSlipItem_saleId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT "DiningSessionSlipItem_saleItemId_fkey";
+ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT IF EXISTS "DiningSessionSlipItem_saleItemId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT "DiningSessionSlipItem_slipId_fkey";
+ALTER TABLE "DiningSessionSlipItem" DROP CONSTRAINT IF EXISTS "DiningSessionSlipItem_slipId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "Sale" DROP CONSTRAINT "Sale_businessId_fkey";
+ALTER TABLE "Sale" DROP CONSTRAINT IF EXISTS "Sale_businessId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "StaffRole" DROP CONSTRAINT "StaffRole_businessId_fkey";
+ALTER TABLE "StaffRole" DROP CONSTRAINT IF EXISTS "StaffRole_businessId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "StaffRole" DROP CONSTRAINT "StaffRole_createdByUserId_fkey";
+ALTER TABLE "StaffRole" DROP CONSTRAINT IF EXISTS "StaffRole_createdByUserId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "User" DROP CONSTRAINT "User_primaryBranchId_fkey";
+ALTER TABLE "User" DROP CONSTRAINT IF EXISTS "User_primaryBranchId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "UserStaffRole" DROP CONSTRAINT "UserStaffRole_businessId_fkey";
+ALTER TABLE "UserStaffRole" DROP CONSTRAINT IF EXISTS "UserStaffRole_businessId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "UserStaffRole" DROP CONSTRAINT "UserStaffRole_staffRoleId_fkey";
+ALTER TABLE "UserStaffRole" DROP CONSTRAINT IF EXISTS "UserStaffRole_staffRoleId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "UserStaffRole" DROP CONSTRAINT "UserStaffRole_userId_fkey";
+ALTER TABLE "UserStaffRole" DROP CONSTRAINT IF EXISTS "UserStaffRole_userId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "business_scans" DROP CONSTRAINT "business_scans_user_id_fkey";
+ALTER TABLE "business_scans" DROP CONSTRAINT IF EXISTS "business_scans_user_id_fkey";
 
 -- AlterTable
 ALTER TABLE "CheckoutEvent" ALTER COLUMN "eventType" SET DEFAULT 'session_started',
@@ -177,56 +180,57 @@ ALTER COLUMN "updatedAt" DROP DEFAULT,
 ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMP(3);
 
 -- AlterTable
-ALTER TABLE "PaymentTransaction" DROP COLUMN "status",
-ADD COLUMN     "status" "PaymentTransactionStatus" NOT NULL;
+ALTER TABLE "PaymentTransaction" DROP COLUMN IF EXISTS "status",
+ADD COLUMN IF NOT EXISTS    "status" "PaymentTransactionStatus" NOT NULL;
+
+-- AlterTable (IF NOT EXISTS: columns may already exist from 20260325000000_phase2a_monetization)
+ALTER TABLE "Plan" ADD COLUMN IF NOT EXISTS "aiCreditsMonthly" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN IF NOT EXISTS "cmsPostsLimit" INTEGER,
+ADD COLUMN IF NOT EXISTS "discoveryFeatured" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS "qrCodesLimit" INTEGER,
+ADD COLUMN IF NOT EXISTS "siteBuilderIncluded" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS "storageGBLimit" INTEGER NOT NULL DEFAULT 5;
 
 -- AlterTable
-ALTER TABLE "Plan" ADD COLUMN     "aiCreditsMonthly" INTEGER NOT NULL DEFAULT 50,
-ADD COLUMN     "cmsPostsLimit" INTEGER,
-ADD COLUMN     "discoveryFeatured" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "qrCodesLimit" INTEGER,
-ADD COLUMN     "siteBuilderIncluded" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "storageGBLimit" INTEGER NOT NULL DEFAULT 5;
+ALTER TABLE "Reservation" DROP COLUMN IF EXISTS "depositAmountCents";
+
+-- AlterTable (IF NOT EXISTS for columns from 20260325000000_phase2a_monetization; new columns without guard)
+ALTER TABLE "Restaurant" 
+ADD COLUMN IF NOT EXISTS "aiCreditsLimit" INTEGER NOT NULL DEFAULT 20,
+ADD COLUMN IF NOT EXISTS "aiCreditsUsed" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS "aiResetDate" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "approvalStatus" TEXT NOT NULL DEFAULT 'PENDING',
+ADD COLUMN IF NOT EXISTS    "approvedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "approvedBy" TEXT,
+ADD COLUMN IF NOT EXISTS "cmsPostsThisMonth" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS    "duplicateFlags" JSONB,
+ADD COLUMN IF NOT EXISTS "qrCodesCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS    "rejectionReason" TEXT,
+ADD COLUMN IF NOT EXISTS    "riskLevel" TEXT NOT NULL DEFAULT 'LOW',
+ADD COLUMN IF NOT EXISTS "storageUsedBytes" BIGINT NOT NULL DEFAULT 0;
 
 -- AlterTable
-ALTER TABLE "Reservation" DROP COLUMN "depositAmountCents";
-
--- AlterTable
-ALTER TABLE "Restaurant" ADD COLUMN     "aiCreditsLimit" INTEGER NOT NULL DEFAULT 20,
-ADD COLUMN     "aiCreditsUsed" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "aiResetDate" TIMESTAMP(3),
-ADD COLUMN     "approvalStatus" TEXT NOT NULL DEFAULT 'PENDING',
-ADD COLUMN     "approvedAt" TIMESTAMP(3),
-ADD COLUMN     "approvedBy" TEXT,
-ADD COLUMN     "cmsPostsThisMonth" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "duplicateFlags" JSONB,
-ADD COLUMN     "qrCodesCount" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "rejectionReason" TEXT,
-ADD COLUMN     "riskLevel" TEXT NOT NULL DEFAULT 'LOW',
-ADD COLUMN     "storageUsedBytes" BIGINT NOT NULL DEFAULT 0;
-
--- AlterTable
-ALTER TABLE "Sale" ADD COLUMN     "addedAt" TIMESTAMP(3),
-ADD COLUMN     "expoConfirmedAt" TIMESTAMP(3),
-ADD COLUMN     "expoStatus" "ExpoStatus" DEFAULT 'PENDING',
-ADD COLUMN     "isAddon" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "parentOrderId" TEXT,
-ADD COLUMN     "readyForExpoAt" TIMESTAMP(3),
-ADD COLUMN     "servedConfirmedAt" TIMESTAMP(3),
-ADD COLUMN     "syncedAt" TIMESTAMP(3),
+ALTER TABLE "Sale" ADD COLUMN IF NOT EXISTS    "addedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "expoConfirmedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "expoStatus" "ExpoStatus" DEFAULT 'PENDING',
+ADD COLUMN IF NOT EXISTS    "isAddon" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS    "parentOrderId" TEXT,
+ADD COLUMN IF NOT EXISTS    "readyForExpoAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "servedConfirmedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "syncedAt" TIMESTAMP(3),
 ALTER COLUMN "kitchenDispatchedAt" SET DATA TYPE TIMESTAMP(3);
 
 -- AlterTable
-ALTER TABLE "SaleItem" ADD COLUMN     "deliveredAt" TIMESTAMP(3),
-ADD COLUMN     "itemStatus" "ItemStatus" DEFAULT 'NEW',
-ADD COLUMN     "itemVersion" INTEGER NOT NULL DEFAULT 1,
-ADD COLUMN     "mutationType" "MutationType" NOT NULL DEFAULT 'CREATED',
-ADD COLUMN     "parentItemId" TEXT,
-ADD COLUMN     "prepStartedAt" TIMESTAMP(3),
-ADD COLUMN     "readyAt" TIMESTAMP(3),
-ADD COLUMN     "replacedBy" TEXT,
-ADD COLUMN     "routedAt" TIMESTAMP(3),
-ADD COLUMN     "stationId" TEXT;
+ALTER TABLE "SaleItem" ADD COLUMN IF NOT EXISTS    "deliveredAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "itemStatus" "ItemStatus" DEFAULT 'NEW',
+ADD COLUMN IF NOT EXISTS    "itemVersion" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN IF NOT EXISTS    "mutationType" "MutationType" NOT NULL DEFAULT 'CREATED',
+ADD COLUMN IF NOT EXISTS    "parentItemId" TEXT,
+ADD COLUMN IF NOT EXISTS    "prepStartedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "readyAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "replacedBy" TEXT,
+ADD COLUMN IF NOT EXISTS    "routedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS    "stationId" TEXT;
 
 -- AlterTable
 ALTER TABLE "StaffRole" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMP(3),
@@ -234,8 +238,8 @@ ALTER COLUMN "updatedAt" DROP DEFAULT,
 ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMP(3);
 
 -- AlterTable
-ALTER TABLE "Subscription" DROP COLUMN "status",
-ADD COLUMN     "status" "SubscriptionStatus" NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE "Subscription" DROP COLUMN IF EXISTS "status",
+ADD COLUMN IF NOT EXISTS    "status" "SubscriptionStatus" NOT NULL DEFAULT 'ACTIVE';
 
 -- AlterTable
 ALTER TABLE "TableSession" ALTER COLUMN "checkoutMode" SET NOT NULL,
@@ -245,18 +249,18 @@ ALTER COLUMN "checkoutCompletedAt" SET DATA TYPE TIMESTAMP(3),
 ALTER COLUMN "runningTotalCents" SET NOT NULL;
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "locale" TEXT NOT NULL DEFAULT 'en',
-ADD COLUMN     "preferredCurrency" TEXT NOT NULL DEFAULT 'RWF',
-ADD COLUMN     "timezone" TEXT NOT NULL DEFAULT 'Africa/Kigali';
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS    "locale" TEXT NOT NULL DEFAULT 'en',
+ADD COLUMN IF NOT EXISTS    "preferredCurrency" TEXT NOT NULL DEFAULT 'RWF',
+ADD COLUMN IF NOT EXISTS    "timezone" TEXT NOT NULL DEFAULT 'Africa/Kigali';
 
 -- AlterTable
 ALTER TABLE "UserStaffRole" ALTER COLUMN "assignedAt" SET DATA TYPE TIMESTAMP(3);
 
--- DropTable
-DROP TABLE "business_scans";
+-- DropTable (idempotent)
+DROP TABLE IF EXISTS "business_scans";
 
 -- CreateTable
-CREATE TABLE "SeatSession" (
+CREATE TABLE IF NOT EXISTS "SeatSession" (
     "id" TEXT NOT NULL,
     "seatId" TEXT NOT NULL,
     "tableSessionId" TEXT,
@@ -275,7 +279,7 @@ CREATE TABLE "SeatSession" (
 );
 
 -- CreateTable
-CREATE TABLE "BusinessView" (
+CREATE TABLE IF NOT EXISTS "BusinessView" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "profileId" TEXT,
@@ -290,7 +294,7 @@ CREATE TABLE "BusinessView" (
 );
 
 -- CreateTable
-CREATE TABLE "UserLoginOtp" (
+CREATE TABLE IF NOT EXISTS "UserLoginOtp" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "hashedOtp" TEXT NOT NULL,
@@ -305,7 +309,7 @@ CREATE TABLE "UserLoginOtp" (
 );
 
 -- CreateTable
-CREATE TABLE "UserDevice" (
+CREATE TABLE IF NOT EXISTS "UserDevice" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "fingerprint" TEXT NOT NULL,
@@ -320,7 +324,7 @@ CREATE TABLE "UserDevice" (
 );
 
 -- CreateTable
-CREATE TABLE "SecurityEvent" (
+CREATE TABLE IF NOT EXISTS "SecurityEvent" (
     "id" TEXT NOT NULL,
     "userId" TEXT,
     "eventType" TEXT NOT NULL,
@@ -333,7 +337,7 @@ CREATE TABLE "SecurityEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "BillingEvent" (
+CREATE TABLE IF NOT EXISTS "BillingEvent" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "subscriptionId" TEXT,
@@ -348,7 +352,7 @@ CREATE TABLE "BillingEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "EventLog" (
+CREATE TABLE IF NOT EXISTS "EventLog" (
     "id" TEXT NOT NULL,
     "businessId" TEXT,
     "sessionId" TEXT,
@@ -363,7 +367,7 @@ CREATE TABLE "EventLog" (
 );
 
 -- CreateTable
-CREATE TABLE "QrTemplate" (
+CREATE TABLE IF NOT EXISTS "QrTemplate" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "category" TEXT NOT NULL,
@@ -376,7 +380,7 @@ CREATE TABLE "QrTemplate" (
 );
 
 -- CreateTable
-CREATE TABLE "QrDesign" (
+CREATE TABLE IF NOT EXISTS "QrDesign" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "templateId" TEXT NOT NULL,
@@ -390,7 +394,7 @@ CREATE TABLE "QrDesign" (
 );
 
 -- CreateTable
-CREATE TABLE "QrCode" (
+CREATE TABLE IF NOT EXISTS "QrCode" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "designId" TEXT NOT NULL,
@@ -407,7 +411,7 @@ CREATE TABLE "QrCode" (
 );
 
 -- CreateTable
-CREATE TABLE "WaiterCall" (
+CREATE TABLE IF NOT EXISTS "WaiterCall" (
     "id" TEXT NOT NULL,
     "tableId" TEXT NOT NULL,
     "sessionId" TEXT,
@@ -428,7 +432,7 @@ CREATE TABLE "WaiterCall" (
 );
 
 -- CreateTable
-CREATE TABLE "CurrencyExchangeRate" (
+CREATE TABLE IF NOT EXISTS "CurrencyExchangeRate" (
     "id" TEXT NOT NULL,
     "fromCurrency" TEXT NOT NULL,
     "toCurrency" TEXT NOT NULL,
@@ -443,7 +447,7 @@ CREATE TABLE "CurrencyExchangeRate" (
 );
 
 -- CreateTable
-CREATE TABLE "SupportedCurrency" (
+CREATE TABLE IF NOT EXISTS "SupportedCurrency" (
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "symbol" TEXT NOT NULL,
@@ -457,7 +461,7 @@ CREATE TABLE "SupportedCurrency" (
 );
 
 -- CreateTable
-CREATE TABLE "BusinessScan" (
+CREATE TABLE IF NOT EXISTS "BusinessScan" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "score" INTEGER NOT NULL,
@@ -474,7 +478,7 @@ CREATE TABLE "BusinessScan" (
 );
 
 -- CreateTable
-CREATE TABLE "OptimizationRecommendation" (
+CREATE TABLE IF NOT EXISTS "OptimizationRecommendation" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "source" TEXT NOT NULL,
@@ -496,7 +500,7 @@ CREATE TABLE "OptimizationRecommendation" (
 );
 
 -- CreateTable
-CREATE TABLE "OptimizationAction" (
+CREATE TABLE IF NOT EXISTS "OptimizationAction" (
     "id" TEXT NOT NULL,
     "recommendationId" TEXT NOT NULL,
     "actionType" TEXT NOT NULL,
@@ -514,7 +518,7 @@ CREATE TABLE "OptimizationAction" (
 );
 
 -- CreateTable
-CREATE TABLE "OptimizationOutcome" (
+CREATE TABLE IF NOT EXISTS "OptimizationOutcome" (
     "id" TEXT NOT NULL,
     "recommendationId" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
@@ -531,7 +535,7 @@ CREATE TABLE "OptimizationOutcome" (
 );
 
 -- CreateTable
-CREATE TABLE "SupportedTimezone" (
+CREATE TABLE IF NOT EXISTS "SupportedTimezone" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "utcOffset" TEXT NOT NULL,
@@ -543,7 +547,7 @@ CREATE TABLE "SupportedTimezone" (
 );
 
 -- CreateTable
-CREATE TABLE "ReferralClick" (
+CREATE TABLE IF NOT EXISTS "ReferralClick" (
     "id" TEXT NOT NULL,
     "referralLinkId" TEXT NOT NULL,
     "ipAddress" TEXT,
@@ -558,7 +562,7 @@ CREATE TABLE "ReferralClick" (
 );
 
 -- CreateTable
-CREATE TABLE "ReferralReward" (
+CREATE TABLE IF NOT EXISTS "ReferralReward" (
     "id" TEXT NOT NULL,
     "referralLinkId" TEXT NOT NULL,
     "customerId" TEXT,
@@ -583,7 +587,7 @@ CREATE TABLE "ReferralReward" (
 );
 
 -- CreateTable
-CREATE TABLE "AffiliateEarnings" (
+CREATE TABLE IF NOT EXISTS "AffiliateEarnings" (
     "id" TEXT NOT NULL,
     "referralLinkId" TEXT NOT NULL,
     "month" TEXT NOT NULL,
@@ -602,7 +606,7 @@ CREATE TABLE "AffiliateEarnings" (
 );
 
 -- CreateTable
-CREATE TABLE "TableSessionInvite" (
+CREATE TABLE IF NOT EXISTS "TableSessionInvite" (
     "id" TEXT NOT NULL,
     "sessionId" TEXT NOT NULL,
     "inviterId" TEXT NOT NULL,
@@ -619,7 +623,7 @@ CREATE TABLE "TableSessionInvite" (
 );
 
 -- CreateTable
-CREATE TABLE "FraudDetectionLog" (
+CREATE TABLE IF NOT EXISTS "FraudDetectionLog" (
     "id" TEXT NOT NULL,
     "entityType" TEXT NOT NULL,
     "entityId" TEXT NOT NULL,
@@ -635,7 +639,7 @@ CREATE TABLE "FraudDetectionLog" (
 );
 
 -- CreateTable
-CREATE TABLE "ABTest" (
+CREATE TABLE IF NOT EXISTS "ABTest" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -651,7 +655,7 @@ CREATE TABLE "ABTest" (
 );
 
 -- CreateTable
-CREATE TABLE "ABVariant" (
+CREATE TABLE IF NOT EXISTS "ABVariant" (
     "id" TEXT NOT NULL,
     "testId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -664,7 +668,7 @@ CREATE TABLE "ABVariant" (
 );
 
 -- CreateTable
-CREATE TABLE "ABAssignment" (
+CREATE TABLE IF NOT EXISTS "ABAssignment" (
     "id" TEXT NOT NULL,
     "testId" TEXT NOT NULL,
     "variantId" TEXT NOT NULL,
@@ -676,7 +680,7 @@ CREATE TABLE "ABAssignment" (
 );
 
 -- CreateTable
-CREATE TABLE "ABEvent" (
+CREATE TABLE IF NOT EXISTS "ABEvent" (
     "id" TEXT NOT NULL,
     "testId" TEXT NOT NULL,
     "variantId" TEXT NOT NULL,
@@ -689,7 +693,7 @@ CREATE TABLE "ABEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "SupplierRecommendationLog" (
+CREATE TABLE IF NOT EXISTS "SupplierRecommendationLog" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -704,7 +708,7 @@ CREATE TABLE "SupplierRecommendationLog" (
 );
 
 -- CreateTable
-CREATE TABLE "SupplierPerformanceCache" (
+CREATE TABLE IF NOT EXISTS "SupplierPerformanceCache" (
     "id" TEXT NOT NULL,
     "supplierId" TEXT NOT NULL,
     "avgDeliveryDays" DOUBLE PRECISION,
@@ -717,7 +721,7 @@ CREATE TABLE "SupplierPerformanceCache" (
 );
 
 -- CreateTable
-CREATE TABLE "Contact" (
+CREATE TABLE IF NOT EXISTS "Contact" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "phone" TEXT,
@@ -751,7 +755,7 @@ CREATE TABLE "Contact" (
 );
 
 -- CreateTable
-CREATE TABLE "ContactOrganization" (
+CREATE TABLE IF NOT EXISTS "ContactOrganization" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "type" "OrganizationType" NOT NULL,
@@ -783,7 +787,7 @@ CREATE TABLE "ContactOrganization" (
 );
 
 -- CreateTable
-CREATE TABLE "OrganizationMember" (
+CREATE TABLE IF NOT EXISTS "OrganizationMember" (
     "id" TEXT NOT NULL,
     "contactId" TEXT NOT NULL,
     "organizationId" TEXT NOT NULL,
@@ -799,7 +803,7 @@ CREATE TABLE "OrganizationMember" (
 );
 
 -- CreateTable
-CREATE TABLE "ContactRelationship" (
+CREATE TABLE IF NOT EXISTS "ContactRelationship" (
     "id" TEXT NOT NULL,
     "fromContactId" TEXT,
     "toContactId" TEXT,
@@ -821,7 +825,7 @@ CREATE TABLE "ContactRelationship" (
 );
 
 -- CreateTable
-CREATE TABLE "ContactActivity" (
+CREATE TABLE IF NOT EXISTS "ContactActivity" (
     "id" TEXT NOT NULL,
     "contactId" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
@@ -840,7 +844,7 @@ CREATE TABLE "ContactActivity" (
 );
 
 -- CreateTable
-CREATE TABLE "ContactSegment" (
+CREATE TABLE IF NOT EXISTS "ContactSegment" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -858,7 +862,7 @@ CREATE TABLE "ContactSegment" (
 );
 
 -- CreateTable
-CREATE TABLE "ContactTag" (
+CREATE TABLE IF NOT EXISTS "ContactTag" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -872,7 +876,7 @@ CREATE TABLE "ContactTag" (
 );
 
 -- CreateTable
-CREATE TABLE "SupportConversation" (
+CREATE TABLE IF NOT EXISTS "SupportConversation" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "createdById" TEXT NOT NULL,
@@ -888,7 +892,7 @@ CREATE TABLE "SupportConversation" (
 );
 
 -- CreateTable
-CREATE TABLE "SupportMessage" (
+CREATE TABLE IF NOT EXISTS "SupportMessage" (
     "id" TEXT NOT NULL,
     "conversationId" TEXT NOT NULL,
     "senderUserId" TEXT,
@@ -904,7 +908,7 @@ CREATE TABLE "SupportMessage" (
 );
 
 -- CreateTable
-CREATE TABLE "SupportCannedReply" (
+CREATE TABLE IF NOT EXISTS "SupportCannedReply" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -918,7 +922,7 @@ CREATE TABLE "SupportCannedReply" (
 );
 
 -- CreateTable
-CREATE TABLE "ProfessionalMarketer" (
+CREATE TABLE IF NOT EXISTS "ProfessionalMarketer" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -938,7 +942,7 @@ CREATE TABLE "ProfessionalMarketer" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketerAttribution" (
+CREATE TABLE IF NOT EXISTS "MarketerAttribution" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "marketerId" TEXT NOT NULL,
@@ -955,7 +959,7 @@ CREATE TABLE "MarketerAttribution" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketerWallet" (
+CREATE TABLE IF NOT EXISTS "MarketerWallet" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -970,7 +974,7 @@ CREATE TABLE "MarketerWallet" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketerCommission" (
+CREATE TABLE IF NOT EXISTS "MarketerCommission" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -991,7 +995,7 @@ CREATE TABLE "MarketerCommission" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketerPayout" (
+CREATE TABLE IF NOT EXISTS "MarketerPayout" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -1018,7 +1022,7 @@ CREATE TABLE "MarketerPayout" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketerRiskProfile" (
+CREATE TABLE IF NOT EXISTS "MarketerRiskProfile" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -1034,7 +1038,7 @@ CREATE TABLE "MarketerRiskProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "RevenueEvent" (
+CREATE TABLE IF NOT EXISTS "RevenueEvent" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" "RevenueEventType" NOT NULL,
@@ -1048,7 +1052,7 @@ CREATE TABLE "RevenueEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "RevenueAlert" (
+CREATE TABLE IF NOT EXISTS "RevenueAlert" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "severity" "AlertSeverity" NOT NULL,
@@ -1065,7 +1069,7 @@ CREATE TABLE "RevenueAlert" (
 );
 
 -- CreateTable
-CREATE TABLE "DemoRequest" (
+CREATE TABLE IF NOT EXISTS "DemoRequest" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -1083,7 +1087,7 @@ CREATE TABLE "DemoRequest" (
 );
 
 -- CreateTable
-CREATE TABLE "NewsletterSubscriber" (
+CREATE TABLE IF NOT EXISTS "NewsletterSubscriber" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "emailOrPhone" TEXT NOT NULL,
@@ -1095,7 +1099,7 @@ CREATE TABLE "NewsletterSubscriber" (
 );
 
 -- CreateTable
-CREATE TABLE "Station" (
+CREATE TABLE IF NOT EXISTS "Station" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -1110,7 +1114,7 @@ CREATE TABLE "Station" (
 );
 
 -- CreateTable
-CREATE TABLE "RouteRule" (
+CREATE TABLE IF NOT EXISTS "RouteRule" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "stationId" TEXT NOT NULL,
@@ -1125,7 +1129,7 @@ CREATE TABLE "RouteRule" (
 );
 
 -- CreateTable
-CREATE TABLE "TicketEvent" (
+CREATE TABLE IF NOT EXISTS "TicketEvent" (
     "id" TEXT NOT NULL,
     "saleId" TEXT NOT NULL,
     "saleItemId" TEXT,
@@ -1144,7 +1148,7 @@ CREATE TABLE "TicketEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "SLAProfile" (
+CREATE TABLE IF NOT EXISTS "SLAProfile" (
     "id" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
     "stationId" TEXT,
@@ -1159,7 +1163,7 @@ CREATE TABLE "SLAProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "IdempotencyKey" (
+CREATE TABLE IF NOT EXISTS "IdempotencyKey" (
     "id" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "businessId" TEXT NOT NULL,
@@ -1174,565 +1178,565 @@ CREATE TABLE "IdempotencyKey" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SeatSession_participantId_key" ON "SeatSession"("participantId");
+CREATE UNIQUE INDEX IF NOT EXISTS "SeatSession_participantId_key" ON "SeatSession"("participantId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SeatSession_sessionToken_key" ON "SeatSession"("sessionToken");
+CREATE UNIQUE INDEX IF NOT EXISTS "SeatSession_sessionToken_key" ON "SeatSession"("sessionToken");
 
 -- CreateIndex
-CREATE INDEX "SeatSession_seatId_state_idx" ON "SeatSession"("seatId", "state");
+CREATE INDEX IF NOT EXISTS "SeatSession_seatId_state_idx" ON "SeatSession"("seatId", "state");
 
 -- CreateIndex
-CREATE INDEX "SeatSession_lockExpiresAt_idx" ON "SeatSession"("lockExpiresAt");
+CREATE INDEX IF NOT EXISTS "SeatSession_lockExpiresAt_idx" ON "SeatSession"("lockExpiresAt");
 
 -- CreateIndex
-CREATE INDEX "SeatSession_sessionToken_idx" ON "SeatSession"("sessionToken");
+CREATE INDEX IF NOT EXISTS "SeatSession_sessionToken_idx" ON "SeatSession"("sessionToken");
 
 -- CreateIndex
-CREATE INDEX "SeatSession_lockedByTempId_idx" ON "SeatSession"("lockedByTempId");
+CREATE INDEX IF NOT EXISTS "SeatSession_lockedByTempId_idx" ON "SeatSession"("lockedByTempId");
 
 -- CreateIndex
-CREATE INDEX "BusinessView_businessId_viewedAt_idx" ON "BusinessView"("businessId", "viewedAt");
+CREATE INDEX IF NOT EXISTS "BusinessView_businessId_viewedAt_idx" ON "BusinessView"("businessId", "viewedAt");
 
 -- CreateIndex
-CREATE INDEX "BusinessView_sessionId_idx" ON "BusinessView"("sessionId");
+CREATE INDEX IF NOT EXISTS "BusinessView_sessionId_idx" ON "BusinessView"("sessionId");
 
 -- CreateIndex
-CREATE INDEX "BusinessView_userId_idx" ON "BusinessView"("userId");
+CREATE INDEX IF NOT EXISTS "BusinessView_userId_idx" ON "BusinessView"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserLoginOtp_confirmToken_key" ON "UserLoginOtp"("confirmToken");
+CREATE UNIQUE INDEX IF NOT EXISTS "UserLoginOtp_confirmToken_key" ON "UserLoginOtp"("confirmToken");
 
 -- CreateIndex
-CREATE INDEX "UserLoginOtp_userId_idx" ON "UserLoginOtp"("userId");
+CREATE INDEX IF NOT EXISTS "UserLoginOtp_userId_idx" ON "UserLoginOtp"("userId");
 
 -- CreateIndex
-CREATE INDEX "UserLoginOtp_confirmToken_idx" ON "UserLoginOtp"("confirmToken");
+CREATE INDEX IF NOT EXISTS "UserLoginOtp_confirmToken_idx" ON "UserLoginOtp"("confirmToken");
 
 -- CreateIndex
-CREATE INDEX "UserLoginOtp_expiresAt_idx" ON "UserLoginOtp"("expiresAt");
+CREATE INDEX IF NOT EXISTS "UserLoginOtp_expiresAt_idx" ON "UserLoginOtp"("expiresAt");
 
 -- CreateIndex
-CREATE INDEX "UserDevice_userId_idx" ON "UserDevice"("userId");
+CREATE INDEX IF NOT EXISTS "UserDevice_userId_idx" ON "UserDevice"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserDevice_userId_fingerprint_key" ON "UserDevice"("userId", "fingerprint");
+CREATE UNIQUE INDEX IF NOT EXISTS "UserDevice_userId_fingerprint_key" ON "UserDevice"("userId", "fingerprint");
 
 -- CreateIndex
-CREATE INDEX "SecurityEvent_userId_idx" ON "SecurityEvent"("userId");
+CREATE INDEX IF NOT EXISTS "SecurityEvent_userId_idx" ON "SecurityEvent"("userId");
 
 -- CreateIndex
-CREATE INDEX "SecurityEvent_eventType_createdAt_idx" ON "SecurityEvent"("eventType", "createdAt");
+CREATE INDEX IF NOT EXISTS "SecurityEvent_eventType_createdAt_idx" ON "SecurityEvent"("eventType", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "BillingEvent_businessId_occurredAt_idx" ON "BillingEvent"("businessId", "occurredAt");
+CREATE INDEX IF NOT EXISTS "BillingEvent_businessId_occurredAt_idx" ON "BillingEvent"("businessId", "occurredAt");
 
 -- CreateIndex
-CREATE INDEX "BillingEvent_subscriptionId_idx" ON "BillingEvent"("subscriptionId");
+CREATE INDEX IF NOT EXISTS "BillingEvent_subscriptionId_idx" ON "BillingEvent"("subscriptionId");
 
 -- CreateIndex
-CREATE INDEX "BillingEvent_paymentTransactionId_idx" ON "BillingEvent"("paymentTransactionId");
+CREATE INDEX IF NOT EXISTS "BillingEvent_paymentTransactionId_idx" ON "BillingEvent"("paymentTransactionId");
 
 -- CreateIndex
-CREATE INDEX "BillingEvent_eventType_occurredAt_idx" ON "BillingEvent"("eventType", "occurredAt");
+CREATE INDEX IF NOT EXISTS "BillingEvent_eventType_occurredAt_idx" ON "BillingEvent"("eventType", "occurredAt");
 
 -- CreateIndex
-CREATE INDEX "EventLog_businessId_type_createdAt_idx" ON "EventLog"("businessId", "type", "createdAt");
+CREATE INDEX IF NOT EXISTS "EventLog_businessId_type_createdAt_idx" ON "EventLog"("businessId", "type", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "EventLog_type_createdAt_idx" ON "EventLog"("type", "createdAt");
+CREATE INDEX IF NOT EXISTS "EventLog_type_createdAt_idx" ON "EventLog"("type", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "EventLog_entityType_entityId_idx" ON "EventLog"("entityType", "entityId");
+CREATE INDEX IF NOT EXISTS "EventLog_entityType_entityId_idx" ON "EventLog"("entityType", "entityId");
 
 -- CreateIndex
-CREATE INDEX "EventLog_sessionId_idx" ON "EventLog"("sessionId");
+CREATE INDEX IF NOT EXISTS "EventLog_sessionId_idx" ON "EventLog"("sessionId");
 
 -- CreateIndex
-CREATE INDEX "QrTemplate_category_idx" ON "QrTemplate"("category");
+CREATE INDEX IF NOT EXISTS "QrTemplate_category_idx" ON "QrTemplate"("category");
 
 -- CreateIndex
-CREATE INDEX "QrDesign_businessId_idx" ON "QrDesign"("businessId");
+CREATE INDEX IF NOT EXISTS "QrDesign_businessId_idx" ON "QrDesign"("businessId");
 
 -- CreateIndex
-CREATE INDEX "QrDesign_templateId_idx" ON "QrDesign"("templateId");
+CREATE INDEX IF NOT EXISTS "QrDesign_templateId_idx" ON "QrDesign"("templateId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrCode_designId_key" ON "QrCode"("designId");
+CREATE UNIQUE INDEX IF NOT EXISTS "QrCode_designId_key" ON "QrCode"("designId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrCode_token_key" ON "QrCode"("token");
+CREATE UNIQUE INDEX IF NOT EXISTS "QrCode_token_key" ON "QrCode"("token");
 
 -- CreateIndex
-CREATE INDEX "QrCode_token_idx" ON "QrCode"("token");
+CREATE INDEX IF NOT EXISTS "QrCode_token_idx" ON "QrCode"("token");
 
 -- CreateIndex
-CREATE INDEX "QrCode_businessId_idx" ON "QrCode"("businessId");
+CREATE INDEX IF NOT EXISTS "QrCode_businessId_idx" ON "QrCode"("businessId");
 
 -- CreateIndex
-CREATE INDEX "WaiterCall_tableId_status_idx" ON "WaiterCall"("tableId", "status");
+CREATE INDEX IF NOT EXISTS "WaiterCall_tableId_status_idx" ON "WaiterCall"("tableId", "status");
 
 -- CreateIndex
-CREATE INDEX "WaiterCall_businessId_status_idx" ON "WaiterCall"("businessId", "status");
+CREATE INDEX IF NOT EXISTS "WaiterCall_businessId_status_idx" ON "WaiterCall"("businessId", "status");
 
 -- CreateIndex
-CREATE INDEX "WaiterCall_createdAt_idx" ON "WaiterCall"("createdAt");
+CREATE INDEX IF NOT EXISTS "WaiterCall_createdAt_idx" ON "WaiterCall"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "WaiterCall_status_createdAt_idx" ON "WaiterCall"("status", "createdAt");
+CREATE INDEX IF NOT EXISTS "WaiterCall_status_createdAt_idx" ON "WaiterCall"("status", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "WaiterCall_orderId_createdAt_idx" ON "WaiterCall"("orderId", "createdAt");
+CREATE INDEX IF NOT EXISTS "WaiterCall_orderId_createdAt_idx" ON "WaiterCall"("orderId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "CurrencyExchangeRate_fromCurrency_toCurrency_validFrom_idx" ON "CurrencyExchangeRate"("fromCurrency", "toCurrency", "validFrom");
+CREATE INDEX IF NOT EXISTS "CurrencyExchangeRate_fromCurrency_toCurrency_validFrom_idx" ON "CurrencyExchangeRate"("fromCurrency", "toCurrency", "validFrom");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CurrencyExchangeRate_fromCurrency_toCurrency_validFrom_key" ON "CurrencyExchangeRate"("fromCurrency", "toCurrency", "validFrom");
+CREATE UNIQUE INDEX IF NOT EXISTS "CurrencyExchangeRate_fromCurrency_toCurrency_validFrom_key" ON "CurrencyExchangeRate"("fromCurrency", "toCurrency", "validFrom");
 
 -- CreateIndex
-CREATE INDEX "BusinessScan_businessId_createdAt_idx" ON "BusinessScan"("businessId", "createdAt");
+CREATE INDEX IF NOT EXISTS "BusinessScan_businessId_createdAt_idx" ON "BusinessScan"("businessId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "BusinessScan_score_idx" ON "BusinessScan"("score");
+CREATE INDEX IF NOT EXISTS "BusinessScan_score_idx" ON "BusinessScan"("score");
 
 -- CreateIndex
-CREATE INDEX "OptimizationRecommendation_businessId_status_createdAt_idx" ON "OptimizationRecommendation"("businessId", "status", "createdAt");
+CREATE INDEX IF NOT EXISTS "OptimizationRecommendation_businessId_status_createdAt_idx" ON "OptimizationRecommendation"("businessId", "status", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "OptimizationRecommendation_source_category_idx" ON "OptimizationRecommendation"("source", "category");
+CREATE INDEX IF NOT EXISTS "OptimizationRecommendation_source_category_idx" ON "OptimizationRecommendation"("source", "category");
 
 -- CreateIndex
-CREATE INDEX "OptimizationRecommendation_priority_status_idx" ON "OptimizationRecommendation"("priority", "status");
+CREATE INDEX IF NOT EXISTS "OptimizationRecommendation_priority_status_idx" ON "OptimizationRecommendation"("priority", "status");
 
 -- CreateIndex
-CREATE INDEX "OptimizationAction_recommendationId_executedAt_idx" ON "OptimizationAction"("recommendationId", "executedAt");
+CREATE INDEX IF NOT EXISTS "OptimizationAction_recommendationId_executedAt_idx" ON "OptimizationAction"("recommendationId", "executedAt");
 
 -- CreateIndex
-CREATE INDEX "OptimizationAction_actionType_idx" ON "OptimizationAction"("actionType");
+CREATE INDEX IF NOT EXISTS "OptimizationAction_actionType_idx" ON "OptimizationAction"("actionType");
 
 -- CreateIndex
-CREATE INDEX "OptimizationOutcome_recommendationId_measuredAt_idx" ON "OptimizationOutcome"("recommendationId", "measuredAt");
+CREATE INDEX IF NOT EXISTS "OptimizationOutcome_recommendationId_measuredAt_idx" ON "OptimizationOutcome"("recommendationId", "measuredAt");
 
 -- CreateIndex
-CREATE INDEX "OptimizationOutcome_businessId_metricType_idx" ON "OptimizationOutcome"("businessId", "metricType");
+CREATE INDEX IF NOT EXISTS "OptimizationOutcome_businessId_metricType_idx" ON "OptimizationOutcome"("businessId", "metricType");
 
 -- CreateIndex
-CREATE INDEX "ReferralClick_referralLinkId_clickedAt_idx" ON "ReferralClick"("referralLinkId", "clickedAt");
+CREATE INDEX IF NOT EXISTS "ReferralClick_referralLinkId_clickedAt_idx" ON "ReferralClick"("referralLinkId", "clickedAt");
 
 -- CreateIndex
-CREATE INDEX "ReferralClick_deviceId_idx" ON "ReferralClick"("deviceId");
+CREATE INDEX IF NOT EXISTS "ReferralClick_deviceId_idx" ON "ReferralClick"("deviceId");
 
 -- CreateIndex
-CREATE INDEX "ReferralClick_ipAddress_idx" ON "ReferralClick"("ipAddress");
+CREATE INDEX IF NOT EXISTS "ReferralClick_ipAddress_idx" ON "ReferralClick"("ipAddress");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_referralLinkId_status_idx" ON "ReferralReward"("referralLinkId", "status");
+CREATE INDEX IF NOT EXISTS "ReferralReward_referralLinkId_status_idx" ON "ReferralReward"("referralLinkId", "status");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_customerId_status_idx" ON "ReferralReward"("customerId", "status");
+CREATE INDEX IF NOT EXISTS "ReferralReward_customerId_status_idx" ON "ReferralReward"("customerId", "status");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_type_status_idx" ON "ReferralReward"("type", "status");
+CREATE INDEX IF NOT EXISTS "ReferralReward_type_status_idx" ON "ReferralReward"("type", "status");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_tier_status_idx" ON "ReferralReward"("tier", "status");
+CREATE INDEX IF NOT EXISTS "ReferralReward_tier_status_idx" ON "ReferralReward"("tier", "status");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_lockUntil_idx" ON "ReferralReward"("lockUntil");
+CREATE INDEX IF NOT EXISTS "ReferralReward_lockUntil_idx" ON "ReferralReward"("lockUntil");
 
 -- CreateIndex
-CREATE INDEX "ReferralReward_createdAt_idx" ON "ReferralReward"("createdAt");
+CREATE INDEX IF NOT EXISTS "ReferralReward_createdAt_idx" ON "ReferralReward"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "AffiliateEarnings_referralLinkId_status_idx" ON "AffiliateEarnings"("referralLinkId", "status");
+CREATE INDEX IF NOT EXISTS "AffiliateEarnings_referralLinkId_status_idx" ON "AffiliateEarnings"("referralLinkId", "status");
 
 -- CreateIndex
-CREATE INDEX "AffiliateEarnings_month_idx" ON "AffiliateEarnings"("month");
+CREATE INDEX IF NOT EXISTS "AffiliateEarnings_month_idx" ON "AffiliateEarnings"("month");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AffiliateEarnings_referralLinkId_month_key" ON "AffiliateEarnings"("referralLinkId", "month");
+CREATE UNIQUE INDEX IF NOT EXISTS "AffiliateEarnings_referralLinkId_month_key" ON "AffiliateEarnings"("referralLinkId", "month");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TableSessionInvite_inviteCode_key" ON "TableSessionInvite"("inviteCode");
+CREATE UNIQUE INDEX IF NOT EXISTS "TableSessionInvite_inviteCode_key" ON "TableSessionInvite"("inviteCode");
 
 -- CreateIndex
-CREATE INDEX "TableSessionInvite_inviteCode_idx" ON "TableSessionInvite"("inviteCode");
+CREATE INDEX IF NOT EXISTS "TableSessionInvite_inviteCode_idx" ON "TableSessionInvite"("inviteCode");
 
 -- CreateIndex
-CREATE INDEX "TableSessionInvite_sessionId_status_idx" ON "TableSessionInvite"("sessionId", "status");
+CREATE INDEX IF NOT EXISTS "TableSessionInvite_sessionId_status_idx" ON "TableSessionInvite"("sessionId", "status");
 
 -- CreateIndex
-CREATE INDEX "TableSessionInvite_inviterId_idx" ON "TableSessionInvite"("inviterId");
+CREATE INDEX IF NOT EXISTS "TableSessionInvite_inviterId_idx" ON "TableSessionInvite"("inviterId");
 
 -- CreateIndex
-CREATE INDEX "FraudDetectionLog_entityType_entityId_idx" ON "FraudDetectionLog"("entityType", "entityId");
+CREATE INDEX IF NOT EXISTS "FraudDetectionLog_entityType_entityId_idx" ON "FraudDetectionLog"("entityType", "entityId");
 
 -- CreateIndex
-CREATE INDEX "FraudDetectionLog_riskScore_idx" ON "FraudDetectionLog"("riskScore");
+CREATE INDEX IF NOT EXISTS "FraudDetectionLog_riskScore_idx" ON "FraudDetectionLog"("riskScore");
 
 -- CreateIndex
-CREATE INDEX "FraudDetectionLog_action_idx" ON "FraudDetectionLog"("action");
+CREATE INDEX IF NOT EXISTS "FraudDetectionLog_action_idx" ON "FraudDetectionLog"("action");
 
 -- CreateIndex
-CREATE INDEX "FraudDetectionLog_createdAt_idx" ON "FraudDetectionLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "FraudDetectionLog_createdAt_idx" ON "FraudDetectionLog"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "ABTest_businessId_status_idx" ON "ABTest"("businessId", "status");
+CREATE INDEX IF NOT EXISTS "ABTest_businessId_status_idx" ON "ABTest"("businessId", "status");
 
 -- CreateIndex
-CREATE INDEX "ABTest_menuItemId_idx" ON "ABTest"("menuItemId");
+CREATE INDEX IF NOT EXISTS "ABTest_menuItemId_idx" ON "ABTest"("menuItemId");
 
 -- CreateIndex
-CREATE INDEX "ABVariant_testId_idx" ON "ABVariant"("testId");
+CREATE INDEX IF NOT EXISTS "ABVariant_testId_idx" ON "ABVariant"("testId");
 
 -- CreateIndex
-CREATE INDEX "ABAssignment_testId_variantId_idx" ON "ABAssignment"("testId", "variantId");
+CREATE INDEX IF NOT EXISTS "ABAssignment_testId_variantId_idx" ON "ABAssignment"("testId", "variantId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ABAssignment_testId_visitorId_key" ON "ABAssignment"("testId", "visitorId");
+CREATE UNIQUE INDEX IF NOT EXISTS "ABAssignment_testId_visitorId_key" ON "ABAssignment"("testId", "visitorId");
 
 -- CreateIndex
-CREATE INDEX "ABEvent_testId_variantId_type_idx" ON "ABEvent"("testId", "variantId", "type");
+CREATE INDEX IF NOT EXISTS "ABEvent_testId_variantId_type_idx" ON "ABEvent"("testId", "variantId", "type");
 
 -- CreateIndex
-CREATE INDEX "ABEvent_createdAt_idx" ON "ABEvent"("createdAt");
+CREATE INDEX IF NOT EXISTS "ABEvent_createdAt_idx" ON "ABEvent"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "SupplierRecommendationLog_businessId_supplierId_idx" ON "SupplierRecommendationLog"("businessId", "supplierId");
+CREATE INDEX IF NOT EXISTS "SupplierRecommendationLog_businessId_supplierId_idx" ON "SupplierRecommendationLog"("businessId", "supplierId");
 
 -- CreateIndex
-CREATE INDEX "SupplierRecommendationLog_userId_action_idx" ON "SupplierRecommendationLog"("userId", "action");
+CREATE INDEX IF NOT EXISTS "SupplierRecommendationLog_userId_action_idx" ON "SupplierRecommendationLog"("userId", "action");
 
 -- CreateIndex
-CREATE INDEX "SupplierRecommendationLog_createdAt_idx" ON "SupplierRecommendationLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "SupplierRecommendationLog_createdAt_idx" ON "SupplierRecommendationLog"("createdAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SupplierPerformanceCache_supplierId_key" ON "SupplierPerformanceCache"("supplierId");
+CREATE UNIQUE INDEX IF NOT EXISTS "SupplierPerformanceCache_supplierId_key" ON "SupplierPerformanceCache"("supplierId");
 
 -- CreateIndex
-CREATE INDEX "SupplierPerformanceCache_lastCalculated_idx" ON "SupplierPerformanceCache"("lastCalculated");
+CREATE INDEX IF NOT EXISTS "SupplierPerformanceCache_lastCalculated_idx" ON "SupplierPerformanceCache"("lastCalculated");
 
 -- CreateIndex
-CREATE INDEX "Contact_businessId_type_idx" ON "Contact"("businessId", "type");
+CREATE INDEX IF NOT EXISTS "Contact_businessId_type_idx" ON "Contact"("businessId", "type");
 
 -- CreateIndex
-CREATE INDEX "Contact_businessId_status_idx" ON "Contact"("businessId", "status");
+CREATE INDEX IF NOT EXISTS "Contact_businessId_status_idx" ON "Contact"("businessId", "status");
 
 -- CreateIndex
-CREATE INDEX "Contact_email_idx" ON "Contact"("email");
+CREATE INDEX IF NOT EXISTS "Contact_email_idx" ON "Contact"("email");
 
 -- CreateIndex
-CREATE INDEX "Contact_phone_idx" ON "Contact"("phone");
+CREATE INDEX IF NOT EXISTS "Contact_phone_idx" ON "Contact"("phone");
 
 -- CreateIndex
-CREATE INDEX "Contact_tags_idx" ON "Contact"("tags");
+CREATE INDEX IF NOT EXISTS "Contact_tags_idx" ON "Contact"("tags");
 
 -- CreateIndex
-CREATE INDEX "Contact_lastActivityAt_idx" ON "Contact"("lastActivityAt");
+CREATE INDEX IF NOT EXISTS "Contact_lastActivityAt_idx" ON "Contact"("lastActivityAt");
 
 -- CreateIndex
-CREATE INDEX "Contact_createdAt_idx" ON "Contact"("createdAt");
+CREATE INDEX IF NOT EXISTS "Contact_createdAt_idx" ON "Contact"("createdAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Contact_businessId_phone_key" ON "Contact"("businessId", "phone");
+CREATE UNIQUE INDEX IF NOT EXISTS "Contact_businessId_phone_key" ON "Contact"("businessId", "phone");
 
 -- CreateIndex
-CREATE INDEX "ContactOrganization_businessId_type_idx" ON "ContactOrganization"("businessId", "type");
+CREATE INDEX IF NOT EXISTS "ContactOrganization_businessId_type_idx" ON "ContactOrganization"("businessId", "type");
 
 -- CreateIndex
-CREATE INDEX "ContactOrganization_businessId_name_idx" ON "ContactOrganization"("businessId", "name");
+CREATE INDEX IF NOT EXISTS "ContactOrganization_businessId_name_idx" ON "ContactOrganization"("businessId", "name");
 
 -- CreateIndex
-CREATE INDEX "ContactOrganization_createdAt_idx" ON "ContactOrganization"("createdAt");
+CREATE INDEX IF NOT EXISTS "ContactOrganization_createdAt_idx" ON "ContactOrganization"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "OrganizationMember_organizationId_idx" ON "OrganizationMember"("organizationId");
+CREATE INDEX IF NOT EXISTS "OrganizationMember_organizationId_idx" ON "OrganizationMember"("organizationId");
 
 -- CreateIndex
-CREATE INDEX "OrganizationMember_contactId_idx" ON "OrganizationMember"("contactId");
+CREATE INDEX IF NOT EXISTS "OrganizationMember_contactId_idx" ON "OrganizationMember"("contactId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "OrganizationMember_contactId_organizationId_key" ON "OrganizationMember"("contactId", "organizationId");
+CREATE UNIQUE INDEX IF NOT EXISTS "OrganizationMember_contactId_organizationId_key" ON "OrganizationMember"("contactId", "organizationId");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_businessId_relationshipType_idx" ON "ContactRelationship"("businessId", "relationshipType");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_businessId_relationshipType_idx" ON "ContactRelationship"("businessId", "relationshipType");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_fromContactId_idx" ON "ContactRelationship"("fromContactId");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_fromContactId_idx" ON "ContactRelationship"("fromContactId");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_toContactId_idx" ON "ContactRelationship"("toContactId");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_toContactId_idx" ON "ContactRelationship"("toContactId");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_fromOrgId_idx" ON "ContactRelationship"("fromOrgId");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_fromOrgId_idx" ON "ContactRelationship"("fromOrgId");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_toOrgId_idx" ON "ContactRelationship"("toOrgId");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_toOrgId_idx" ON "ContactRelationship"("toOrgId");
 
 -- CreateIndex
-CREATE INDEX "ContactRelationship_isActive_idx" ON "ContactRelationship"("isActive");
+CREATE INDEX IF NOT EXISTS "ContactRelationship_isActive_idx" ON "ContactRelationship"("isActive");
 
 -- CreateIndex
-CREATE INDEX "ContactActivity_contactId_timestamp_idx" ON "ContactActivity"("contactId", "timestamp");
+CREATE INDEX IF NOT EXISTS "ContactActivity_contactId_timestamp_idx" ON "ContactActivity"("contactId", "timestamp");
 
 -- CreateIndex
-CREATE INDEX "ContactActivity_businessId_activityType_idx" ON "ContactActivity"("businessId", "activityType");
+CREATE INDEX IF NOT EXISTS "ContactActivity_businessId_activityType_idx" ON "ContactActivity"("businessId", "activityType");
 
 -- CreateIndex
-CREATE INDEX "ContactActivity_timestamp_idx" ON "ContactActivity"("timestamp");
+CREATE INDEX IF NOT EXISTS "ContactActivity_timestamp_idx" ON "ContactActivity"("timestamp");
 
 -- CreateIndex
-CREATE INDEX "ContactActivity_source_sourceId_idx" ON "ContactActivity"("source", "sourceId");
+CREATE INDEX IF NOT EXISTS "ContactActivity_source_sourceId_idx" ON "ContactActivity"("source", "sourceId");
 
 -- CreateIndex
-CREATE INDEX "ContactSegment_businessId_idx" ON "ContactSegment"("businessId");
+CREATE INDEX IF NOT EXISTS "ContactSegment_businessId_idx" ON "ContactSegment"("businessId");
 
 -- CreateIndex
-CREATE INDEX "ContactTag_businessId_idx" ON "ContactTag"("businessId");
+CREATE INDEX IF NOT EXISTS "ContactTag_businessId_idx" ON "ContactTag"("businessId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ContactTag_businessId_name_key" ON "ContactTag"("businessId", "name");
+CREATE UNIQUE INDEX IF NOT EXISTS "ContactTag_businessId_name_key" ON "ContactTag"("businessId", "name");
 
 -- CreateIndex
-CREATE INDEX "SupportConversation_businessId_status_updatedAt_idx" ON "SupportConversation"("businessId", "status", "updatedAt");
+CREATE INDEX IF NOT EXISTS "SupportConversation_businessId_status_updatedAt_idx" ON "SupportConversation"("businessId", "status", "updatedAt");
 
 -- CreateIndex
-CREATE INDEX "SupportConversation_createdById_updatedAt_idx" ON "SupportConversation"("createdById", "updatedAt");
+CREATE INDEX IF NOT EXISTS "SupportConversation_createdById_updatedAt_idx" ON "SupportConversation"("createdById", "updatedAt");
 
 -- CreateIndex
-CREATE INDEX "SupportConversation_assignedToId_status_idx" ON "SupportConversation"("assignedToId", "status");
+CREATE INDEX IF NOT EXISTS "SupportConversation_assignedToId_status_idx" ON "SupportConversation"("assignedToId", "status");
 
 -- CreateIndex
-CREATE INDEX "SupportMessage_conversationId_createdAt_idx" ON "SupportMessage"("conversationId", "createdAt");
+CREATE INDEX IF NOT EXISTS "SupportMessage_conversationId_createdAt_idx" ON "SupportMessage"("conversationId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "SupportMessage_senderType_createdAt_idx" ON "SupportMessage"("senderType", "createdAt");
+CREATE INDEX IF NOT EXISTS "SupportMessage_senderType_createdAt_idx" ON "SupportMessage"("senderType", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "SupportCannedReply_businessId_isActive_idx" ON "SupportCannedReply"("businessId", "isActive");
+CREATE INDEX IF NOT EXISTS "SupportCannedReply_businessId_isActive_idx" ON "SupportCannedReply"("businessId", "isActive");
 
 -- CreateIndex
-CREATE INDEX "SupportCannedReply_businessId_shortcut_idx" ON "SupportCannedReply"("businessId", "shortcut");
+CREATE INDEX IF NOT EXISTS "SupportCannedReply_businessId_shortcut_idx" ON "SupportCannedReply"("businessId", "shortcut");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProfessionalMarketer_userId_key" ON "ProfessionalMarketer"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "ProfessionalMarketer_userId_key" ON "ProfessionalMarketer"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProfessionalMarketer_email_key" ON "ProfessionalMarketer"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "ProfessionalMarketer_email_key" ON "ProfessionalMarketer"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProfessionalMarketer_phone_key" ON "ProfessionalMarketer"("phone");
+CREATE UNIQUE INDEX IF NOT EXISTS "ProfessionalMarketer_phone_key" ON "ProfessionalMarketer"("phone");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProfessionalMarketer_referralCode_key" ON "ProfessionalMarketer"("referralCode");
+CREATE UNIQUE INDEX IF NOT EXISTS "ProfessionalMarketer_referralCode_key" ON "ProfessionalMarketer"("referralCode");
 
 -- CreateIndex
-CREATE INDEX "ProfessionalMarketer_status_idx" ON "ProfessionalMarketer"("status");
+CREATE INDEX IF NOT EXISTS "ProfessionalMarketer_status_idx" ON "ProfessionalMarketer"("status");
 
 -- CreateIndex
-CREATE INDEX "ProfessionalMarketer_referralCode_idx" ON "ProfessionalMarketer"("referralCode");
+CREATE INDEX IF NOT EXISTS "ProfessionalMarketer_referralCode_idx" ON "ProfessionalMarketer"("referralCode");
 
 -- CreateIndex
-CREATE INDEX "ProfessionalMarketer_email_idx" ON "ProfessionalMarketer"("email");
+CREATE INDEX IF NOT EXISTS "ProfessionalMarketer_email_idx" ON "ProfessionalMarketer"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MarketerAttribution_businessId_key" ON "MarketerAttribution"("businessId");
+CREATE UNIQUE INDEX IF NOT EXISTS "MarketerAttribution_businessId_key" ON "MarketerAttribution"("businessId");
 
 -- CreateIndex
-CREATE INDEX "MarketerAttribution_marketerId_idx" ON "MarketerAttribution"("marketerId");
+CREATE INDEX IF NOT EXISTS "MarketerAttribution_marketerId_idx" ON "MarketerAttribution"("marketerId");
 
 -- CreateIndex
-CREATE INDEX "MarketerAttribution_businessId_idx" ON "MarketerAttribution"("businessId");
+CREATE INDEX IF NOT EXISTS "MarketerAttribution_businessId_idx" ON "MarketerAttribution"("businessId");
 
 -- CreateIndex
-CREATE INDEX "MarketerAttribution_attributedAt_idx" ON "MarketerAttribution"("attributedAt");
+CREATE INDEX IF NOT EXISTS "MarketerAttribution_attributedAt_idx" ON "MarketerAttribution"("attributedAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MarketerWallet_marketerId_key" ON "MarketerWallet"("marketerId");
+CREATE UNIQUE INDEX IF NOT EXISTS "MarketerWallet_marketerId_key" ON "MarketerWallet"("marketerId");
 
 -- CreateIndex
-CREATE INDEX "MarketerWallet_marketerId_idx" ON "MarketerWallet"("marketerId");
+CREATE INDEX IF NOT EXISTS "MarketerWallet_marketerId_idx" ON "MarketerWallet"("marketerId");
 
 -- CreateIndex
-CREATE INDEX "MarketerCommission_marketerId_status_idx" ON "MarketerCommission"("marketerId", "status");
+CREATE INDEX IF NOT EXISTS "MarketerCommission_marketerId_status_idx" ON "MarketerCommission"("marketerId", "status");
 
 -- CreateIndex
-CREATE INDEX "MarketerCommission_businessId_idx" ON "MarketerCommission"("businessId");
+CREATE INDEX IF NOT EXISTS "MarketerCommission_businessId_idx" ON "MarketerCommission"("businessId");
 
 -- CreateIndex
-CREATE INDEX "MarketerCommission_status_idx" ON "MarketerCommission"("status");
+CREATE INDEX IF NOT EXISTS "MarketerCommission_status_idx" ON "MarketerCommission"("status");
 
 -- CreateIndex
-CREATE INDEX "MarketerCommission_createdAt_idx" ON "MarketerCommission"("createdAt");
+CREATE INDEX IF NOT EXISTS "MarketerCommission_createdAt_idx" ON "MarketerCommission"("createdAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MarketerPayout_referenceId_key" ON "MarketerPayout"("referenceId");
+CREATE UNIQUE INDEX IF NOT EXISTS "MarketerPayout_referenceId_key" ON "MarketerPayout"("referenceId");
 
 -- CreateIndex
-CREATE INDEX "MarketerPayout_marketerId_status_idx" ON "MarketerPayout"("marketerId", "status");
+CREATE INDEX IF NOT EXISTS "MarketerPayout_marketerId_status_idx" ON "MarketerPayout"("marketerId", "status");
 
 -- CreateIndex
-CREATE INDEX "MarketerPayout_status_idx" ON "MarketerPayout"("status");
+CREATE INDEX IF NOT EXISTS "MarketerPayout_status_idx" ON "MarketerPayout"("status");
 
 -- CreateIndex
-CREATE INDEX "MarketerPayout_createdAt_idx" ON "MarketerPayout"("createdAt");
+CREATE INDEX IF NOT EXISTS "MarketerPayout_createdAt_idx" ON "MarketerPayout"("createdAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MarketerRiskProfile_marketerId_key" ON "MarketerRiskProfile"("marketerId");
+CREATE UNIQUE INDEX IF NOT EXISTS "MarketerRiskProfile_marketerId_key" ON "MarketerRiskProfile"("marketerId");
 
 -- CreateIndex
-CREATE INDEX "MarketerRiskProfile_riskLevel_idx" ON "MarketerRiskProfile"("riskLevel");
+CREATE INDEX IF NOT EXISTS "MarketerRiskProfile_riskLevel_idx" ON "MarketerRiskProfile"("riskLevel");
 
 -- CreateIndex
-CREATE INDEX "MarketerRiskProfile_marketerId_idx" ON "MarketerRiskProfile"("marketerId");
+CREATE INDEX IF NOT EXISTS "MarketerRiskProfile_marketerId_idx" ON "MarketerRiskProfile"("marketerId");
 
 -- CreateIndex
-CREATE INDEX "RevenueEvent_type_createdAt_idx" ON "RevenueEvent"("type", "createdAt");
+CREATE INDEX IF NOT EXISTS "RevenueEvent_type_createdAt_idx" ON "RevenueEvent"("type", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "RevenueEvent_entityType_entityId_idx" ON "RevenueEvent"("entityType", "entityId");
+CREATE INDEX IF NOT EXISTS "RevenueEvent_entityType_entityId_idx" ON "RevenueEvent"("entityType", "entityId");
 
 -- CreateIndex
-CREATE INDEX "RevenueEvent_createdAt_idx" ON "RevenueEvent"("createdAt");
+CREATE INDEX IF NOT EXISTS "RevenueEvent_createdAt_idx" ON "RevenueEvent"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "RevenueAlert_severity_acknowledged_idx" ON "RevenueAlert"("severity", "acknowledged");
+CREATE INDEX IF NOT EXISTS "RevenueAlert_severity_acknowledged_idx" ON "RevenueAlert"("severity", "acknowledged");
 
 -- CreateIndex
-CREATE INDEX "RevenueAlert_createdAt_idx" ON "RevenueAlert"("createdAt");
+CREATE INDEX IF NOT EXISTS "RevenueAlert_createdAt_idx" ON "RevenueAlert"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "RevenueAlert_acknowledged_idx" ON "RevenueAlert"("acknowledged");
+CREATE INDEX IF NOT EXISTS "RevenueAlert_acknowledged_idx" ON "RevenueAlert"("acknowledged");
 
 -- CreateIndex
-CREATE INDEX "DemoRequest_status_createdAt_idx" ON "DemoRequest"("status", "createdAt");
+CREATE INDEX IF NOT EXISTS "DemoRequest_status_createdAt_idx" ON "DemoRequest"("status", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "DemoRequest_createdAt_idx" ON "DemoRequest"("createdAt");
+CREATE INDEX IF NOT EXISTS "DemoRequest_createdAt_idx" ON "DemoRequest"("createdAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "NewsletterSubscriber_emailOrPhone_key" ON "NewsletterSubscriber"("emailOrPhone");
+CREATE UNIQUE INDEX IF NOT EXISTS "NewsletterSubscriber_emailOrPhone_key" ON "NewsletterSubscriber"("emailOrPhone");
 
 -- CreateIndex
-CREATE INDEX "NewsletterSubscriber_isActive_createdAt_idx" ON "NewsletterSubscriber"("isActive", "createdAt");
+CREATE INDEX IF NOT EXISTS "NewsletterSubscriber_isActive_createdAt_idx" ON "NewsletterSubscriber"("isActive", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "NewsletterSubscriber_createdAt_idx" ON "NewsletterSubscriber"("createdAt");
+CREATE INDEX IF NOT EXISTS "NewsletterSubscriber_createdAt_idx" ON "NewsletterSubscriber"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "Station_businessId_isActive_idx" ON "Station"("businessId", "isActive");
+CREATE INDEX IF NOT EXISTS "Station_businessId_isActive_idx" ON "Station"("businessId", "isActive");
 
 -- CreateIndex
-CREATE INDEX "Station_businessId_type_idx" ON "Station"("businessId", "type");
+CREATE INDEX IF NOT EXISTS "Station_businessId_type_idx" ON "Station"("businessId", "type");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Station_businessId_code_key" ON "Station"("businessId", "code");
+CREATE UNIQUE INDEX IF NOT EXISTS "Station_businessId_code_key" ON "Station"("businessId", "code");
 
 -- CreateIndex
-CREATE INDEX "RouteRule_businessId_isActive_idx" ON "RouteRule"("businessId", "isActive");
+CREATE INDEX IF NOT EXISTS "RouteRule_businessId_isActive_idx" ON "RouteRule"("businessId", "isActive");
 
 -- CreateIndex
-CREATE INDEX "RouteRule_menuItemId_idx" ON "RouteRule"("menuItemId");
+CREATE INDEX IF NOT EXISTS "RouteRule_menuItemId_idx" ON "RouteRule"("menuItemId");
 
 -- CreateIndex
-CREATE INDEX "RouteRule_category_idx" ON "RouteRule"("category");
+CREATE INDEX IF NOT EXISTS "RouteRule_category_idx" ON "RouteRule"("category");
 
 -- CreateIndex
-CREATE INDEX "RouteRule_stationId_idx" ON "RouteRule"("stationId");
+CREATE INDEX IF NOT EXISTS "RouteRule_stationId_idx" ON "RouteRule"("stationId");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_saleId_createdAt_idx" ON "TicketEvent"("saleId", "createdAt");
+CREATE INDEX IF NOT EXISTS "TicketEvent_saleId_createdAt_idx" ON "TicketEvent"("saleId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_saleItemId_sequenceNumber_idx" ON "TicketEvent"("saleItemId", "sequenceNumber");
+CREATE INDEX IF NOT EXISTS "TicketEvent_saleItemId_sequenceNumber_idx" ON "TicketEvent"("saleItemId", "sequenceNumber");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_eventType_idx" ON "TicketEvent"("eventType");
+CREATE INDEX IF NOT EXISTS "TicketEvent_eventType_idx" ON "TicketEvent"("eventType");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_createdAt_idx" ON "TicketEvent"("createdAt");
+CREATE INDEX IF NOT EXISTS "TicketEvent_createdAt_idx" ON "TicketEvent"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_stationId_idx" ON "TicketEvent"("stationId");
+CREATE INDEX IF NOT EXISTS "TicketEvent_stationId_idx" ON "TicketEvent"("stationId");
 
 -- CreateIndex
-CREATE INDEX "TicketEvent_idempotencyKey_idx" ON "TicketEvent"("idempotencyKey");
+CREATE INDEX IF NOT EXISTS "TicketEvent_idempotencyKey_idx" ON "TicketEvent"("idempotencyKey");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TicketEvent_saleItemId_idempotencyKey_key" ON "TicketEvent"("saleItemId", "idempotencyKey");
+CREATE UNIQUE INDEX IF NOT EXISTS "TicketEvent_saleItemId_idempotencyKey_key" ON "TicketEvent"("saleItemId", "idempotencyKey");
 
 -- CreateIndex
-CREATE INDEX "SLAProfile_businessId_isActive_idx" ON "SLAProfile"("businessId", "isActive");
+CREATE INDEX IF NOT EXISTS "SLAProfile_businessId_isActive_idx" ON "SLAProfile"("businessId", "isActive");
 
 -- CreateIndex
-CREATE INDEX "SLAProfile_stationId_idx" ON "SLAProfile"("stationId");
+CREATE INDEX IF NOT EXISTS "SLAProfile_stationId_idx" ON "SLAProfile"("stationId");
 
 -- CreateIndex
-CREATE INDEX "SLAProfile_category_idx" ON "SLAProfile"("category");
+CREATE INDEX IF NOT EXISTS "SLAProfile_category_idx" ON "SLAProfile"("category");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "IdempotencyKey_key_key" ON "IdempotencyKey"("key");
+CREATE UNIQUE INDEX IF NOT EXISTS "IdempotencyKey_key_key" ON "IdempotencyKey"("key");
 
 -- CreateIndex
-CREATE INDEX "IdempotencyKey_businessId_endpoint_idx" ON "IdempotencyKey"("businessId", "endpoint");
+CREATE INDEX IF NOT EXISTS "IdempotencyKey_businessId_endpoint_idx" ON "IdempotencyKey"("businessId", "endpoint");
 
 -- CreateIndex
-CREATE INDEX "IdempotencyKey_expiresAt_idx" ON "IdempotencyKey"("expiresAt");
+CREATE INDEX IF NOT EXISTS "IdempotencyKey_expiresAt_idx" ON "IdempotencyKey"("expiresAt");
 
 -- CreateIndex
-CREATE INDEX "AffiliateCommissionNew_status_lockUntil_idx" ON "AffiliateCommissionNew"("status", "lockUntil");
+CREATE INDEX IF NOT EXISTS "AffiliateCommissionNew_status_lockUntil_idx" ON "AffiliateCommissionNew"("status", "lockUntil");
 
 -- CreateIndex
-CREATE INDEX "AffiliateCommissionNew_affiliateId_status_idx" ON "AffiliateCommissionNew"("affiliateId", "status");
+CREATE INDEX IF NOT EXISTS "AffiliateCommissionNew_affiliateId_status_idx" ON "AffiliateCommissionNew"("affiliateId", "status");
 
 -- CreateIndex
-CREATE INDEX "CheckoutEvent_paymentId_idx" ON "CheckoutEvent"("paymentId");
+CREATE INDEX IF NOT EXISTS "CheckoutEvent_paymentId_idx" ON "CheckoutEvent"("paymentId");
 
 -- CreateIndex
-CREATE INDEX "CheckoutEvent_eventType_createdAt_idx" ON "CheckoutEvent"("eventType", "createdAt");
+CREATE INDEX IF NOT EXISTS "CheckoutEvent_eventType_createdAt_idx" ON "CheckoutEvent"("eventType", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "PaymentTransaction_status_idx" ON "PaymentTransaction"("status");
+CREATE INDEX IF NOT EXISTS "PaymentTransaction_status_idx" ON "PaymentTransaction"("status");
 
 -- CreateIndex
-CREATE INDEX "PaymentTransaction_updatedAt_idx" ON "PaymentTransaction"("updatedAt");
+CREATE INDEX IF NOT EXISTS "PaymentTransaction_updatedAt_idx" ON "PaymentTransaction"("updatedAt");
 
 -- CreateIndex
-CREATE INDEX "PaymentTransaction_status_createdAt_idx" ON "PaymentTransaction"("status", "createdAt");
+CREATE INDEX IF NOT EXISTS "PaymentTransaction_status_createdAt_idx" ON "PaymentTransaction"("status", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "PaymentTransaction_businessId_status_idx" ON "PaymentTransaction"("businessId", "status");
+CREATE INDEX IF NOT EXISTS "PaymentTransaction_businessId_status_idx" ON "PaymentTransaction"("businessId", "status");
 
 -- CreateIndex
-CREATE INDEX "Sale_businessId_createdAt_idx" ON "Sale"("businessId", "createdAt");
+CREATE INDEX IF NOT EXISTS "Sale_businessId_createdAt_idx" ON "Sale"("businessId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "Sale_paymentStatus_createdAt_idx" ON "Sale"("paymentStatus", "createdAt");
+CREATE INDEX IF NOT EXISTS "Sale_paymentStatus_createdAt_idx" ON "Sale"("paymentStatus", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "Sale_parentOrderId_idx" ON "Sale"("parentOrderId");
+CREATE INDEX IF NOT EXISTS "Sale_parentOrderId_idx" ON "Sale"("parentOrderId");
 
 -- CreateIndex
-CREATE INDEX "Sale_isAddon_idx" ON "Sale"("isAddon");
+CREATE INDEX IF NOT EXISTS "Sale_isAddon_idx" ON "Sale"("isAddon");
 
 -- CreateIndex
-CREATE INDEX "Sale_businessId_isAddon_idx" ON "Sale"("businessId", "isAddon");
+CREATE INDEX IF NOT EXISTS "Sale_businessId_isAddon_idx" ON "Sale"("businessId", "isAddon");
 
 -- CreateIndex
-CREATE INDEX "SaleItem_itemStatus_idx" ON "SaleItem"("itemStatus");
+CREATE INDEX IF NOT EXISTS "SaleItem_itemStatus_idx" ON "SaleItem"("itemStatus");
 
 -- CreateIndex
-CREATE INDEX "SaleItem_stationId_idx" ON "SaleItem"("stationId");
+CREATE INDEX IF NOT EXISTS "SaleItem_stationId_idx" ON "SaleItem"("stationId");
 
 -- CreateIndex
-CREATE INDEX "SaleItem_saleId_itemStatus_idx" ON "SaleItem"("saleId", "itemStatus");
+CREATE INDEX IF NOT EXISTS "SaleItem_saleId_itemStatus_idx" ON "SaleItem"("saleId", "itemStatus");
 
 -- CreateIndex
-CREATE INDEX "SaleItem_parentItemId_idx" ON "SaleItem"("parentItemId");
+CREATE INDEX IF NOT EXISTS "SaleItem_parentItemId_idx" ON "SaleItem"("parentItemId");
 
 -- CreateIndex
-CREATE INDEX "SaleItem_mutationType_idx" ON "SaleItem"("mutationType");
+CREATE INDEX IF NOT EXISTS "SaleItem_mutationType_idx" ON "SaleItem"("mutationType");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_primaryBranchId_fkey" FOREIGN KEY ("primaryBranchId") REFERENCES "Branch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1741,25 +1745,25 @@ ALTER TABLE "User" ADD CONSTRAINT "User_primaryBranchId_fkey" FOREIGN KEY ("prim
 ALTER TABLE "Sale" ADD CONSTRAINT "Sale_parentOrderId_fkey" FOREIGN KEY ("parentOrderId") REFERENCES "Sale"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Sale" ADD CONSTRAINT "Sale_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Sale_businessId_fkey') THEN ALTER TABLE "Sale" ADD CONSTRAINT "Sale_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "StaffRole" ADD CONSTRAINT "StaffRole_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'StaffRole_businessId_fkey') THEN ALTER TABLE "StaffRole" ADD CONSTRAINT "StaffRole_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "StaffRole" ADD CONSTRAINT "StaffRole_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'UserStaffRole_userId_fkey') THEN ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_staffRoleId_fkey" FOREIGN KEY ("staffRoleId") REFERENCES "StaffRole"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'UserStaffRole_staffRoleId_fkey') THEN ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_staffRoleId_fkey" FOREIGN KEY ("staffRoleId") REFERENCES "StaffRole"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'UserStaffRole_businessId_fkey') THEN ALTER TABLE "UserStaffRole" ADD CONSTRAINT "UserStaffRole_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SeatSession" ADD CONSTRAINT "SeatSession_seatId_fkey" FOREIGN KEY ("seatId") REFERENCES "Seat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SeatSession_seatId_fkey') THEN ALTER TABLE "SeatSession" ADD CONSTRAINT "SeatSession_seatId_fkey" FOREIGN KEY ("seatId") REFERENCES "Seat"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "SeatSession" ADD CONSTRAINT "SeatSession_tableSessionId_fkey" FOREIGN KEY ("tableSessionId") REFERENCES "TableSession"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1768,19 +1772,19 @@ ALTER TABLE "SeatSession" ADD CONSTRAINT "SeatSession_tableSessionId_fkey" FOREI
 ALTER TABLE "SeatSession" ADD CONSTRAINT "SeatSession_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "SessionParticipant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BusinessView" ADD CONSTRAINT "BusinessView_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessView_businessId_fkey') THEN ALTER TABLE "BusinessView" ADD CONSTRAINT "BusinessView_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "UserLoginOtp" ADD CONSTRAINT "UserLoginOtp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'UserLoginOtp_userId_fkey') THEN ALTER TABLE "UserLoginOtp" ADD CONSTRAINT "UserLoginOtp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "UserDevice" ADD CONSTRAINT "UserDevice_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'UserDevice_userId_fkey') THEN ALTER TABLE "UserDevice" ADD CONSTRAINT "UserDevice_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "SecurityEvent" ADD CONSTRAINT "SecurityEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BillingEvent" ADD CONSTRAINT "BillingEvent_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BillingEvent_businessId_fkey') THEN ALTER TABLE "BillingEvent" ADD CONSTRAINT "BillingEvent_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "BillingEvent" ADD CONSTRAINT "BillingEvent_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "Subscription"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1789,73 +1793,73 @@ ALTER TABLE "BillingEvent" ADD CONSTRAINT "BillingEvent_subscriptionId_fkey" FOR
 ALTER TABLE "BillingEvent" ADD CONSTRAINT "BillingEvent_paymentTransactionId_fkey" FOREIGN KEY ("paymentTransactionId") REFERENCES "PaymentTransaction"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrDesign" ADD CONSTRAINT "QrDesign_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'QrDesign_businessId_fkey') THEN ALTER TABLE "QrDesign" ADD CONSTRAINT "QrDesign_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "QrDesign" ADD CONSTRAINT "QrDesign_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "QrTemplate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'QrDesign_templateId_fkey') THEN ALTER TABLE "QrDesign" ADD CONSTRAINT "QrDesign_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "QrTemplate"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "QrCode" ADD CONSTRAINT "QrCode_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'QrCode_businessId_fkey') THEN ALTER TABLE "QrCode" ADD CONSTRAINT "QrCode_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "QrCode" ADD CONSTRAINT "QrCode_designId_fkey" FOREIGN KEY ("designId") REFERENCES "QrDesign"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'QrCode_designId_fkey') THEN ALTER TABLE "QrCode" ADD CONSTRAINT "QrCode_designId_fkey" FOREIGN KEY ("designId") REFERENCES "QrDesign"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "AIUsageLog" ADD CONSTRAINT "AIUsageLog_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'AIUsageLog_businessId_fkey') THEN ALTER TABLE "AIUsageLog" ADD CONSTRAINT "AIUsageLog_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SiteBuilderSubscription" ADD CONSTRAINT "SiteBuilderSubscription_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SiteBuilderSubscription_businessId_fkey') THEN ALTER TABLE "SiteBuilderSubscription" ADD CONSTRAINT "SiteBuilderSubscription_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "DiscoverySubscription" ADD CONSTRAINT "DiscoverySubscription_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiscoverySubscription_businessId_fkey') THEN ALTER TABLE "DiscoverySubscription" ADD CONSTRAINT "DiscoverySubscription_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "Table"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'WaiterCall_tableId_fkey') THEN ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "Table"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'WaiterCall_businessId_fkey') THEN ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "WaiterCall" ADD CONSTRAINT "WaiterCall_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Sale"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BusinessScan" ADD CONSTRAINT "BusinessScan_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessScan_businessId_fkey') THEN ALTER TABLE "BusinessScan" ADD CONSTRAINT "BusinessScan_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OptimizationRecommendation" ADD CONSTRAINT "OptimizationRecommendation_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OptimizationRecommendation_businessId_fkey') THEN ALTER TABLE "OptimizationRecommendation" ADD CONSTRAINT "OptimizationRecommendation_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OptimizationAction" ADD CONSTRAINT "OptimizationAction_recommendationId_fkey" FOREIGN KEY ("recommendationId") REFERENCES "OptimizationRecommendation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OptimizationAction_recommendationId_fkey') THEN ALTER TABLE "OptimizationAction" ADD CONSTRAINT "OptimizationAction_recommendationId_fkey" FOREIGN KEY ("recommendationId") REFERENCES "OptimizationRecommendation"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OptimizationOutcome" ADD CONSTRAINT "OptimizationOutcome_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OptimizationOutcome_businessId_fkey') THEN ALTER TABLE "OptimizationOutcome" ADD CONSTRAINT "OptimizationOutcome_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OptimizationOutcome" ADD CONSTRAINT "OptimizationOutcome_recommendationId_fkey" FOREIGN KEY ("recommendationId") REFERENCES "OptimizationRecommendation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OptimizationOutcome_recommendationId_fkey') THEN ALTER TABLE "OptimizationOutcome" ADD CONSTRAINT "OptimizationOutcome_recommendationId_fkey" FOREIGN KEY ("recommendationId") REFERENCES "OptimizationRecommendation"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ReferralClick" ADD CONSTRAINT "ReferralClick_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ReferralClick_referralLinkId_fkey') THEN ALTER TABLE "ReferralClick" ADD CONSTRAINT "ReferralClick_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ReferralReward" ADD CONSTRAINT "ReferralReward_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ReferralReward_referralLinkId_fkey') THEN ALTER TABLE "ReferralReward" ADD CONSTRAINT "ReferralReward_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "AffiliateEarnings" ADD CONSTRAINT "AffiliateEarnings_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'AffiliateEarnings_referralLinkId_fkey') THEN ALTER TABLE "AffiliateEarnings" ADD CONSTRAINT "AffiliateEarnings_referralLinkId_fkey" FOREIGN KEY ("referralLinkId") REFERENCES "ReferralLink"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "TableSessionInvite" ADD CONSTRAINT "TableSessionInvite_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TableSessionInvite_sessionId_fkey') THEN ALTER TABLE "TableSessionInvite" ADD CONSTRAINT "TableSessionInvite_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "TableSessionInvite" ADD CONSTRAINT "TableSessionInvite_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "SessionParticipant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TableSessionInvite_inviterId_fkey') THEN ALTER TABLE "TableSessionInvite" ADD CONSTRAINT "TableSessionInvite_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "SessionParticipant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "TableSessionInvite" ADD CONSTRAINT "TableSessionInvite_inviteeId_fkey" FOREIGN KEY ("inviteeId") REFERENCES "SessionParticipant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ABTest" ADD CONSTRAINT "ABTest_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABTest_businessId_fkey') THEN ALTER TABLE "ABTest" ADD CONSTRAINT "ABTest_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "ABTest" ADD CONSTRAINT "ABTest_menuItemId_fkey" FOREIGN KEY ("menuItemId") REFERENCES "MenuItem"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1864,145 +1868,145 @@ ALTER TABLE "ABTest" ADD CONSTRAINT "ABTest_menuItemId_fkey" FOREIGN KEY ("menuI
 ALTER TABLE "ABTest" ADD CONSTRAINT "ABTest_winnerVariantId_fkey" FOREIGN KEY ("winnerVariantId") REFERENCES "ABVariant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ABVariant" ADD CONSTRAINT "ABVariant_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABVariant_testId_fkey') THEN ALTER TABLE "ABVariant" ADD CONSTRAINT "ABVariant_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ABAssignment" ADD CONSTRAINT "ABAssignment_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABAssignment_testId_fkey') THEN ALTER TABLE "ABAssignment" ADD CONSTRAINT "ABAssignment_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ABAssignment" ADD CONSTRAINT "ABAssignment_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "ABVariant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABAssignment_variantId_fkey') THEN ALTER TABLE "ABAssignment" ADD CONSTRAINT "ABAssignment_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "ABVariant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ABEvent" ADD CONSTRAINT "ABEvent_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABEvent_testId_fkey') THEN ALTER TABLE "ABEvent" ADD CONSTRAINT "ABEvent_testId_fkey" FOREIGN KEY ("testId") REFERENCES "ABTest"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ABEvent" ADD CONSTRAINT "ABEvent_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "ABVariant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ABEvent_variantId_fkey') THEN ALTER TABLE "ABEvent" ADD CONSTRAINT "ABEvent_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "ABVariant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupplierRecommendationLog_businessId_fkey') THEN ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupplierRecommendationLog_userId_fkey') THEN ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupplierRecommendationLog_supplierId_fkey') THEN ALTER TABLE "SupplierRecommendationLog" ADD CONSTRAINT "SupplierRecommendationLog_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupplierPerformanceCache" ADD CONSTRAINT "SupplierPerformanceCache_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupplierPerformanceCache_supplierId_fkey') THEN ALTER TABLE "SupplierPerformanceCache" ADD CONSTRAINT "SupplierPerformanceCache_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "Contact" ADD CONSTRAINT "Contact_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Contact_businessId_fkey') THEN ALTER TABLE "Contact" ADD CONSTRAINT "Contact_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactOrganization" ADD CONSTRAINT "ContactOrganization_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactOrganization_businessId_fkey') THEN ALTER TABLE "ContactOrganization" ADD CONSTRAINT "ContactOrganization_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OrganizationMember_contactId_fkey') THEN ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "ContactOrganization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'OrganizationMember_organizationId_fkey') THEN ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "ContactOrganization"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactRelationship_businessId_fkey') THEN ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_fromContactId_fkey" FOREIGN KEY ("fromContactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactRelationship_fromContactId_fkey') THEN ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_fromContactId_fkey" FOREIGN KEY ("fromContactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_toContactId_fkey" FOREIGN KEY ("toContactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactRelationship_toContactId_fkey') THEN ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_toContactId_fkey" FOREIGN KEY ("toContactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "ContactRelationship" ADD CONSTRAINT "ContactRelationship_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "ContactOrganization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactActivity_contactId_fkey') THEN ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactActivity_businessId_fkey') THEN ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactSegment" ADD CONSTRAINT "ContactSegment_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactSegment_businessId_fkey') THEN ALTER TABLE "ContactSegment" ADD CONSTRAINT "ContactSegment_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ContactTag_businessId_fkey') THEN ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupportConversation" ADD CONSTRAINT "SupportConversation_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupportConversation_businessId_fkey') THEN ALTER TABLE "SupportConversation" ADD CONSTRAINT "SupportConversation_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SupportConversation" ADD CONSTRAINT "SupportConversation_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupportConversation_createdById_fkey') THEN ALTER TABLE "SupportConversation" ADD CONSTRAINT "SupportConversation_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "SupportConversation" ADD CONSTRAINT "SupportConversation_assignedToId_fkey" FOREIGN KEY ("assignedToId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SupportMessage" ADD CONSTRAINT "SupportMessage_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "SupportConversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupportMessage_conversationId_fkey') THEN ALTER TABLE "SupportMessage" ADD CONSTRAINT "SupportMessage_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "SupportConversation"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "SupportMessage" ADD CONSTRAINT "SupportMessage_senderUserId_fkey" FOREIGN KEY ("senderUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SupportCannedReply" ADD CONSTRAINT "SupportCannedReply_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SupportCannedReply_businessId_fkey') THEN ALTER TABLE "SupportCannedReply" ADD CONSTRAINT "SupportCannedReply_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "DiningSessionSlip" ADD CONSTRAINT "DiningSessionSlip_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiningSessionSlip_sessionId_fkey') THEN ALTER TABLE "DiningSessionSlip" ADD CONSTRAINT "DiningSessionSlip_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "DiningSessionSlip" ADD CONSTRAINT "DiningSessionSlip_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiningSessionSlip_businessId_fkey') THEN ALTER TABLE "DiningSessionSlip" ADD CONSTRAINT "DiningSessionSlip_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "DiningSessionSlip" ADD CONSTRAINT "DiningSessionSlip_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "Table"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_slipId_fkey" FOREIGN KEY ("slipId") REFERENCES "DiningSessionSlip"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiningSessionSlipItem_slipId_fkey') THEN ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_slipId_fkey" FOREIGN KEY ("slipId") REFERENCES "DiningSessionSlip"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiningSessionSlipItem_saleId_fkey') THEN ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_saleItemId_fkey" FOREIGN KEY ("saleItemId") REFERENCES "SaleItem"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DiningSessionSlipItem_saleItemId_fkey') THEN ALTER TABLE "DiningSessionSlipItem" ADD CONSTRAINT "DiningSessionSlipItem_saleItemId_fkey" FOREIGN KEY ("saleItemId") REFERENCES "SaleItem"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "CheckoutEvent" ADD CONSTRAINT "CheckoutEvent_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CheckoutEvent_sessionId_fkey') THEN ALTER TABLE "CheckoutEvent" ADD CONSTRAINT "CheckoutEvent_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "TableSession"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "CheckoutEvent" ADD CONSTRAINT "CheckoutEvent_slipId_fkey" FOREIGN KEY ("slipId") REFERENCES "DiningSessionSlip"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CheckoutEvent" ADD CONSTRAINT "CheckoutEvent_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CheckoutEvent_businessId_fkey') THEN ALTER TABLE "CheckoutEvent" ADD CONSTRAINT "CheckoutEvent_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "MarketerAttribution" ADD CONSTRAINT "MarketerAttribution_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MarketerAttribution_marketerId_fkey') THEN ALTER TABLE "MarketerAttribution" ADD CONSTRAINT "MarketerAttribution_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "MarketerWallet" ADD CONSTRAINT "MarketerWallet_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MarketerWallet_marketerId_fkey') THEN ALTER TABLE "MarketerWallet" ADD CONSTRAINT "MarketerWallet_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "MarketerCommission" ADD CONSTRAINT "MarketerCommission_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MarketerCommission_marketerId_fkey') THEN ALTER TABLE "MarketerCommission" ADD CONSTRAINT "MarketerCommission_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "MarketerPayout" ADD CONSTRAINT "MarketerPayout_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MarketerPayout_marketerId_fkey') THEN ALTER TABLE "MarketerPayout" ADD CONSTRAINT "MarketerPayout_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "MarketerRiskProfile" ADD CONSTRAINT "MarketerRiskProfile_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MarketerRiskProfile_marketerId_fkey') THEN ALTER TABLE "MarketerRiskProfile" ADD CONSTRAINT "MarketerRiskProfile_marketerId_fkey" FOREIGN KEY ("marketerId") REFERENCES "ProfessionalMarketer"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "Station" ADD CONSTRAINT "Station_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Station_businessId_fkey') THEN ALTER TABLE "Station" ADD CONSTRAINT "Station_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'RouteRule_businessId_fkey') THEN ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "Station"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'RouteRule_stationId_fkey') THEN ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "Station"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_menuItemId_fkey" FOREIGN KEY ("menuItemId") REFERENCES "MenuItem"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'RouteRule_menuItemId_fkey') THEN ALTER TABLE "RouteRule" ADD CONSTRAINT "RouteRule_menuItemId_fkey" FOREIGN KEY ("menuItemId") REFERENCES "MenuItem"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TicketEvent_saleId_fkey') THEN ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_saleItemId_fkey" FOREIGN KEY ("saleItemId") REFERENCES "SaleItem"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TicketEvent_saleItemId_fkey') THEN ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_saleItemId_fkey" FOREIGN KEY ("saleItemId") REFERENCES "SaleItem"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
 ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "Station"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -2011,10 +2015,10 @@ ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_stationId_fkey" FOREIGN KE
 ALTER TABLE "TicketEvent" ADD CONSTRAINT "TicketEvent_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SLAProfile" ADD CONSTRAINT "SLAProfile_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SLAProfile_businessId_fkey') THEN ALTER TABLE "SLAProfile" ADD CONSTRAINT "SLAProfile_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "SLAProfile" ADD CONSTRAINT "SLAProfile_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "Station"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SLAProfile_stationId_fkey') THEN ALTER TABLE "SLAProfile" ADD CONSTRAINT "SLAProfile_stationId_fkey" FOREIGN KEY ("stationId") REFERENCES "Station"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
 
 -- AddForeignKey
-ALTER TABLE "IdempotencyKey" ADD CONSTRAINT "IdempotencyKey_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'IdempotencyKey_businessId_fkey') THEN ALTER TABLE "IdempotencyKey" ADD CONSTRAINT "IdempotencyKey_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE; END IF; END $$;
