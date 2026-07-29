@@ -209,12 +209,12 @@ CREATE INDEX "AnomalyAlert_scannedDocumentId_idx" ON "AnomalyAlert"("scannedDocu
 -- Foreign Keys
 -- ====================================================
 -- ScanJob
-ALTER TABLE "ScanJob" ADD CONSTRAINT "ScanJob_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ScanJob" ADD CONSTRAINT "ScanJob_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "ScanJob" ADD CONSTRAINT "ScanJob_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- ScannedDocument
 ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_scanJobId_fkey" FOREIGN KEY ("scanJobId") REFERENCES "ScanJob"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_matchedPurchaseOrderId_fkey" FOREIGN KEY ("matchedPurchaseOrderId") REFERENCES "PurchaseOrder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "ScannedDocument" ADD CONSTRAINT "ScannedDocument_matchedGoodsReceivedNoteId_fkey" FOREIGN KEY ("matchedGoodsReceivedNoteId") REFERENCES "GoodsReceivedNote"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -243,7 +243,7 @@ ALTER TABLE "ProductAlias" ADD CONSTRAINT "ProductAlias_inventoryItemId_fkey" FO
 ALTER TABLE "ProductAlias" ADD CONSTRAINT "ProductAlias_supplierProductId_fkey" FOREIGN KEY ("supplierProductId") REFERENCES "SupplierProduct"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AnomalyAlert
-ALTER TABLE "AnomalyAlert" ADD CONSTRAINT "AnomalyAlert_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AnomalyAlert" ADD CONSTRAINT "AnomalyAlert_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "AnomalyAlert" ADD CONSTRAINT "AnomalyAlert_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "AnomalyAlert" ADD CONSTRAINT "AnomalyAlert_scannedDocumentId_fkey" FOREIGN KEY ("scannedDocumentId") REFERENCES "ScannedDocument"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "AnomalyAlert" ADD CONSTRAINT "AnomalyAlert_scannedDocumentItemId_fkey" FOREIGN KEY ("scannedDocumentItemId") REFERENCES "ScannedDocumentItem"("id") ON DELETE SET NULL ON UPDATE CASCADE;

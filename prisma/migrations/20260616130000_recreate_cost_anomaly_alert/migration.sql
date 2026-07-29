@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "CostAnomalyAlert" (
   "notes"                     TEXT,
   "createdAt"                 TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "resolvedAt"                TIMESTAMP(3),
-  CONSTRAINT "CostAnomalyAlert_businessId_fkey"  FOREIGN KEY ("businessId")  REFERENCES "Business"("id")               ON DELETE CASCADE  ON UPDATE CASCADE,
+  CONSTRAINT "CostAnomalyAlert_businessId_fkey"  FOREIGN KEY ("businessId")  REFERENCES "Restaurant"("id")            ON DELETE CASCADE  ON UPDATE CASCADE,
   CONSTRAINT "CostAnomalyAlert_supplierId_fkey"  FOREIGN KEY ("supplierId")  REFERENCES "Supplier"("id")               ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT "CostAnomalyAlert_grnItemId_fkey"   FOREIGN KEY ("grnItemId")   REFERENCES "GoodsReceivedNoteItem"("id")  ON DELETE SET NULL ON UPDATE CASCADE
 );
