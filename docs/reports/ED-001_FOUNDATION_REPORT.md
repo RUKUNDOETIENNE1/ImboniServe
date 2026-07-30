@@ -1,9 +1,23 @@
 # ED-001 — Engineering Foundation Report
 
-**Version:** 1.0  
-**Date:** 2026-07-30  
+```yaml
+id: ED-001-RPT
+title: ED-001 Engineering Foundation Report
+type: report
+version: 1.0
+status: complete
+owner: Engineering Lead
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: on-change
+depends_on: [ED-001]
+implements: [ED-001]
+related_documents: [CHALLENGE, IECON-001, IGS-001, ESC-001, IEL-001]
+supersedes: []
+tags: [report, foundation, ed-001]
+```
+
 **Directive:** ED-001 — Establish the Imboni Engineering Foundation v1.0  
-**Status:** ✅ COMPLETE  
 
 ---
 

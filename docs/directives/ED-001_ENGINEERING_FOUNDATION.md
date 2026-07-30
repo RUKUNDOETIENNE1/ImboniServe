@@ -1,10 +1,23 @@
 # ED-001 — Establish the Imboni Engineering Foundation v1.0
 
-**Directive Number:** ED-001  
-**Version:** 1.0  
-**Date:** 2026-07-30  
+```yaml
+id: ED-001
+title: Establish the Imboni Engineering Foundation v1.0
+type: directive
+version: 1.0
+status: executed
+owner: Founder
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: on-change
+depends_on: [IECON-001, ESC-001, IGS-001]
+implements: []
+related_documents: [ED-001-RPT, CHALLENGE]
+supersedes: []
+tags: [directive, foundation, authorization]
+```
+
 **Authorizing Authority:** Founder, Imboni Integrated Systems  
-**Status:** ✅ EXECUTED  
 
 ---
 

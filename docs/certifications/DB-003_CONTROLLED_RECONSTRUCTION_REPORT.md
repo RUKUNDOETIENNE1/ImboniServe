@@ -1,5 +1,22 @@
 # DB-003 — Controlled Database Reconstruction & Validation Report
 
+```yaml
+id: DB-003
+title: Controlled Database Reconstruction & Validation Report
+type: certification
+version: 1.0
+status: complete
+owner: Founder
+created: 2026-07-29
+updated: 2026-07-29
+review_frequency: on-change
+depends_on: [DB-001, DB-002, DB-002.5]
+implements: []
+related_documents: [CERT-EP1-001]
+supersedes: []
+tags: [certification, reconstruction, recovery, database]
+```
+
 ## Production Recovery Engineering Operation
 
 **Project:** ImboniServe  

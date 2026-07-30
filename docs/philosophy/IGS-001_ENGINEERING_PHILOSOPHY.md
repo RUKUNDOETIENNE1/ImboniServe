@@ -1,9 +1,23 @@
 # IGS-001 — Imboni Engineering Philosophy
 
-**Version:** 1.0  
-**Date:** 2026-07-30  
+```yaml
+id: IGS-001
+title: Imboni Engineering Philosophy
+type: philosophy
+version: 1.0
+status: active
+owner: Engineering Lead
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IECON-001]
+implements: [MEP-001 D1]
+related_documents: [IEOS-FP-001, ESC-001]
+supersedes: []
+tags: [philosophy, governance, mindset]
+```
+
 **Authority:** IECON-001 Engineering Constitution, Article II  
-**Status:** ✅ PUBLISHED  
 
 ---
 

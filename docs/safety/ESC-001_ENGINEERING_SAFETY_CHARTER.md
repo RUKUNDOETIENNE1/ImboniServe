@@ -1,9 +1,23 @@
 # ESC-001 — Engineering Safety Charter
 
-**Version:** 1.0  
-**Date:** 2026-07-30  
+```yaml
+id: ESC-001
+title: Engineering Safety Charter
+type: safety
+version: 1.0
+status: active
+owner: Engineering Lead
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IECON-001]
+implements: [MEP-001 D1]
+related_documents: [IEOS-FP-001, IEL-001]
+supersedes: []
+tags: [safety, governance, mandatory-rules]
+```
+
 **Authority:** IECON-001 Engineering Constitution, Article III  
-**Status:** ✅ PUBLISHED  
 
 ---
 

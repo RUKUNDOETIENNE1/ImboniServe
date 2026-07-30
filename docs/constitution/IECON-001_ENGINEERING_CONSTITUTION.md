@@ -1,10 +1,25 @@
 # IECON-001 — Imboni Engineering Constitution
 
-**Version:** 1.0  
+```yaml
+id: IECON-001
+title: Imboni Engineering Constitution
+type: constitution
+version: 1.0
+status: active
+owner: Founder
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IEOS-FP-001]
+implements: [MEP-001 D1]
+related_documents: [IGS-001, ESC-001, IEL-001]
+supersedes: []
+tags: [constitution, governance, supreme-law]
+```
+
 **Ratified:** 2026-07-30  
 **Authority:** Imboni Integrated Systems  
 **Scope:** All Imboni engineering work — products, platforms, infrastructure, and operations  
-**Status:** ✅ RATIFIED  
 
 ---
 

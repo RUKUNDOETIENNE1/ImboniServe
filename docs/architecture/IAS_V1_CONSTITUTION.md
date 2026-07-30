@@ -1,11 +1,26 @@
 # IMBONI ARCHITECTURE STANDARD (IAS) v1.0
 ## CONSTITUTION
 
-**Version:** 1.0  
+```yaml
+id: IAS-V1
+title: Imboni Architecture Standard Constitution
+type: architecture
+version: 1.0
+status: active
+owner: Engineering Lead
+created: 2026-07-06
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IECON-001]
+implements: []
+related_documents: [ARCH_INVARIANTS, IAS_GOV_MODEL, IAS_AMENDMENTS]
+supersedes: []
+tags: [architecture, ias, constitution]
+```
+
 **Ratified:** 2026-07-06  
 **Authority:** Imboni Integrated Systems  
 **Scope:** All Imboni Products and Platforms  
-**Status:** ✅ **RATIFIED**
 
 ---
 

@@ -1,9 +1,25 @@
 # DB-001 — Repository Integrity Audit Report
 
-**Date:** 2026-07-29  
+```yaml
+id: DB-001
+title: Repository Integrity Audit Report
+type: certification
+version: 1.0
+status: complete
+owner: Founder
+created: 2026-07-29
+updated: 2026-07-29
+review_frequency: on-change
+depends_on: []
+implements: []
+related_documents: [DB-002, DB-002.5, DB-003]
+supersedes: []
+tags: [certification, audit, repository, integrity]
+```
+
 **Auditor:** Cascade AI (assisted)  
 **Repository:** `c:\Dev\ImboniResto` (ImboniServe v2.0.1)  
-**Phase:** DB-001 — Evidence-gathering only. No modifications made.
+**Phase:** DB-001 — Evidence-gathering only. No modifications made.  
 
 ---
 

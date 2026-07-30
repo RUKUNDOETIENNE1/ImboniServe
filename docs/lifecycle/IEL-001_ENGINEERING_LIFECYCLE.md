@@ -1,9 +1,23 @@
 # IEL-001 — Imboni Engineering Lifecycle
 
-**Version:** 1.0  
-**Date:** 2026-07-30  
+```yaml
+id: IEL-001
+title: Imboni Engineering Lifecycle
+type: lifecycle
+version: 1.0
+status: active
+owner: Engineering Lead
+created: 2026-07-30
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IECON-001]
+implements: [MEP-001 D1]
+related_documents: [ESC-001, IEOS-LC-001]
+supersedes: []
+tags: [lifecycle, governance, workflow]
+```
+
 **Authority:** IECON-001 Engineering Constitution, Articles III and V  
-**Status:** ✅ PUBLISHED  
 
 ---
 

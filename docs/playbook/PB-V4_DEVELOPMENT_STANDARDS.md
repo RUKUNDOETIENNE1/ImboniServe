@@ -12,7 +12,7 @@ updated: 2026-07-30
 review_frequency: bi-annual
 depends_on: [PB-V1, PB-V2, IEOS-FP-001, IEOS-MD-001]
 implements: [MEP-001 D2]
-related_documents: [TERMINOLOGY_STANDARD, FINANCIAL_DATA_GOVERNANCE]
+related_documents: [IEC-TERM-001, IEC-FIG-001]
 supersedes: []
 tags: [playbook, development, standards]
 ```

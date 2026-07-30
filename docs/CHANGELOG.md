@@ -86,3 +86,36 @@ tags: [changelog, documentation]
 **Restructured:**
 - Moved governance documents from `docs/governance/*` to flat `docs/*` structure per MEP-001
 - Original `docs/governance/` directory retained for backward compatibility
+
+### 2026-07-30 — ED-002 Governance Validation & Remediation
+
+**Audit:**
+- AUD-ED002-001 Governance Validation & Operational Readiness Audit
+- Initial certification: ⚠️ Ready With Conditions (overall score 75/100)
+- Post-remediation certification: ✅ Operationally Ready (overall score 93/100)
+
+**Remediated — Metadata Compliance (18 files):**
+- Added YAML metadata to IECON-001, IGS-001, ESC-001, IEL-001
+- Added YAML metadata to IAS-V1, IAS-AMEND-001, ARCH-INV-001
+- Added YAML metadata to IEC-TERM-001, IEC-FIG-001, IEC-IGS-001, IEC-SEV-001
+- Added YAML metadata to ED-001
+- Added YAML metadata to DB-001, DB-002, DB-002.5, DB-003
+- Added YAML metadata to ED-001-RPT, CHALLENGE-001
+- Metadata compliance: 33/51 (65%) → 51/51 (100%)
+
+**Added — ADRs (3):**
+- ADR-001 Prisma Migrations as Canonical Database Source
+- ADR-002 Disable RLS — Application-Level Authorization via NextAuth
+- ADR-003 FinancialLedgerEntry as Exclusive Revenue Analytics Source
+
+**Added — Runbooks (2):**
+- RB-001 Database Recovery Runbook
+- RB-002 Production Deployment Runbook
+
+**Updated — Engineering Index:**
+- Added CERT-EP1-001, ADR-001/002/003, RB-001/002, AUD-ED002-001
+- Fixed artifact IDs: IEC-TERM-001, IEC-FIG-001, IEC-IGS-001, IEC-SEV-001, IAS-AMEND-001, ARCH-INV-001, CHALLENGE-001
+- Updated statistics: 51 artifacts, 3 ADRs, 2 runbooks
+
+**Fixed — PB-V4 Reference Consistency:**
+- Updated related_documents from names to IDs: [IEC-TERM-001, IEC-FIG-001]

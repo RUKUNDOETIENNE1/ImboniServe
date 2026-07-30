@@ -1,10 +1,26 @@
 # IAS CONSTITUTIONAL AMENDMENTS
 ## PROPOSED CHANGES FOR IAS v1.1
 
+```yaml
+id: IAS-AMEND-001
+title: IAS Constitutional Amendments v1.1
+type: architecture
+version: 1.1
+status: draft
+owner: Founder
+created: 2026-07-06
+updated: 2026-07-30
+review_frequency: on-change
+depends_on: [IAS-V1]
+implements: []
+related_documents: [IAS-V1, IAS-GOV-MODEL]
+supersedes: []
+tags: [architecture, ias, amendments, pending]
+```
+
 **Amendment Date:** 2026-07-06  
 **Current Version:** IAS v1.0  
 **Proposed Version:** IAS v1.1  
-**Status:** ⏳ **PENDING FOUNDER APPROVAL**
 
 ---
 

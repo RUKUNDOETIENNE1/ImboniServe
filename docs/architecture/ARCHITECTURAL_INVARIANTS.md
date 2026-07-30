@@ -1,6 +1,23 @@
 # Architectural Invariants
 
-> **Document Status**: ENFORCED  
+```yaml
+id: ARCH-INV-001
+title: Architectural Invariants
+type: architecture
+version: 1.0
+status: active
+owner: Engineering Lead
+created: 2026-07-01
+updated: 2026-07-30
+review_frequency: annual
+depends_on: [IAS-V1]
+implements: []
+related_documents: [IECON-001, IAS-V1]
+supersedes: []
+tags: [architecture, invariants, enforced]
+```
+
+> **Status**: ENFORCED  
 > **Sprint**: Platform Integrity Resolution Sprint (PIRS)  
 > **Date**: July 2026
 

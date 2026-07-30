@@ -55,19 +55,19 @@ tags: [index, engineering, master]
 | ID | Title | Owner | Version | Status | Dependencies |
 |----|-------|-------|---------|--------|-------------|
 | IEOS-MD-001 | Metadata Standard | Engineering Lead | 1.0 | active | IEOS-FP-001 |
-| TERMINOLOGY | Terminology Standard | Engineering Lead | 1.0 | active | — |
-| FINANCIAL_DATA | Financial Data Governance | Engineering Lead | 1.0 | active | — |
-| INTELLIGENCE_GOV | Intelligence Governance | Engineering Lead | 1.0 | active | TERMINOLOGY, FINANCIAL_DATA |
-| SEVERITY_CAL | Severity Calibration | Engineering Lead | 1.0 | active | — |
+| IEC-TERM-001 | Intelligence Terminology Standard | Engineering Lead | 1.0 | active | — |
+| IEC-FIG-001 | Financial Data Governance Standard | Engineering Lead | 1.0 | active | — |
+| IEC-IGS-001 | Intelligence Governance Standard | Engineering Lead | 1.0 | active | IEC-TERM-001, IEC-FIG-001 |
+| IEC-SEV-001 | Severity Calibration Standard | Principal Decision Intelligence Architect | 1.0 | active | — |
 
 ### Architecture
 
 | ID | Title | Owner | Version | Status | Dependencies |
 |----|-------|-------|---------|--------|-------------|
-| IAS-V1 | IAS Constitution | Engineering Lead | 1.0 | active | — |
-| IAS_AMENDMENTS | IAS Constitutional Amendments | Founder | 1.1 | pending | IAS-V1 |
-| ARCH_INVARIANTS | Architectural Invariants | Engineering Lead | 1.0 | active | — |
-| IAS_GOV_MODEL | IAS Governance Model | Engineering Lead | 1.0 | active | IAS-V1 |
+| IAS-V1 | IAS Constitution | Engineering Lead | 1.0 | active | IECON-001 |
+| IAS-AMEND-001 | IAS Constitutional Amendments v1.1 | Founder | 1.1 | draft | IAS-V1 |
+| ARCH-INV-001 | Architectural Invariants | Engineering Lead | 1.0 | active | IAS-V1 |
+| IAS-GOV-MODEL | IAS Governance Model | Engineering Lead | 1.0 | active | IAS-V1 |
 
 ### Directives
 
@@ -126,26 +126,31 @@ tags: [index, engineering, master]
 | DB-002 | Database Architecture Forensics | Founder | 1.0 | complete | DB-001 |
 | DB-002.5 | Canonical Reconstruction Manifest | Founder | 1.0 | complete | DB-001, DB-002 |
 | DB-003 | Controlled Reconstruction Report | Founder | 1.0 | complete | DB-001, DB-002, DB-002.5 |
+| CERT-EP1-001 | EP1 Final Certification | Principal Engineering Auditor | 1.0 | active | IEOS-FP-001, IECON-001, IEOS-MD-001, IEOS-LC-001 |
 
 ### Reports
 
 | ID | Title | Owner | Version | Status | Dependencies |
 |----|-------|-------|---------|--------|-------------|
-| ED-001-RPT | Foundation Report | Engineering Lead | 1.0 | complete | All governance docs |
-| CHALLENGE | Engineering Challenge Review | Independent Reviewer | 1.0 | complete | All governance docs |
+| ED-001-RPT | Foundation Report | Engineering Lead | 1.0 | complete | ED-001 |
+| CHALLENGE-001 | Engineering Challenge Review | Independent Reviewer | 1.0 | complete | ED-001-RPT |
 | MEP-001-P1 | Repository Assessment | Engineering Lead | 1.0 | approved | ED-001 |
+| AUD-ED002-001 | ED-002 Governance Validation Audit | Principal Engineering Auditor | 1.0 | active | IEOS-FP-001, IEOS-MD-001, IEOS-IDX-001 |
 
 ### ADRs
 
 | ID | Title | Owner | Version | Status |
 |----|-------|-------|---------|--------|
-| *(none yet)* | | | | |
+| ADR-001 | Prisma Migrations as Canonical Database Source | Founder | 1.0 | active |
+| ADR-002 | Disable RLS — Application-Level Authorization | Founder | 1.0 | active |
+| ADR-003 | FinancialLedgerEntry as Exclusive Analytics Source | Founder | 1.0 | active |
 
 ### Runbooks
 
 | ID | Title | Owner | Version | Status |
 |----|-------|-------|---------|--------|
-| *(none yet)* | | | | |
+| RB-001 | Database Recovery Runbook | Principal SRE | 1.0 | active |
+| RB-002 | Production Deployment Runbook | Principal DevOps Engineer | 1.0 | active |
 
 ---
 
@@ -171,15 +176,16 @@ tags: [index, engineering, master]
 
 | Metric | Value |
 |--------|-------|
-| Total artifacts | 42 |
-| Active | 35 |
-| Complete | 5 |
-| Pending | 1 |
+| Total artifacts | 51 |
+| Active | 42 |
+| Complete | 6 |
+| Draft | 1 |
 | Executed | 1 |
-| ADRs | 0 |
-| Runbooks | 0 |
+| ADRs | 3 |
+| Runbooks | 2 |
 
 ---
 
 **Last Updated:** 2026-07-30  
-**Maintained By:** Principal Engineering Governance Lead
+**Maintained By:** Principal Engineering Governance Lead  
+**Audit Status:** ED-002 — Remediation Complete, Pending Re-verification

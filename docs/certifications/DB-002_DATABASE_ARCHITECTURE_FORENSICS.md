@@ -1,9 +1,25 @@
 # DB-002 — Database Architecture & Migration Forensics
 
-**Date:** 2026-07-29  
+```yaml
+id: DB-002
+title: Database Architecture & Migration Forensics
+type: certification
+version: 1.0
+status: complete
+owner: Founder
+created: 2026-07-29
+updated: 2026-07-29
+review_frequency: on-change
+depends_on: [DB-001]
+implements: []
+related_documents: [DB-002.5, DB-003]
+supersedes: []
+tags: [certification, forensics, database, migration]
+```
+
 **Auditor:** Cascade AI (assisted)  
 **Repository:** `c:\Dev\ImboniResto` (ImboniServe v2.0.1)  
-**Phase:** DB-002 — Investigative only. No modifications made.
+**Phase:** DB-002 — Investigative only. No modifications made.  
 
 ---
 
