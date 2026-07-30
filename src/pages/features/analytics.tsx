@@ -72,22 +72,25 @@ export default function AnalyticsFeaturesPage() {
   const { t, locale } = useTranslation()
 
   return (
-    <PublicLayout title="Analytics Features — Imboni Serve">
+    <PublicLayout
+      title={t('features_analytics.title_page', 'Analytics Features — Imboni Serve')}
+      metaDescription={t('features_analytics.meta_description', 'AI-powered business, menu, and revenue analytics with sub-second dashboards and auto-refresh.')}
+    >
       <Head>
         <meta name="robots" content="index,follow" />
       </Head>
       <div key={locale} className="bg-imboni-light min-h-screen">
         <div className="max-w-5xl mx-auto px-4 py-16">
           <Link href="/features" className="text-imboni-blue text-sm font-medium hover:text-imboni-orange mb-6 inline-flex items-center gap-1">
-            ← All Features
+            ← {t('features_page.back', 'All Features')}
           </Link>
 
           <div className="text-center mb-14">
             <div className="inline-block bg-imboni-green/10 text-imboni-green text-xs font-semibold px-3 py-1 rounded-full mb-3">
-              Analytics
+              {t('features_analytics.badge', 'Analytics')}
             </div>
-            <h1 className="text-4xl font-bold text-imboni-blue mb-4">Know Your Business Inside Out</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Data you can act on, not just admire.</p>
+            <h1 className="text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>{t('features_analytics.h1', 'Know Your Business Inside Out')}</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>{t('features_analytics.subheading', 'Data you can act on, not just admire.')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -96,8 +99,8 @@ export default function AnalyticsFeaturesPage() {
                 <div className="w-16 h-16 rounded-2xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-5">
                   {c.icon}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-3">{c.title}</h2>
-                <p className="text-gray-600 leading-relaxed">{c.desc}</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>{t(`features_analytics.hero.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.title`, c.title)}</h2>
+                <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>{t(`features_analytics.hero.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.desc`, c.desc)}</p>
               </div>
             ))}
           </div>
@@ -108,13 +111,13 @@ export default function AnalyticsFeaturesPage() {
                 <div className="w-12 h-12 rounded-xl bg-imboni-green/10 text-imboni-green flex items-center justify-center mb-4">
                   {c.icon}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{c.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{c.desc}</p>
+                <h3 className="font-bold text-gray-900 mb-2" suppressHydrationWarning>{t(`features_analytics.featured.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.title`, c.title)}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed" suppressHydrationWarning>{t(`features_analytics.featured.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.desc`, c.desc)}</p>
               </div>
             ))}
           </div>
 
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Standard Analytics</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6" suppressHydrationWarning>{t('features_analytics.standard_section_title', 'Standard Analytics')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
             {standardCapabilities.map((c, i) => (
               <div key={i} className="bg-white rounded-xl p-5 border border-slate-100 flex items-start gap-3">
@@ -122,16 +125,16 @@ export default function AnalyticsFeaturesPage() {
                   {c.icon}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{c.title}</h3>
-                  <p className="text-xs text-gray-500">{c.desc}</p>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1" suppressHydrationWarning>{t(`features_analytics.standard.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.title`, c.title)}</h3>
+                  <p className="text-xs text-gray-500" suppressHydrationWarning>{t(`features_analytics.standard.${String(c.title).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}.desc`, c.desc)}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="text-center">
-            <Link href="/signup" className="inline-flex items-center gap-2 bg-imboni-blue text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-imboni-blue/90 transition shadow-lg">
-              Start Free Trial <ArrowRight className="w-4 h-4" />
+            <Link href="/signup" className="inline-flex items-center gap-2 bg-imboni-blue text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-imboni-blue/90 transition shadow-lg" aria-label={t('features_page.cta', 'Start Free Trial')}>
+              {t('features_page.cta', 'Start Free Trial')} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

@@ -6,7 +6,7 @@ import { CartProvider } from '@/contexts/CartContext'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { setLocale, loadTranslations, type Locale } from '@/lib/i18n'
+import { setLocale, loadTranslations, getTranslation, type Locale } from '@/lib/i18n'
 import '@/styles/globals.css'
 import '@/styles/animations.css'
 import '@/lib/analytics/pwa-telemetry'
@@ -80,7 +80,7 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
         <link rel="icon" href="/imgs/imboni-serve-favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/imgs/imboni-serve-favicon.png" />
         <meta name="application-name" content="Imboni Serve" />
-        <meta name="description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, and customers in one seamless system." />
+        <meta name="description" content={getTranslation(ssrLocale, 'public.meta.description', 'Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments.')} />
       </Head>
       <LocaleProvider>
         <ToastProvider>

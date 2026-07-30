@@ -41,7 +41,7 @@ import {
   Bell,
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/currency'
-import { PRICING_PLANS } from '@/config/pricing'
+import { PRICING_PLANS, PRICING_CONFIG } from '@/config/pricing'
 
 // Use unified pricing config (show all plans on homepage)
 const plans = PRICING_PLANS.map(p => ({
@@ -301,7 +301,7 @@ export default function HomePage() {
   const supportWhatsAppUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || 'https://wa.me/250735214496'
 
   return (
-    <PublicLayout title="Imboni Serve — Hospitality Operating System">
+    <PublicLayout title={t('home.title_page', 'Imboni Serve — Hospitality Operating System')}>
     <Head>
       <meta name="robots" content="index,follow" />
       <script
@@ -398,7 +398,7 @@ export default function HomePage() {
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={t('homepage.hero.aria_go_to_slide', { n: String(index + 1) })}
               />
             ))}
           </div>
@@ -407,7 +407,7 @@ export default function HomePage() {
               href="/signup"
               className="bg-imboni-orange text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-accent-dark hover:scale-105 transition-all shadow-lg shadow-orange-900/30 flex items-center gap-2"
             >
-              {t('homepage.hero.cta_primary', 'Start Free 14-Day Trial')} <ArrowRight className="w-4 h-4" />
+              {t('homepage.hero.cta_primary', `Start Free ${PRICING_CONFIG.trialDays ?? 14}-Day Trial`)} <ArrowRight className="w-4 h-4" />
             </Link>
             <a
               href={supportWhatsAppUrl}
@@ -749,21 +749,21 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Users className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">14 days</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.trial_days', '14 days')}</div>
             <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.trial', 'Free trial, no card needed')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <ShoppingCart className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">No card</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.no_card', 'No card')}</div>
             <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.orders', 'needed to start')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Shield className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">5 plans</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.plans_count', '5 plans')}</div>
             <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.plans', 'From Starter to Enterprise')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
@@ -789,8 +789,8 @@ export default function HomePage() {
             <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-2" suppressHydrationWarning>
               {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your hospitality business.')}
             </p>
-            <p className="text-sm text-imboni-blue/80 font-medium tracking-wide">
-              Unified. Intelligent. Reliable.
+            <p className="text-sm text-imboni-blue/80 font-medium tracking-wide" suppressHydrationWarning>
+              {t('homepage.features.tagline', 'Unified. Intelligent. Reliable.')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1256,7 +1256,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>{t('homepage.final_cta.title', 'Ready to grow your business?')}</h2>
           <p className="text-white/80 text-lg mb-8" suppressHydrationWarning>
-            {t('homepage.final_cta.subtitle', 'Start your free 14-day trial today — no credit card needed. Join the Imboni Serve community of hospitality businesses across Rwanda.')}
+            {t('homepage.final_cta.subtitle', `Start your free ${PRICING_CONFIG.trialDays ?? 14}-day trial today — no credit card needed. Join the Imboni Serve community of hospitality businesses across Rwanda.`)}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

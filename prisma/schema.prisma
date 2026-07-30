@@ -74,6 +74,7 @@ model User {
   accounts                     Account[]
   affiliate                    Affiliate?                  @relation("AffiliateUser")
   affiliateCommissionsNew      AffiliateCommissionNew[]    @relation("AffiliateCommissions")
+  founderPartner               FounderPartner?             @relation("FounderPartnerUser")
   whatsappMessages             WhatsAppMessage[]
   staffTipsReceived            StaffTip[]
   ownedBusinesses              Business[]                  @relation("BusinessOwner")
@@ -277,6 +278,9 @@ model Business {
   isFoundingMember         Boolean   @default(false)
   foundingJoinedAt         DateTime?
   foundingDiscountPercent  Float     @default(50.0)
+
+  // Acquisition & Attribution (Phase 1A)
+  acquisitionAttribution   AcquisitionAttribution?
 
   @@map("Restaurant")
 }
@@ -4911,4 +4915,475 @@ model AICreditPolicy {
 
   @@index([policyKey])
   @@index([appliesTo, isActive])
+}
+
+// ============================================================================
+// ACQUISITION & PARTNERSHIP FOUNDATION (Phase 1A)
+// Unified attribution architecture + Founder Partner Program data models
+// All models are additive — no existing tables are modified or renamed.
+// ============================================================================
+
+// ─── Enums ────────────────────────────────────────────────────────────────
+
+enum AttributionSourceType {
+  FOUNDER_CODE
+  AFFILIATE
+  PROFESSIONAL_MARKETER
+  REFERRAL_LINK
+  CUSTOMER_REFERRAL
+  BUSINESS_INVITE
+  DIRECT_ORGANIC
+  OTHER
+}
+
+enum AttributionStatus {
+  PENDING
+  CONFIRMED
+  SUPERSEDED
+  REJECTED
+}
+
+enum PartnerStatus {
+  PROSPECT
+  APPLIED
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum PartnerType {
+  FOUNDER
+  STRATEGIC
+  CHANNEL
+}
+
+enum FounderCodeStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+  REVOKED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum FounderCommissionType {
+  SIGNUP_BONUS
+  RECURRING_REVENUE
+  CAMPAIGN_BONUS
+}
+
+enum FounderCommissionStatus {
+  PENDING
+  VALIDATED
+  PAID
+  VOID
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+enum AgreementStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum PartnershipEventType {
+  PARTNER_CREATED
+  PARTNER_APPLIED
+  PARTNER_APPROVED
+  PARTNER_SUSPENDED
+  PARTNER_TERMINATED
+  AGREEMENT_SENT
+  AGREEMENT_SIGNED
+  AGREEMENT_EXPIRED
+  CODE_CREATED
+  CODE_PAUSED
+  CODE_REVOKED
+  CODE_REDEEMED
+  ATTRIBUTION_RECORDED
+  ATTRIBUTION_SUPERSEDED
+  CAMPAIGN_LAUNCHED
+  CAMPAIGN_PAUSED
+  CAMPAIGN_COMPLETED
+  COMMISSION_ACCRUED
+  COMMISSION_VALIDATED
+  COMMISSION_PAID
+  COMMISSION_VOIDED
+  PAYOUT_REQUESTED
+  PAYOUT_APPROVED
+  PAYOUT_PAID
+  PAYOUT_FAILED
+  RISK_SCORE_UPDATED
+  RISK_FLAG_ADDED
+  QBR_CREATED
+  QBR_REVIEWED
+}
+
+// ─── Attribution Models ───────────────────────────────────────────────────
+
+/// Canonical attribution — one per business. Records how a business was acquired.
+model AcquisitionAttribution {
+  id                String                @id @default(cuid())
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  businessId        String                @unique
+  sourceType        AttributionSourceType
+  sourceId          String?
+  sourceCode        String?
+  status            AttributionStatus     @default(CONFIRMED)
+  resolvedAt        DateTime              @default(now())
+
+  ipAddress         String?
+  userAgent         String?
+  utmSource         String?
+  utmCampaign       String?
+  utmMedium         String?
+
+  trialDaysOverride Int?
+  sourceName        String?
+  sourceMetadata    Json?
+
+  business          Business              @relation(fields: [businessId], references: [id])
+
+  @@index([sourceType, sourceId])
+  @@index([sourceCode])
+  @@index([sourceType])
+}
+
+// ─── Founder Partner Models ───────────────────────────────────────────────
+
+model FounderPartner {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  userId      String?      @unique
+  name        String
+  email       String       @unique
+  phone       String       @unique
+
+  partnerType PartnerType  @default(FOUNDER)
+  status      PartnerStatus @default(PROSPECT)
+  onboardedBy String?
+  onboardedAt DateTime?
+
+  organization String?
+  region       String?
+  notes        String?
+
+  user         User?                    @relation("FounderPartnerUser", fields: [userId], references: [id])
+  application  FounderPartnerApplication?
+  agreement    PartnerAgreement?
+  codes        FounderCode[]
+  campaigns    PartnerCampaign[]
+  commissions  FounderCommission[]
+  payouts      FounderPartnerPayout[]
+  riskProfile  FounderPartnerRiskProfile?
+  activities   PartnerActivity[]
+  qbrs         PartnerQBR[]
+  auditLogs    PartnershipAuditLog[]
+
+  @@index([status])
+  @@index([email])
+  @@index([partnerType])
+}
+
+model FounderPartnerApplication {
+  id          String            @id @default(cuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  partnerId   String            @unique
+
+  motivation  String?           @db.Text
+  experience  String?
+  networkSize String?
+  references  Json?
+
+  status      ApplicationStatus @default(SUBMITTED)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  reviewNotes String?
+
+  partner     FounderPartner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model PartnerAgreement {
+  id          String           @id @default(cuid())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  partnerId   String           @unique
+
+  version     String
+  terms       Json?
+
+  signedAt    DateTime?
+  effectiveAt DateTime?
+  expiresAt   DateTime?
+
+  status      AgreementStatus  @default(PENDING)
+
+  partner     FounderPartner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model FounderCode {
+  id              String            @id @default(cuid())
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  code            String            @unique
+  partnerId       String
+
+  trialDays       Int               @default(30)
+  campaignId      String?
+
+  status          FounderCodeStatus @default(ACTIVE)
+  expiresAt       DateTime?
+  maxRedemptions  Int?
+  redemptionCount Int               @default(0)
+
+  label           String?
+  notes           String?
+
+  partner         FounderPartner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  campaign        PartnerCampaign?  @relation(fields: [campaignId], references: [id])
+  redemptions     FounderCodeRedemption[]
+
+  @@index([partnerId])
+  @@index([code])
+  @@index([status])
+}
+
+model FounderCodeRedemption {
+  id               String      @id @default(cuid())
+  createdAt        DateTime    @default(now())
+
+  codeId           String
+  businessId       String
+  userId           String?
+
+  ipAddress        String?
+  userAgent        String?
+
+  trialDaysGranted Int
+
+  code             FounderCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  @@unique([codeId, businessId])
+  @@index([codeId])
+  @@index([businessId])
+}
+
+model PartnerCampaign {
+  id                  String         @id @default(cuid())
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  partnerId           String
+  name                String
+  description         String?
+
+  channel             String?
+  startDate           DateTime?
+  endDate             DateTime?
+
+  targetSignups       Int?
+  targetConversions   Int?
+  budgetCents         Int?
+
+  status              CampaignStatus @default(DRAFT)
+
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
+
+  partner             FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  codes               FounderCode[]
+
+  @@index([partnerId])
+  @@index([status])
+}
+
+model FounderCommission {
+  id           String                  @id @default(cuid())
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  partnerId    String
+  businessId   String
+  codeId       String?
+  invoiceId    String?
+
+  type         FounderCommissionType
+  amountCents  Int
+  currency     String                  @default("RWF")
+  ratePercent  Float
+
+  status       FounderCommissionStatus @default(PENDING)
+  lockedUntil  DateTime?
+  validatedAt  DateTime?
+  paidAt       DateTime?
+
+  periodMonth  Int?
+  description  String?
+
+  partner      FounderPartner          @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, status])
+  @@index([businessId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model FounderPartnerPayout {
+  id               String        @id @default(cuid())
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  partnerId        String
+
+  amountCents      Int
+  currency         String        @default("RWF")
+  method           PayoutMethod
+
+  status           PayoutStatus  @default(PENDING)
+
+  approvedBy       String?
+  approvedAt       DateTime?
+  processedAt      DateTime?
+  paidAt           DateTime?
+  failedAt         DateTime?
+  rejectedAt       DateTime?
+  rejectedBy       String?
+  rejectReason     String?
+
+  referenceId      String?       @unique
+  providerResponse String?
+
+  recipientPhone   String?
+  recipientBank    String?
+  recipientAccount String?
+
+  partner          FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model FounderPartnerRiskProfile {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  partnerId       String         @unique
+  riskScore       Int            @default(0)
+  riskLevel       RiskLevel      @default(LOW)
+
+  flags           String[]
+
+  totalPayouts    Int            @default(0)
+  avgPayoutCents  Int            @default(0)
+  lastPayoutAt    DateTime?
+
+  partner         FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([riskLevel])
+}
+
+model PartnerActivity {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+
+  partnerId   String
+  type        String
+  description String?
+  metadata    Json?
+
+  partner     FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, createdAt])
+  @@index([type, createdAt])
+}
+
+model PartnerQBR {
+  id                    String         @id @default(cuid())
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  partnerId             String
+  quarter               String
+
+  totalSignups          Int            @default(0)
+  totalConversions      Int            @default(0)
+  totalRevenueCents     Int            @default(0)
+  totalCommissionCents  Int            @default(0)
+
+  highlights            String?        @db.Text
+  challenges            String?        @db.Text
+  actionItems           String?        @db.Text
+
+  reviewedBy            String?
+  reviewedAt            DateTime?
+  status                String         @default("DRAFT")
+
+  partner               FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([partnerId, quarter])
+  @@index([partnerId])
+}
+
+model PartnershipAuditLog {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+
+  partnerId   String
+  action      String
+  actorId     String?
+  oldValue    String?
+  newValue    String?
+  metadata    Json?
+
+  partner     FounderPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, createdAt])
+  @@index([action, createdAt])
+}
+
+// ─── Partnership Event Log ────────────────────────────────────────────────
+
+model PartnershipEvent {
+  id          String                @id @default(cuid())
+  createdAt   DateTime              @default(now())
+
+  type        PartnershipEventType
+  entityType  String
+  entityId    String
+
+  payload     Json?
+  triggeredBy String?
+  ipAddress   String?
+
+  @@index([type, createdAt])
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }

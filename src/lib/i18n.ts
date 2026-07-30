@@ -87,6 +87,10 @@ function translateFor(locale: Locale, key: string, fallback?: string): string {
   return fallback || key
 }
 
+export function getTranslation(locale: Locale, key: string, fallback?: string): string {
+  return translateFor(locale, key, fallback)
+}
+
 export function t(key: string, fallback?: string): string {
   // Backward-compatible global translation using the effective locale
   const locale = getLocale()

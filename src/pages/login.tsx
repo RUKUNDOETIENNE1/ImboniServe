@@ -97,7 +97,7 @@ export default function Login() {
     e.preventDefault()
     const code = otp.join('')
     if (code.length !== 6) {
-      setError('Enter the complete 6-digit code.')
+      setError(t('auth.enter_6_digit_code', 'Enter the complete 6-digit code.'))
       return
     }
 
@@ -125,11 +125,11 @@ export default function Login() {
           })
         }
         if (verifyRes.status === 429) {
-          setError('Too many attempts. Please wait a few minutes, then request a new code.')
+          setError(t('auth.too_many_attempts', 'Too many attempts. Please wait a few minutes, then request a new code.'))
         } else if (verifyData.error?.toLowerCase().includes('expired') || verifyData.error?.toLowerCase().includes('not found')) {
-          setError('Your code has expired. Click "Resend code" below to get a new one.')
+          setError(t('auth.code_expired', 'Your code has expired. Click "Resend code" below to get a new one.'))
         } else {
-          setError(verifyData.error || 'Invalid or expired code.')
+          setError(verifyData.error || t('auth.invalid_or_expired_code', 'Invalid or expired code.'))
         }
         return
       }
@@ -189,13 +189,13 @@ export default function Login() {
 
         await router.push('/dashboard')
       } else {
-        setError('Login could not be completed. The code may have expired — request a new one.')
+        setError(t('auth.login_incomplete', 'Login could not be completed. The code may have expired — request a new one.'))
         if (AUTH_DEBUG) {
           console.warn('[auth-debug] signIn failure', { debugRequestId, result })
         }
       }
     } catch {
-      setError('Verification failed. Please try again.')
+      setError(t('auth.verification_failed', 'Verification failed. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -224,15 +224,15 @@ export default function Login() {
           console.warn('[auth-debug] resend-otp failure', { debugRequestId, status: res.status, error: data.error })
         }
         if (res.status === 429) {
-          setError('Too many resend requests. Please wait a few minutes and try again.')
+          setError(t('auth.too_many_resends', 'Too many resend requests. Please wait a few minutes and try again.'))
         } else {
-          setError(data.error || 'Could not resend code.')
+          setError(data.error || t('auth.could_not_resend', 'Could not resend code.'))
         }
       } else if (AUTH_DEBUG) {
         console.log('[auth-debug] resend-otp success', { debugRequestId })
       }
     } catch {
-      setError('Could not resend code. Try again.')
+      setError(t('auth.could_not_resend_retry', 'Could not resend code. Try again.'))
     } finally {
       setResending(false)
       otpRefs.current[0]?.focus()
@@ -283,7 +283,7 @@ export default function Login() {
               onClick={() => { setStep('credentials'); setError(null); setOtp(['','','','','','']) }}
               className="text-sm text-imboni-blue hover:text-imboni-orange transition inline-flex items-center gap-1"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> {t('auth.back', 'Back')}
             </button>
           ) : (
             <Link href="/" className="text-sm text-imboni-blue hover:text-imboni-orange transition inline-flex items-center gap-1" suppressHydrationWarning>
@@ -394,9 +394,9 @@ export default function Login() {
                   <ShieldCheck className="w-7 h-7 text-imboni-blue" />
                 </div>
                 <p className="text-sm text-gray-600">
-                  A 6-digit code was sent to <strong>{maskedEmail}</strong>
-                  {otpChannel === 'both' && ' (email + WhatsApp)'}
-                  {otpChannel === 'whatsapp' && ' via WhatsApp'}
+                  {t('auth.code_sent_to', 'A 6-digit code was sent to')} <strong>{maskedEmail}</strong>
+                  {otpChannel === 'both' && ` ${t('auth.email_and_whatsapp', '(email + WhatsApp)')}`}
+                  {otpChannel === 'whatsapp' && ` ${t('auth.via_whatsapp', 'via WhatsApp')}`}
                 </p>
               </div>
 
@@ -425,7 +425,7 @@ export default function Login() {
                 disabled={loading || otp.join('').length < 6}
                 className="w-full bg-imboni-blue text-white font-medium py-3 px-4 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-imboni-blue disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Verifying...' : 'Verify & Sign In'}
+                {loading ? t('auth.verifying', 'Verifying...') : t('auth.verify_and_signin', 'Verify & Sign In')}
               </button>
 
               <div className="text-center">
@@ -436,12 +436,12 @@ export default function Login() {
                   className="text-sm text-imboni-blue hover:text-imboni-orange inline-flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
-                  {resending ? 'Sending...' : "Didn't receive it? Resend code"}
+                  {resending ? t('auth.sending', 'Sending...') : t('auth.resend_code', "Didn't receive it? Resend code")}
                 </button>
               </div>
 
               <p className="text-xs text-gray-500 text-center">
-                🔒 Never share this code. It expires in 10 minutes.
+                {t('auth.never_share_code', '🔒 Never share this code. It expires in 10 minutes.')}
               </p>
             </form>
           )}
@@ -472,7 +472,7 @@ export default function Login() {
 
       <div className="mt-6 text-center text-xs text-gray-400">
         <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-gray-600">
-          Powered by ICTHubs
+          {t('auth.powered_by', 'Powered by ICTHubs')}
         </a>
       </div>
     </div>

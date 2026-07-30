@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
 
-// Capture ?ref=CODE and set a 30-day referral cookie (last-click attribution)
+// Capture referral params and set a 30-day cookie (last-click attribution)
+// Canonical: ?ref=  | Aliases: ?aff=, ?partner=, ?m=, ?invite=, ?inv=
 // Also add request ID for observability
+const REFERRAL_PARAM_ALIASES = ['ref', 'aff', 'partner', 'm', 'invite', 'inv'] as const
+const REFERRAL_CODE_REGEX = /^[a-zA-Z0-9_-]{3,32}$/
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl
-  const ref = url.searchParams.get('ref')
 
   // Add request ID for correlation and debugging
   const requestId = req.headers.get('x-request-id') || uuidv4()
@@ -18,31 +21,34 @@ export function middleware(req: NextRequest) {
       headers: requestHeaders,
     },
   })
-  
+
   // Add request ID to response headers for debugging
   res.headers.set('x-request-id', requestId)
 
-  if (ref && /^[a-zA-Z0-9_-]{3,32}$/.test(ref)) {
-    const maxAge = 60 * 60 * 24 * 30 // 30 days
-    res.cookies.set('im_ref', ref, {
-      maxAge,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-    })
-  }
-
-  const inv = url.searchParams.get('inv')
-  if (inv && /^INV-[A-F0-9]{8}$/.test(inv)) {
-    const maxAge = 60 * 60 * 24 * 30 // 30 days
-    res.cookies.set('im_inv', inv, {
-      maxAge,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-    })
+  // Unified referral cookie: first matching alias wins
+  for (const param of REFERRAL_PARAM_ALIASES) {
+    const code = url.searchParams.get(param)
+    if (code && REFERRAL_CODE_REGEX.test(code)) {
+      const maxAge = 60 * 60 * 24 * 30 // 30 days
+      res.cookies.set('im_ref', code, {
+        maxAge,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+      })
+      // Also set im_inv for BusinessInvite backward compat when param is inv/invite
+      if (param === 'inv' || param === 'invite') {
+        res.cookies.set('im_inv', code, {
+          maxAge,
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
+          path: '/',
+        })
+      }
+      break
+    }
   }
 
   return res

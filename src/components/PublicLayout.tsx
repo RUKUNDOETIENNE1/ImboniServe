@@ -18,9 +18,10 @@ import SocialShare from '@/components/SocialShare'
 interface PublicLayoutProps {
   children: React.ReactNode
   title?: string
+  metaDescription?: string
 }
 
-export default function PublicLayout({ children, title }: PublicLayoutProps) {
+export default function PublicLayout({ children, title, metaDescription }: PublicLayoutProps) {
   const pageTitle = title ?? 'Imboni Serve'
   const [solutionsOpen, setSolutionsOpen] = React.useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
@@ -36,25 +37,26 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
     'public.meta.description',
     'Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments.'
   )
+  const description = metaDescription || defaultDesc
   const shareImage = (siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'
   return (
     <>
     <Head>
       <title>{pageTitle}</title>
-      <meta name="description" content={defaultDesc} />
+      <meta name="description" content={description} />
       {canonical && <link rel="canonical" href={canonical} />}
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
       <meta property="og:title" content={pageTitle} />
-      <meta property="og:description" content={defaultDesc} />
+      <meta property="og:description" content={description} />
       {canonical && <meta property="og:url" content={canonical} />}
       <meta property="og:image" content={shareImage} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={pageTitle} />
-      <meta name="twitter:description" content={defaultDesc} />
+      <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={shareImage} />
 
       {/* JSON-LD */}
@@ -138,7 +140,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg hover:bg-white/20 transition"
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+              title={darkMode ? t('topbar.light_mode', 'Light Mode') : t('topbar.dark_mode', 'Dark Mode')}
             >
               {darkMode ? (
                 <Sun size={20} className="text-yellow-300" />
@@ -164,7 +166,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-white/20 transition text-white"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-label={mobileMenuOpen ? t('public.nav.close_menu', 'Close menu') : t('public.nav.open_menu', 'Open menu')}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
@@ -224,7 +226,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             <div>
               <SocialShare
                 title="ImboniServe"
-                text="Discover ImboniServe – Smart Dining for Hospitality Businesses in Rwanda"
+                text={t('public.footer.share_text', 'Discover ImboniServe – Smart Dining for Hospitality Businesses in Rwanda')}
                 variant="compact"
               />
             </div>
@@ -270,7 +272,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
             </div>
             <div className="mt-3 text-xs text-white/40">
               <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-white/60">
-                Powered by ICTHubs
+                {t('public.footer.powered_by', 'Powered by ICTHubs')}
               </a>
             </div>
           </div>

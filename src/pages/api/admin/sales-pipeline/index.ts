@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { successResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers'
+import { TrialPolicyService } from '@/lib/services/trial-policy.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { normalizeSalesStatus, toSalesStatusToken } from '@/lib/sales-pipeline/status'
 
@@ -85,7 +86,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Calculate derived fields
   const enrichedBusinesses = businesses.map(business => {
     const today = new Date()
-    const computedEnd = business.trialEndDate || (business.trialStartDate ? new Date(new Date(business.trialStartDate).getTime() + 14 * 24 * 60 * 60 * 1000) : null)
+    const computedEnd = business.trialEndDate || (business.trialStartDate ? TrialPolicyService.computeTrialEndDate(new Date(business.trialStartDate), TrialPolicyService.getDefaultTrialDays()) : null)
     const daysLeft = computedEnd 
       ? Math.ceil((computedEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
       : null

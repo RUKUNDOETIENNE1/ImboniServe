@@ -22,12 +22,59 @@
     "all": "Byose",
     "actions": "Ibikorwa"
   },
+  "features_finance": {
+    "title_page": "Ibiranga by'Imari — Imboni Serve",
+    "badge": "Imari",
+    "h1": "Buri franga rikurikiranwa",
+    "subheading": "Uhereye kuri Mobile Money kugeza ku makuru ya CFO — amafaranga yawe agaragara neza.",
+    "meta_description": "Kurikira ubwishyu n'imiterere y'imari ukoresheje CFO/CEO dashboards, monitoring mu gihe nyacyo no guhuza neza.",
+    "hero": { "title": "CFO Dashboard", "desc": "Imiterere y'imari, ubwenge ku nyungu, na metrics za subscription — hamwe n'inkuru za AI n'isuzuma ry'ihuriro. Byihuta cyane (<1s)." },
+    "featured": { "title": "CEO Dashboard", "desc": "Imiterere y'ubucuruzi, inyungu, abakiriya n'imikorere — byegeranyijwe mu masoko atandukanye y'ubwenge. Bivugururwa buri minota 5." },
+    "standard_section_title": "Imari isanzwe",
+    "standard": {
+      "payout_summary": { "title": "Incamake y'ubwishyu buhabwa (payout)", "desc": "Brut, commission, na net kuri buri gacuruzwa. Ushobora guhitamo igihe." },
+      "payment_monitor": { "title": "Kugenzura ubwishyu", "desc": "Kukurikirana mu gihe nyacyo hamwe n'isesengura ry'uburyo bwo kwishyura." },
+      "transactions": { "title": "Transaksiyo", "desc": "Urutonde rwose rwa transaksiyo hamwe n'ayunguruzo n'ohereza hanze." }
+    }
+  },
+  "features_growth": {
+    "title_page": "Ibiranga by'Ukwagura — Imboni Serve",
+    "badge": "Ukwagura",
+    "h1": "Hindura rimwe. Ukure iteka.",
+    "subheading": "Imikorere ni intangiriro gusa. ImboniServe igufasha kubona no kubungabunga abakiriya.",
+    "meta_description": "Kubona no kubungabunga abakiriya ukoresheje Discovery, kwamamaza kuri WhatsApp, kubaka urubuga n'ibikoresho by'ibikubiyeno.",
+    "hero": { "title": "Kugaragara kuri Discovery", "desc": "Ugaragare ku bashakisha ubucuruzi bwo kwakira hafi yabo. Urubuga rwawe ku rutonde rwa rubanda hamwe n'amoko y'ibiribwa, ibiciro n'aho biherereye.", "cta": "Sura marketplace" },
+    "featured": {
+      "whatsapp_campaigns": { "title": "Kwamamaza kuri WhatsApp", "desc": "Ubutumwa bugenewe ibyiciro bya CRM — Champions, Abari mu kaga, Bashya — neza kuri WhatsApp. Ubutumwa bwihariye n'ikurikirana." },
+      "site_builder": { "title": "Kubaka urubuga (Site Builder)", "desc": "Himba urubuga rwawe ukoresheje AI. Uhitamo templates, umwimerere wa brand, no gushyira hanze mu klik imwe." },
+      "marketer_dashboard": { "title": "Ikibaho cya Marketer", "desc": "Sisitemu yo gusangira no kwamamaza n'umufuka, komisiyo, ubwishyu n'ibikaratasi bya QR. Kurikirana no guhemba abashyigikira." },
+      "content_management_cms": { "title": "Kuyobora ibikubiyemo (CMS)", "desc": "Ohereza inyandiko n'amashusho kuri Discovery. Kuyobora urugendo rwose rw'ibikubiyemo." },
+      "video_analytics": { "title": "Isesengura rya video", "desc": "Reba uko amashusho yakiriwe: views, igihe cyo kureba n'ubwitabire." }
+    }
+  },
+  "features_infrastructure": {
+    "title_page": "Ibiranga by'Ishingiro — Imboni Serve",
+    "badge": "Ishingiro",
+    "h1": "Byubakiye ku itsinda",
+    "subheading": "Urufatiro rutuma ibindi byose bishoboka.",
+    "meta_description": "Inshingano z'itsinda, ububiko, contacts, umutekano n'amenyesha — urufatiro rw'imikorere yawe.",
+    "also_included": "Birimo kandi",
+    "standard": {
+      "staff_management": { "title": "Gucunga abakozi", "desc": "CRUD yuzuye hamwe n'inshingano za sisitemu, inshingano zihariye, uburenganzira n'igenera amashami. Igenzura ryimbitse ry'uruhushya: waiter, cashier, supervisor, manager n'ibindi." },
+      "inventory_management": { "title": "Gucunga ububiko", "desc": "Kurikira ububiko hamwe na min/reorder, igiciro kuri buri gicuruzwa n'amatsinda. Inyandikomvugo yuzuye." },
+      "contacts": { "title": "Contacts", "desc": "Gucunga contacts mu buryo bumwe hamwe no guhuza n'imiryango. Kurikirana suppliers, abakiriya n'abafatanyabikorwa." }
+    },
+    "operational": {
+      "security_sessions": { "title": "Umutekano & Sessions", "desc": "Kukurikirana sessions zikora, MFA, ibyabaye mu mutekano no gukura sessions." },
+      "notifications_settings": { "title": "Igenamiterere ry'amenyesha", "desc": "Gahunda y'amaraporo ya buri munsi, alerts za WhatsApp na timezone." }
+    }
+  },
   "marketplace": {
   "browse_products": "Reba Ibicuruzwa",
   "ai_recommendations": "Inama za AI",
   "map_view": "Kurebera ku Ikarita",
-  "supplier_locations": "Aho Abatanga Ibikoresho Baherereye",
-  "nearest_suppliers": "Abatanga Ibikoresho Biri Hafi",
+  "supplier_locations": "Aho Abatanga Ibikorenerwa Baherereye",
+  "nearest_suppliers": "Abatanga Ibikorenerwa Biri Hafi",
   "featured_products": "Ibicuruzwa Byatoranyijwe",
   "verified": "Byemejwe",
   "products": "ibicuruzwa",
@@ -37,9 +84,9 @@
   "to": "kugeza kuri",
   "cart": "Agakangara",
   "checkout": "Kwishyura",
-  "order_confirmation": "Kwemeza Commande",
-  "order_history": "Amateka ya Commande",
-  "minimum_order": "Commande ntoya yemerewe",
+  "order_confirmation": "Kwemeza Komande",
+  "order_history": "Amateka ya Komande",
+  "minimum_order": "Komande ntoya yemerewe",
   "add_more_items": "Ongeraho {amount} RWF kugira ngo uge ku mubare ntarengwa",
   "clear_cart": "Siba Agakangara",
   "proceed_to_checkout": "Komeza Ujye Kwishyura",
@@ -51,20 +98,20 @@
   "payment_method": "Uburyo bwo Kwishyura",
   "mobile_money": "Mobile Money",
   "cash": "Amafaranga",
-  "place_order": "Ohereza Commande",
-  "orders_grouped_by_supplier": "Commande zitondekanyijwe ku batanga ibikoresho",
+  "place_order": "Ohereza Komande",
+  "orders_grouped_by_supplier": "Komande zitondekanyijwe ku batanga ibikorenerwa",
   "subtotal": "Igiteranyo",
   "delivery": "Gutwara",
   "calculated_at_checkout": "Bibarwa igihe cyo kwishyura",
   "store_title": "Murakaza neza ku Iguriro",
-  "store_subtitle": "Shakisha abatanga ibikoresho byiza n'ibicuruzwa byiza ku bucuruzi bwawe",
-  "supplier": "Umutangabicuruzwa"
+  "store_subtitle": "Shakisha abatanga ibikorenerwa byiza n'ibicuruzwa byiza ku bucuruzi bwawe",
+  "supplier": "Utanga ibikorenerwa"
 },
 
   "discovery": {
     "title": "Shakisha Ubucuruzi bwo hafi",
-    "subtitle": "Shakisha resitora, kafe, na bar nziza hafi yawe",
-    "searchPlaceholder": "Shakisha resitora, kafe, bar...",
+    "subtitle": "Shakisha resitora, kafeyi, na bar nziza hafi yawe",
+    "searchPlaceholder": "Shakisha resitora, kafeyi, bar...",
     "filters": "Shungura",
     "category": "Icyiciro",
     "location": "Ahantu",
@@ -120,16 +167,18 @@
       "title": "Hindura buri meza",
       "title_highlight": "Abe isoko y'inyungu yihuta",
       "subtitle": "Gabanya igihe cyo gutegereza, korera abakiriya benshi, kandi utunganya ibikorwa byawe—gutumiza ukoresheje QR (Impishabanga shusho), POS (sisitemu yo kwishyuriraho), n'amakuru ya AI kuri platforme imwe.",
-      "description": "Byakozwe kuri resitora, amahoteli, bar, na kafe.",
+      "description": "Byakozwe kuri resitora, amahoteli, bar, na kafeyi.",
       "rt_os": "Sisitemu ikorera mu gihe nyacyo: reba buri kugurisha, buri meza, n'ibikorwa by'abakiriya byose — kandi wongere inyungu ku buryo bwikora.",
       "cta_primary": "Tangira Igerageza ry'Iminsi 14 Kubuntu",
       "cta_secondary": "Reba Ibiciro",
+      "cta_talk_to_team": "Vugana n'Ikipe yacu",
       "cta_explore": "Reba Ubucuruzi Buri Hafi Yawe",
+      "aria_go_to_slide": "Jya kuri slide ya {{n}}",
       "slides": {
         "0": {
           "title": "Hindura buri meza",
           "highlight": "Abe isoko y'inyungu yihuta",
-          "subtitle": "Garagara. Bona Commande. Kura vuba.",
+          "subtitle": "Garagara. Bona Komande. Kura vuba.",
           "description": "Gabanya igihe cyo gutegereza, korera abakiriya benshi, kandi utunganye ibikorwa byawe — QR, POS, na AI byose muri platforme imwe."
         },
         "1": {
@@ -149,14 +198,45 @@
           "highlight": "Igenzura Ryuzuye",
           "subtitle": "POS, QR, Ububiko, Isesengura",
           "description": "Reka kujarajara muri sisitemu nyinshi. Kurikirana unamenye ibyatumwe, ububiko, abakozi, na raporo byose mu rubuga rumwe rusobanutse."
+        },
+        "os": {
+          "title": "Sisitemu ikorera",
+          "highlight": "ubucuruzi bwo kwakira abakiriya.",
+          "subtitle": "Cunga resitora, hoteli, bar cyangwa kafeyi ukoresheje platforme imwe y'ubwenge.",
+          "description": "Ibyo ukeneye byose — kuva ku itegeko n'ububiko kugera ku kwishyura n'isesengura — byose muri platforme imwe yubakiwe hospitality."
+        },
+        "replay": {
+          "title": "Service Replay™",
+          "highlight": "Reba ibyabaye koko",
+          "subtitle": "Subiramo igihe cyose cy'akazi",
+          "description": "Subiramo ibyabaye nk'umukino — buri komande, buri meza, buri poste n'itambukiranya. Menya ikibazo vuba, utoze itsinda, wirinde igihombo."
+        },
+        "qr": {
+          "title": "Gutumiza ukoresheje QR byihuse",
+          "highlight": "Nta Gutegereza",
+          "subtitle": "Abakiriya batumiza kuri telefoni zabo",
+          "description": "Sikana, reba menu, utume ako kanya. Nta porogaramu. Nta guhagarika abakozi. Ikinyuranyo ni imikorere."
+        },
+        "analytics": {
+          "title": "Isesengura ry'ubwenge",
+          "highlight": "Iterambere rishingiye ku makuru",
+          "subtitle": "Menya ubucuruzi bwawe neza",
+          "description": "Kurikirana igurisha, unoze ububiko, ufate ibyemezo byiza ukoresheje inama zishingiye ku makuru."
+        },
+        "platform": {
+          "title": "Platforme imwe ikubiyemo byose",
+          "highlight": "Igenzura Ryuzuye",
+          "subtitle": "POS, QR, Ububiko, Isesengura",
+          "description": "Genzura byose kuva ku byatumwe kugeza ku raporo ukoresheje dashboard imwe."
         }
       }
     },
     "features": {
       "title": "Platforme imwe. Imikorere yuzuye.",
-      "subtitle": "Genzura ubucuruzi bwawe bwo kwakira abakiriya uhereye kuri platforme imwe y'ubwenge — ama commande, ububiko, ubwishyu, isesengura, n’iterambere.",
+      "subtitle": "Genzura ubucuruzi bwawe bwo kwakira abakiriya uhereye kuri platforme imwe y'ubwenge — komande, ububiko, ubwishyu, isesengura, n’iterambere.",
+      "tagline": "Buhuye. Bwenge. Bwizuye.",
       "qr_ordering": "Gutumiza ukoresheje QR (Impishabanga shusho)",
-      "qr_ordering_desc": "Abakiriya barasikana, bakareba menu yawe, bagakora commande kuri telefoni zabo — nta app ikenewe.",
+      "qr_ordering_desc": "Abakiriya barasikana, bakareba menu yawe, bagakora komande kuri telefoni zabo — nta app ikenewe.",
       "inventory": "Ibikoresho n'Ubucuruzi",
       "inventory_desc": "Kurikirana ibiri mu bubiko, shyiraho aho wongera gutumiza, kandi ucunge ibicuruzwa byose ugura. Ubone raporo zuzuye z’ibikorwa byose byakozwe.",
       "reports": "Raporo n'Isesengura",
@@ -172,7 +252,7 @@
       "promotions": " Promos & Ibihe Byihariye",
       "promotions_desc": "Shyiraho igabanyirizwa rishingiye ku bihe n'utundi tuntu runaka, bitangira kandi bikarangira mu buryo bwikora.",
       "whatsapp": "Guhuza na WhatsApp",
-      "whatsapp_desc": "Akira amamenyesha y'itumiza (commande), incamake za buri munsi, n'amamenyesha y’uko ububiko bugiye gushira, byose kuri WhatsAp.",
+      "whatsapp_desc": "Akira amamenyesha ya komande, incamake za buri munsi, n'amamenyesha y’uko ububiko bugiye gushira, byose kuri WhatsApp.",
       "mobile_money": "Kwishyura kuri Mobile Money",
       "mobile_money_desc": "Emera kwishyura kuri mobile money — nta terminal yo kwishyura ikenewe.",
       "multi_branch": "Kugenzura Amashami Menshi",
@@ -252,11 +332,11 @@
       "step3_title": "Shyiraho Ameza na QR (Impishabanga shusho)",
       "step3_desc": "Shyiraho ameza yawe (Table 1, VIP Section, Terrace, n’ibindi) kandi ukore QR (Impishabanga shusho) zidasanzwe kuri buri meza — byose ubikoreye kuri dashboard yawe. Zicapishe uzishyire ku meza.",
       "step4_title": "Huza WhatsApp n'Ubwishyu",
-      "step4_desc": "Huza nimero yawe ya WhatsApp kugira ngo ubone ubutumwa bw'ibicuruzwa (commande) ako kanya na raporo za buri munsi. Emera uburyo bwo kwishyura uhitamo kugira ngo kwishyura byorohe.",
+      "step4_desc": "Huza nimero yawe ya WhatsApp kugira ngo ubone ubutumwa bwa komande ako kanya na raporo za buri munsi. Emera uburyo bwo kwishyura uhitamo kugira ngo kwishyura byorohe.",
       "step5_title": "Koresha Ububiko n'Ibiciro",
       "step5_desc": "Ongeraho ibicuruzwa byo mu bubiko, shyiraho aho wongera kubitumiza, kandi ukurikirane buri gikorwa cyo kugura. Bona iburira rya AI igihe ibiciro byiyongereye cyangwa ububiko bugiye gushira.",
       "step6_title": "Tangira kandi Ukure!",
-      "step6_desc": "Abakiriya basikana kode za QR bagakora commande, igikoni kigahita kibona imenyesha, kandi ubwishyu bugakorwa mu buryo bwikora. Kurikirana imibare y’ubucuruzi, tegura promo, kandi wagure ubucuruzi bwawe nta mpungenge.",
+      "step6_desc": "Abakiriya basikana kode za QR bagakora komande, igikoni kigahita kibona imenyesha, kandi ubwishyu bugakorwa mu buryo bwikora. Kurikirana imibare y’ubucuruzi, tegura promo, kandi wagure ubucuruzi bwawe nta mpungenge.",
       "cta_ready": "Witeguye gutangira?",
       "cta_subtitle": "Kora konti yawe — bifata iminota 2 gusa!",
       "cta_button": "Kora Konti"
@@ -268,17 +348,64 @@
       "description": "Reba uko Imboni Serve ihindura imikorere ya resitora"
     },
     "store": {
-      "badge": "Isoko ryo Kuguriramo Ibikoresho",
-      "title": "Gura ibikoresho ku bagurisha bizewe — ahantu hamwe",
+      "badge": "Isoko ryo Kuguriramo Ibikorenerwa",
+      "title": "Gura ibikorenerwa ku bagurisha bizewe — ahantu hamwe",
       "subtitle": "Shaka abagurisha bemejwe, ugereranya ibiciro, kandi utumize ku buryo butaziguye. Koresha ibyo utumije kandi umenye ibiciro byose.",
       "cta_browse": "Reba Isoko",
       "cta_explore": "Shakisha Isoko"
     },
     "stats": {
       "businesses": "Ubucuruzi bwakoresheje",
-      "orders": "Ibicuruzwa byakoreshejwe",
+      "orders": "Komande zakozwe",
       "trial": "Igerageza kubuntu, nta karita",
+      "trial_days": "Iminsi 14",
+      "no_card": "Nta karita",
+      "plans_count": "Gahunda 5",
       "features": "Ibyiza bihariye"
+    },
+    "why_switch": {
+      "badge": "Kuki uhindura?",
+      "title": "Nturi kubona gusa POS. Uhabwa Ubwenge.",
+      "subtitle": "Ubushobozi bukemura ibibazo abandi birengagiza.",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Subiramo igihe cy'akazi nk'umukino. Buri komande, buri poste, buri meza — uko byakurikiranye.",
+      "crm_title": "CRM y'Abakiriya (RFM)",
+      "crm_desc": "Tandukanya abakiriya: Abahize, Ab'indahemuka, n'Abari mu kaga.",
+      "ab_title": "Kugerageza A/B kwa Menu",
+      "ab_desc": "Gerageza ibiciro, amagambo n'amafoto. Hitamo ibihesha umusaruro ukoresheje amakuru."
+    },
+    "why_ai": {
+      "badge": "Kuki AI?",
+      "title": "AI si ijambo rigezweho gusa. Irimo gukora ubu kuri dashboard yawe.",
+      "subtitle": "AI ikora akazi nyako — atari ukwerekana gusa imibare.",
+      "menu_builder_title": "AI Menu Builder",
+      "menu_builder_desc": "Ohereza ifoto cyangwa PDF ya menu. AI isohora ibyo kurya, ibiciro n'ibisobanuro.",
+      "auto_reorder_title": "AI yo Gusubizamo Ububiko",
+      "auto_reorder_desc": "Isesengura ibisabwa, igihe cyo gutanga n'ububiko bw'umutekano igatanga inama zo gusubizamo.",
+      "insight_reports_title": "Raporo z'Ubwenge za AI",
+      "insight_reports_desc": "Raporo za buri cyumweru na buri kwezi zifite KPI, isesengura ryanditse n'iby'ingenzi byo gushyira imbere.",
+      "cost_anomaly_title": "Iburira ry'izamuka ry'ibiciro",
+      "cost_anomaly_desc": "Kumenya ku buryo bwikora izamuka ry'ibiciro by'abagurisha hakoreshejwe statistiki."
+    },
+    "why_trust": {
+      "badge": "Kuki waturema icyizere?",
+      "title": "Si POS isanzwe ifite amashusho meza. Ni ubwenge ku rwego rw'ibigo.",
+      "subtitle": "Byubakiwe abayobozi, atari abakira amategeko gusa.",
+      "cfo_title": "Dashboard ya CFO",
+      "cfo_desc": "Imiterere y'imari, ubwenge bw'inyungu, metrics z'ubusabe — hamwe n'inyandiko za AI n'isesengura ry'ihuzwa.",
+      "cfo_cta": "Reba Dashboard ya CFO",
+      "ceo_title": "Dashboard ya CEO",
+      "ceo_desc": "Imiterere y'ubucuruzi, inyungu, abakiriya, imikorere n'iby'ubukerarugendo — byegeranyijwe mu buryo bwikora.",
+      "ceo_cta": "Reba Dashboard ya CEO"
+    },
+    "why_now": {
+      "badge": "Kuki none?",
+      "title": "Buri munsi udafite ubwenge ni umunsi w'inyungu zitakaye.",
+      "stockouts": "Kubura ububiko bituma utakaza abakiriya. AI ibikumira mbere y'igihe.",
+      "pricing": "Uri gushyiraho ibiciro uhumye. Gerageza ibiciro ukoresheje amakuru y'ukuri.",
+      "churn": "Ntumenya ugiye kureka kugura. RFM irabigaragaza mu buryo bwikora.",
+      "supplier": "Abagurisha bazamura ibiciro bucece. Iburira ry'ibiciro ribifata kare.",
+      "replay": "Ntushobora kumenya neza ibyabaye ijoro ryashize. Service Replay™ isubiramo buri kintu."
     },
     "pricing": {
       "title": "Ibiciro Byoroshye kuri Rwanda",
@@ -290,7 +417,7 @@
       "billed_annually": "Kwishyurwa buri mwaka",
       "choose_plan": "Hitamo {{plan}}",
       "plan_essentials_name": "Iby'ingenzi",
-      "plan_essentials_desc": "Ni Nziza kuri kafe ntoya n'amastand y'ibiryo",
+      "plan_essentials_desc": "Ni Nziza kuri kafeyi ntoya n'amastand y'ibiryo",
       "plan_professional_name": "Umwuga",
       "plan_business_name": "Business",
       "plan_enterprise_name": "Ibiciro Byihariye",
@@ -310,7 +437,7 @@
       "feature_site_builder_preview_mode": "Kureba mbere kwa Site Builder",
       "feature_discovery_basic_listing": "Kugaragara ku rwego rw'ibanze",
       "feature_weekly_monthly_reports": "Raporo z'icyumweru n'ukwezi",
-      "feature_procurement_workflow": "Imikorere yo kugura ibikoresho",
+      "feature_procurement_workflow": "Imikorere yo kugura ibikorenerwa",
       "feature_priority_support": "Ubufasha bwihutirwa",
       "feature_everything_in_professional": "Byose biri mu Umwuga",
       "feature_200_ai_credits_month": "Amapointi 200 ya AI/kwezi",
@@ -343,7 +470,7 @@
       "sales_desc": "Reba amafaranga winjiza mu gihe nyacyo, kandi uhite ufata ibyemezo ako kanya.",
       "sales_cta": "Fungura Dashboard",
       "qr_title": "Imikorere ya QR ku Meza",
-      "qr_desc": "Menya ni iyihe meza cyangwa QR izana commande menshi n'inyungu nyinshi.",
+      "qr_desc": "Menya ni iyihe meza cyangwa QR izana komande nyinshi n'inyungu nyinshi.",
       "qr_cta": "Reba Imikorere ya QR",
       "tables_title": "Uko Ameza n’Ibice Bihagaze",
       "tables_desc": "Menya uko ameza ahagaze — ari gukoreshwa, ategereje, cyangwa adakoreshwa — mu gihe nyacyo.",
@@ -351,9 +478,9 @@
       "peak_title": "Amasaha Yuzuye & Imigendekere",
       "peak_desc": "Tegura abakozi ukurikije uko abakiriya bakugana mu masaha atandukanye y’umunsi.",
       "peak_cta": "Reba Amasaha Yuzuye",
-      "orders_title": "Ama commande yose -ku kibaho kimwe",
-      "orders_desc": "Kurikirana ama commande yo kurira aho uri, ayo gutwara, n’ayo kugeza mu ngo n’ahandi — byose ku kibaho kimwe (dashboard).",
-      "orders_cta": "Fungura Ama commande"
+      "orders_title": "Komande zose ku kibaho kimwe",
+      "orders_desc": "Kurikirana komande zo kuririraho aho uri, izo gutwara, n’izijya mu ngo — byose ku kibaho kimwe (dashboard).",
+      "orders_cta": "Fungura komande"
     },
     "growth": {
       "badge": "Moteri zo Gukura ku Buryo Bwikora",
@@ -374,14 +501,14 @@
       "alerts_desc": "Ntuzigere ubura ibicuruzwa. Akira iburira mbere y’uko bigera ku musozo.",
       "alerts_cta": "Shyiraho iburira",
       "resv_title": "Kwishyura mbere n’ibikorwa byo kubika ahantu",
-      "resv_desc": "Gabanya abadafata reservations ukoresheje kubitsa no kwemeza booking mu buryo bwikora."
+      "resv_desc": "Gabanya abadafata rezerivasiyo ukoresheje kubitsa no kwemeza rezerivasiyo mu buryo bwikora."
     }
   },
   "dashboard": {
     "title": "Ikibaho",
     "welcome": "Ikaze Nanone! Dore ibiri gukorwa uyu munsi.",
     "daily_sales": "Igurisha rya Buri Munsi",
-    "total_orders": "Ibicuruzwa Byose",
+    "total_orders": "Komande zose",
     "revenue": "Amafaranga Yinjiye",
     "inventory_alerts": "Iburira ry'Ibicuruzwa",
     "table_management": "Gucunga Ameza",
@@ -393,9 +520,9 @@
       "live_metrics": "Ibipimo (Metrics) biri kuba ubu",
       "connecting": "Biri kuza...",
       "live_revenue": "Amafaranga amaze kwinjira ubu",
-      "active_orders": "Commande zirimo gukorwa",
+      "active_orders": "Komande zirimo gukorwa",
       "customers_today": "Abakiriya b'uyu munsi",
-      "avg_order_value": "Impuzandengo y’Agaciro ka Commande"
+      "avg_order_value": "Impuzandengo y’agaciro ka komande"
       
     },
     "staff": {
@@ -538,7 +665,7 @@
       "benefit_mobile_ready": "Byiteguye kuri Telefoni",
       "benefit_mobile_desc": "Inyandikorugero zose zigaragara neza ku bikoresho byose",
       "choose_template": "Hitamo Inyandikorugero Yawe",
-      "choose_template_desc": "Shakisha inyandikorugero zakozwe n'abahanga zihuye na resitora, kafe, n'ubucuruzi bw'ibiryo",
+      "choose_template_desc": "Shakisha inyandikorugero zakozwe n'abahanga zihuye na resitora, kafeyi, n'ubucuruzi bw'ibiryo",
       "popular": "Ikunzwe",
       "selected": "Byatoranijwe",
       "use_template_cta": "Koresha Iyi Nyandikorugero",
@@ -589,7 +716,7 @@
       "note_text": "Domaine .tk na .ml ntizishyigikiwe. Nyuma yo gusaba, uzakira amabwiriza yo gushyiraho DNS.",
       "categories": {
         "restaurant": "Resitora",
-        "cafe": "Kafe",
+        "cafe": "Kafeyi",
         "bar": "Akabari",
         "hotel": "Hoteli",
         "specialty": "Ibyihariye"
@@ -713,7 +840,7 @@
       "inventoryAlerts": "Amatangazo y'ibicuruzwa",
       "crm": "Gucunga Abakiriya",
       "staffPerformance": "Imikorere y'abakozi",
-      "reservations": "Guteganya"
+      "reservations": "Rezerivasiyo"
     }
   },
   "auth": {
@@ -754,7 +881,59 @@
     "plan_professional": "Umwuga - RWF 25,000/ukwezi cyangwa 20,000 iyo wishyuye buri mwaka (⭐ Ikunzwe cyane)",
     "plan_business": "Ubucuruzi - RWF 62,500/ukwezi cyangwa 50,000 iyo wishyuye buri mwaka (🏢 Amashami menshi)",
     "plan_premium": "Premium - RWF 208,334/ukwezi cyangwa 166,667 iyo wishyuye buri mwaka (🏢 Ibintu byose)",
-    "plan_enterprise": "Ikigo - Ibiciro Byihariye"
+    "plan_enterprise": "Ikigo - Ibiciro Byihariye",
+    "verify_identity": "Hakomeza umwirondoro wawe",
+    "enter_6_digit_code": "Andika kode yuzuye y'ibara 6.",
+    "too_many_attempts": "Gerageza byinshi. Tegereza iminota mike, hanyuma usabe kode nshya.",
+    "code_expired": "Kode yawe yarenze igihe. Kanda \"Ohereza kode nshya\" munsi kugira ngo ubone iyindi.",
+    "invalid_or_expired_code": "Kode itemewe cyangwa yarenze igihe.",
+    "login_incomplete": "Kwinjira ntibyakunze. Kode ishobora kuba yarenze igihe — sabe iyindi.",
+    "verification_failed": "Kugenzura byanze. Ongera ugerageze.",
+    "too_many_resends": "Kwisaba ko kohereza kode byinshi. Tegereza iminota mike hanyuma ongera ugerageze.",
+    "could_not_resend": "Ntibyakunze kohereza kode.",
+    "could_not_resend_retry": "Ntibyakunze kohereza kode. Ongera ugerageze.",
+    "code_sent_to": "Kode y'ibara 6 yoherejwe kuri",
+    "via_whatsapp": "ukoresheje WhatsApp",
+    "email_and_whatsapp": "(imeri + WhatsApp)",
+    "verifying": "Hakenzura...",
+    "verify_and_signin": "Hakenzura kandi Winjire",
+    "sending": "Yohereza...",
+    "resend_code": "Wabayitakuye? Ohereza kode nshya",
+    "never_share_code": "🔒 Ntiwagabana na n'umwe iyi kode. Yarenze igihe mu minota 10.",
+    "back": "Subira inyuma",
+    "login_error": "Serivisi yo kwinjira ntiboneka. Ongera ugerageze.",
+    "powered_by": "Kuwufashijwe na ICTHubs",
+    "and_service_terms": ", na ",
+    "forgot_failed": "Byanze kohereza imeri yo kongera gushyiraho ijambo ry'ibanga",
+    "network_error": "Ikibazo cya murandasi. Ongera ugerageze.",
+    "check_email": "Reba Imeri Yawe",
+    "reset_link_sent": "Niba hari konti ifite",
+    "reset_link_will_arrive": "uzabona urubuga rwo kongera gushyiraho ijambo ry'ibanga ako kanya.",
+    "reset_link_expires": "Urubuga ruzarenza igihe mu isaha 1. Reba mu biyandikiwe by'ibyifashiswa nabi niba nturyaboneka.",
+    "back_to_login": "Subira ku kwinjira",
+    "forgot_password_title": "Wibagiwe Ijambo ry'IBanga?",
+    "forgot_password_desc": "Nta kibazo! Andika imeri yawe tukohereze urubuga rwo kongera gushyiraho.",
+    "send_reset_link": "Ohereze Urubuga rwo Kongera Gusubiraho",
+    "invalid_reset_link": "Urubuga rwo kongera gushyiraho si rwo. Sabe ko kongera gushyiraho ijambo ry'ibanga.",
+    "password_min_length": "Ijambo ry'ibanga rigomba kuba rifite inyuguti nibura 8",
+    "password_uppercase": "Ijambo ry'ibanga rigomba kuba rifite inyuguti nkuru nibura imwe",
+    "password_lowercase": "Ijambo ry'ibanga rigomba kuba rifite inyuguti nto nibura imwe",
+    "password_number": "Ijambo ry'ibanga rigomba kuba rifite umubare nibura umwe",
+    "passwords_no_match": "Amagambo y'ibanga ntaahura",
+    "fix_password_requirements": "Reba neza ibisabwa by'ijambo ry'ibanga",
+    "reset_failed": "Byanze kongera gushyiraho ijambo ry'ibanga",
+    "reset_success_title": "Ijambo ry'IBanga Ryongerewe Gusubiraho Neza!",
+    "reset_success_desc": "Ijambo ryawe ry'ibanga ryahinduwe. Iminikino yose ikora yafunguwe kubera umutekano.",
+    "redirecting_to_login": "Kohereza ku paji yo kwinjira...",
+    "go_to_login": "Jya ku kwinjira",
+    "reset_password_title": "Kongera Ushyireho Ijambo ry'IBanga",
+    "enter_new_password_for": "Andika ijambo ry'ibanga rishya rya",
+    "new_password": "Ijambo ry'IBanga Rishya",
+    "enter_new_password": "Andika ijambo ry'ibanga rishya",
+    "confirm_password": "Emeza Ijambo ry'IBanga",
+    "confirm_new_password": "Emeza ijambo ry'ibanga rishya",
+    "resetting_password": "Kongera gushyiraho ijambo ry'ibanga...",
+    "reset_password": "Kongera Ushyireho Ijambo ry'IBanga"
   },
   "navigation": {
     "home": "Ahabanza",
@@ -773,7 +952,13 @@
     "network": "Ikibazo cya murandasi. Reba umuyoboro wawe.",
     "unauthorized": "Ntabwo ufite uburenganzira bwo gukora ibi.",
     "not_found": "Ibyo usaba ntibyabonetse.",
-    "validation": "Reba neza ibyo wanditse hanyuma ugerageze."
+    "validation": "Reba neza ibyo wanditse hanyuma ugerageze.",
+    "server_error": "Ikibazo cya Seriviri",
+    "server_error_desc": "Habayeho ikibazo ku rubuga rwacu. Ongera ugerageze nyuma y'akanya gato.",
+    "go_home": "Subira ku Ntangiriro",
+    "server_error_code": "Habayeho ikibazo ku seriviri",
+    "client_error": "Habayeho ikibazo ku mukoresha",
+    "go_home_link": "Subira ahabanza"
   },
   "qr": {
     "title": "Impishabanga shusho (Kode QR)",
@@ -845,7 +1030,7 @@
     "new_sale": "Igurisha Rishya",
     "todays_sales": "Igurisha rya Uyu Munsi",
     "total_orders": "Ibicuruzwa Byose",
-    "average_order": "Igicuruzwa Gisanzwe",
+    "average_order": "Impuzandengo y’agaciro ka komande",
     "cash_sales": "Igurisha mu Mafaranga",
     "from_yesterday": "kuva ejo",
     "today": "Uyu munsi",
@@ -873,7 +1058,7 @@
     "item": "Ikintu",
     "urgent": "BYIHUTIRWA",
     "action": "Igikorwa",
-    "no_orders": "Nta Commande",
+    "no_orders": "Nta Komande",
     "pending": "Bitegereje",
     "accepted": "Byemewe",
     "preparing": "Bitegurwa",
@@ -912,8 +1097,8 @@
     "unlock_message": "Isesengura Ricukumbuye rifungurwa ari uko ugejeje abakiriya 10 bakoresha serivisi",
     "basic_reports": "Raporo z'ibanze zirahari mu cyiciro cya Raporo",
     "total_revenue": "Amafaranga Yose Yinjiye",
-    "total_orders": "Ibicuruzwa Byose",
-    "avg_order_value": "Agaciro k'Igicuruzwa Gisanzwe",
+    "total_orders": "Komande zose",
+    "avg_order_value": "Impuzandengo y’agaciro ka komande",
     "customers": "Abakiriya",
     "returning": "bagaruka",
     "day_period": "igihe cy'iminsi",
@@ -968,17 +1153,23 @@
       "marketplace": "Isoko",
       "find_suppliers": "Shakisha abatanga serivisi n'abafatanyabikorwa",
       "store": "Isoko",
-      "procurement_market": "Isoko ryo kuguriraho ibikoresho",
+      "procurement_market": "Isoko ryo kuguriraho ibikorenerwa",
       "list_business": "Shyira ubucuruzi bwawe ku rubuga-guriro",
       "get_discovered": "Ugaragare ku bakiriya",
       "referral": "Porogaramu yo gutumira abandi",
       "share_earn": "Sangiza uhembwe",
+      "share_earn_short": "Sangiza uhembwe",
       "discover": "Shakisha",
-      "contact": "Tuvugishe"
+      "contact": "Tuvugishe",
+      "close_menu": "Funga ibikubiyemo",
+      "open_menu": "Fungura ibikubiyemo"
     },
     "cta": {
       "sign_in": "Injira",
-      "start_trial": "Tangira igerageza ry'ubuntu"
+      "start_trial": "Tangira igerageza ry'ubuntu",
+      "installed": "Byashyizweho",
+      "install": "Shyiraho Porogaramu",
+      "trial": "Igerageza"
     },
     "footer": {
       "tagline": "Byagenewe ubucuzi rwo kwakira abantu (Hospitality).",
@@ -988,10 +1179,119 @@
       "privacy": "Politiki y'Ibanga",
       "cookies": "Politiki ya Cookies",
       "service_terms": "Amabwiriza ya Serivisi",
-      "cookie_prefs": "Iby'Imikoreshereze ya Cookies"
+      "cookie_prefs": "Iby'Imikoreshereze ya Cookies",
+      "powered_by": "Kuwufashijwe na ICTHubs",
+      "share_text": "Menya ImboniServe – Ifunguro Ryiza ku Bucuruzi bwo Kwakira Abakiriya mu Rwanda"
+    },
+    "errors": {
+      "404": {
+        "title": "Paji ntiyabonetse",
+        "description": "Paji ushakisha ntibaho cyangwa yaba yarimuwe.",
+        "cta_home": "Subira ku rubuga rw'itangiriro"
+      }
+    }
+  },
+  "features_page": {
+    "title_page": "Ibiranga — Imboni Serve",
+    "meta_description": "Reba ibiranga bya ImboniServe byose — imikorere, AI, isesengura, imari, ukwagura n'ishingiro mu rubuga rumwe rw'ubucuruzi bwo kwakira abakiriya.",
+    "title": "Ibyo ukeneye byose kugira ngo ucunge ubucuruzi bwo kwakira abakiriya",
+    "subtitle": "Ibiranga 38 byemejwe, biteguye gukoreshwa. Biteguye ukoresheje iby'ibyara umusaruro — si iby'imbere by'ikoranabuhanga.",
+    "explore": "Reba byinshi",
+    "back": "Ibiranga byose",
+    "ready_title": "Witeguye kubireba bikora?",
+    "ready_desc": "Tangira igerageza ry'iminsi 14 ku buntu. Nta karita y'inguzanyo ikenewe.",
+    "cta": "Tangira igerageza ry'ubuntu",
+    "categories": {
+      "operations": { "title": "Imikorere", "desc": "Uhereye ku itegeko kugeza ku gutanga, buri cyiciro kiragaragara kandi gigenzurwa." },
+      "ai": { "title": "AI", "desc": "AI igufasha mu kazi — si ukwerekana imibare gusa." },
+      "analytics": { "title": "Isesengura", "desc": "Ibyo ushobora gushyira mu bikorwa — si ukubitangira amaso gusa." },
+      "finance": { "title": "Imari", "desc": "Buri franga rikurikiranwa — kuva kuri Mobile Money kugeza ku makuru ya CFO." },
+      "growth": { "title": "Ukwagura", "desc": "Hindura rimwe. Ukure neza iteka." },
+      "infrastructure": { "title": "Ishingiro", "desc": "Urufatiro rutuma ibindi byose bishoboka." }
+    }
+  },
+  "features_ai": {
+    "title_page": "Ibiranga by'AI — Imboni Serve",
+    "badge": "AI",
+    "h1": "AI igukorera mu gihe ukora",
+    "subheading": "AI si ibintu by'inyongera. Ni urufatiro. Buri bushobozi bwa AI bukora akazi nyakuri — si ukwerekana gusa.",
+    "meta_description": "Kubaka menu ukoresheje AI, kongera gutumiza, raporo, iburira ry'ibiciro, A/B testing n'ikigo cyo kunoza — AI ikora akazi nyakuri.",
+    "hero": { "title": "Kubaka Menu ukoresheje AI", "desc": "Shyiraho ifoto cyangwa PDF ya menu yawe. AI ihita ikuramo ibicuruzwa, ibiciro n'ibisobanuro. Nta kwandika intoki — amasaha abaye iminota." },
+    "capabilities": {
+      "auto_reorder_ai": { "title": "AI yo kongera gutumiza", "desc": "Isesengura ry'ibyifuzo, igihe cyo gutanga n'ububiko bw'umutekano — ritanga ibyifuzo bifite amanota y'ikizere. Kwemeza rimwe gusa." },
+      "ai_insight_reports": { "title": "Raporo za AI", "desc": "Raporo za buri cyumweru n'ukwezi, zerekana KPI, ibisobanuro, n'inama z'ib priority. Umusesenguzi wawe wa AI." },
+      "cost_anomaly_alerts": { "title": "Iburira ry'izamu ry'ibiciro", "desc": "Gufata kare izamuka ry'ibiciro bya suppliers ukoresheje z-score n'ubukana. Rinda inyungu yawe." },
+      "a_b_testing_for_menus": { "title": "A/B Testing kuri menu", "desc": "Gerageza ibiciro, amagambo n'amashusho. Tangira ugabanye traffic. Pima. Hitamo gishingiye ku makuru." },
+      "optimization_hub": { "title": "Ikigo cyo kunoza (Optimization Hub)", "desc": "Inama za AI zituruka kuri Business Scanner, AI Insights na Autopilot — zifite ikigereranyo cy'ingaruka." }
+    },
+    "analytics_section_title": "Isesengura rishingiye kuri AI",
+    "analytics": {
+      "menu_performance_analytics": { "title": "Isesengura rya performance ya menu", "desc": "Amafaranga yinjira, umubare n'imigendekere kuri buri kintu." },
+      "peak_hours_analytics": { "title": "Amasaha akomeye", "desc": "Imigendekere y'amasaha n'iminsi. Teganya abakozi ukoresheje amakuru." },
+      "instruction_insights": { "title": "Amabwiriza y'abakiriya", "desc": "Imyitwarire y'amabwiriza ku byatumijwe — menya ibyo abakiriya bakunda." }
+    }
+  },
+  "features_analytics": {
+    "title_page": "Ibiranga by'Isesengura — Imboni Serve",
+    "badge": "Isesengura",
+    "h1": "Menya ubucuruzi bwawe kugeza ku mizi",
+    "subheading": "Amakuru ushobora gushyira mu bikorwa, atari uguhora uyitegereza.",
+    "meta_description": "Isesengura ry'ubucuruzi, menu n'inyungu rishingiye kuri AI, hamwe na dashboards zihuta n'kugenzura bikora ku giti cyazo.",
+    "hero": {
+      "cfo_dashboard": { "title": "CFO Dashboard", "desc": "Imiterere y'imari, ubwenge ku nyungu, na subscription metrics — hamwe n'inkuru za AI. Bigashyingurwa ku muvuduko uri munsi ya 1s." },
+      "ceo_dashboard": { "title": "CEO Dashboard", "desc": "Imiterere y'ubucuruzi, inyungu, abakiriya, imikorere — byakusanyijwe mu masoko menshi y'ubwenge. Bihora bivugururwa buri minota 5." }
+    },
+    "featured": {
+      "crm_with_rfm_segmentation": { "title": "CRM na RFM", "desc": "Gutura mu byiciro by'abakiriya: Champions, Inyangamugayo, Abari mu kaga, Babuze, Bashya, B'ahazaza. VLV, ubwinshi, amafaranga." },
+      "qr_analytics": { "title": "Isesengura rya QR", "desc": "Kugereranya scans→revenu. Menya QR zikora neza kurusha izindi." },
+      "menu_performance_analytics": { "title": "Performance ya menu", "desc": "Amafaranga n'umubare kuri buri kintu. Menya ibyitwara neza n'ibitagenda." },
+      "peak_hours_analytics": { "title": "Amasaha akomeye", "desc": "Imigendekere y'amasaha n'iminsi. Tegura abakozi." },
+      "instruction_insights": { "title": "Amabwiriza y'abakiriya", "desc": "Imyitwarire y'amabwiriza — menya ibyo abakiriya bifuza." },
+      "video_analytics": { "title": "Isesengura rya video", "desc": "Imikorere ya video: views, igihe cyo kureba, n'ubwitabire." }
+    },
+    "standard_section_title": "Isesengura risanzwe",
+    "standard": {
+      "payment_monitor": { "title": "Kugenzura ubwishyu", "desc": "Gukurikirana ubwishyu mu gihe nyacyo, n'isesengura ry'imikorere y'uburyo bwo kwishyura." },
+      "transactions": { "title": "Transaksiyo", "desc": "Urutonde rwose rwa transaksiyo, n'ubushobozi bwo kuyungurura no kohereza hanze." }
+    }
+  },
+  "features_operations": {
+    "title_page": "Ibiranga ku Mikorere — Imboni Serve",
+    "badge": "Imikorere",
+    "h1": "Tunganya neza aho wakirira abakiriya",
+    "subheading": "Uhereye ku itegeko kugeza ku gutanga serivisi, buri ntambwe iragaragara kandi igenzurwa.",
+    "meta_description": "Tunganya aho wakirira abakiriya ukoresheje QR Code, Service Replay™, Smart Dining Slips™, Kitchen Display, rezerivasiyo n'ibindi.",
+    "hero": {
+      "title": "Gukorera ku QR Code",
+      "desc": "Abakiriya basoma QR, bareba menu kandi bagatanga ibyo bakeneye bahereye kuri telefone zabo — nta porogaramu yihariye ibasabye. Itsinda rimwe, kugenzura uko winjira (OTP), inama zo kongeramo ibicuruzwa, amahitamo y'indyo, kwicara ahantu, no guhamagara umukozi.",
+      "cta": "Gerageza gutumiza ukoresheje QR"
+    },
+    "featured": {
+      "service_replay": {
+        "title": "Service Replay™",
+        "desc": "Sibomora (replay) igihe cyose cy'akazi, igikorwa ku kindi — nk'umukino. Buri komande, buri poste, buri meza. Kugenzura gusubiramo, umuvuduko uhinduka n'ayungurura ku meza, poste, umukozi cyangwa ubwoko bw'igikorwa."
+      },
+      "smart_dining_slips": {
+        "title": "Smart Dining Slips™",
+        "desc": "Inyemezabwishyu za dijitali zikorerwa ako kanya, zifite aho gusangirwa (shareable links) ku bw'ubunararibonye bwiza bw'umukiriya. Nta mpapuro, kinyamwuga kandi byorohereza gukurikirana."
+      },
+      "qr_analytics": {
+        "title": "Isesengura rya QR",
+        "desc": "Kurikira uko QR zisomwe, ubwinshi bwo guhinduka mu kugura n'amafaranga binjijwe kuri buri QR. Menya ameza na QR bitanga amabyo menshi n'amafaranga menshi."
+      }
+    },
+    "standard_section_title": "Imikorere isanzwe",
+    "standard": {
+      "kds": { "title": "Kitchen Display System (KDS)", "desc": "Kwerekana amabwiriza y'akazi mu gihe nyacyo hamwe n'ubukana n'imiterere y'ubwishyu." },
+      "waiter_dashboard": { "title": "Ikibaho cy'Abakozi batanga serivisi", "desc": "Ururonde rwa 5 rw'ibikorwa: gutegereza → gutegura → byiteguye → byakusanyijwe → byatanzwe." },
+      "reservations": { "title": "Rezerivasiyo", "desc": "Gucunga ibikorwa byo kubitsa imyanya (rezerivasiyo) hamwe no gukurikirana amafaranga y'ubwizigame n'imimerere." },
+      "close_day": { "title": "Gufunga Umunsi (Z-Report)", "desc": "Kuhuza no kugereranya ibyinjira bya buri munsi hakurikijwe uburyo bwo kwishyura n'aho byaturutse." },
+      "promotions": { "title": "Promotions", "desc": "Igabanyirizwa ku ijana, amafaranga akurwa, na happy hour biteganyijwe hakoreshejwe amasaha." },
+      "qr_builder": { "title": "QR Builder", "desc": "Himba QR z'ikigo cyawe hamwe n'ilogo, imiterere yiteguye (templates), na URLs ngufi." }
     }
   },
   "home": {
+    "title_page": "Imboni Serve — Sisiteme y'Imikorere y'Ubucuruzi bwo Kwakira Abakiriya",
     "launch_badge": "🎉 Igabanyirizwa ryihariye  -Kugabanyirizwa 50% kuri gahunda zose!",
     "hero": {
       "title1": "Hindura buri meza",
@@ -1008,7 +1308,7 @@
   "pricing": {
     "title_page": "Ibiciro — Imboni Serve",
     "heading": "Ibiciro Byoroshye ku Bucuruzi Bwose Bwo Kwakira Abantu",
-    "subheading": "Hitamo gahunda nziza kuri resitora yawe, hoteri, bar, cyangwa kafe. Gahunda zose zirimo guhuza WhatsApp no kwakira amafaranga ya telefoni.",
+    "subheading": "Hitamo gahunda nziza kuri resitora yawe, hoteri, bar, cyangwa kafeyi. Gahunda zose zirimo guhuza WhatsApp no kwakira amafaranga ya telefoni.",
     "tagline": "Bihujwe. By'ubwenge. Byizewe.",
     "launch_badge": "🎉 Igabanyirizwa rya 50% rya Launch ku Gahunda Zose!",
     "monthly": "Buri kwezi",
@@ -1029,10 +1329,10 @@
     "custom_pricing": "Ibiciro Byihariye",
     "plan_starter": "Iby'ingenzi",
     "plan_starter_name": "Iby'ingenzi",
-    "plan_starter_desc": "Ni Nziza kuri kafe ntoya n'amastand y'ibiryo",
+    "plan_starter_desc": "Ni Nziza kuri kafeyi ntoya n'amastand y'ibiryo",
     "plan_professional": "Umwuga",
     "plan_professional_name": "Umwuga",
-    "plan_professional_desc": "Kuri resitora na kafé zimaze gutera imbere",
+    "plan_professional_desc": "Kuri resitora na kafeyi zimaze gutera imbere",
     "plan_business": "Business",
     "plan_business_name": "Business",
     "plan_business_desc": "Kuri hotels, imiyoboro ya resitora (chains), n'ubucuruzi bufite abakiriya benshi",
@@ -1043,12 +1343,12 @@
     "plan_enterprise_name": "Ibiciro Byihariye",
     "plan_enterprise_desc": "Ibirimo byose byo muri Premium, hamwe n'ibidakorwa n'abandi",
     "plan_essentials_name": "Iby'ingenzi",
-    "plan_essentials_desc": "Ni Nziza kuri kafe ntoya n'amastand y'ibiryo",
+    "plan_essentials_desc": "Ni Nziza kuri kafeyi ntoya n'amastand y'ibiryo",
     "feature_unlimited_users": "Abakoresha batagira umupaka",
-    "feature_orders_tables_management": "Gucunga ama commande n'ameza",
+    "feature_orders_tables_management": "Gucunga komande n'ameza",
     "feature_kitchen_tickets": "Amatike y'igikoni (Kitchen tickets)",
     "feature_basic_inventory_tracking": "Gukurikirana ububiko (ibanze)",
-    "feature_basic_supplier_orders": "Gutumiza ku batanga ibikoresho (ibanze)",
+    "feature_basic_supplier_orders": "Gutumiza ku batanga ibikorenerwa (ibanze)",
     "feature_mobile_money_payments": "Kwishyura hakoreshejwe Mobile Money",
     "feature_daily_weekly_reports": "Raporo za buri munsi n'iz'icyumweru",
     "feature_basic_crm": "CRM y'ibanze",
@@ -1058,8 +1358,8 @@
     "feature_20_ai_credits_month": "AI kiredi 20 / ukwezi",
     "feature_1_branch_1_outlet": "Ishami 1, outlet 1",
     "feature_everything_in_essentials": "Ibirimo byose byo mu cyiciro cy'Iby'ingenzi",
-    "feature_procurement_workflow": "Gahunda yo gutumiza ibikoresho",
-    "feature_reservations": "Gucunga reservations",
+    "feature_procurement_workflow": "Gahunda yo gutumiza ibikorenerwa",
+    "feature_reservations": "Gucunga rezerivasiyo",
     "feature_staff_management": "Gucunga abakozi",
     "feature_role_based_access": "Uburenganzira bushingiye ku nshingano",
     "feature_inventory_alerts_basic": "Iburira ry'ububiko (ibanze)",
@@ -1073,8 +1373,8 @@
     "feature_multiple_outlets": "Aho ukorera henshi (multiple outlets)",
     "feature_everything_in_professional": "Ibirimo byose byo mu cyiciro cy'Umwuga",
     "feature_multi_branch_up_to_3": "Amashami menshi (kugeza kuri 3)",
-    "feature_kitchen_display_system": "Sisitemu yo kwerekana ama commande mu gikoni (Kitchen Display System)",
-    "feature_supplier_portal_with_delivery_confirmation": "Urubuga rw'abatanga ibikoresho rufite icyemezo cyo kwakira ibicuruzwa",
+    "feature_kitchen_display_system": "Sisitemu yo kwerekana komande mu gikoni (Kitchen Display System)",
+    "feature_supplier_portal_with_delivery_confirmation": "Urubuga rw'abatanga ibikorenerwa rufite icyemezo cyo kwakira ibicuruzwa",
     "feature_whatsapp_campaigns_pro_segments": "Kwamamaza kuri WhatsApp (Pro, ibice by'abakiriya)",
     "feature_campaign_scheduling_templates": "Gahunda yo gutegura n'inyandikorugero z'ubukangurambaga",
     "feature_a_b_testing_lite_1_concurrent": "Kugerageza A/B (Lite, kimwe icyarimwe)",
@@ -1128,7 +1428,20 @@
     "feature_unlimited_cms_posts": "Inyandiko za CMS zidafite umupaka",
     "feature_20_gb_storage": "Ububiko bwa 20 GB",
     "feature_multi_branch_support": "Gukoresha amashami menshi",
-    "feature_profit_leak_detection": "Gutahura aho inyungu zirigitira"
+    "feature_profit_leak_detection": "Gutahura aho inyungu zirigitira",
+    "feature_qr_code_ordering": "Gukorera ku QR Code",
+    "feature_smart_dining_slips": "Smart Dining Slips™",
+    "feature_ai_menu_builder": "Kubaka Menu ukoresheje AI",
+    "feature_auto_reorder_ai": "AI yo kongera gutumiza",
+    "feature_a_b_testing": "A/B Testing",
+    "feature_crm_with_rfm": "CRM na RFM",
+    "feature_payout_summary": "Incamake y'ubwishyu buhabwa (payout)",
+    "feature_payment_monitor": "Kugenzura ubwishyu",
+    "feature_transactions": "Transaksiyo",
+    "feature_discovery_listing": "Kugaragara kuri Discovery",
+    "feature_site_builder": "Kubaka urubuga (Site Builder)",
+    "feature_inventory": "Ububiko",
+    "feature_contacts": "Contacts"
   },
   "faq": {
     "title_page": "Ibibazo — Imboni Serve",
@@ -1640,10 +1953,10 @@
     "cancel": "Hagarika"
   },
   "unified_orders": {
-    "title": "Ama Commande Ahuriweho",
-    "subtitle": "Ama commande yose ava kuri QR, WhatsApp, na POS ahantu hamwe",
+    "title": "Komande Ahuriweho",
+    "subtitle": "Komande zose ziva kuri QR, WhatsApp, na POS ahantu hamwe",
     "refresh": "Vugurura",
-    "total_orders": "Ama Commande Yose",
+    "total_orders": "Komande zose",
     "pending": "Bitegereje",
     "preparing": "Bitegurwa",
     "ready": "Biteguye",
@@ -1654,13 +1967,13 @@
     "qr": "QR",
     "whatsapp": "WHATSAPP",
     "pos": "POS",
-    "no_orders_found": "Nta ma commande yabonetse",
+    "no_orders_found": "Nta komande zabonetse",
     "table": "Imeza",
     "takeaway": "Kujyana",
     "staff": "Abakozi",
     "items": "Ibintu",
     "instructions": "Amabwiriza",
-    "order": "Commande",
+    "order": "Komande",
     "start_preparing": "Tangira Gutegura",
     "mark_ready": "Shyira nk'Ibiteguye",
     "complete": "Rangiza"
@@ -1674,11 +1987,11 @@
     "total_scans": "Scans Zose",
     "conversion_rate": "Igipimo cyo Guhindura",
     "total_revenue": "Amafaranga Yose",
-    "avg_order_value": "Agaciro ka Commande Gisanzwe",
+    "avg_order_value": "Agaciro ka Komande Gisanzwe",
     "top_performing_qrs": "QR Codes Zikora Neza",
     "table": "Imeza",
     "scans": "Scans",
-    "orders": "Ama Commande",
+    "orders": "Ama Komande",
     "conversion": "Guhindura",
     "revenue": "Amafaranga",
     "peak_scanning_hours": "Amasaha yo Gusikana Cyane",
@@ -1713,11 +2026,11 @@
     "last_90_days": "Iminsi 90 Ishize",
     "peak_hour": "Isaha Nyinshi",
     "peak_day": "Umunsi Nyinshi",
-    "total_orders": "Ama Commande Yose",
+    "total_orders": "Ama Komande Yose",
     "total_revenue": "Amafaranga Yose",
-    "hourly_order_volume": "Umubare w'Ama Commande ku Isaha",
+    "hourly_order_volume": "Umubare w'Ama Komande ku Isaha",
     "daily_breakdown": "Ibisobanuro bya Buri Munsi",
-    "orders": "ama commande",
+    "orders": "ama komande",
     "staffing_recommendations": "💡 Inama zagenewe",
     "recommendation_schedule_more": "Shyira abakozi benshi mu isaha nyinshi: {hour}:00 - {nextHour}:00",
     "recommendation_busiest_day": "{day} ni umunsi uriho cyane - emeza ko itsinda ryose rihari",
@@ -1735,15 +2048,15 @@
     "title": "Ubumenyi ku Mabwiriza",
     "subtitle": "Kurikirana amabwiriza yihariye n'ibyo abakiriya bakunda",
     "days": "Iminsi",
-    "total_orders": "Ama Commande Yose",
-    "orders_with_instructions": "Ama Commande Afite Amabwiriza",
+    "total_orders": "Ama Komande Yose",
+    "orders_with_instructions": "Ama Komande Afite Amabwiriza",
     "instruction_rate": "Igipimo cy'Amabwiriza",
     "top_instruction_tags": "Tags z'Amabwiriza Zikoreshwa Cyane",
     "no_instruction_tags": "Nta tags z'amabwiriza zihari",
     "items_with_most_instructions": "Ibintu Bifite Amabwiriza Menshi",
     "instructions_by_category": "Amabwiriza Yishingiye ku Byiciro",
     "no_data": "Nta makuru ariho",
-    "instructions_by_source": "Amabwiriza Yishingiye ku Nkomoko y'Ama Commande"
+    "instructions_by_source": "Amabwiriza Yishingiye ku Nkomoko y'Ama Komande"
   },
   "payment_analytics": {
     "title": "Isesengura ry'Ubwishyu",
@@ -1752,13 +2065,13 @@
     "last_30_days": "Iminsi 30 ishize",
     "last_90_days": "Iminsi 90 ishize",
     "export_csv": "Kohereza CSV",
-    "total_orders": "Ama Commande Yose",
+    "total_orders": "Ama Komande Yose",
     "total_revenue": "Amafaranga Yose",
-    "avg_order_value": "Agaciro ka Commande Gisanzwe",
+    "avg_order_value": "Agaciro ka Komande Gisanzwe",
     "fee_savings": "Amafaranga Yabitswe",
     "saved": "yabitswe",
     "payment_method_breakdown": "Ibisobanuro by'Uburyo bwo Kwishyura",
-    "orders": "ama commande",
+    "orders": "ama komande",
     "of_total": "by'amafaranga yose",
     "success_rate": "igipimo cyo gutsinda",
     "success_rates": "Ibipimo byo Gutsinda",
@@ -1799,7 +2112,7 @@
     "top_issues": "Ibibazo Bikomeye",
     "all": "Byose",
     "method": "Uburyo",
-    "order": "Commande",
+    "order": "Komande",
     "rating": "Amanota",
     "stars": "Inyenyeri",
     "issues": "Ibibazo",
@@ -1830,7 +2143,7 @@
     "type_table_desc": "QR y'imeza runaka",
     "type_branch_desc": "QR y'ishami ryose",
     "type_preorder_desc": "QR yo gutumiza mbere",
-    "type_pickup_desc": "QR y'ama commande yo kujyana",
+    "type_pickup_desc": "QR y'ama komande yo kujyana",
     "select_table": "Hitamo Imeza",
     "no_tables_found": "Nta meza yabonetse. Kora ameza mbere.",
     "message_placeholder": "Ubutumwa bugufi",
@@ -2020,7 +2333,7 @@
     "benefit_mobile_ready": "Byiteguye kuri Telefoni",
     "benefit_mobile_desc": "Inyandikorugero zose zigaragara neza ku bikoresho byose",
     "choose_template": "Hitamo Inyandikorugero Yawe",
-    "choose_template_desc": "Shakisha inyandikorugero zakozwe n'abahanga zihuye na resitora, kafe, n'ubucuruzi bw'ibiryo",
+    "choose_template_desc": "Shakisha inyandikorugero zakozwe n'abahanga zihuye na resitora, kafeyi, n'ubucuruzi bw'ibiryo",
     "popular": "Ikunzwe",
     "selected": "Byatoranijwe",
     "use_template_cta": "Koresha Iyi Nyandikorugero",
@@ -2087,5 +2400,75 @@
     "request_domain": "Saba Guhuza Domaine",
     "note": "Icyitonderwa:",
     "note_text": "Domaine .tk na .ml ntizishyigikiwe. Nyuma yo gusaba, uzakira amabwiriza yo gushyiraho DNS."
+  },
+  "refer": {
+    "title_page": "Porogaramu yo Gutumira Abandi — Imboni Serve",
+    "meta_description": "Sangiza urubuga rwo gutumira abandi n'inshuti zawe. Baba batanze ibyo bakeneye, mubiri mwe mwese mufata 1,000 RWF. Nta bipimo, nta makuru y'ubwishyu buri gihe.",
+    "h1": "Sangiza Uhembwe 1,000 RWF ku Munsi",
+    "subtitle": "Sangiza urubuga rwo gutumira abandi n'inshuti zawe. Baba batanze ibyo bakeneye, mubiri mwe mwese mufata 1,000 RWF. Nta bipimo, nta makuru y'ubwishyu buri gihe — ni impembo ako kanya!",
+    "how_it_works_title": "Ubyo Bikora Ute — Byoroshye kandi Byihuta",
+    "steps": {
+      "1_title": "Fata Kode Yawe",
+      "1_desc": "Andika telefone yawe kugira ngo ukure kode yihariye yo gutumira abandi",
+      "2_title": "Batumize",
+      "2_desc": "Inshuti ikanda urubuga rwawe itange ibyo bakeneye",
+      "3_title": "Ibyo Batumije Byemejwe",
+      "3_desc": "Agaciro gato ka komande ni 5,000 RWF",
+      "4_title": "Mwese Muhembwa",
+      "4_desc": "1,000 RWF ku mwe — ako kanya!"
+    },
+    "requirements_title": "Ibisabwa Byoroshye",
+    "requirements_desc": "Inshuti yawe igomba kurangiza komande yayo ya mbere (nka make 5,000 RWF). Ni ibyo gusa! Nta nzira ngorwaro yo kumenyekanisha.",
+    "phone_label": "Telefone Yawe *",
+    "name_label": "Izina Ryawe (Si ngombwa)",
+    "error_phone_required": "Telefoni irakenewe",
+    "error_generate_failed": "Byanze gukora kode yo gutumira abandi",
+    "generating": "Birakorwa...",
+    "get_code_btn": "Fura Kode Yange yo Gutumira Abandi",
+    "your_code": "Kode Yawe yo Gutumira Abandi",
+    "share_code_desc": "Sangiza iyi kode n'abinyigishwa b'ubucuruzi bwo kwakira abakiriya",
+    "share_link_btn": "Sangiza Urubuga rwo Gutumira Abandi",
+    "referral_link_label": "Urubuga rwo gutumira abandi:",
+    "copied_alert": "Urubuga rwo gutumira abandi rwakopiriwe!",
+    "share_message": "Injira mu Imboni Serve uhindure ubucuruzi bwawe bwo kwakira abakiriya! Koresha kode yange yo gutumira abandi: {{code}}\n\n{{link}}\n\nTangira ukoresheje QR yo gutumiza, kuyobora ibicuruzwa n'ibindi byinshi.",
+    "share_title": "Injira mu Imboni Serve",
+    "rewards_title": "Ibyo Ufata",
+    "welcome_bonus_title": "Impembo yo Kwinjira ya 1,000 RWF",
+    "welcome_bonus_desc": "Impembo imwe gusa igihe inshuti yawe irangiza komande yayo ya mbere. Nta makuru y'ubwishyu buri gihe, nta amategeko ngorwaro.",
+    "your_reward": "Impembo yawe:",
+    "friend_reward": "Impembo y'inshuti:",
+    "total_per_referral": "Igiteranyo ku gutumira:",
+    "unlimited_title": "Gutumira Abandi Nta Bipimo",
+    "unlimited_desc": "Nta bipimo, nta mbogamizi. Tumira inshuti 10, uhembwe 10,000 RWF. Tumira inshuti 100, uhembwe 100,000 RWF. Ni byo gusa!",
+    "unlimited_note": "Sangiza ushaka — buri gutumira bifite agaciro!",
+    "fast_payout_title": "Kwishyura Byihuta",
+    "fast_payout_desc": "Impembo zifunguka nyuma y'iminsi 7 yo kugenzura. Jyanya kuri Mobile Money cyangwa koresha ku bucuruzi bwo kwakira abakiriya ku Imboni Serve.",
+    "fast_payout_note": "Kwishyura gato: 10,000 RWF (gutumira 10)",
+    "process_title": "Inzira Yoroshye mu Intambwe 3",
+    "step1_title": "Intambwe 1: Sangiza urubuga rwawe",
+    "step1_desc": "Ohereza urubuga rwawe rwihariye rwo gutumira abandi ku nshuti zawe ukoresheje WhatsApp, SMS, cyangwa imiyoboro y'itangazamakuru",
+    "step2_title": "Intambwe 2: Batumize",
+    "step2_desc": "Inshuti ikanda urubuga rwawe itange komande yayo ya mbere (nka make 5,000 RWF)",
+    "step3_title": "Intambwe 3: Mwese mwahembwa!",
+    "step3_desc": "1,000 RWF byinjizwa ku konti ku mwe nyuma y'iminsi 7 yo kugenzura",
+    "redeem_title": "Uko Ukoresha Amafaranga Yawe",
+    "redeem_dine_title": "Kurya ku Bucuruzi Bifatanyije",
+    "redeem_dine_desc": "Koresha amafaranga yawe kwishyura ibiryo ku bucuruzi bwo kwakira abakiriya bukoresha Imboni Serve. Tangaza telefoni yawe kwishyurwa.",
+    "redeem_dine_list_1": "Nta gaciro gato",
+    "redeem_dine_list_2": "Byakora ahantu bifatanyije",
+    "redeem_dine_list_3": "Kuyikoresha ako kanya",
+    "redeem_cash_title": "Kuvana amafaranga kuri Mobile Money",
+    "redeem_cash_desc": "Jyanya amafaranga kuri MTN MoMo cyangwa Airtel Money nyuma yo kwuzuza ibisabwa by'izina.",
+    "redeem_cash_list_1": "Bisaba gutumira 1+ cyemewe",
+    "redeem_cash_list_2": "Konti igomba kuba ifite iminsi 30+",
+    "redeem_cash_list_3": "Kwishyura 100% (nta makuru)",
+    "terms_title": "Amategeko Ngombwa",
+    "terms_validation": "Kugenzura kw'iminsi 7: Impembo zifunguka nyuma y'iminsi 7 ku komande yemejwe",
+    "terms_min_order": "Komade gato: Komade ya mbere y'inshuti igomba kuba nka make 5,000 RWF",
+    "terms_one_time": "Impembo imwe: 1,000 RWF ku nshuti (titabaye)",
+    "terms_withdrawal": "Kwishyura: Nka make 10,000 RWF kugira ngo uvane amafaranga kuri Mobile Money",
+    "affiliate_title": "Ushaka Porogaramu y'Abafatanyabikorwa B2B?",
+    "affiliate_desc": "Nuri umazarwa w'umunyamwenda ushaka kuza ubucuruzi bwo kwakira abakiriya kuri Imboni Serve ukabona komisiyo ya 15% buri kwezi, ushobora kugera ku rubuga rwawe rw'abafatanyabikorwa hano.",
+    "affiliate_btn": "Fungura Urubuga rw'Abafatanyabikorwa"
   }
 }

@@ -15,6 +15,7 @@ import { prisma } from './prisma'
 import { logger } from './logger'
 import { PaymentTransactionStatus } from '@prisma/client'
 import { ReservationService } from './services/reservation.service'
+import { TrialPolicyService } from './services/trial-policy.service'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -183,7 +184,7 @@ export class CronService {
 
         for (const biz of candidates) {
           if (!biz.trialStartDate) continue
-          const end = new Date(new Date(biz.trialStartDate).getTime() + 14 * 24 * 60 * 60 * 1000)
+          const end = TrialPolicyService.computeTrialEndDate(new Date(biz.trialStartDate), TrialPolicyService.getDefaultTrialDays())
           if (end.getTime() >= now.getTime() && end.getTime() <= threeDaysAhead.getTime()) {
             await prisma.business.update({ where: { id: biz.id }, data: { salesStatus: 'Trial Ending Soon' } } as any)
           }

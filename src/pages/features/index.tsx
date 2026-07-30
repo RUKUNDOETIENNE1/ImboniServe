@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import PublicLayout from '@/components/PublicLayout'
 import { useTranslation } from '@/lib/i18n'
+import { PRICING_CONFIG } from '@/config/pricing'
 import {
   ShoppingCart,
   BrainCircuit,
@@ -19,6 +20,7 @@ import {
 
 const featureCategories = [
   {
+    key: 'operations',
     icon: <ShoppingCart className="w-8 h-8" />,
     title: 'Operations',
     desc: 'From order to delivery, every step visible and controlled.',
@@ -27,6 +29,7 @@ const featureCategories = [
     highlights: ['QR Code Ordering', 'Service Replay™', 'Smart Dining Slips™'],
   },
   {
+    key: 'ai',
     icon: <BrainCircuit className="w-8 h-8" />,
     title: 'AI',
     desc: 'AI that works while you work — not just dashboards.',
@@ -35,6 +38,7 @@ const featureCategories = [
     highlights: ['AI Menu Builder', 'Auto-Reorder AI', 'A/B Testing'],
   },
   {
+    key: 'analytics',
     icon: <BarChart3 className="w-8 h-8" />,
     title: 'Analytics',
     desc: 'Data you can act on, not just admire.',
@@ -43,6 +47,7 @@ const featureCategories = [
     highlights: ['CFO Dashboard', 'CEO Dashboard', 'CRM with RFM'],
   },
   {
+    key: 'finance',
     icon: <DollarSign className="w-8 h-8" />,
     title: 'Finance',
     desc: 'Every franc tracked — from mobile money to CFO intelligence.',
@@ -51,6 +56,7 @@ const featureCategories = [
     highlights: ['Payout Summary', 'Payment Monitor', 'Transactions'],
   },
   {
+    key: 'growth',
     icon: <TrendingUp className="w-8 h-8" />,
     title: 'Growth',
     desc: 'Switch once. Grow forever.',
@@ -59,6 +65,7 @@ const featureCategories = [
     highlights: ['Discovery Listing', 'WhatsApp Campaigns', 'Site Builder'],
   },
   {
+    key: 'infrastructure',
     icon: <Package className="w-8 h-8" />,
     title: 'Infrastructure',
     desc: 'The foundation that makes everything else possible.',
@@ -72,7 +79,10 @@ export default function FeaturesPage() {
   const { t, locale } = useTranslation()
 
   return (
-    <PublicLayout title="Features — Imboni Serve">
+    <PublicLayout
+      title={t('features_page.title_page', 'Features — Imboni Serve')}
+      metaDescription={t('features_page.meta_description', 'Explore all features of ImboniServe — operations, AI, analytics, finance, growth, and infrastructure in one hospitality platform.')}
+    >
       <Head>
         <meta name="robots" content="index,follow" />
       </Head>
@@ -97,13 +107,27 @@ export default function FeaturesPage() {
                 <div className={`w-16 h-16 rounded-2xl ${cat.color} flex items-center justify-center mb-5`}>
                   {cat.icon}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{cat.title}</h2>
-                <p className="text-gray-600 mb-4">{cat.desc}</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                  {t(`features_page.categories.${(cat as any).key}.title`, cat.title)}
+                </h2>
+                <p className="text-gray-600 mb-4" suppressHydrationWarning>
+                  {t(`features_page.categories.${(cat as any).key}.desc`, cat.desc)}
+                </p>
                 <div className="space-y-1 mb-4">
                   {cat.highlights.map((h, j) => (
                     <div key={j} className="text-sm text-imboni-blue font-medium flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-imboni-orange" />
-                      {h}
+                      {(
+                        () => {
+                          const slug = String(h)
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, '_')
+                            .replace(/_+/g, '_')
+                            .replace(/^_|_$/g, '')
+                          // Try reuse pricing.feature_* keys for consistency
+                          return t(`pricing.feature_${slug}`, h)
+                        }
+                      )()}
                     </div>
                   ))}
                 </div>
@@ -119,7 +143,7 @@ export default function FeaturesPage() {
               {t('features_page.ready_title', 'Ready to see it in action?')}
             </h2>
             <p className="text-white/80 mb-8 max-w-xl mx-auto" suppressHydrationWarning>
-              {t('features_page.ready_desc', 'Start your free 14-day trial. No credit card needed. Full access to all capabilities.')}
+              {t('features_page.ready_desc', `Start your free ${PRICING_CONFIG.trialDays ?? 14}-day trial. No credit card needed. Full access to all capabilities.`)}
             </p>
             <Link
               href="/signup"

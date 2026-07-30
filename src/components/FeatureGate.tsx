@@ -7,6 +7,7 @@ import { ReactNode } from 'react'
 import { Crown, Lock, ArrowRight } from 'lucide-react'
 import { PlanCode, hasFeatureAccess, getUpgradePlanForFeature, PlanEntitlements } from '@/lib/plan-entitlements'
 import { useRouter } from 'next/router'
+import { PRICING_CONFIG } from '@/config/pricing'
 
 interface FeatureGateProps {
   children: ReactNode
@@ -84,7 +85,7 @@ export default function FeatureGate({
             </div>
 
             <p className="text-xs text-slate-500 mt-4">
-              ✓ 14-day free trial • Cancel anytime
+              ✓ {PRICING_CONFIG.trialDays ?? 14}-day free trial • Cancel anytime
             </p>
           </div>
         </div>

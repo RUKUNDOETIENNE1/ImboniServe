@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import PublicLayout from '@/components/PublicLayout'
 import { useTranslation } from '@/lib/i18n'
 import { formatCurrency, detectCurrencyFromLocale } from '@/lib/utils/currency'
-import { PRICING_PLANS } from '@/config/pricing'
+import { PRICING_PLANS, PRICING_CONFIG } from '@/config/pricing'
 import CurrencySelector from '@/components/CurrencySelector'
 
 export default function Pricing() {
@@ -181,7 +181,7 @@ export default function Pricing() {
 
         <div className="text-center">
           <p className="text-gray-600 mb-4">
-            {t('pricing.all_plans_include', 'All plans include a')} <strong>{t('pricing.trial_14', '14-day free trial')}</strong>. {t('pricing.no_card', 'No credit card required.')} 
+            {t('pricing.all_plans_include', 'All plans include a')} <strong>{t('pricing.trial_14', `${PRICING_CONFIG.trialDays ?? 14}-day free trial`)}</strong>. {t('pricing.no_card', 'No credit card required.')} 
           </p>
           <p className="text-sm text-gray-500">
             {t('pricing.need_help', 'Need help choosing?')} <a href="https://wa.me/250735214496" className="text-imboni-blue hover:text-imboni-orange">{t('pricing.chat_whatsapp', 'Chat with us on WhatsApp')}</a>

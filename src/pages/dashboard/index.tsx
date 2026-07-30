@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 import BusinessRevenueScanner from '@/components/BusinessRevenueScanner'
 import SetupProgressBanner from '@/components/SetupProgressBanner'
+import { TrialPill } from '@/components/TrialPill'
 const LiveMetricsTicker = dynamic(
   () => import('@/components/dashboard/LiveMetricsTicker').then(m => m.LiveMetricsTicker),
   { ssr: false, loading: () => null }
@@ -145,6 +146,9 @@ export default function Dashboard() {
           <div>
             <h1 className="text-2xl font-bold text-slate-800">{t('dashboard.title', 'Dashboard')}</h1>
             <p className="text-sm text-slate-500 mt-1">{t('dashboard.welcome', "Welcome back! Here's what's happening today.")}</p>
+            <div className="mt-2">
+              <TrialPill />
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button
