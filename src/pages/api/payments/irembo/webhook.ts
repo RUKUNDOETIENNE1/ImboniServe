@@ -7,6 +7,8 @@ import { BusinessInviteService } from '@/lib/services/business-invite.service'
 import { logBillingEvent } from '@/lib/services/billing-ledger.service'
 import { BillingEventType } from '@prisma/client'
 import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
+import { FounderCommissionService } from '@/lib/services/founder-commission.service'
+import { MarketerCommissionService } from '@/lib/services/marketer-commission.service'
 
 export const config = {
   api: {
@@ -137,6 +139,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Create affiliate commissions if applicable
       await createAffiliateCommissions(transaction)
+
+      // Create Founder Partner commissions if applicable
+      await createFounderCommissions(transaction)
+
+      // Create Professional Marketer commissions if applicable
+      await createMarketerCommissions(transaction)
     }
 
     // For non-SUCCESS statuses or if already processed, we updated raw data above; finish
@@ -279,5 +287,87 @@ async function createAffiliateCommissions(transaction: any) {
   } catch (error) {
     console.error('Error creating affiliate commissions:', error)
     // Don't throw - we don't want to fail the webhook if commission creation fails
+  }
+}
+
+async function createFounderCommissions(transaction: any) {
+  try {
+    const businessId = transaction.businessId
+    if (!businessId) return
+
+    const amountCents = transaction.exVatAmountCents || transaction.amountCents || 0
+    if (amountCents <= 0) return
+
+    await FounderCommissionService.createCommissionForPayment({
+      businessId,
+      paymentTransactionId: transaction.id,
+      amountCents,
+    })
+
+    console.log('Founder commissions processed')
+  } catch (error) {
+    console.error('Error creating founder commissions:', error)
+  }
+}
+
+async function createMarketerCommissions(transaction: any) {
+  try {
+    const subscription = transaction.subscription
+    if (!subscription || !subscription.business) return
+
+    const businessId = subscription.business.id
+    const amountCents = transaction.exVatAmountCents || transaction.amountCents || 0
+    if (amountCents <= 0) return
+
+    // Check if business has a marketer attribution
+    const attribution = await prisma.acquisitionAttribution.findUnique({
+      where: { businessId },
+    })
+
+    if (!attribution || attribution.sourceType !== 'PROFESSIONAL_MARKETER') return
+
+    const marketerId = attribution.sourceId
+    if (!marketerId) return
+
+    const marketer = await prisma.professionalMarketer.findUnique({
+      where: { id: marketerId },
+    })
+
+    if (!marketer || marketer.status !== 'ACTIVE') return
+
+    // Anti-fraud: self-referral check
+    if (subscription.business.ownerId === marketer.userId) {
+      console.log('Marketer self-referral detected - no commission')
+      return
+    }
+
+    // Create signup bonus on first payment
+    const existingBonus = await prisma.marketerCommission.findFirst({
+      where: {
+        marketerId,
+        businessId,
+        type: 'SIGNUP_BONUS',
+      },
+    })
+
+    if (!existingBonus) {
+      await MarketerCommissionService.createSignupBonus({
+        marketerId,
+        businessId,
+        description: 'Signup bonus for first referred payment',
+      })
+    }
+
+    // Create recurring commission
+    await MarketerCommissionService.createRecurringCommission({
+      marketerId,
+      businessId,
+      invoiceId: transaction.id,
+      invoiceAmountCents: amountCents,
+    })
+
+    console.log('Marketer commissions processed')
+  } catch (error) {
+    console.error('Error creating marketer commissions:', error)
   }
 }

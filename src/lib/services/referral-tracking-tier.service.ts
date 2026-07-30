@@ -323,6 +323,40 @@ export class ReferralTrackingTierService {
   }
 
   /**
+   * Expire stale dining credits past their expiry date
+   */
+  static async expireStaleDiningCredits(): Promise<number> {
+    const now = new Date()
+    const result = await prisma.diningCredit.updateMany({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: { lt: now },
+      },
+      data: {
+        status: 'EXPIRED',
+      },
+    })
+    return result.count
+  }
+
+  /**
+   * Unlock dining credits that have passed their lock period (if applicable)
+   */
+  static async unlockDueCredits(): Promise<number> {
+    const now = new Date()
+    const result = await prisma.diningCredit.updateMany({
+      where: {
+        status: 'LOCKED',
+        expiresAt: { gt: now },
+      },
+      data: {
+        status: 'ACTIVE',
+      },
+    })
+    return result.count
+  }
+
+  /**
    * Get dashboard data for a referral link (Tier 2)
    */
   static async getAffiliateDashboard(referralLinkId: string) {

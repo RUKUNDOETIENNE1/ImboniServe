@@ -10,6 +10,7 @@ import { BusinessApprovalService } from '@/lib/services/business-approval.servic
 import { AttributionResolver, type AttributionResult } from '@/lib/services/attribution-resolver.service'
 import { AttributionService } from '@/lib/services/attribution.service'
 import { TrialPolicyService } from '@/lib/services/trial-policy.service'
+import { FounderCodeService } from '@/lib/services/founder-code.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -170,6 +171,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ipAddress,
       userAgent: req.headers['user-agent'] || undefined,
     })
+
+    // Founder Code redemption — create redemption record and increment counter
+    if (attribution?.source === 'FOUNDER_CODE') {
+      try {
+        await FounderCodeService.redeemCode({
+          codeId: attribution.entityId,
+          businessId: restaurant.id,
+          userId: user.id,
+          ipAddress,
+          userAgent: req.headers['user-agent'] || undefined,
+        })
+      } catch (err) {
+        console.error('Founder Code redemption error:', err)
+      }
+    }
 
     // Business owner invite attribution (peer-to-peer invite program)
     // Use attribution resolver result if source is BUSINESS_INVITE, otherwise check form/cookie
