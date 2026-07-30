@@ -144,6 +144,7 @@ export class FounderPartnerService {
   }) {
     const partner = await prisma.founderPartner.findUnique({
       where: { id: params.partnerId },
+      include: { application: true },
     })
 
     if (!partner) throw new Error('Partner not found')

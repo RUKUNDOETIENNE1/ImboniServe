@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
-import { UserCog, Plus, Handshake, CheckCircle, XCircle, Pause, Play, DollarSign, TrendingUp, Users, Award } from 'lucide-react'
+import { UserCog, Plus, Users2, CheckCircle, XCircle, Pause, Play, DollarSign, TrendingUp, Users, Award } from 'lucide-react'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -423,3 +423,6 @@ export default function AdminFounderPartners() {
           </div>
         </div>
       )}
+    </AdminLayout>
+  )
+}

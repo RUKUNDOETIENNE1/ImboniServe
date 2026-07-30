@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
-import { TrendingUp, Users, DollarSign, Award, Copy, Handshake, Clock, CheckCircle, Activity, Wallet } from 'lucide-react'
+import { TrendingUp, Users, DollarSign, Award, Copy, Users2, Clock, CheckCircle, Activity, Wallet } from 'lucide-react'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -120,7 +120,7 @@ export default function PartnerDashboard() {
       <DashboardLayout>
         <div className="max-w-2xl mx-auto py-12">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-8 text-center">
-            <Handshake className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+            <Users2 className="w-16 h-16 text-purple-300 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-slate-800 mb-2">Founder Partner Program</h1>
             <p className="text-slate-500 mb-6">
               Join our exclusive Founder Partner Program and earn commissions by referring businesses to ImboniServe.

@@ -22,11 +22,7 @@ export class FounderCommissionService {
     const attribution = await prisma.acquisitionAttribution.findUnique({
       where: { businessId },
       include: {
-        business: {
-          include: {
-            subscription: true,
-          },
-        },
+        business: true,
       },
     })
 
@@ -211,9 +207,6 @@ export class FounderCommissionService {
       where: {
         partnerId,
         ...(status && { status }),
-      },
-      include: {
-        business: { select: { id: true, name: true } },
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
