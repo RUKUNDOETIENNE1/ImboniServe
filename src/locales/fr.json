@@ -27,13 +27,28 @@
     "h1": "Chaque franc suivi",
     "subheading": "De l'argent mobile à l'intelligence CFO — votre argent, pleinement visible.",
     "meta_description": "Suivez paiements, versements et santé financière avec tableaux CFO/CEO, moniteurs temps réel et réconciliation claire.",
-    "hero": { "title": "Tableau de bord CFO", "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s." },
-    "featured": { "title": "Tableau de bord CEO", "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min." },
+    "hero": {
+      "title": "Tableau de bord CFO",
+      "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s."
+    },
+    "featured": {
+      "title": "Tableau de bord CEO",
+      "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min."
+    },
     "standard_section_title": "Finance standard",
     "standard": {
-      "payout_summary": { "title": "Récapitulatif des versements", "desc": "Montants brut, commission et net par vente. Période sélectionnable." },
-      "payment_monitor": { "title": "Suivi des paiements", "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh." },
-      "transactions": { "title": "Transactions", "desc": "Historique complet avec filtres d'état et export." }
+      "payout_summary": {
+        "title": "Récapitulatif des versements",
+        "desc": "Montants brut, commission et net par vente. Période sélectionnable."
+      },
+      "payment_monitor": {
+        "title": "Suivi des paiements",
+        "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Historique complet avec filtres d'état et export."
+      }
     }
   },
   "features_growth": {
@@ -42,13 +57,32 @@
     "h1": "Basculez une fois. Grandissez durablement.",
     "subheading": "Les opérations ne sont que le début. ImboniServe vous aide à trouver et fidéliser vos clients.",
     "meta_description": "Acquérir et fidéliser via Fiche Découverte, campagnes WhatsApp, créateur de site et outils contenus.",
-    "hero": { "title": "Fiche Découverte", "desc": "Soyez trouvé par les clients à la recherche d'établissements près d'eux. Votre entreprise listée avec type de cuisine, gamme de prix et filtres par localisation.", "cta": "Parcourir le marketplace" },
+    "hero": {
+      "title": "Fiche Découverte",
+      "desc": "Soyez trouvé par les clients à la recherche d'établissements près d'eux. Votre entreprise listée avec type de cuisine, gamme de prix et filtres par localisation.",
+      "cta": "Parcourir le marketplace"
+    },
     "featured": {
-      "whatsapp_campaigns": { "title": "Campagnes WhatsApp", "desc": "Campagnes ciblées vers des segments CRM — Champions, À risque, Nouveaux — directement sur WhatsApp. Messages personnalisés et suivi de livraison." },
-      "site_builder": { "title": "Créateur de site", "desc": "Créez votre site avec génération de contenu IA. Modèles, personnalisation de marque et publication en un clic." },
-      "marketer_dashboard": { "title": "Tableau marketer", "desc": "Parrainage & affiliation avec portefeuille, commissions, paiements et QR. Suivez et récompensez vos ambassadeurs." },
-      "content_management_cms": { "title": "Gestion de contenu (CMS)", "desc": "Publiez articles et vidéos dans votre flux Découverte. Cycle complet avec médias." },
-      "video_analytics": { "title": "Analyses vidéo", "desc": "Vues, temps de visionnage et engagement." }
+      "whatsapp_campaigns": {
+        "title": "Campagnes WhatsApp",
+        "desc": "Campagnes ciblées vers des segments CRM — Champions, À risque, Nouveaux — directement sur WhatsApp. Messages personnalisés et suivi de livraison."
+      },
+      "site_builder": {
+        "title": "Créateur de site",
+        "desc": "Créez votre site avec génération de contenu IA. Modèles, personnalisation de marque et publication en un clic."
+      },
+      "marketer_dashboard": {
+        "title": "Tableau marketer",
+        "desc": "Parrainage & affiliation avec portefeuille, commissions, paiements et QR. Suivez et récompensez vos ambassadeurs."
+      },
+      "content_management_cms": {
+        "title": "Gestion de contenu (CMS)",
+        "desc": "Publiez articles et vidéos dans votre flux Découverte. Cycle complet avec médias."
+      },
+      "video_analytics": {
+        "title": "Analyses vidéo",
+        "desc": "Vues, temps de visionnage et engagement."
+      }
     }
   },
   "features_infrastructure": {
@@ -59,13 +93,28 @@
     "meta_description": "Rôles, stocks, contacts, sécurité et notifications — l'ossature de vos opérations.",
     "also_included": "Également inclus",
     "standard": {
-      "staff_management": { "title": "Gestion du personnel", "desc": "CRUD complet avec rôles système, rôles personnalisés, permissions et affectation par succursale. Contrôle d'accès fin: serveur, caissier, superviseur, manager, etc." },
-      "inventory_management": { "title": "Gestion des stocks", "desc": "Suivi des stocks avec seuils min/réappro, coûts unitaires et filtres par catégorie. Traçabilité complète." },
-      "contacts": { "title": "Contacts", "desc": "Gestion centralisée des contacts avec lien organisations. Suivez fournisseurs, clients et partenaires." }
+      "staff_management": {
+        "title": "Gestion du personnel",
+        "desc": "CRUD complet avec rôles système, rôles personnalisés, permissions et affectation par succursale. Contrôle d'accès fin: serveur, caissier, superviseur, manager, etc."
+      },
+      "inventory_management": {
+        "title": "Gestion des stocks",
+        "desc": "Suivi des stocks avec seuils min/réappro, coûts unitaires et filtres par catégorie. Traçabilité complète."
+      },
+      "contacts": {
+        "title": "Contacts",
+        "desc": "Gestion centralisée des contacts avec lien organisations. Suivez fournisseurs, clients et partenaires."
+      }
     },
     "operational": {
-      "security_sessions": { "title": "Sécurité & sessions", "desc": "Surveillance des sessions actives, état MFA, événements de sécurité et révocation." },
-      "notifications_settings": { "title": "Paramètres de notifications", "desc": "Planification des rapports quotidiens, alertes WhatsApp, fuseau horaire." }
+      "security_sessions": {
+        "title": "Sécurité & sessions",
+        "desc": "Surveillance des sessions actives, état MFA, événements de sécurité et révocation."
+      },
+      "notifications_settings": {
+        "title": "Paramètres de notifications",
+        "desc": "Planification des rapports quotidiens, alertes WhatsApp, fuseau horaire."
+      }
     }
   },
   "features_analytics": {
@@ -75,21 +124,51 @@
     "subheading": "Des données actionnables, pas seulement admirables.",
     "meta_description": "Analyses IA pour l'activité, le menu et les revenus avec tableaux sous-seconde et auto-rafraîchissement.",
     "hero": {
-      "cfo_dashboard": { "title": "Tableau de bord CFO", "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s." },
-      "ceo_dashboard": { "title": "Tableau de bord CEO", "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min." }
+      "cfo_dashboard": {
+        "title": "Tableau de bord CFO",
+        "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s."
+      },
+      "ceo_dashboard": {
+        "title": "Tableau de bord CEO",
+        "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min."
+      }
     },
     "featured": {
-      "crm_with_rfm_segmentation": { "title": "CRM avec segmentation RFM", "desc": "Segmentation automatique : Champions, Fidèles, À risque, Perdus, Nouveaux, Prometteurs. VLV, fréquence, dépenses." },
-      "qr_analytics": { "title": "Analyses QR", "desc": "Conversion scan→revenu. Identifiez les QR les plus performants par heure, appareil, lieu." },
-      "menu_performance_analytics": { "title": "Performance du menu", "desc": "Revenus, quantités et tendances par article. Identifiez les meilleurs et moins performants." },
-      "peak_hours_analytics": { "title": "Heures de pointe", "desc": "Demandes horaires et quotidiennes. Planifiez les équipes avec des données." },
-      "instruction_insights": { "title": "Insights sur instructions", "desc": "Motifs des instructions de commande. Comprenez les préférences et demandes spéciales." },
-      "video_analytics": { "title": "Analyses vidéo", "desc": "Performances vidéo : vues, temps de visionnage, engagement." }
+      "crm_with_rfm_segmentation": {
+        "title": "CRM avec segmentation RFM",
+        "desc": "Segmentation automatique : Champions, Fidèles, À risque, Perdus, Nouveaux, Prometteurs. VLV, fréquence, dépenses."
+      },
+      "qr_analytics": {
+        "title": "Analyses QR",
+        "desc": "Conversion scan→revenu. Identifiez les QR les plus performants par heure, appareil, lieu."
+      },
+      "menu_performance_analytics": {
+        "title": "Performance du menu",
+        "desc": "Revenus, quantités et tendances par article. Identifiez les meilleurs et moins performants."
+      },
+      "peak_hours_analytics": {
+        "title": "Heures de pointe",
+        "desc": "Demandes horaires et quotidiennes. Planifiez les équipes avec des données."
+      },
+      "instruction_insights": {
+        "title": "Insights sur instructions",
+        "desc": "Motifs des instructions de commande. Comprenez les préférences et demandes spéciales."
+      },
+      "video_analytics": {
+        "title": "Analyses vidéo",
+        "desc": "Performances vidéo : vues, temps de visionnage, engagement."
+      }
     },
     "standard_section_title": "Analyses standards",
     "standard": {
-      "payment_monitor": { "title": "Suivi des paiements", "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh." },
-      "transactions": { "title": "Transactions", "desc": "Historique complet avec filtres d'état et export." }
+      "payment_monitor": {
+        "title": "Suivi des paiements",
+        "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Historique complet avec filtres d'état et export."
+      }
     }
   },
   "cookies": {
@@ -322,7 +401,13 @@
       "multi_branch": "Opérations Multi-Établissements",
       "multi_branch_desc": "Pilotez plusieurs établissements depuis une seule plateforme avec des rapports centralisés, une visibilité des stocks et une cohérence opérationnelle.",
       "business_intelligence": "Business Intelligence",
-      "business_intelligence_desc": "Suivez les ventes, les tendances clients, l’inventaire et la performance financière avec des insights en temps réel pour prendre de meilleures décisions."
+      "business_intelligence_desc": "Suivez les ventes, les tendances clients, l’inventaire et la performance financière avec des insights en temps réel pour prendre de meilleures décisions.",
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Revivez chaque période de service événement par événement afin de comprendre exactement ce qui s'est passé.",
+      "inventory_alerts": "Alertes de Stock & Réapprovisionnement Automatique",
+      "inventory_alerts_desc": "Recevez automatiquement des alertes de stock ainsi que des propositions de commandes d'achat générées par l'IA pour vos fournisseurs.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Générez automatiquement des reçus numériques avec des liens partageables pour offrir une meilleure expérience client."
     },
     "discovery": {
       "badge": "Découverte de l’établissement",
@@ -333,7 +418,11 @@
       "feature_visibility": "Visibilité",
       "feature_orders": "Commandes directes",
       "feature_growth": "Croissance",
-      "feature_customers": "Nouveaux clients"
+      "feature_customers": "Nouveaux clients",
+      "feature_posts": "Publications Commerciales",
+      "feature_media": "Photos & Vidéos",
+      "feature_promos": "Promotions & Offres Combinées",
+      "feature_attribution": "Origine des Commandes"
     },
     "payments": {
       "title": "Acceptez les paiements que vos clients utilisent déjà",
@@ -387,7 +476,8 @@
       "title": "Voir Imboni Serve en Action",
       "subtitle": "Regardez comment les restaurants rationalisent leurs opérations avec notre plateforme tout-en-un.",
       "cta": "Cliquez pour regarder sur YouTube",
-      "description": "Voyez comment Imboni Serve transforme les opérations des restaurants"
+      "description": "Voyez comment Imboni Serve transforme les opérations des restaurants",
+      "alt": "Vidéo de démonstration d'Imboni Serve"
     },
     "store": {
       "badge": "Boutique d'Approvisionnement",
@@ -403,7 +493,8 @@
       "trial_days": "14 jours",
       "no_card": "Sans carte",
       "plans_count": "5 plans",
-      "features": "Fonctionnalités vérifiées"
+      "features": "Fonctionnalités vérifiées",
+      "plans": "Du Starter à l'Enterprise"
     },
     "why_switch": {
       "badge": "Pourquoi changer ?",
@@ -414,7 +505,10 @@
       "crm_title": "CRM Client (RFM)",
       "crm_desc": "Segmentez en Champions, Fidèles et À Risque.",
       "ab_title": "Tests A/B du menu",
-      "ab_desc": "Testez prix, textes et visuels. Choisissez les gagnants avec des données."
+      "ab_desc": "Testez prix, textes et visuels. Choisissez les gagnants avec des données.",
+      "replay_cta": "Voir en Action",
+      "crm_cta": "Découvrir le CRM",
+      "ab_cta": "Lancer un Test"
     },
     "why_ai": {
       "badge": "Pourquoi l'IA ?",
@@ -502,7 +596,46 @@
       "alerts_cta": "Configurer les Alertes",
       "resv_title": "Dépôts & Réservations",
       "resv_desc": "Réduisez les absences avec des dépôts et confirmations intelligents.",
-      "resv_cta": "Gérer les Réservations"
+      "resv_cta": "Gérer les Réservations",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Revivez chaque période de service événement par événement, comme si vous regardiez le replay d'un match de football.",
+      "replay_cta": "Découvrir Service Replay"
+    },
+    "pricing_preview": {
+      "heading": "Des Tarifs Transparents pour Toutes les Tailles d'Entreprise",
+      "subtitle": "ImboniServe propose des offres flexibles adaptées aux établissements d'hôtellerie-restauration de toutes tailles.",
+      "starting_at": "À partir de",
+      "per_month": "/ mois",
+      "starter_desc": "Idéal pour les établissements disposant d'un seul site qui souhaitent moderniser leurs opérations.",
+      "annual_savings": "La facturation annuelle vous permet d'économiser 25 % (l'équivalent de 3 mois gratuits).",
+      "scale": "Des offres qui évoluent avec votre entreprise, d'un seul établissement jusqu'aux entreprises multi-sites.",
+      "all_plans_include": "Tous les Plans Incluent",
+      "feature_1": "Commandes par QR, POS et gestion de cuisine",
+      "feature_2": "Gestion des stocks et des approvisionnements",
+      "feature_3": "Intégration WhatsApp et paiements Mobile Money",
+      "feature_4": "Rapports et analyses",
+      "enterprise_note": "Des offres Enterprise avec une tarification personnalisée sont disponibles pour les entreprises multi-sites et les besoins avancés.",
+      "founding_note": "🎉 Les membres du Founding Hospitality Business Program bénéficient d'une réduction de 50 % à vie sur tous les plans.",
+      "founding_link": "En savoir plus ci-dessous ↓",
+      "view_full_pricing": "Voir Tous les Tarifs",
+      "help": "Besoin d'aide pour choisir ?",
+      "chat": "Discutez avec nous sur WhatsApp"
+    },
+    "founding_program": {
+      "badge": "Programme Limité des Premiers Utilisateurs",
+      "title": "Programme Fondateur des Entreprises d'Hôtellerie",
+      "subtitle": "Rejoignez les 100 premiers établissements qui contribueront à construire l'avenir de l'hôtellerie.",
+      "benefit_1_title": "50 % de Réduction à Vie",
+      "benefit_1_desc": "Conservez une réduction de 50 % aussi longtemps que vous restez client. Sans expiration.",
+      "benefit_2_title": "Support Direct des Fondateurs",
+      "benefit_2_desc": "Profitez d'un accompagnement prioritaire et d'un accès direct à l'équipe fondatrice.",
+      "benefit_3_title": "Accès Anticipé aux Nouvelles Fonctionnalités",
+      "benefit_3_desc": "Soyez parmi les premiers à découvrir et utiliser les nouvelles fonctionnalités.",
+      "benefit_4_title": "Contribuez à l'Évolution de la Plateforme",
+      "benefit_4_desc": "Vos besoins opérationnels influencent directement les priorités de développement de la plateforme.",
+      "limited": "Limité aux 100 premiers établissements",
+      "cta": "Rejoindre le Programme",
+      "learn_more": "En Savoir Plus"
     }
   },
   "dashboard": {
@@ -791,8 +924,12 @@
     "last_90_days": "90 derniers jours",
     "last_365_days": "365 derniers jours",
     "lifetime": "Durée de vie",
-    "brand": { "tagline": "Gestion hôtelière" },
-    "user": { "anon": "Utilisateur" },
+    "brand": {
+      "tagline": "Gestion hôtelière"
+    },
+    "user": {
+      "anon": "Utilisateur"
+    },
     "actions": {
       "logout": "Se déconnecter",
       "searchPlaceholder": "Rechercher..."
@@ -1242,12 +1379,30 @@
     "ready_desc": "Démarrez votre essai gratuit de 14 jours. Aucune carte bancaire requise.",
     "cta": "Commencer l'essai gratuit",
     "categories": {
-      "operations": { "title": "Opérations", "desc": "De la commande à la livraison, chaque étape est visible et maîtrisée." },
-      "ai": { "title": "IA", "desc": "Une IA utile au quotidien — pas seulement des tableaux de bord." },
-      "analytics": { "title": "Analyses", "desc": "Des données actionnables, pas seulement admirables." },
-      "finance": { "title": "Finance", "desc": "Chaque franc suivi — de l'argent mobile à l'intelligence CFO." },
-      "growth": { "title": "Croissance", "desc": "Basculez une fois. Grandissez durablement." },
-      "infrastructure": { "title": "Infrastructure", "desc": "La base qui rend tout le reste possible." }
+      "operations": {
+        "title": "Opérations",
+        "desc": "De la commande à la livraison, chaque étape est visible et maîtrisée."
+      },
+      "ai": {
+        "title": "IA",
+        "desc": "Une IA utile au quotidien — pas seulement des tableaux de bord."
+      },
+      "analytics": {
+        "title": "Analyses",
+        "desc": "Des données actionnables, pas seulement admirables."
+      },
+      "finance": {
+        "title": "Finance",
+        "desc": "Chaque franc suivi — de l'argent mobile à l'intelligence CFO."
+      },
+      "growth": {
+        "title": "Croissance",
+        "desc": "Basculez une fois. Grandissez durablement."
+      },
+      "infrastructure": {
+        "title": "Infrastructure",
+        "desc": "La base qui rend tout le reste possible."
+      }
     }
   },
   "features_ai": {
@@ -1256,19 +1411,46 @@
     "h1": "Une IA qui travaille pendant que vous travaillez",
     "subheading": "L'IA n'est pas un gadget. C'est le socle. Chaque capacité fait un vrai travail — pas seulement afficher des chiffres.",
     "meta_description": "Créateur de menu IA, réapprovisionnement, rapports, alertes de coûts, tests A/B et hub d'optimisation.",
-    "hero": { "title": "Créateur de Menu par IA", "desc": "Importez une photo ou un PDF de votre menu. L'IA extrait automatiquement les articles, prix et descriptions. Plus de saisie manuelle — des heures réduites à des minutes." },
+    "hero": {
+      "title": "Créateur de Menu par IA",
+      "desc": "Importez une photo ou un PDF de votre menu. L'IA extrait automatiquement les articles, prix et descriptions. Plus de saisie manuelle — des heures réduites à des minutes."
+    },
     "capabilities": {
-      "auto_reorder_ai": { "title": "IA de réapprovisionnement", "desc": "Analyse de la demande, délais et stock de sécurité pour proposer des réapprovisionnements avec scores de confiance. Validation en un clic." },
-      "ai_insight_reports": { "title": "Rapports d'Insights IA", "desc": "Rapports hebdomadaires et mensuels avec KPIs, analyse narrative et recommandations prioritaires. Votre analyste IA." },
-      "cost_anomaly_alerts": { "title": "Alertes d'anomalie de coûts", "desc": "Détection automatique des hausses fournisseurs (analyse z-score) avec niveau de sévérité. Stoppez l'érosion de marge." },
-      "a_b_testing_for_menus": { "title": "Tests A/B pour menus", "desc": "Testez prix, textes, visuels. Répartissez le trafic. Mesurez. Choisissez sur données, pas à l'instinct." },
-      "optimization_hub": { "title": "Hub d'optimisation", "desc": "Recommandations IA issues du Scanner Business, Insights IA et Autopilote — avec impact mesuré." }
+      "auto_reorder_ai": {
+        "title": "IA de réapprovisionnement",
+        "desc": "Analyse de la demande, délais et stock de sécurité pour proposer des réapprovisionnements avec scores de confiance. Validation en un clic."
+      },
+      "ai_insight_reports": {
+        "title": "Rapports d'Insights IA",
+        "desc": "Rapports hebdomadaires et mensuels avec KPIs, analyse narrative et recommandations prioritaires. Votre analyste IA."
+      },
+      "cost_anomaly_alerts": {
+        "title": "Alertes d'anomalie de coûts",
+        "desc": "Détection automatique des hausses fournisseurs (analyse z-score) avec niveau de sévérité. Stoppez l'érosion de marge."
+      },
+      "a_b_testing_for_menus": {
+        "title": "Tests A/B pour menus",
+        "desc": "Testez prix, textes, visuels. Répartissez le trafic. Mesurez. Choisissez sur données, pas à l'instinct."
+      },
+      "optimization_hub": {
+        "title": "Hub d'optimisation",
+        "desc": "Recommandations IA issues du Scanner Business, Insights IA et Autopilote — avec impact mesuré."
+      }
     },
     "analytics_section_title": "Analyses pilotées par l'IA",
     "analytics": {
-      "menu_performance_analytics": { "title": "Performance du menu", "desc": "Revenus, quantités et tendances par article." },
-      "peak_hours_analytics": { "title": "Heures de pointe", "desc": "Courbes horaires/quotidiennes de demande. Planifiez les équipes." },
-      "instruction_insights": { "title": "Insights sur instructions", "desc": "Analyse des préférences via les instructions de commande." }
+      "menu_performance_analytics": {
+        "title": "Performance du menu",
+        "desc": "Revenus, quantités et tendances par article."
+      },
+      "peak_hours_analytics": {
+        "title": "Heures de pointe",
+        "desc": "Courbes horaires/quotidiennes de demande. Planifiez les équipes."
+      },
+      "instruction_insights": {
+        "title": "Insights sur instructions",
+        "desc": "Analyse des préférences via les instructions de commande."
+      }
     }
   },
   "features_operations": {
@@ -1298,12 +1480,30 @@
     },
     "standard_section_title": "Opérations standard",
     "standard": {
-      "kds": { "title": "Kitchen Display System (KDS)", "desc": "Affichage des commandes en temps réel avec urgences et statut de paiement." },
-      "waiter_dashboard": { "title": "Tableau de bord serveur", "desc": "File d'attente en 5 étapes : en attente → en préparation → prêt → récupéré → livré." },
-      "reservations": { "title": "Réservations", "desc": "Gestion des réservations avec suivi des acomptes et états." },
-      "close_day": { "title": "Clôture (Z-Report)", "desc": "Rapprochement de fin de journée avec ventilation par mode de paiement et source de commande." },
-      "promotions": { "title": "Promotions", "desc": "Remises en pourcentage, montants fixes et happy hours avec activation programmée." },
-      "qr_builder": { "title": "Créateur de QR", "desc": "Créez des QR de marque avec logo, modèles et URLs courtes." }
+      "kds": {
+        "title": "Kitchen Display System (KDS)",
+        "desc": "Affichage des commandes en temps réel avec urgences et statut de paiement."
+      },
+      "waiter_dashboard": {
+        "title": "Tableau de bord serveur",
+        "desc": "File d'attente en 5 étapes : en attente → en préparation → prêt → récupéré → livré."
+      },
+      "reservations": {
+        "title": "Réservations",
+        "desc": "Gestion des réservations avec suivi des acomptes et états."
+      },
+      "close_day": {
+        "title": "Clôture (Z-Report)",
+        "desc": "Rapprochement de fin de journée avec ventilation par mode de paiement et source de commande."
+      },
+      "promotions": {
+        "title": "Promotions",
+        "desc": "Remises en pourcentage, montants fixes et happy hours avec activation programmée."
+      },
+      "qr_builder": {
+        "title": "Créateur de QR",
+        "desc": "Créez des QR de marque avec logo, modèles et URLs courtes."
+      }
     }
   },
   "home": {

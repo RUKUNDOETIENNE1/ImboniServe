@@ -2,14 +2,14 @@
 
 Unverified translations and structural mismatches between the termbase and en.json.
 
-**Generated:** 2026-07-31T05:52:01.546Z
+**Generated:** 2026-08-01T20:15:29.308Z
 
 ---
 
 ## Part 1: Termbase Keys Not Matching en.json Structure
 
-**Total unmatched termbase leaf keys:** 1304
-**Total termbase top-level sections not in en.json:** 168
+**Total unmatched termbase leaf keys:** 1303
+**Total termbase top-level sections not in en.json:** 167
 
 These termbase keys exist in the verified termbase but do not correspond to any key path in `en.json`.
 They were NOT included in `rw.json` because `rw.json` is built from `en.json`'s structure.
@@ -112,79 +112,78 @@ These may represent translations from a different app version or a flattened str
 | 93 | `footer` | 12 | No |
 | 94 | `good` | 1 | No |
 | 95 | `growth` | 19 | No |
-| 96 | `home` | 1 | Yes |
-| 97 | `how_it_works` | 18 | No |
-| 98 | `imports` | 24 | No |
-| 99 | `integrations` | 25 | No |
-| 100 | `invoice` | 1 | No |
-| 101 | `last_28_days` | 1 | No |
-| 102 | `last_365_days` | 1 | No |
-| 103 | `last_7_days` | 1 | No |
-| 104 | `last_90_days` | 1 | No |
-| 105 | `licenses` | 23 | No |
-| 106 | `lifetime` | 1 | No |
-| 107 | `live` | 1 | No |
-| 108 | `live_sales` | 1 | No |
-| 109 | `low_stock` | 1 | No |
-| 110 | `monitoring` | 21 | No |
-| 111 | `nav` | 60 | No |
-| 112 | `next_billing` | 1 | No |
-| 113 | `no_alerts` | 1 | No |
-| 114 | `no_data` | 1 | No |
-| 115 | `no_inventory_alerts` | 1 | No |
-| 116 | `no_recent_transactions` | 1 | No |
-| 117 | `no_sales_data` | 1 | No |
-| 118 | `no_tables` | 1 | No |
-| 119 | `no_transactions` | 1 | No |
-| 120 | `notifications` | 24 | Yes |
-| 121 | `occupied` | 1 | No |
-| 122 | `offline` | 1 | No |
-| 123 | `organization` | 24 | No |
-| 124 | `password` | 25 | No |
-| 125 | `payments` | 6 | No |
-| 126 | `pending` | 1 | No |
-| 127 | `pending_syncs` | 1 | No |
-| 128 | `preferences` | 21 | No |
-| 129 | `pricing` | 1 | Yes |
-| 130 | `privacy` | 22 | No |
-| 131 | `pro_plan` | 1 | No |
-| 132 | `profile` | 20 | Yes |
-| 133 | `real_time_sales` | 1 | No |
-| 134 | `reservations` | 26 | No |
-| 135 | `reserved` | 1 | No |
-| 136 | `restock_now` | 1 | No |
-| 137 | `rt` | 17 | No |
-| 138 | `seats` | 1 | No |
-| 139 | `sessions` | 26 | No |
-| 140 | `settings` | 47 | No |
-| 141 | `site_builder` | 81 | No |
-| 142 | `staff` | 27 | No |
-| 143 | `standard` | 4 | No |
-| 144 | `standard_section_title` | 1 | No |
-| 145 | `start_selling` | 1 | No |
-| 146 | `stats` | 7 | No |
-| 147 | `status` | 20 | No |
-| 148 | `store` | 5 | No |
-| 149 | `subscription` | 27 | No |
-| 150 | `support` | 32 | No |
-| 151 | `system` | 27 | No |
-| 152 | `system_health` | 21 | No |
-| 153 | `tables` | 21 | Yes |
-| 154 | `today` | 1 | No |
-| 155 | `todays_performance` | 1 | No |
-| 156 | `transactions_appear` | 1 | No |
-| 157 | `transactions_will_appear` | 1 | No |
-| 158 | `units` | 1 | No |
-| 159 | `user` | 1 | No |
-| 160 | `video` | 4 | No |
-| 161 | `view_all` | 1 | No |
-| 162 | `warning` | 1 | No |
-| 163 | `webhooks` | 28 | No |
-| 164 | `whatsapp` | 1 | No |
-| 165 | `why_ai` | 11 | No |
-| 166 | `why_now` | 7 | No |
-| 167 | `why_switch` | 9 | No |
-| 168 | `why_trust` | 9 | No |
+| 96 | `how_it_works` | 18 | No |
+| 97 | `imports` | 24 | No |
+| 98 | `integrations` | 25 | No |
+| 99 | `invoice` | 1 | No |
+| 100 | `last_28_days` | 1 | No |
+| 101 | `last_365_days` | 1 | No |
+| 102 | `last_7_days` | 1 | No |
+| 103 | `last_90_days` | 1 | No |
+| 104 | `licenses` | 23 | No |
+| 105 | `lifetime` | 1 | No |
+| 106 | `live` | 1 | No |
+| 107 | `live_sales` | 1 | No |
+| 108 | `low_stock` | 1 | No |
+| 109 | `monitoring` | 21 | No |
+| 110 | `nav` | 60 | No |
+| 111 | `next_billing` | 1 | No |
+| 112 | `no_alerts` | 1 | No |
+| 113 | `no_data` | 1 | No |
+| 114 | `no_inventory_alerts` | 1 | No |
+| 115 | `no_recent_transactions` | 1 | No |
+| 116 | `no_sales_data` | 1 | No |
+| 117 | `no_tables` | 1 | No |
+| 118 | `no_transactions` | 1 | No |
+| 119 | `notifications` | 24 | Yes |
+| 120 | `occupied` | 1 | No |
+| 121 | `offline` | 1 | No |
+| 122 | `organization` | 24 | No |
+| 123 | `password` | 25 | No |
+| 124 | `payments` | 6 | No |
+| 125 | `pending` | 1 | No |
+| 126 | `pending_syncs` | 1 | No |
+| 127 | `preferences` | 21 | No |
+| 128 | `pricing` | 1 | Yes |
+| 129 | `privacy` | 22 | No |
+| 130 | `pro_plan` | 1 | No |
+| 131 | `profile` | 20 | Yes |
+| 132 | `real_time_sales` | 1 | No |
+| 133 | `reservations` | 26 | No |
+| 134 | `reserved` | 1 | No |
+| 135 | `restock_now` | 1 | No |
+| 136 | `rt` | 17 | No |
+| 137 | `seats` | 1 | No |
+| 138 | `sessions` | 26 | No |
+| 139 | `settings` | 47 | No |
+| 140 | `site_builder` | 81 | No |
+| 141 | `staff` | 27 | No |
+| 142 | `standard` | 4 | No |
+| 143 | `standard_section_title` | 1 | No |
+| 144 | `start_selling` | 1 | No |
+| 145 | `stats` | 7 | No |
+| 146 | `status` | 20 | No |
+| 147 | `store` | 5 | No |
+| 148 | `subscription` | 27 | No |
+| 149 | `support` | 32 | No |
+| 150 | `system` | 27 | No |
+| 151 | `system_health` | 21 | No |
+| 152 | `tables` | 21 | Yes |
+| 153 | `today` | 1 | No |
+| 154 | `todays_performance` | 1 | No |
+| 155 | `transactions_appear` | 1 | No |
+| 156 | `transactions_will_appear` | 1 | No |
+| 157 | `units` | 1 | No |
+| 158 | `user` | 1 | No |
+| 159 | `video` | 4 | No |
+| 160 | `view_all` | 1 | No |
+| 161 | `warning` | 1 | No |
+| 162 | `webhooks` | 28 | No |
+| 163 | `whatsapp` | 1 | No |
+| 164 | `why_ai` | 11 | No |
+| 165 | `why_now` | 7 | No |
+| 166 | `why_switch` | 9 | No |
+| 167 | `why_trust` | 9 | No |
 
 ### Detailed Key Listing
 
@@ -1158,12 +1157,6 @@ These may represent translations from a different app version or a flattened str
 | `growth.alerts_cta` | "Shyiraho Iburira" |
 | `growth.resv_title` | "Pre-Order & Reservations" |
 | `growth.resv_desc` | "Gabanya abataza nyuma yo kubika ameza ukoresheje kubitsa no kwemeza Reservation |
-
-#### home (1 keys)
-
-| Key | Kinyarwanda Translation |
-|-----|------------------------|
-| `home.title_page` | "Imboni Serve — Hospitality Operating System" |
 
 #### how_it_works (18 keys)
 
@@ -2344,7 +2337,7 @@ Where no translation existed, the English value was used as a fallback.
 
 | # | Key | Source Used |
 |---|-----|------------|
-| 1 | `common.minutes` | English fallback |
+| 1 | `common.minutes` | Existing rw.json |
 | 2 | `features_analytics.standard.payment_monitor.title` | Existing rw.json |
 | 3 | `features_analytics.standard.payment_monitor.desc` | Existing rw.json |
 | 4 | `features_analytics.standard.transactions.title` | Existing rw.json |
@@ -2495,7 +2488,7 @@ Where no translation existed, the English value was used as a fallback.
 | 149 | `homepage.growth.alerts_cta` | Existing rw.json |
 | 150 | `homepage.growth.resv_title` | Existing rw.json |
 | 151 | `homepage.growth.resv_desc` | Existing rw.json |
-| 152 | `homepage.growth.resv_cta` | English fallback |
+| 152 | `homepage.growth.resv_cta` | Existing rw.json |
 | 153 | `homepage.why_switch.badge` | Existing rw.json |
 | 154 | `homepage.why_switch.title` | Existing rw.json |
 | 155 | `homepage.why_switch.subtitle` | Existing rw.json |
@@ -2609,19 +2602,19 @@ Where no translation existed, the English value was used as a fallback.
 | 263 | `dashboard.sales.total` | Existing rw.json |
 | 264 | `dashboard.analytics.no_data` | Existing rw.json |
 | 265 | `dashboard.analytics.no_data_desc` | Existing rw.json |
-| 266 | `dashboard.video_analytics.title` | English fallback |
-| 267 | `dashboard.video_analytics.subtitle` | English fallback |
-| 268 | `dashboard.video_analytics.views_over_time` | English fallback |
-| 269 | `dashboard.video_analytics.top_videos` | English fallback |
-| 270 | `dashboard.video_analytics.avg_watch` | English fallback |
-| 271 | `dashboard.video_analytics.video` | English fallback |
-| 272 | `dashboard.video_analytics.views` | English fallback |
-| 273 | `dashboard.video_analytics.status` | English fallback |
-| 274 | `dashboard.video_analytics.posted` | English fallback |
-| 275 | `dashboard.video_analytics.no_views` | English fallback |
-| 276 | `dashboard.video_analytics.no_video_data` | English fallback |
-| 277 | `dashboard.smart_slips.title` | English fallback |
-| 278 | `dashboard.smart_slips.subtitle` | English fallback |
+| 266 | `dashboard.video_analytics.title` | Existing rw.json |
+| 267 | `dashboard.video_analytics.subtitle` | Existing rw.json |
+| 268 | `dashboard.video_analytics.views_over_time` | Existing rw.json |
+| 269 | `dashboard.video_analytics.top_videos` | Existing rw.json |
+| 270 | `dashboard.video_analytics.avg_watch` | Existing rw.json |
+| 271 | `dashboard.video_analytics.video` | Existing rw.json |
+| 272 | `dashboard.video_analytics.views` | Existing rw.json |
+| 273 | `dashboard.video_analytics.status` | Existing rw.json |
+| 274 | `dashboard.video_analytics.posted` | Existing rw.json |
+| 275 | `dashboard.video_analytics.no_views` | Existing rw.json |
+| 276 | `dashboard.video_analytics.no_video_data` | Existing rw.json |
+| 277 | `dashboard.smart_slips.title` | Existing rw.json |
+| 278 | `dashboard.smart_slips.subtitle` | Existing rw.json |
 | 279 | `dashboard.site_builder.title` | Existing rw.json |
 | 280 | `dashboard.site_builder.subtitle` | Existing rw.json |
 | 281 | `dashboard.site_builder.saving` | Existing rw.json |
@@ -2703,9 +2696,9 @@ Where no translation existed, the English value was used as a fallback.
 | 357 | `dashboard.site_builder.failed_to_publish` | Existing rw.json |
 | 358 | `dashboard.site_builder.ai_generation_failed` | Existing rw.json |
 | 359 | `dashboard.site_builder.ai_service_unavailable` | Existing rw.json |
-| 360 | `dashboard.menu_builder.title` | English fallback |
-| 361 | `dashboard.menu_builder.create_manually` | English fallback |
-| 362 | `dashboard.menu_builder.create_manually_desc` | English fallback |
+| 360 | `dashboard.menu_builder.title` | Existing rw.json |
+| 361 | `dashboard.menu_builder.create_manually` | Existing rw.json |
+| 362 | `dashboard.menu_builder.create_manually_desc` | Existing rw.json |
 | 363 | `dashboard.reports` | Existing rw.json |
 | 364 | `dashboard.whatsapp` | Existing rw.json |
 | 365 | `dashboard.live_sales` | Existing rw.json |
@@ -2798,7 +2791,7 @@ Where no translation existed, the English value was used as a fallback.
 | 452 | `dashboard.nav.paymentSettings` | Existing rw.json |
 | 453 | `dashboard.nav.discoveryProfile` | Existing rw.json |
 | 454 | `dashboard.nav.notifications` | Existing rw.json |
-| 455 | `dashboard.nav.dashboard.nav.supportInbox` | English fallback |
+| 455 | `dashboard.nav.dashboard.nav.supportInbox` | Existing rw.json |
 | 456 | `dashboard.nav.support.attachFile` | Existing rw.json |
 | 457 | `dashboard.nav.support.cannedReplies` | Existing rw.json |
 | 458 | `dashboard.nav.support.uploadFailed` | Existing rw.json |
@@ -2816,18 +2809,18 @@ Where no translation existed, the English value was used as a fallback.
 | 470 | `dashboard.nav.currencySettings` | Existing rw.json |
 | 471 | `dashboard.nav.analytics` | Existing rw.json |
 | 472 | `dashboard.nav.inventoryAlerts` | Existing rw.json |
-| 473 | `menu.dish_info` | English fallback |
-| 474 | `menu.dietary_info` | English fallback |
-| 475 | `menu.vegetarian` | English fallback |
-| 476 | `menu.vegan` | English fallback |
-| 477 | `menu.gluten_free` | English fallback |
-| 478 | `menu.ingredients` | English fallback |
-| 479 | `menu.cooking_method` | English fallback |
-| 480 | `menu.prep_time` | English fallback |
-| 481 | `menu.spice_level` | English fallback |
-| 482 | `menu.allergen_warning` | English fallback |
-| 483 | `menu.contains` | English fallback |
-| 484 | `menu.no_additional_info` | English fallback |
+| 473 | `menu.dish_info` | Existing rw.json |
+| 474 | `menu.dietary_info` | Existing rw.json |
+| 475 | `menu.vegetarian` | Existing rw.json |
+| 476 | `menu.vegan` | Existing rw.json |
+| 477 | `menu.gluten_free` | Existing rw.json |
+| 478 | `menu.ingredients` | Existing rw.json |
+| 479 | `menu.cooking_method` | Existing rw.json |
+| 480 | `menu.prep_time` | Existing rw.json |
+| 481 | `menu.spice_level` | Existing rw.json |
+| 482 | `menu.allergen_warning` | Existing rw.json |
+| 483 | `menu.contains` | Existing rw.json |
+| 484 | `menu.no_additional_info` | Existing rw.json |
 | 485 | `analytics.title` | Existing rw.json |
 | 486 | `analytics.subtitle` | Existing rw.json |
 | 487 | `analytics.unlock_message` | Existing rw.json |
@@ -2890,10 +2883,10 @@ Where no translation existed, the English value was used as a fallback.
 | 544 | `features_ai.analytics.peak_hours_analytics.desc` | Existing rw.json |
 | 545 | `features_ai.analytics.instruction_insights.title` | Existing rw.json |
 | 546 | `features_ai.analytics.instruction_insights.desc` | Existing rw.json |
-| 547 | `pricing.plan_professional_desc_full` | English fallback |
-| 548 | `pricing.plan_business_desc_full` | English fallback |
-| 549 | `pricing.plan_premium_desc_full` | English fallback |
-| 550 | `pricing.plan_enterprise_desc_full` | English fallback |
+| 547 | `pricing.plan_professional_desc_full` | Existing rw.json |
+| 548 | `pricing.plan_business_desc_full` | Existing rw.json |
+| 549 | `pricing.plan_premium_desc_full` | Existing rw.json |
+| 550 | `pricing.plan_enterprise_desc_full` | Existing rw.json |
 | 551 | `pricing.feature_unlimited_users` | Existing rw.json |
 | 552 | `pricing.feature_sales_inventory_tracking` | Existing rw.json |
 | 553 | `pricing.feature_daily_reports` | Existing rw.json |
@@ -2979,32 +2972,32 @@ Where no translation existed, the English value was used as a fallback.
 | 633 | `pricing.feature_regional_data_residency` | Existing rw.json |
 | 634 | `pricing.feature_custom_workflows` | Existing rw.json |
 | 635 | `pricing.feature_audit_exports` | Existing rw.json |
-| 636 | `pricing.feature_referrals` | English fallback |
+| 636 | `pricing.feature_referrals` | Existing rw.json |
 | 637 | `pricing.feature_smart_dining_slips` | Existing rw.json |
-| 638 | `pricing.feature_standard_support` | English fallback |
-| 639 | `pricing.feature_everything_in_starter` | English fallback |
-| 640 | `pricing.feature_inventory_alerts` | English fallback |
-| 641 | `pricing.feature_role_based_access_control` | English fallback |
+| 638 | `pricing.feature_standard_support` | Existing rw.json |
+| 639 | `pricing.feature_everything_in_starter` | Existing rw.json |
+| 640 | `pricing.feature_inventory_alerts` | Existing rw.json |
+| 641 | `pricing.feature_role_based_access_control` | Existing rw.json |
 | 642 | `pricing.feature_payment_monitor` | Existing rw.json |
-| 643 | `pricing.feature_menu_performance_analytics` | English fallback |
-| 644 | `pricing.feature_peak_hours_analytics` | English fallback |
-| 645 | `pricing.feature_crm_with_rfm_segmentation` | English fallback |
-| 646 | `pricing.feature_qr_builder_20_codes` | English fallback |
-| 647 | `pricing.feature_1_branch_unlimited_outlets` | English fallback |
-| 648 | `pricing.feature_multi_branch_dashboard` | English fallback |
-| 649 | `pricing.feature_supplier_orders_enhanced` | English fallback |
-| 650 | `pricing.feature_delivery_confirmation` | English fallback |
-| 651 | `pricing.feature_qr_analytics` | English fallback |
-| 652 | `pricing.feature_qr_builder_unlimited_codes` | English fallback |
-| 653 | `pricing.feature_discovery_featured_listing` | English fallback |
-| 654 | `pricing.feature_whatsapp_campaigns` | English fallback |
-| 655 | `pricing.feature_ai_draft_purchase_orders` | English fallback |
-| 656 | `pricing.feature_service_replay` | English fallback |
-| 657 | `pricing.feature_a_b_testing_for_menus` | English fallback |
-| 658 | `pricing.feature_cfo_dashboard` | English fallback |
-| 659 | `pricing.feature_ceo_dashboard` | English fallback |
-| 660 | `pricing.feature_custom_roles_and_permissions` | English fallback |
-| 661 | `pricing.feature_training_and_onboarding` | English fallback |
+| 643 | `pricing.feature_menu_performance_analytics` | Existing rw.json |
+| 644 | `pricing.feature_peak_hours_analytics` | Existing rw.json |
+| 645 | `pricing.feature_crm_with_rfm_segmentation` | Existing rw.json |
+| 646 | `pricing.feature_qr_builder_20_codes` | Existing rw.json |
+| 647 | `pricing.feature_1_branch_unlimited_outlets` | Existing rw.json |
+| 648 | `pricing.feature_multi_branch_dashboard` | Existing rw.json |
+| 649 | `pricing.feature_supplier_orders_enhanced` | Existing rw.json |
+| 650 | `pricing.feature_delivery_confirmation` | Existing rw.json |
+| 651 | `pricing.feature_qr_analytics` | Existing rw.json |
+| 652 | `pricing.feature_qr_builder_unlimited_codes` | Existing rw.json |
+| 653 | `pricing.feature_discovery_featured_listing` | Existing rw.json |
+| 654 | `pricing.feature_whatsapp_campaigns` | Existing rw.json |
+| 655 | `pricing.feature_ai_draft_purchase_orders` | Existing rw.json |
+| 656 | `pricing.feature_service_replay` | Existing rw.json |
+| 657 | `pricing.feature_a_b_testing_for_menus` | Existing rw.json |
+| 658 | `pricing.feature_cfo_dashboard` | Existing rw.json |
+| 659 | `pricing.feature_ceo_dashboard` | Existing rw.json |
+| 660 | `pricing.feature_custom_roles_and_permissions` | Existing rw.json |
+| 661 | `pricing.feature_training_and_onboarding` | Existing rw.json |
 | 662 | `pricing.feature_qr_code_ordering` | Existing rw.json |
 | 663 | `pricing.feature_ai_menu_builder` | Existing rw.json |
 | 664 | `pricing.feature_auto_reorder_ai` | Existing rw.json |

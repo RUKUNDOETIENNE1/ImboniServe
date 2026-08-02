@@ -299,6 +299,72 @@
       "multi_branch_desc": "Cunga amashami menshi muri Dashboard imwe hamwe na raporo rusange cyangwa iz'ishami rimwe.",
       "roles": "Role-Based Access",
       "roles_desc": "Ushinzwe kashi, umuseriveri, umugenzuzi n'umucungamutungo — buri wese abona ibyo yemerewe gusa."
+    },
+    "growth": {
+      "replay_title": "Service Replay™",
+      "replay_desc": "Subiza inyuma urebe buri gikorwa cyabaye muri serivisi kuva ku ntangiriro kugeza ku musozo, nk'ureba isubiramo ry'umukino w'umupira w'amaguru.",
+      "replay_cta": "Reba Service Replay"
+    },
+    "advanced": {
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Subiza inyuma urebe buri gikorwa cyose cyabaye muri serivisi maze umenye neza icyagenze n'icyo ugomba kunoza.",
+      "inventory_alerts": "Imenyesha ry'Ububiko Buke & Gutumiza mu Buryo Bwikora",
+      "inventory_alerts_desc": "Menyeshwa igihe ububiko buri hafi gushira, AI igufashe no gutegura ibyo ugomba gutumiza ku baguha ibicuruzwa.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Hita ukora inyemezabwishyu za digitale ushobora gusangiza umukiriya kugira ngo arusheho guhabwa serivisi nziza."
+    },
+    "why_switch": {
+      "replay_cta": "Reba Uko Ikora",
+      "crm_cta": "Menya CRM",
+      "ab_cta": "Gerageza"
+    },
+    "video": {
+      "alt": "Video yerekana uko Imboni Serve ikora"
+    },
+    "stats": {
+      "plans": "Kuva kuri Starter kugeza kuri Enterprise"
+    },
+    "pricing_preview": {
+      "heading": "Ibiciro Bijyanye n'Ingano y'Ubucuruzi Bwawe",
+      "subtitle": "Dufite gahunda zitandukanye zijyanye n'ubucuruzi bwawe, waba ufite café, restaurant, hotel cyangwa amashami menshi.",
+      "starting_at": "Bitangirira kuri",
+      "per_month": "/ ukwezi",
+      "starter_desc": "Bikwiriye ubucuruzi bufite ishami rimwe bushaka gutangira gukoresha uburyo bugezweho bwo gucunga ibikorwa.",
+      "annual_savings": "Wishyuye umwaka wose ubona igabanyirizwa rya 25% (bingana n'amezi 3 y'ubuntu).",
+      "scale": "Gahunda zacu zikurana n'ubucuruzi bwawe, uhereye ku ishami rimwe ukageza ku mashami menshi.",
+      "all_plans_include": "Buri Gahunda Irimo",
+      "feature_1": "Komande za QR, POS n'Imicungire y'Igikoni",
+      "feature_2": "Gucunga Ububiko no Gutumiza Ibicuruzwa",
+      "feature_3": "Guhuza na WhatsApp no Kwishyura hakoreshejwe Mobile Money",
+      "feature_4": "Raporo n'Isesengura ry'Ubucuruzi",
+      "enterprise_note": "Hari gahunda za Enterprise zifite ibiciro byihariye ku bucuruzi bufite amashami menshi cyangwa ibisabwa byihariye.",
+      "founding_note": "🎉 Abinjira muri Founding Hospitality Business Program bahabwa igabanyirizwa rya 50% ku buzima bwose kuri gahunda zose.",
+      "founding_link": "Menya byinshi hasi aha ↓",
+      "view_full_pricing": "Reba Ibiciro Byose",
+      "help": "Ukeneye ubufasha mu guhitamo?",
+      "chat": "Tuvugishe kuri WhatsApp"
+    },
+    "founding_program": {
+      "badge": "Porogaramu y'Abinjira Mbere",
+      "title": "Founding Hospitality Business Program",
+      "subtitle": "Ba umwe mu bucuruzi 100 bwa mbere buzagira uruhare mu kubaka ejo hazaza h'ikoranabuhanga rifasha ubwakiranyi.",
+      "benefit_1_title": "Igabanyirizwa rya 50% ku Buzima Bwose",
+      "benefit_1_desc": "Uzahora wishyura kimwe cya kabiri cy'igiciro cya gahunda yawe igihe cyose uzakomeza gukoresha Imboni Serve. Nta gihe ntarengwa.",
+      "benefit_2_title": "Ubufasha Buturutse ku Bashinze Imboni Serve",
+      "benefit_2_desc": "Habwa ubufasha bwihariye bwo gutangira gukoresha Imboni Serve ndetse unabashe kuvugana n'abayishinze igihe ubikeneye.",
+      "benefit_3_title": "Kubona Mbere ibishya Ibyongewemo",
+      "benefit_3_desc": "Ba mu ba mbere bakoresha features nshya n'ibindi bishya bya Imboni Serve mbere y'abandi.",
+      "benefit_4_title": "Gira Uruhare mu Guteza Imbere Platform",
+      "benefit_4_desc": "Ibitekerezo byawe n'ibyo ukeneye mu bucuruzi bwawe bizadufasha kugena ibyo tuzashyira muri Platform mu gihe kiri imbere.",
+      "limited": "Igenewe ubucuruzi 100 bwa mbere gusa",
+      "cta": "Injira muri Founding Program",
+      "learn_more": "Menya Byinshi"
+    },
+    "discovery": {
+      "feature_posts": "Posts zo Kwamamaza Ibicuruzwa",
+      "feature_media": "Amafoto na Video",
+      "feature_promos": "Promos na Combos",
+      "feature_attribution": "Inkomoko ya Komande"
     }
   },
   "advanced": {
@@ -1338,7 +1404,7 @@
     }
   },
   "home": {
-    "title_page": "Imboni Serve — Hospitality Operating System",
+    "title_page": "Imboni Serve — Platform Ifasha Gucunga Hotel, Restaurant na Café",
     "launch_badge": "🎉 Igabanyirizwa rya 50% rya Launch kuri Gahunda zose!",
     "hero": {
       "title1": "Hindura buri meza",

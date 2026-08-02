@@ -28,13 +28,28 @@
     "h1": "Every Franc Tracked",
     "subheading": "From mobile money to CFO intelligence — your money, fully visible.",
     "meta_description": "Track payments, payouts, and financial health with CFO/CEO dashboards, real-time monitors, and clear reconciliation.",
-    "hero": { "title": "CFO Dashboard", "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times." },
-    "featured": { "title": "CEO Dashboard", "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes." },
+    "hero": {
+      "title": "CFO Dashboard",
+      "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times."
+    },
+    "featured": {
+      "title": "CEO Dashboard",
+      "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes."
+    },
     "standard_section_title": "Standard Finance",
     "standard": {
-      "payout_summary": { "title": "Payout Summary", "desc": "Gross, commission, and net payout per sale. Date-range selectable." },
-      "payment_monitor": { "title": "Payment Monitor", "desc": "Real-time payment tracking with method breakdown and auto-refresh." },
-      "transactions": { "title": "Transactions", "desc": "Full transaction history with status filters and export." }
+      "payout_summary": {
+        "title": "Payout Summary",
+        "desc": "Gross, commission, and net payout per sale. Date-range selectable."
+      },
+      "payment_monitor": {
+        "title": "Payment Monitor",
+        "desc": "Real-time payment tracking with method breakdown and auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Full transaction history with status filters and export."
+      }
     }
   },
   "features_growth": {
@@ -43,13 +58,32 @@
     "h1": "Switch Once. Grow Forever.",
     "subheading": "Operations are just the beginning. ImboniServe helps you find and keep customers.",
     "meta_description": "Acquire and retain customers with Discovery listings, WhatsApp campaigns, site builder, and content tools.",
-    "hero": { "title": "Discovery Listing", "desc": "Get found by customers searching for hospitality businesses near them. Your business listed on our public directory with cuisine type, price range, and location filters.", "cta": "Browse the Marketplace" },
+    "hero": {
+      "title": "Discovery Listing",
+      "desc": "Get found by customers searching for hospitality businesses near them. Your business listed on our public directory with cuisine type, price range, and location filters.",
+      "cta": "Browse the Marketplace"
+    },
     "featured": {
-      "whatsapp_campaigns": { "title": "WhatsApp Campaigns", "desc": "Targeted campaigns to CRM segments — Champions, At Risk, New — directly on WhatsApp. Personalized messages with delivery tracking." },
-      "site_builder": { "title": "Site Builder", "desc": "Create your own website with AI content generation. Template selection, branding customization, and one-click publishing." },
-      "marketer_dashboard": { "title": "Marketer Dashboard", "desc": "Referral and affiliate system with wallet, commissions, payouts, and QR code generation. Track referrals and reward advocates." },
-      "content_management_cms": { "title": "Content Management (CMS)", "desc": "Publish posts and videos to your discovery feed. Full content lifecycle management with media uploads." },
-      "video_analytics": { "title": "Video Analytics", "desc": "Track views, watch time, and engagement on your video content. Know what resonates with your audience." }
+      "whatsapp_campaigns": {
+        "title": "WhatsApp Campaigns",
+        "desc": "Targeted campaigns to CRM segments — Champions, At Risk, New — directly on WhatsApp. Personalized messages with delivery tracking."
+      },
+      "site_builder": {
+        "title": "Site Builder",
+        "desc": "Create your own website with AI content generation. Template selection, branding customization, and one-click publishing."
+      },
+      "marketer_dashboard": {
+        "title": "Marketer Dashboard",
+        "desc": "Referral and affiliate system with wallet, commissions, payouts, and QR code generation. Track referrals and reward advocates."
+      },
+      "content_management_cms": {
+        "title": "Content Management (CMS)",
+        "desc": "Publish posts and videos to your discovery feed. Full content lifecycle management with media uploads."
+      },
+      "video_analytics": {
+        "title": "Video Analytics",
+        "desc": "Track views, watch time, and engagement on your video content. Know what resonates with your audience."
+      }
     }
   },
   "features_infrastructure": {
@@ -60,13 +94,28 @@
     "meta_description": "Team-ready roles, inventory, contacts, security, and notifications — the backbone of your operations.",
     "also_included": "Also Included",
     "standard": {
-      "staff_management": { "title": "Staff Management", "desc": "Full CRUD with system roles, custom roles, permissions, and branch assignment. Granular access control: waiter, cashier, supervisor, manager, and more." },
-      "inventory_management": { "title": "Inventory Management", "desc": "Stock tracking with min/reorder levels, unit costs, and category filtering. Full audit trail of every movement." },
-      "contacts": { "title": "Contacts", "desc": "Centralized contact management with organization linking. Keep track of suppliers, customers, and partners." }
+      "staff_management": {
+        "title": "Staff Management",
+        "desc": "Full CRUD with system roles, custom roles, permissions, and branch assignment. Granular access control: waiter, cashier, supervisor, manager, and more."
+      },
+      "inventory_management": {
+        "title": "Inventory Management",
+        "desc": "Stock tracking with min/reorder levels, unit costs, and category filtering. Full audit trail of every movement."
+      },
+      "contacts": {
+        "title": "Contacts",
+        "desc": "Centralized contact management with organization linking. Keep track of suppliers, customers, and partners."
+      }
     },
     "operational": {
-      "security_sessions": { "title": "Security & Sessions", "desc": "Active session monitoring, MFA status, security events, and session revocation." },
-      "notifications_settings": { "title": "Notifications Settings", "desc": "Daily report scheduling, WhatsApp alert configuration, and timezone management." }
+      "security_sessions": {
+        "title": "Security & Sessions",
+        "desc": "Active session monitoring, MFA status, security events, and session revocation."
+      },
+      "notifications_settings": {
+        "title": "Notifications Settings",
+        "desc": "Daily report scheduling, WhatsApp alert configuration, and timezone management."
+      }
     }
   },
   "features_analytics": {
@@ -76,21 +125,51 @@
     "subheading": "Data you can act on, not just admire.",
     "meta_description": "AI-powered business, menu, and revenue analytics with sub-second dashboards and auto-refresh.",
     "hero": {
-      "cfo_dashboard": { "title": "CFO Dashboard", "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times." },
-      "ceo_dashboard": { "title": "CEO Dashboard", "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes." }
+      "cfo_dashboard": {
+        "title": "CFO Dashboard",
+        "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times."
+      },
+      "ceo_dashboard": {
+        "title": "CEO Dashboard",
+        "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes."
+      }
     },
     "featured": {
-      "crm_with_rfm_segmentation": { "title": "CRM with RFM Segmentation", "desc": "Automatic customer segmentation: Champions, Loyal, At Risk, Lost, New, Promising. Lifetime value, visit frequency, and spend analysis." },
-      "qr_analytics": { "title": "QR Analytics", "desc": "Scan-to-revenue conversion tracking. Know which QRs perform best by hour, device, and location." },
-      "menu_performance_analytics": { "title": "Menu Performance Analytics", "desc": "Item-level revenue, quantity, and trend analysis. Know your best and worst performers." },
-      "peak_hours_analytics": { "title": "Peak Hours Analytics", "desc": "Hourly and daily demand patterns. Plan staffing with data, not guesswork." },
-      "instruction_insights": { "title": "Instruction Insights", "desc": "Customer order instruction patterns. Understand preferences and special requests." },
-      "video_analytics": { "title": "Video Analytics", "desc": "Video content performance: views, watch time, and engagement tracking." }
+      "crm_with_rfm_segmentation": {
+        "title": "CRM with RFM Segmentation",
+        "desc": "Automatic customer segmentation: Champions, Loyal, At Risk, Lost, New, Promising. Lifetime value, visit frequency, and spend analysis."
+      },
+      "qr_analytics": {
+        "title": "QR Analytics",
+        "desc": "Scan-to-revenue conversion tracking. Know which QRs perform best by hour, device, and location."
+      },
+      "menu_performance_analytics": {
+        "title": "Menu Performance Analytics",
+        "desc": "Item-level revenue, quantity, and trend analysis. Know your best and worst performers."
+      },
+      "peak_hours_analytics": {
+        "title": "Peak Hours Analytics",
+        "desc": "Hourly and daily demand patterns. Plan staffing with data, not guesswork."
+      },
+      "instruction_insights": {
+        "title": "Instruction Insights",
+        "desc": "Customer order instruction patterns. Understand preferences and special requests."
+      },
+      "video_analytics": {
+        "title": "Video Analytics",
+        "desc": "Video content performance: views, watch time, and engagement tracking."
+      }
     },
     "standard_section_title": "Standard Analytics",
     "standard": {
-      "payment_monitor": { "title": "Payment Monitor", "desc": "Real-time payment tracking with method breakdown and auto-refresh." },
-      "transactions": { "title": "Transactions", "desc": "Full transaction history with status filters and export." }
+      "payment_monitor": {
+        "title": "Payment Monitor",
+        "desc": "Real-time payment tracking with method breakdown and auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Full transaction history with status filters and export."
+      }
     }
   },
   "marketplace": {
@@ -303,7 +382,13 @@
       "multi_branch": "Multi-Branch Operations",
       "multi_branch_desc": "Run multiple branches from one platform with centralized reporting, inventory visibility, and operational consistency.",
       "business_intelligence": "Business Intelligence",
-      "business_intelligence_desc": "Monitor sales, customer trends, inventory, and financial performance with real-time insights that support better business decisions."
+      "business_intelligence_desc": "Monitor sales, customer trends, inventory, and financial performance with real-time insights that support better business decisions.",
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Replay every service period event-by-event and understand exactly what happened.",
+      "inventory_alerts": "Inventory Alerts & Auto-Reorder",
+      "inventory_alerts_desc": "Receive automatic stock alerts and AI-generated draft purchase orders for your suppliers.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Automatically generate digital receipts with shareable links for a seamless customer experience."
     },
     "discovery": {
       "badge": "Business Discovery",
@@ -314,7 +399,11 @@
       "feature_visibility": "Customer Visibility",
       "feature_orders": "Direct Orders",
       "feature_growth": "Business Growth",
-      "feature_customers": "New Customers"
+      "feature_customers": "New Customers",
+      "feature_posts": "Shoppable Posts",
+      "feature_media": "Photo & Video",
+      "feature_promos": "Promotions & Combos",
+      "feature_attribution": "Order Attribution"
     },
     "payments": {
       "title": "Accept Payments Your Customers Already Use",
@@ -368,7 +457,8 @@
       "title": "See Imboni Serve in Action",
       "subtitle": "Watch how hospitality businesses streamline operations with our all-in-one platform.",
       "cta": "Click to watch on YouTube",
-      "description": "See how Imboni Serve transforms hospitality operations"
+      "description": "See how Imboni Serve transforms hospitality operations",
+      "alt": "Imboni Serve demonstration video"
     },
     "store": {
       "badge": "Procurement Store",
@@ -384,7 +474,8 @@
       "trial_days": "14 days",
       "no_card": "No card",
       "plans_count": "5 plans",
-      "features": "Verified capabilities"
+      "features": "Verified capabilities",
+      "plans": "From Starter to Enterprise"
     },
     "pricing": {
       "title": "Simple Pricing for Rwanda",
@@ -439,7 +530,10 @@
       "alerts_cta": "Configure Alerts",
       "resv_title": "Deposits & Reservations",
       "resv_desc": "Cut no‑shows with smart deposits & confirmations.",
-      "resv_cta": "Manage Reservations"
+      "resv_cta": "Manage Reservations",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Replay every service period event-by-event—just like reviewing a football match.",
+      "replay_cta": "Explore Service Replay"
     },
     "why_switch": {
       "badge": "Why Switch?",
@@ -450,7 +544,10 @@
       "crm_title": "Customer CRM (RFM)",
       "crm_desc": "Segment customers into Champions, Loyal, and At-Risk.",
       "ab_title": "Menu A/B Testing",
-      "ab_desc": "Test price, copy, and visuals. Pick winners with data."
+      "ab_desc": "Test price, copy, and visuals. Pick winners with data.",
+      "ab_cta": "Start a Test",
+      "crm_cta": "Explore CRM",
+      "replay_cta": "See It in Action"
     },
     "why_ai": {
       "badge": "Why AI?",
@@ -484,6 +581,42 @@
       "churn": "You don't know who's about to churn. RFM segmentation reveals it automatically.",
       "supplier": "Supplier prices are creeping up unnoticed. Cost anomaly alerts catch them early.",
       "replay": "You can't reconstruct what went wrong last Friday. Service Replay™ lets you replay any service period event-by-event."
+    },
+    "founding_program": {
+      "badge": "Limited Early-Adopter Program",
+      "title": "Founding Hospitality Business Program",
+      "subtitle": "Join the first 100 hospitality businesses to shape the future of hospitality operations.",
+      "benefit_1_title": "50% Lifetime Discount",
+      "benefit_1_desc": "Lock in 50% off your subscription for as long as you remain a customer. No expiration.",
+      "benefit_2_title": "Direct Founder Support",
+      "benefit_2_desc": "Get priority onboarding and direct access to the founding team for support and guidance.",
+      "benefit_3_title": "Early Access to New Capabilities",
+      "benefit_3_desc": "Be the first to access selected new features and capabilities as they launch.",
+      "benefit_4_title": "Shape Platform Development",
+      "benefit_4_desc": "Direct input on roadmap priorities — your operational needs help guide what we build next.",
+      "limited": "Limited to first 100 hospitality businesses",
+      "cta": "Join Founding Program",
+      "learn_more": "Learn More"
+    },
+    "pricing_preview": {
+      "heading": "Transparent Pricing for Every Business Size",
+      "subtitle": "ImboniServe offers flexible plans designed for hospitality businesses of all sizes.",
+      "starting_at": "Starting at",
+      "per_month": "/ month",
+      "starter_desc": "Perfect for single-location hospitality businesses getting started with modern operations.",
+      "annual_savings": "Annual billing saves 25% (equivalent to 3 free months)",
+      "scale": "Plans scale from single locations to multi-branch enterprises.",
+      "all_plans_include": "All Plans Include",
+      "feature_1": "QR ordering, POS, and kitchen operations",
+      "feature_2": "Inventory and procurement management",
+      "feature_3": "WhatsApp integration and mobile money payments",
+      "feature_4": "Reporting and analytics",
+      "enterprise_note": "Enterprise plans available with custom pricing for multi-branch operations and advanced requirements.",
+      "founding_note": "🎉 Founding Hospitality Business Program members receive 50% lifetime discount on all plans.",
+      "founding_link": "Learn more below ↓",
+      "view_full_pricing": "View Full Pricing",
+      "help": "Need help choosing?",
+      "chat": "Chat with us on WhatsApp"
     }
   },
   "cookies": {
@@ -792,8 +925,12 @@
     "last_90_days": "Last 90 days",
     "last_365_days": "Last 365 days",
     "lifetime": "Lifetime",
-    "brand": { "tagline": "Hospitality Management" },
-    "user": { "anon": "User" },
+    "brand": {
+      "tagline": "Hospitality Management"
+    },
+    "user": {
+      "anon": "User"
+    },
     "actions": {
       "logout": "Logout",
       "searchPlaceholder": "Search..."
@@ -1285,22 +1422,48 @@
     "h1": "AI That Works While You Work",
     "subheading": "AI isn't a feature. It's the foundation. Every AI capability does real work — not just displays data.",
     "meta_description": "AI Menu Builder, auto-reorder, insight reports, cost anomaly alerts, A/B testing, and optimization hub — AI that does real work.",
-    "hero": { "title": "AI Menu Builder", "desc": "Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions automatically. No manual entry — from hours to minutes." },
+    "hero": {
+      "title": "AI Menu Builder",
+      "desc": "Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions automatically. No manual entry — from hours to minutes."
+    },
     "capabilities": {
-      "auto_reorder_ai": { "title": "Auto-Reorder AI", "desc": "AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again." },
-      "ai_insight_reports": { "title": "AI Insight Reports", "desc": "Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst." },
-      "cost_anomaly_alerts": { "title": "Cost Anomaly Alerts", "desc": "Automatic detection of supplier price increases with z-score analysis and severity scoring. Catch price creep before it hurts." },
-      "a_b_testing_for_menus": { "title": "A/B Testing for Menus", "desc": "Test price, copy, and visuals. Split traffic. Measure conversion. Pick winners with real data, not gut feeling." },
-      "optimization_hub": { "title": "Optimization Hub", "desc": "AI-driven recommendations from Business Scanner, AI Insights, and Autopilot — with measured impact tracking." }
+      "auto_reorder_ai": {
+        "title": "Auto-Reorder AI",
+        "desc": "AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again."
+      },
+      "ai_insight_reports": {
+        "title": "AI Insight Reports",
+        "desc": "Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst."
+      },
+      "cost_anomaly_alerts": {
+        "title": "Cost Anomaly Alerts",
+        "desc": "Automatic detection of supplier price increases with z-score analysis and severity scoring. Catch price creep before it hurts."
+      },
+      "a_b_testing_for_menus": {
+        "title": "A/B Testing for Menus",
+        "desc": "Test price, copy, and visuals. Split traffic. Measure conversion. Pick winners with real data, not gut feeling."
+      },
+      "optimization_hub": {
+        "title": "Optimization Hub",
+        "desc": "AI-driven recommendations from Business Scanner, AI Insights, and Autopilot — with measured impact tracking."
+      }
     },
     "analytics_section_title": "AI-Powered Analytics",
     "analytics": {
-      "menu_performance_analytics": { "title": "Menu Performance Analytics", "desc": "Item-level revenue, quantity, and trend analysis." },
-      "peak_hours_analytics": { "title": "Peak Hours Analytics", "desc": "Hourly and daily demand patterns. Plan staffing with data." },
-      "instruction_insights": { "title": "Instruction Insights", "desc": "Customer order instruction patterns and preference analysis." }
+      "menu_performance_analytics": {
+        "title": "Menu Performance Analytics",
+        "desc": "Item-level revenue, quantity, and trend analysis."
+      },
+      "peak_hours_analytics": {
+        "title": "Peak Hours Analytics",
+        "desc": "Hourly and daily demand patterns. Plan staffing with data."
+      },
+      "instruction_insights": {
+        "title": "Instruction Insights",
+        "desc": "Customer order instruction patterns and preference analysis."
+      }
     }
   },
-  
   "features_operations": {
     "title_page": "Operations Features — Imboni Serve",
     "badge": "Operations",
@@ -1366,7 +1529,8 @@
       "start_trial_14": "Start 14-Day Free Trial",
       "explore_near": "Explore Businesses Near You",
       "view_pricing": "View Pricing"
-    }
+    },
+    "title_page": "Imboni Serve — Hospitality Operating System"
   },
   "pricing": {
     "title_page": "Pricing — Imboni Serve",
@@ -1646,8 +1810,7 @@
       "insufficient_credits": "Insufficient AI Credits",
       "upgrade_prompt": "Upgrade your plan or purchase additional AI credits to continue scanning."
     }
-  }
-  ,
+  },
   "achievements": {
     "title": "Achievements",
     "show_less": "Show Less",

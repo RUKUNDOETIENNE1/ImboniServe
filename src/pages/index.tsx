@@ -114,38 +114,7 @@ const features = [
   },
 ]
 
-const advancedFeatures = [
-  {
-    icon: <Sparkles className="w-5 h-5" />,
-    title: 'AI Menu Builder',
-    desc: 'Upload a photo or document and let AI build your menu for you.',
-  },
-  {
-    icon: <Globe className="w-5 h-5" />,
-    title: 'Business Discovery',
-    desc: 'Get discovered by customers searching for hospitality businesses powered by ImboniServe.',
-  },
-  {
-    icon: <Gift className="w-5 h-5" />,
-    title: 'Referral Program',
-    desc: 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.',
-  },
-  {
-    icon: <Play className="w-5 h-5" />,
-    title: 'Service Replay™',
-    desc: 'Replay any service period event-by-event — like a football match. Understand exactly what happened.',
-  },
-  {
-    icon: <Package className="w-5 h-5" />,
-    title: 'Inventory Alerts & Auto-Reorder',
-    desc: 'Automatic stock alerts and AI-powered draft purchase orders for your suppliers.',
-  },
-  {
-    icon: <Receipt className="w-5 h-5" />,
-    title: 'Smart Dining Slips',
-    desc: 'Auto-generated digital receipts with shareable links for seamless customer experience.',
-  },
-]
+// advancedFeatures moved inside component for t() access
 
 // Stats will be rendered with translations inline
 
@@ -293,6 +262,39 @@ export default function HomePage() {
       desc: t('homepage.growth.resv_desc', 'Cut no‑shows with smart deposits & confirmations.'),
       href: '/dashboard/reservations',
       cta: t('homepage.growth.resv_cta', 'Manage Reservations')
+    }
+  ]
+
+  const advancedFeatures = [
+    {
+      icon: <Sparkles className="w-5 h-5" />,
+      title: t('homepage.advanced.ai_menu', 'AI Menu Builder'),
+      desc: t('homepage.advanced.ai_menu_desc', 'Upload a photo or document and let AI build your menu for you.'),
+    },
+    {
+      icon: <Globe className="w-5 h-5" />,
+      title: t('homepage.advanced.marketplace', 'Business Discovery'),
+      desc: t('homepage.advanced.marketplace_desc', 'Get discovered by customers searching for hospitality businesses powered by ImboniServe.'),
+    },
+    {
+      icon: <Gift className="w-5 h-5" />,
+      title: t('homepage.advanced.referral', 'Referral Program'),
+      desc: t('homepage.advanced.referral_desc', 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.'),
+    },
+    {
+      icon: <Play className="w-5 h-5" />,
+      title: t('homepage.advanced.service_replay', 'Service Replay™'),
+      desc: t('homepage.advanced.service_replay_desc', 'Replay any service period event-by-event — like a football match. Understand exactly what happened.'),
+    },
+    {
+      icon: <Package className="w-5 h-5" />,
+      title: t('homepage.advanced.inventory_alerts', 'Inventory Alerts & Auto-Reorder'),
+      desc: t('homepage.advanced.inventory_alerts_desc', 'Automatic stock alerts and AI-powered draft purchase orders for your suppliers.'),
+    },
+    {
+      icon: <Receipt className="w-5 h-5" />,
+      title: t('homepage.advanced.smart_slips', 'Smart Dining Slips'),
+      desc: t('homepage.advanced.smart_slips_desc', 'Auto-generated digital receipts with shareable links for seamless customer experience.'),
     }
   ]
 
@@ -623,7 +625,7 @@ export default function HomePage() {
           >
             <img 
               src={`https://img.youtube.com/vi/Pdh2D6uWXQo/maxresdefault.jpg`}
-              alt="Imboni Serve Demo Video"
+              alt={t('homepage.video.alt', 'Imboni Serve Demo Video')}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all flex items-center justify-center">
