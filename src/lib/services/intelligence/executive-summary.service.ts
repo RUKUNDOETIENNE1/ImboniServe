@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 import { CustomerHealthScoreService } from './customer-health-score.service'
 import { BranchHealthScoreService } from './branch-health-score.service'
 import { PaymentWatchdogService } from '../watchdog/payment-watchdog.service'
+import { ReconciliationWatchdogService } from '../watchdog/reconciliation-watchdog.service'
 import { QueueWatchdogService } from '../watchdog/queue-watchdog.service'
 import { startOfMonth, subDays } from 'date-fns'
 
@@ -764,15 +765,15 @@ export class ExecutiveSummaryService {
     // Part 3: Operational
     const operationalIssues: string[] = []
     
-    if (reconciliationHealth.status === 'CRITICAL') {
+    if (reconciliationHealth === 'CRITICAL') {
       operationalIssues.push('reconciliation exceptions exceeded target thresholds')
-    } else if (reconciliationHealth.status === 'WARNING') {
+    } else if (reconciliationHealth === 'WARNING') {
       operationalIssues.push('reconciliation backlog approaching SLA limits')
     }
 
-    if (paymentHealth.status === 'CRITICAL') {
+    if (paymentHealth === 'CRITICAL') {
       operationalIssues.push('payment provider reliability concerns')
-    } else if (paymentHealth.status === 'WARNING') {
+    } else if (paymentHealth === 'WARNING') {
       operationalIssues.push('payment success rate below target')
     }
 

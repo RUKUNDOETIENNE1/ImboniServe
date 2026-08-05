@@ -83,12 +83,12 @@ export class PaymentWatchdogService {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
 
     // Get payment transactions in last hour by provider
-    const providers = ['INTOUCH', 'IREMBOPAY']
+    const providers = ['INTOUCH', 'IREMBO_PAY']
 
     for (const provider of providers) {
       const transactions = await prisma.paymentTransaction.findMany({
         where: {
-          provider,
+          gateway: provider as any,
           createdAt: { gte: oneHourAgo },
         },
         select: {
@@ -222,7 +222,7 @@ export class PaymentWatchdogService {
     const payments = await prisma.paymentTransaction.findMany({
       where: {
         createdAt: { gte: oneHourAgo },
-        status: 'PAID',
+        status: 'SUCCESS',
         paidAt: { not: null },
       },
       select: {

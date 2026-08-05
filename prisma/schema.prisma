@@ -26,6 +26,7 @@ model FinancialLedgerEntry {
   marketplaceOrderId   String?
   invoiceNumber        String?
   providerReference    String?
+  customerId           String?
   idempotencyKey       String?                   @unique
   occurredAt           DateTime                  @default(now())
   createdAt            DateTime                  @default(now())
@@ -38,6 +39,7 @@ model FinancialLedgerEntry {
   @@index([subscriptionId])
   @@index([marketplaceOrderId])
   @@index([invoiceNumber])
+  @@index([customerId])
 }
 
 datasource db {
@@ -75,6 +77,7 @@ model User {
   affiliate                    Affiliate?                  @relation("AffiliateUser")
   affiliateCommissionsNew      AffiliateCommissionNew[]    @relation("AffiliateCommissions")
   founderPartner               FounderPartner?             @relation("FounderPartnerUser")
+  partnership                  Partnership?                @relation("PartnershipUser")
   whatsappMessages             WhatsAppMessage[]
   staffTipsReceived            StaffTip[]
   ownedBusinesses              Business[]                  @relation("BusinessOwner")
@@ -2236,6 +2239,7 @@ enum SubscriptionStatus {
   TRIAL
   ACTIVE
   GRACE_PERIOD
+  PAST_DUE
   EXPIRED
   SUSPENDED
   CANCELLED
@@ -2253,6 +2257,8 @@ enum BillingEventType {
   SUBSCRIPTION_RENEWED
   SUBSCRIPTION_EXPIRED
   SUBSCRIPTION_CANCELLED
+  SUBSCRIPTION_CHARGE
+  MARKETPLACE_SALE
   REMINDER_SENT
 }
 
@@ -4932,6 +4938,8 @@ enum AttributionSourceType {
   REFERRAL_LINK
   CUSTOMER_REFERRAL
   BUSINESS_INVITE
+  PARTNERSHIP_CODE
+  PARTNERSHIP_CAMPAIGN
   DIRECT_ORGANIC
   OTHER
 }
@@ -4955,6 +4963,18 @@ enum PartnerType {
   FOUNDER
   STRATEGIC
   CHANNEL
+  AFFILIATE
+  PROFESSIONAL_MARKETER
+  CUSTOMER_REFERRAL
+  BUSINESS_INVITE
+  HOSPITALITY_ASSOCIATION
+  TOURISM_BOARD
+  GOVERNMENT_PROGRAM
+  POS_PARTNER
+  MARKETPLACE_PARTNER
+  HARDWARE_RESELLER
+  TECHNOLOGY_INTEGRATOR
+  AI_CAMPAIGN_PARTNER
 }
 
 enum FounderCodeStatus {
@@ -5005,31 +5025,45 @@ enum PartnershipEventType {
   PARTNER_APPLIED
   PARTNER_APPROVED
   PARTNER_SUSPENDED
+  PARTNER_REACTIVATED
+  PARTNER_ONBOARDED
   PARTNER_TERMINATED
   AGREEMENT_SENT
   AGREEMENT_SIGNED
   AGREEMENT_EXPIRED
+  AGREEMENT_TERMINATED
   CODE_CREATED
   CODE_PAUSED
   CODE_REVOKED
   CODE_REDEEMED
   ATTRIBUTION_RECORDED
   ATTRIBUTION_SUPERSEDED
+  ATTRIBUTION_RESOLVED
   CAMPAIGN_LAUNCHED
   CAMPAIGN_PAUSED
   CAMPAIGN_COMPLETED
+  CAMPAIGN_CANCELLED
+  TRIAL_ACTIVATED
+  TRIAL_EXPIRED
+  TRIAL_CONVERTED
   COMMISSION_ACCRUED
   COMMISSION_VALIDATED
+  COMMISSION_APPROVED
   COMMISSION_PAID
   COMMISSION_VOIDED
+  COMMISSION_CLAWED_BACK
   PAYOUT_REQUESTED
   PAYOUT_APPROVED
   PAYOUT_PAID
   PAYOUT_FAILED
+  PAYOUT_REJECTED
   RISK_SCORE_UPDATED
   RISK_FLAG_ADDED
+  RISK_FLAG_REMOVED
+  HEALTH_SCORE_UPDATED
   QBR_CREATED
   QBR_REVIEWED
+  PARTNER_TYPE_CHANGED
 }
 
 // ─── Attribution Models ───────────────────────────────────────────────────
@@ -5096,6 +5130,10 @@ model FounderPartner {
   activities   PartnerActivity[]
   qbrs         PartnerQBR[]
   auditLogs    PartnershipAuditLog[]
+
+  // Partnership Platform link (PP-001)
+  partnershipId String?  @unique
+  partnership   Partnership?   @relation("FounderPartnerProfile", fields: [partnershipId], references: [id])
 
   @@index([status])
   @@index([email])
@@ -5386,4 +5424,512 @@ model PartnershipEvent {
   @@index([type, createdAt])
   @@index([entityType, entityId])
   @@index([createdAt])
+}
+
+// ─── Partnership Platform (PP-001) ────────────────────────────────────────
+// Generalized partnership infrastructure supporting all partner types.
+// Founder Partner is the first consumer; future partner types reuse
+// these models without schema changes.
+
+enum PartnershipLifecycleStatus {
+  PROSPECT
+  APPLIED
+  ONBOARDED
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum PartnershipCodeStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+  REVOKED
+  EXHAUSTED
+}
+
+enum PartnershipCommissionType {
+  SIGNUP_BONUS
+  RECURRING_REVENUE
+  CAMPAIGN_BONUS
+  TIER_BONUS
+  REFERRAL_FEE
+  CUSTOM
+}
+
+enum PartnershipCommissionStatus {
+  PENDING
+  VALIDATED
+  APPROVED
+  PAID
+  VOID
+  CLAWED_BACK
+}
+
+enum PartnershipPayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  PAID
+  FAILED
+  REJECTED
+}
+
+enum PartnershipAgreementStatus {
+  DRAFT
+  SENT
+  SIGNED
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  AMENDED
+}
+
+enum PartnershipCampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum AttributionTouchType {
+  FIRST_TOUCH
+  LAST_TOUCH
+  ASSIST
+}
+
+enum PartnershipHealthGrade {
+  A
+  B
+  C
+  D
+  F
+}
+
+/// Root entity for all partnerships. Every partner — Founder, Affiliate,
+/// Marketer, Tourism Board, etc. — has exactly one Partnership row.
+/// Partner-type-specific profiles (e.g. FounderPartner) link back via
+/// partnershipId.
+model Partnership {
+  id              String                     @id @default(cuid())
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  // Identity
+  userId          String?                    @unique
+  name            String
+  email           String
+  phone           String?
+
+  // Classification
+  partnerType     PartnerType
+  status          PartnershipLifecycleStatus @default(PROSPECT)
+
+  // Onboarding
+  onboardedBy     String?
+  onboardedAt     DateTime?
+
+  // Organization context
+  organization    String?
+  region          String?
+  notes           String?
+
+  // Lifetime metrics (denormalized for dashboards)
+  totalSignups        Int                    @default(0)
+  totalConversions    Int                    @default(0)
+  totalRevenueCents   Int                    @default(0)
+  totalCommissionCents Int                   @default(0)
+  totalPayoutsCents   Int                    @default(0)
+
+  // Relations
+  user                User?                  @relation("PartnershipUser", fields: [userId], references: [id])
+  application         PartnershipApplication?
+  agreements          PartnershipAgreement[]
+  campaigns           PartnershipCampaign[]
+  codes               PartnershipCode[]
+  commissions         PartnershipCommission[]
+  payouts             PartnershipPayout[]
+  activities          PartnershipActivityLog[]
+  riskProfile         PartnershipRiskProfile?
+  healthScore         PartnershipHealthScore?
+  auditRecords        PartnershipAuditRecord[]
+  attributions        PartnershipAttribution[]
+
+  // Backward-compatible link to FounderPartner profile
+  founderPartnerProfile FounderPartner? @relation("FounderPartnerProfile")
+
+  @@index([status])
+  @@index([partnerType])
+  @@index([email])
+}
+
+/// Generalized application flow for any partnership type.
+model PartnershipApplication {
+  id              String                     @id @default(cuid())
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  partnershipId   String                     @unique
+
+  motivation      String?                    @db.Text
+  experience      String?
+  networkSize     String?
+  references      Json?
+
+  status          ApplicationStatus          @default(SUBMITTED)
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNotes     String?
+
+  partnership     Partnership                @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+/// Agreement lifecycle for partnerships. Supports amendment chains
+/// via previousAgreementId self-reference.
+model PartnershipAgreement {
+  id              String                     @id @default(cuid())
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  partnershipId   String
+
+  version         String
+  terms           Json?
+
+  signedAt        DateTime?
+  effectiveAt     DateTime?
+  expiresAt       DateTime?
+
+  status          PartnershipAgreementStatus @default(DRAFT)
+
+  // Amendment chain — self-reference to previous version
+  previousAgreementId String?  @unique
+  previousAgreement   PartnershipAgreement?   @relation("AgreementAmendmentChain", fields: [previousAgreementId], references: [id])
+  amendedBy           PartnershipAgreement?   @relation("AgreementAmendmentChain")
+
+  partnership     Partnership                @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([partnershipId])
+  @@index([status])
+  @@index([effectiveAt])
+  @@index([expiresAt])
+}
+
+/// Campaign management for partnerships with denormalized analytics.
+model PartnershipCampaign {
+  id                  String                     @id @default(cuid())
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+
+  partnershipId       String
+  name                String
+  description         String?
+
+  channel             String?
+  startDate           DateTime?
+  endDate             DateTime?
+
+  targetSignups       Int?
+  targetConversions   Int?
+  budgetCents         Int?
+
+  status              PartnershipCampaignStatus  @default(DRAFT)
+
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
+
+  // Analytics denormalized
+  actualSignups       Int                        @default(0)
+  actualConversions   Int                        @default(0)
+  actualRevenueCents  Int                        @default(0)
+
+  partnership         Partnership                @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  codes               PartnershipCode[]
+  commissions         PartnershipCommission[]
+
+  @@index([partnershipId])
+  @@index([status])
+  @@index([channel])
+}
+
+/// Generalized code namespace. Any partnership type can issue codes.
+/// Replaces FounderCode for new partnerships. FounderCode remains for
+/// backward compatibility.
+model PartnershipCode {
+  id              String                   @id @default(cuid())
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  code            String                   @unique
+  partnershipId   String
+  campaignId      String?
+
+  trialDays       Int                      @default(0)
+  status          PartnershipCodeStatus    @default(ACTIVE)
+  expiresAt       DateTime?
+
+  maxRedemptions  Int?
+  redemptionCount Int                      @default(0)
+
+  label           String?
+  notes           String?
+
+  // Metadata for custom code behavior per partner type
+  metadata        Json?
+
+  partnership     Partnership              @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  campaign        PartnershipCampaign?     @relation(fields: [campaignId], references: [id])
+  redemptions     PartnershipCodeRedemption[]
+  attributions    PartnershipAttribution[]
+  commissions     PartnershipCommission[]
+
+  @@index([partnershipId])
+  @@index([code])
+  @@index([status])
+}
+
+/// Tracks each redemption of a partnership code.
+model PartnershipCodeRedemption {
+  id               String      @id @default(cuid())
+  createdAt        DateTime    @default(now())
+
+  codeId           String
+  businessId       String
+  userId           String?
+
+  ipAddress        String?
+  userAgent        String?
+
+  trialDaysGranted Int
+
+  code             PartnershipCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  @@unique([codeId, businessId])
+  @@index([codeId])
+  @@index([businessId])
+}
+
+/// Multi-touch attribution history. Each business acquisition may have
+/// multiple attribution touches (first-touch, last-touch, assists).
+/// The canonical attribution remains in AcquisitionAttribution.
+model PartnershipAttribution {
+  id              String                @id @default(cuid())
+  createdAt       DateTime              @default(now())
+
+  partnershipId   String
+  businessId      String
+  codeId          String?
+
+  sourceType      AttributionSourceType
+  touchType       AttributionTouchType
+  priority        Int                   @default(0)
+
+  // Attribution metadata
+  sourceCode      String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+
+  ipAddress       String?
+  userAgent       String?
+
+  // Trial context
+  trialDaysOverride Int?
+
+  // Whether this touch is the canonical attribution
+  isCanonical     Boolean               @default(false)
+
+  partnership     Partnership           @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  code            PartnershipCode?      @relation(fields: [codeId], references: [id])
+
+  @@index([partnershipId])
+  @@index([businessId])
+  @@index([sourceType])
+  @@index([touchType])
+  @@index([isCanonical])
+}
+
+/// PartnershipAttribution and PartnershipCommission reference businessId
+/// as a plain string (no FK to Business) to avoid coupling between the
+/// Partnership aggregate and the Business aggregate. This follows the
+/// same pattern as MarketerAttribution. BusinessId is a read-only reference.
+
+/// Generalized commission ledger. Any partnership type can accrue commissions.
+model PartnershipCommission {
+  id              String                       @id @default(cuid())
+  createdAt       DateTime                     @default(now())
+  updatedAt       DateTime                     @updatedAt
+
+  partnershipId   String
+  businessId      String
+  codeId          String?
+  campaignId      String?
+  invoiceId       String?
+
+  type            PartnershipCommissionType
+  amountCents     Int
+  currency        String                       @default("RWF")
+  ratePercent     Float
+
+  status          PartnershipCommissionStatus  @default(PENDING)
+  lockedUntil     DateTime?
+  validatedAt     DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
+  paidAt          DateTime?
+
+  // Payout linkage — set when commission is included in a payout
+  payoutId        String?
+
+  periodMonth     Int?
+  description     String?
+
+  // Clawback support
+  clawbackReason  String?
+  clawbackDate    DateTime?
+
+  partnership     Partnership                  @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  code            PartnershipCode?             @relation(fields: [codeId], references: [id])
+  campaign        PartnershipCampaign?         @relation(fields: [campaignId], references: [id])
+  payout          PartnershipPayout?           @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+
+  @@index([partnershipId, status])
+  @@index([partnershipId, status, periodMonth])
+  @@index([businessId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([type])
+  @@index([payoutId])
+}
+
+/// Generalized payout. Any partnership type can request payouts.
+model PartnershipPayout {
+  id               String                     @id @default(cuid())
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+
+  partnershipId    String
+
+  amountCents      Int
+  currency         String                     @default("RWF")
+  method           PayoutMethod
+
+  status           PartnershipPayoutStatus    @default(PENDING)
+
+  approvedBy       String?
+  approvedAt       DateTime?
+  processedAt      DateTime?
+  paidAt           DateTime?
+  failedAt         DateTime?
+  rejectedAt       DateTime?
+  rejectedBy       String?
+  rejectReason     String?
+
+  referenceId      String?                    @unique
+  providerResponse String?
+
+  recipientPhone   String?
+  recipientBank    String?
+  recipientAccount String?
+
+  partnership      Partnership                @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  commissions      PartnershipCommission[]
+
+  @@index([partnershipId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Generalized activity log. Replaces PartnerActivity for new partnerships.
+model PartnershipActivityLog {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+
+  partnershipId   String
+  type            String
+  description     String?
+  metadata        Json?
+
+  partnership     Partnership    @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([partnershipId, createdAt])
+  @@index([type, createdAt])
+}
+
+/// Risk profile for partnerships. Tracks fraud signals and payout risk.
+model PartnershipRiskProfile {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  partnershipId   String         @unique
+  riskScore       Int            @default(0)
+  riskLevel       RiskLevel      @default(LOW)
+
+  flags           String[]
+
+  totalPayouts    Int            @default(0)
+  avgPayoutCents  Int            @default(0)
+  lastPayoutAt    DateTime?
+
+  partnership     Partnership    @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([riskLevel])
+}
+
+/// Health score for partnerships. Computed from signups, conversions,
+/// revenue, activity, and risk signals. Updated periodically.
+model PartnershipHealthScore {
+  id              String                 @id @default(cuid())
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  partnershipId   String                 @unique
+
+  score           Int                    @default(0)
+  grade           PartnershipHealthGrade @default(C)
+
+  // Component scores (0-100 each)
+  acquisitionScore    Int                @default(0)
+  conversionScore     Int                @default(0)
+  revenueScore        Int                @default(0)
+  engagementScore     Int                @default(0)
+  riskComponentScore  Int                @default(0)
+
+  // Trend
+  previousScore   Int?
+  trendDirection  String?
+
+  // Metadata
+  computedAt      DateTime               @default(now())
+  notes           String?
+
+  partnership     Partnership            @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([grade])
+  @@index([score])
+}
+
+/// Audit record for partnerships. Tracks data-level changes (who changed
+/// what field from what value to what value). Distinct from
+/// PartnershipActivityLog which tracks business-level timeline events.
+model PartnershipAuditRecord {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+
+  partnershipId   String
+  action          String
+  actorId         String?
+  oldValue        String?
+  newValue        String?
+  metadata        Json?
+
+  partnership     Partnership    @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([partnershipId, createdAt])
+  @@index([action, createdAt])
 }

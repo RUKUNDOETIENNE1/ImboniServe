@@ -21,6 +21,7 @@ import { AttributionSourceType, AttributionStatus } from '@prisma/client'
  */
 const SOURCE_TYPE_MAP: Record<string, AttributionSourceType> = {
   FOUNDER_CODE: AttributionSourceType.FOUNDER_CODE,
+  PARTNERSHIP_CODE: AttributionSourceType.PARTNERSHIP_CODE,
   AFFILIATE: AttributionSourceType.AFFILIATE,
   PROFESSIONAL_MARKETER: AttributionSourceType.PROFESSIONAL_MARKETER,
   REFERRAL_LINK: AttributionSourceType.REFERRAL_LINK,

@@ -177,25 +177,25 @@ export class FinancialPrioritiesService {
     // === HIGH PRIORITIES (Subscription Risk) ===
 
     // Priority 5: Subscription Health
-    if (subscriptionHealth.status === 'CRITICAL') {
+    if (subscriptionHealth === 'CRITICAL') {
       priorities.push({
         level: 'HIGH',
         category: 'SUBSCRIPTION_RISK',
         title: 'Subscription Health Critical',
         description: 'Grace period subscriptions or failed renewals exceeding thresholds',
-        metricValue: subscriptionHealth.status,
+        metricValue: subscriptionHealth,
         threshold: 'HEALTHY',
         trend: '🔴 Critical',
         action: 'Review grace period accounts. Address payment failures. Implement proactive renewal outreach.',
         severity: 78
       })
-    } else if (subscriptionHealth.status === 'WARNING') {
+    } else if (subscriptionHealth === 'WARNING') {
       priorities.push({
         level: 'MEDIUM',
         category: 'SUBSCRIPTION_RISK',
         title: 'Subscription Health Warning',
         description: 'Subscription metrics showing early warning signs',
-        metricValue: subscriptionHealth.status,
+        metricValue: subscriptionHealth,
         threshold: 'HEALTHY',
         trend: '⚠️ Warning',
         action: 'Monitor grace period aging. Improve renewal communication. Check payment method health.',
@@ -206,25 +206,25 @@ export class FinancialPrioritiesService {
     // === MEDIUM PRIORITIES (Operational Risk) ===
 
     // Priority 6: Reconciliation Health
-    if (reconciliationHealth.status === 'CRITICAL') {
+    if (reconciliationHealth === 'CRITICAL') {
       priorities.push({
         level: 'MEDIUM',
         category: 'OPERATIONAL_RISK',
         title: 'Reconciliation Backlog Critical',
         description: 'Financial reconciliation exceptions require immediate attention',
-        metricValue: reconciliationHealth.status,
+        metricValue: reconciliationHealth,
         threshold: 'HEALTHY',
         trend: '🔴 Critical',
         action: 'Clear reconciliation backlog. Investigate reconciliation failures. Improve automation.',
         severity: 65
       })
-    } else if (reconciliationHealth.status === 'WARNING') {
+    } else if (reconciliationHealth === 'WARNING') {
       priorities.push({
         level: 'MEDIUM',
         category: 'OPERATIONAL_RISK',
         title: 'Reconciliation Backlog Warning',
         description: 'Reconciliation backlog approaching SLA threshold',
-        metricValue: reconciliationHealth.status,
+        metricValue: reconciliationHealth,
         threshold: 'HEALTHY',
         trend: '⚠️ Warning',
         action: 'Allocate finance team resources. Review reconciliation process efficiency.',
@@ -233,25 +233,25 @@ export class FinancialPrioritiesService {
     }
 
     // Priority 7: Payment Operations
-    if (paymentHealth.status === 'CRITICAL') {
+    if (paymentHealth === 'CRITICAL') {
       priorities.push({
         level: 'MEDIUM',
         category: 'OPERATIONAL_RISK',
         title: 'Payment Operations Critical',
         description: 'Payment provider failures or high failure rates detected',
-        metricValue: paymentHealth.status,
+        metricValue: paymentHealth,
         threshold: 'HEALTHY',
         trend: '🔴 Critical',
         action: 'Contact payment providers. Review failure patterns. Implement fallback payment methods.',
         severity: 62
       })
-    } else if (paymentHealth.status === 'WARNING') {
+    } else if (paymentHealth === 'WARNING') {
       priorities.push({
         level: 'MEDIUM',
         category: 'OPERATIONAL_RISK',
         title: 'Payment Operations Warning',
         description: 'Payment success rate below target',
-        metricValue: paymentHealth.status,
+        metricValue: paymentHealth,
         threshold: 'HEALTHY',
         trend: '⚠️ Warning',
         action: 'Monitor payment provider health. Review payment retry logic. Check customer payment methods.',

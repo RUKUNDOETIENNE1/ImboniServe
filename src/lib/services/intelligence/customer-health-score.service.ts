@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma'
+import { subDays } from 'date-fns'
 
 export interface CustomerHealthScore {
   customerId: string

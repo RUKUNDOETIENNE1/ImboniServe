@@ -141,8 +141,8 @@ export class ReconciliationWatchdogService {
       select: {
         id: true,
         createdAt: true,
-        amount: true,
-        type: true,
+        amountCents: true,
+        eventType: true,
       },
     })
 
@@ -166,8 +166,8 @@ export class ReconciliationWatchdogService {
           oldestEntryId: oldestEntry.id,
           ageHours: ageHours.toFixed(2),
           createdAt: oldestEntry.createdAt.toISOString(),
-          amount: oldestEntry.amount,
-          type: oldestEntry.type,
+          amount: oldestEntry.amountCents,
+          type: oldestEntry.eventType,
           slaThreshold: criticalThreshold,
         },
         recommendedAction:
@@ -188,8 +188,8 @@ export class ReconciliationWatchdogService {
           oldestEntryId: oldestEntry.id,
           ageHours: ageHours.toFixed(2),
           createdAt: oldestEntry.createdAt.toISOString(),
-          amount: oldestEntry.amount,
-          type: oldestEntry.type,
+          amount: oldestEntry.amountCents,
+          type: oldestEntry.eventType,
           threshold: errorThreshold,
         },
         recommendedAction:
@@ -220,5 +220,28 @@ export class ReconciliationWatchdogService {
     // - Alert on any mismatches (CRITICAL severity)
 
     return alerts
+  }
+
+  /**
+   * Get overall reconciliation health status for CEO/CFO Dashboard
+   * Returns: HEALTHY, WARNING, or CRITICAL
+   */
+  static async getHealth(): Promise<'HEALTHY' | 'WARNING' | 'CRITICAL'> {
+    try {
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+      const unreconciledCount = await prisma.financialLedgerEntry.count({
+        where: {
+          createdAt: { lt: oneDayAgo },
+        },
+      })
+
+      if (unreconciledCount >= 50) return 'CRITICAL'
+      if (unreconciledCount >= 10) return 'WARNING'
+      return 'HEALTHY'
+    } catch (error) {
+      console.error('Error getting reconciliation health:', error)
+      return 'CRITICAL'
+    }
   }
 }

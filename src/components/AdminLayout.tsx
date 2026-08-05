@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, Building2, Store, TrendingUp, 
   Settings, Bell, Search, ChevronDown, LogOut, Menu, X,
   DollarSign, FileText, UserCog, RefreshCw, Flag, UserCircle,
-  BarChart3, Wallet, Calendar, Mail, Users2, Tag
+  BarChart3, Wallet, Calendar, Mail, Users2, Tag, Rocket, Landmark, Radar
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import Image from 'next/image'
@@ -34,6 +34,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Subscriptions', href: '/admin/subscriptions', icon: DollarSign },
     { name: 'Affiliates', href: '/admin/affiliates', icon: UserCog },
     { name: 'Founder Partners', href: '/admin/founder-partners', icon: Users2 },
+    { name: 'Partnership Applications', href: '/admin/partnership-applications', icon: FileText },
+    { name: 'Growth Workspace', href: '/admin/founder-partners', icon: Rocket },
+    { name: 'Revenue Operations', href: '/admin/revenue-operations', icon: Landmark },
+    { name: 'Operations Intelligence', href: '/admin/operations-intelligence', icon: Radar },
     { name: 'Founder Codes', href: '/admin/founder-codes', icon: Tag },
     { name: 'Payout Control', href: '/admin/payout-control', icon: Wallet },
     { name: 'Revenue Analytics', href: '/admin/revenue-analytics', icon: BarChart3 },

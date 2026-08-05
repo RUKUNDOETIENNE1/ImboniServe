@@ -13,13 +13,13 @@ import { prisma } from '@/lib/prisma'
 import { subDays } from 'date-fns'
 
 export interface FinancialOperationsIntelligence {
-  reconciliation: {
+  reconciliationHealth: {
     status: 'HEALTHY' | 'WARNING' | 'CRITICAL'
     unreconciledItems: number
     settlementDelayDays: number
     available: boolean // False until schema supports
   }
-  payments: {
+  paymentHealth: {
     successRate: number
     successRateStatus: 'HEALTHY' | 'WARNING' | 'CRITICAL'
     providerHealth: {
@@ -38,27 +38,27 @@ export class FinancialOperationsService {
    * Get comprehensive financial operations intelligence
    */
   static async getIntelligence(): Promise<FinancialOperationsIntelligence> {
-    const [reconciliationHealth, paymentHealth, paymentMetrics] = await Promise.all([
+    const [reconciliationHealthStatus, paymentHealthStatus, paymentMetrics] = await Promise.all([
       ReconciliationWatchdogService.getHealth(),
       PaymentWatchdogService.getHealth(),
       this.getPaymentMetrics()
     ])
 
     // Reconciliation metrics require schema updates
-    const reconciliation = {
-      status: reconciliationHealth.status,
+    const reconciliationHealth = {
+      status: reconciliationHealthStatus,
       unreconciledItems: 0,
       settlementDelayDays: 0,
       available: false
     }
 
     // Payment operations
-    const payments = {
+    const paymentHealth = {
       successRate: paymentMetrics.successRate,
       successRateStatus: this.getPaymentSuccessStatus(paymentMetrics.successRate),
       providerHealth: {
-        mtn: paymentHealth.status, // Simplified - would need provider-specific health
-        airtel: paymentHealth.status
+        mtn: paymentHealthStatus, // Simplified - would need provider-specific health
+        airtel: paymentHealthStatus
       },
       revenueProtection: {
         failedPaymentImpact: paymentMetrics.failedPaymentImpact,
@@ -67,8 +67,8 @@ export class FinancialOperationsService {
     }
 
     return {
-      reconciliation,
-      payments
+      reconciliationHealth,
+      paymentHealth
     }
   }
 

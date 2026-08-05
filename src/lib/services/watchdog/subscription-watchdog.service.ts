@@ -66,17 +66,17 @@ export class SubscriptionWatchdogService {
     const graceSubscriptions = await prisma.subscription.findMany({
       where: {
         status: {
-          in: ['GRACE', 'PAST_DUE'],
+          in: ['GRACE_PERIOD', 'PAST_DUE'],
         },
       },
       select: {
         id: true,
         status: true,
-        currentPeriodEnd: true,
+        endDate: true,
         plan: {
           select: {
             name: true,
-            price: true,
+            priceCents: true,
           },
         },
       },
@@ -91,19 +91,19 @@ export class SubscriptionWatchdogService {
 
     // Count subscriptions by aging milestone
     const aging3Days = graceSubscriptions.filter(
-      (s) => s.currentPeriodEnd && s.currentPeriodEnd.getTime() < threeDayAgo
+      (s) => s.endDate && s.endDate.getTime() < threeDayAgo
     )
     const aging7Days = graceSubscriptions.filter(
-      (s) => s.currentPeriodEnd && s.currentPeriodEnd.getTime() < sevenDayAgo
+      (s) => s.endDate && s.endDate.getTime() < sevenDayAgo
     )
     const aging14Days = graceSubscriptions.filter(
-      (s) => s.currentPeriodEnd && s.currentPeriodEnd.getTime() < fourteenDayAgo
+      (s) => s.endDate && s.endDate.getTime() < fourteenDayAgo
     )
 
     // Calculate revenue at risk
-    const revenueAtRisk3Day = aging3Days.reduce((sum, s) => sum + (s.plan?.price || 0), 0)
-    const revenueAtRisk7Day = aging7Days.reduce((sum, s) => sum + (s.plan?.price || 0), 0)
-    const revenueAtRisk14Day = aging14Days.reduce((sum, s) => sum + (s.plan?.price || 0), 0)
+    const revenueAtRisk3Day = aging3Days.reduce((sum, s) => sum + (s.plan?.priceCents || 0), 0)
+    const revenueAtRisk7Day = aging7Days.reduce((sum, s) => sum + (s.plan?.priceCents || 0), 0)
+    const revenueAtRisk14Day = aging14Days.reduce((sum, s) => sum + (s.plan?.priceCents || 0), 0)
 
     // Alert on 14-day aging (CRITICAL - likely to churn)
     if (aging14Days.length > 0) {
@@ -187,7 +187,7 @@ export class SubscriptionWatchdogService {
     const failedRenewals = await prisma.subscription.count({
       where: {
         status: {
-          in: ['GRACE', 'PAST_DUE'],
+          in: ['GRACE_PERIOD', 'PAST_DUE'],
         },
         updatedAt: {
           gte: oneDayAgo,

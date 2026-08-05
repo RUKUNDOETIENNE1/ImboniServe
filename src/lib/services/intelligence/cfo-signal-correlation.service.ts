@@ -94,7 +94,7 @@ export class CfoSignalCorrelationService {
     // Payment success rate low + Queue backlog high
     if (
       operations.paymentHealth.successRate < 90 ||
-      paymentHealth.status === 'CRITICAL'
+      paymentHealth === 'CRITICAL'
     ) {
       correlations.push({
         pattern: 'PAYMENT_SYSTEM_ISSUE',
@@ -103,7 +103,7 @@ export class CfoSignalCorrelationService {
         description: 'Payment failures at critical levels correlating with processing issues',
         signals: [
           `Payment success rate at ${operations.paymentHealth.successRate.toFixed(1)}%`,
-          `Payment watchdog status: ${paymentHealth.status}`
+          `Payment watchdog status: ${paymentHealth}`
         ],
         hypothesis: 'Payment provider reliability issues or payment processing infrastructure problems causing revenue collection failures. This is likely a technical issue, not a customer issue.',
         action: 'Immediate technical investigation: Review payment provider status, analyze failure error codes, check processing queue health, and consider failover to backup payment provider if available.',
@@ -111,7 +111,7 @@ export class CfoSignalCorrelationService {
       })
     } else if (
       operations.paymentHealth.successRate < 95 &&
-      paymentHealth.status === 'WARNING'
+      paymentHealth === 'WARNING'
     ) {
       correlations.push({
         pattern: 'PAYMENT_SYSTEM_ISSUE',
@@ -120,7 +120,7 @@ export class CfoSignalCorrelationService {
         description: 'Payment success rate below target with processing issues',
         signals: [
           `Payment success rate at ${operations.paymentHealth.successRate.toFixed(1)}%`,
-          `Payment watchdog status: ${paymentHealth.status}`
+          `Payment watchdog status: ${paymentHealth}`
         ],
         hypothesis: 'Payment processing showing early signs of degradation. May indicate provider issues or increased payment failures.',
         action: 'Monitor closely: Review payment failure patterns, check provider status, and prepare contingency plans.',
@@ -152,7 +152,7 @@ export class CfoSignalCorrelationService {
     // === PATTERN 4: Operational Bottleneck ===
     // Reconciliation issues + Payment issues
     if (
-      reconHealth.status === 'WARNING' &&
+      reconHealth === 'WARNING' &&
       operations.paymentHealth.successRate < 95
     ) {
       correlations.push({
@@ -161,7 +161,7 @@ export class CfoSignalCorrelationService {
         title: 'Financial Operations Bottleneck',
         description: 'Multiple operational systems showing degraded performance',
         signals: [
-          `Reconciliation status: ${reconHealth.status}`,
+          `Reconciliation status: ${reconHealth}`,
           `Payment success rate: ${operations.paymentHealth.successRate.toFixed(1)}%`
         ],
         hypothesis: 'Operational capacity constraints or data quality issues affecting multiple financial systems. This suggests infrastructure or process problems rather than isolated issues.',
@@ -197,7 +197,7 @@ export class CfoSignalCorrelationService {
     // Payment failures + Reconciliation issues
     if (
       operations.paymentHealth.successRate < 93 &&
-      reconHealth.status !== 'HEALTHY'
+      reconHealth !== 'HEALTHY'
     ) {
       correlations.push({
         pattern: 'REVENUE_LEAKAGE',
@@ -206,8 +206,8 @@ export class CfoSignalCorrelationService {
         description: 'Payment and reconciliation problems causing revenue leakage',
         signals: [
           `Payment success rate: ${operations.paymentHealth.successRate.toFixed(1)}%`,
-          `Reconciliation status: ${reconHealth.status}`
-        ],
+          `Reconciliation status: ${reconHealth}`
+       ],
         hypothesis: 'Revenue is being earned but not efficiently collected or reconciled. Payment failures mean customers want to pay but cannot, and reconciliation issues mean revenue may be unaccounted for.',
         action: 'Revenue operations review: Implement payment retry strategies, improve payment method management, and streamline reconciliation processes to capture all earned revenue.',
         priority: 78

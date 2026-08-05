@@ -266,8 +266,8 @@ export class RevenueWatchdogService {
     const topCustomerRevenue = await prisma.financialLedgerEntry.groupBy({
       by: ['customerId'],
       where: {
-        type: 'REVENUE',
-        createdAt: {
+        eventType: { in: ['SUBSCRIPTION_CHARGE', 'MARKETPLACE_SALE', 'PAYMENT_SUCCESS'] },
+        occurredAt: {
           gte: thirtyDaysAgo,
         },
         customerId: {
@@ -275,11 +275,11 @@ export class RevenueWatchdogService {
         },
       },
       _sum: {
-        amount: true,
+        amountCents: true,
       },
       orderBy: {
         _sum: {
-          amount: 'desc',
+          amountCents: 'desc',
         },
       },
       take: 1,
@@ -287,7 +287,7 @@ export class RevenueWatchdogService {
 
     if (topCustomerRevenue.length === 0) return alerts
 
-    const topRevenue = topCustomerRevenue[0]._sum.amount || 0
+    const topRevenue = (topCustomerRevenue[0]._sum.amountCents || 0) / 100
     const concentrationPercent = (topRevenue / totalRevenue) * 100
 
     // Thresholds
@@ -365,18 +365,18 @@ export class RevenueWatchdogService {
   private static async getRevenueForPeriod(start: Date, end: Date): Promise<number> {
     const result = await prisma.financialLedgerEntry.aggregate({
       where: {
-        type: 'REVENUE',
-        createdAt: {
+        eventType: { in: ['SUBSCRIPTION_CHARGE', 'MARKETPLACE_SALE', 'PAYMENT_SUCCESS'] },
+        occurredAt: {
           gte: start,
           lt: end,
         },
       },
       _sum: {
-        amount: true,
+        amountCents: true,
       },
     })
 
-    return result._sum.amount || 0
+    return (result._sum.amountCents || 0) / 100
   }
 
   /**

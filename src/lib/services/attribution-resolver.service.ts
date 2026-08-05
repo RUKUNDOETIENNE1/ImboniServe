@@ -5,16 +5,18 @@ const log = logger.child({ service: 'attribution-resolver' })
 
 /**
  * Attribution precedence (highest → lowest):
- *   1. FounderCode      (Phase 1 — model not yet in schema)
- *   2. Affiliate
- *   3. ProfessionalMarketer
- *   4. ReferralLink     (customer referral links)
- *   5. CustomerReferral
- *   6. BusinessInvite
+ *   1. FounderCode      (legacy — Phase 1)
+ *   2. PartnershipCode  (PP-001 platform code namespace — supersedes FounderCode)
+ *   3. Affiliate
+ *   4. ProfessionalMarketer
+ *   5. ReferralLink     (customer referral links)
+ *   6. CustomerReferral
+ *   7. BusinessInvite
  */
 
 export type AttributionSource =
   | 'FOUNDER_CODE'
+  | 'PARTNERSHIP_CODE'
   | 'AFFILIATE'
   | 'PROFESSIONAL_MARKETER'
   | 'REFERRAL_LINK'
@@ -131,7 +133,35 @@ class AttributionResolver {
       },
     })
 
-    // 2. Affiliate
+    // 2. PartnershipCode — PP-001 platform code namespace (supersedes FounderCode)
+    resolvers.push({
+      source: 'PARTNERSHIP_CODE',
+      resolve: async (code: string): Promise<AttributionResult | null> => {
+        const pc = await prisma.partnershipCode.findUnique({
+          where: { code },
+          include: { partnership: true },
+        })
+        if (!pc || pc.status !== 'ACTIVE') return null
+        if (pc.expiresAt && pc.expiresAt < new Date()) return null
+        if (pc.maxRedemptions != null && pc.redemptionCount >= pc.maxRedemptions) return null
+        if (email || phone) {
+          const partnership = pc.partnership
+          if (partnership && partnership.userId) {
+            const user = await prisma.user.findUnique({ where: { id: partnership.userId } })
+            if (user && (user.email === email || user.phone === phone)) return null
+          }
+        }
+        return {
+          source: 'PARTNERSHIP_CODE',
+          code: pc.code,
+          entityId: pc.id,
+          userId: pc.partnership?.userId ?? undefined,
+          trialDaysOverride: pc.trialDays > 0 ? pc.trialDays : undefined,
+        }
+      },
+    })
+
+    // 3. Affiliate
     resolvers.push({
       source: 'AFFILIATE',
       resolve: async (code: string): Promise<AttributionResult | null> => {
@@ -152,7 +182,7 @@ class AttributionResolver {
       },
     })
 
-    // 3. ProfessionalMarketer
+    // 4. ProfessionalMarketer
     resolvers.push({
       source: 'PROFESSIONAL_MARKETER',
       resolve: async (code: string): Promise<AttributionResult | null> => {
@@ -171,7 +201,7 @@ class AttributionResolver {
       },
     })
 
-    // 4. ReferralLink (customer referral links)
+    // 5. ReferralLink (customer referral links)
     resolvers.push({
       source: 'REFERRAL_LINK',
       resolve: async (code: string): Promise<AttributionResult | null> => {
@@ -189,7 +219,7 @@ class AttributionResolver {
       },
     })
 
-    // 5. CustomerReferral
+    // 6. CustomerReferral
     resolvers.push({
       source: 'CUSTOMER_REFERRAL',
       resolve: async (code: string): Promise<AttributionResult | null> => {
@@ -206,7 +236,7 @@ class AttributionResolver {
       },
     })
 
-    // 6. BusinessInvite
+    // 7. BusinessInvite
     resolvers.push({
       source: 'BUSINESS_INVITE',
       resolve: async (code: string): Promise<AttributionResult | null> => {

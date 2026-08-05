@@ -22,8 +22,7 @@ export class TrialPolicyService {
     if (override != null && override > 0 && override <= MAX_TRIAL_DAYS) {
       return override
     }
-    if (params?.source === 'FOUNDER_CODE') {
-      // Founder Partner default is 30 days unless overridden
+    if (params?.source === 'FOUNDER_CODE' || params?.source === 'PARTNERSHIP_CODE') {
       return override ?? 30
     }
     return DEFAULT_TRIAL_DAYS
