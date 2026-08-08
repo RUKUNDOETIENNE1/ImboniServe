@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 /**
  * Simple MVP endpoint for the AI Brand Assistant.
@@ -8,7 +9,7 @@ import { authOptions } from '../auth/[...nextauth]'
  * - Calls OpenAI if OPENAI_API_KEY is set
  * - Returns a single answer string
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -70,3 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: error?.message || 'Internal error' })
   }
 }
+
+// Apply commercial enforcement: AI Brand Assistant requires Business plan or higher
+export default requiresFeature('hasAIAssistant')(baseHandler)

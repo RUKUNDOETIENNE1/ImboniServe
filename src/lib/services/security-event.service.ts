@@ -23,6 +23,7 @@ export type SecurityEventType =
   | 'STAFF_SUSPEND'
   | 'PERMISSION_DENIED'
   | 'BRUTE_FORCE_DETECTED'
+  | 'OTP_RESEND_REQUESTED'
 
 export const SecurityEventService = {
   async log(opts: {
@@ -39,7 +40,7 @@ export const SecurityEventService = {
           eventType: opts.eventType,
           ip: opts.ip ?? null,
           userAgent: opts.userAgent ?? null,
-          metadata: opts.metadata ?? {},
+          metadata: (opts.metadata ?? {}) as any,
         },
       })
     } catch (err) {

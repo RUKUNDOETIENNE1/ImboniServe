@@ -180,20 +180,61 @@ export class WhatsAppService {
   }
 
   /**
-   * Opt-in/opt-out management (placeholder)
+   * Opt-in/opt-out management
+   * Stores preferences in WhatsAppMessage metadata via a special OPT_OUT type record
    */
   static async updatePreferences(phone: string, optIn: boolean): Promise<{ success: boolean }> {
-    // TODO: Store preferences in database
-    logger.info('WhatsApp preferences updated', { phone, optIn })
-    return { success: true }
+    try {
+      const { prisma } = await import('@/lib/prisma')
+      // Find existing opt-out record for this phone
+      const existing = await prisma.whatsAppMessage.findFirst({
+        where: { fromNumber: phone, type: 'PREFERENCE_UPDATE' },
+      })
+
+      if (existing) {
+        await prisma.whatsAppMessage.update({
+          where: { id: existing.id },
+          data: { message: optIn ? 'OPT_IN' : 'OPT_OUT' },
+        })
+      } else {
+        await prisma.whatsAppMessage.create({
+          data: {
+            fromNumber: phone,
+            toNumber: 'system',
+            message: optIn ? 'OPT_IN' : 'OPT_OUT',
+            type: 'PREFERENCE_UPDATE',
+            direction: 'INBOUND',
+            status: 'PROCESSED',
+            processed: true,
+            businessId: 'system',
+          },
+        })
+      }
+
+      logger.info('WhatsApp preferences updated', { phone, optIn })
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to update WhatsApp preferences', { error, phone })
+      return { success: false }
+    }
   }
 
   /**
    * Check if user has opted in for WhatsApp notifications
    */
   static async hasOptedIn(phone: string): Promise<boolean> {
-    // TODO: Check database for opt-in status
-    // For now, assume all users are opted in
-    return true
+    try {
+      const { prisma } = await import('@/lib/prisma')
+      const pref = await prisma.whatsAppMessage.findFirst({
+        where: { fromNumber: phone, type: 'PREFERENCE_UPDATE' },
+        orderBy: { createdAt: 'desc' },
+      })
+
+      if (!pref) return true // Default: opted in
+      return pref.message === 'OPT_IN'
+    } catch (error) {
+      logger.error('Failed to check WhatsApp opt-in status', { error, phone })
+      return true // Fail open: assume opted in
+    }
   }
 }

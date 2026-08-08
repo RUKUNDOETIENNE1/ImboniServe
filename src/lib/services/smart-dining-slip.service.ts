@@ -3,6 +3,7 @@ import { ReferralService } from './referral.service'
 import { NotificationService } from './notification.service'
 import { SlipPDFGeneratorService } from './slip-pdf-generator.service'
 import { BusinessInviteService } from './business-invite.service'
+import { FinancialTruthService } from './financial-truth.service'
 
 export interface GenerateSlipInput {
   saleId: string
@@ -57,8 +58,16 @@ export class SmartDiningSlipService {
 
     const slipNumber = `SDS-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
+    // Get actual costs from FinancialTruthService for accurate margin calculation
+    const saleCost = await FinancialTruthService.getSaleCost(input.saleId)
+    const itemCostMap = new Map(
+      saleCost.itemBreakdown.map(item => [item.saleItemId, item])
+    )
+
     const lineItems = sale.items.map((item: any) => {
-      const costCents = item.menuItem.costCents * item.quantity
+      const costInfo = itemCostMap.get(item.id)
+      // Use actual cost if available, otherwise fall back to estimated
+      const costCents = costInfo?.costCents ?? (item.menuItem.costCents * item.quantity)
       const marginCents = item.totalPriceCents - costCents
       const marginPercent = item.totalPriceCents > 0 ? (marginCents / item.totalPriceCents) * 100 : 0
 
@@ -70,6 +79,7 @@ export class SmartDiningSlipService {
         costCents,
         marginCents,
         marginPercent,
+        costSource: costInfo?.source ?? 'ESTIMATED',
       }
     })
 

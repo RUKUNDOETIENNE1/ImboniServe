@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { PaymentTransactionStatus } from '@prisma/client'
 
 type SourceKey = 'webhook' | 'poll' | 'cron' | 'sweeper' | 'unknown'
 
@@ -15,14 +16,14 @@ export class PaymentMetricsService {
     const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000)
 
     const [totalPaidToday, failedToday, pendingOver10] = await Promise.all([
-      prisma.paymentTransaction.count({ where: { status: 'PAID' as any, paidAt: { gte: start } } }),
-      prisma.paymentTransaction.count({ where: { status: 'FAILED' as any, updatedAt: { gte: start } } }),
-      prisma.paymentTransaction.count({ where: { status: 'PENDING' as any, createdAt: { lt: tenMinutesAgo } } }),
+      prisma.paymentTransaction.count({ where: { status: PaymentTransactionStatus.SUCCESS, paidAt: { gte: start } } }),
+      prisma.paymentTransaction.count({ where: { status: PaymentTransactionStatus.FAILED, updatedAt: { gte: start } } }),
+      prisma.paymentTransaction.count({ where: { status: PaymentTransactionStatus.PENDING, createdAt: { lt: tenMinutesAgo } } }),
     ])
 
-    // Compute average finalize delay for today's PAID payments (ms)
+    // Compute average finalize delay for today's SUCCESS payments (ms)
     const paidWithFinalize = await prisma.paymentTransaction.findMany({
-      where: { status: 'PAID' as any, paidAt: { gte: start } },
+      where: { status: PaymentTransactionStatus.SUCCESS, paidAt: { gte: start } },
       select: { paidAt: true, rawStatus: true },
       take: 500,
       orderBy: { paidAt: 'desc' },
@@ -48,7 +49,7 @@ export class PaymentMetricsService {
   static async getFinalizationSourceBreakdown() {
     const start = this.startOfToday()
     const paid = await prisma.paymentTransaction.findMany({
-      where: { status: 'PAID' as any, paidAt: { gte: start } },
+      where: { status: PaymentTransactionStatus.SUCCESS, paidAt: { gte: start } },
       select: { rawStatus: true },
       take: 1000,
       orderBy: { paidAt: 'desc' },
@@ -66,7 +67,7 @@ export class PaymentMetricsService {
   static async getStuckPayments() {
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
     const rows = await prisma.paymentTransaction.findMany({
-      where: { status: 'PENDING' as any, createdAt: { lt: tenMinutesAgo } },
+      where: { status: PaymentTransactionStatus.PENDING, createdAt: { lt: tenMinutesAgo } },
       select: { id: true, transactionId: true, createdAt: true, gateway: true, payerPhone: true },
       orderBy: { createdAt: 'asc' },
       take: 50,
@@ -85,7 +86,7 @@ export class PaymentMetricsService {
   static async getRecentFailures() {
     const start = this.startOfToday()
     const rows = await prisma.paymentTransaction.findMany({
-      where: { status: 'FAILED' as any, updatedAt: { gte: start } },
+      where: { status: PaymentTransactionStatus.FAILED, updatedAt: { gte: start } },
       select: { id: true, transactionId: true, updatedAt: true, rawStatus: true, payerPhone: true },
       orderBy: { updatedAt: 'desc' },
       take: 20,

@@ -5,6 +5,7 @@ import { IremboPayService } from '@/lib/services/irembopay.service';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse, unauthorizedResponse } from '@/lib/api/response-helpers';
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
 const CREDIT_PACKS = {
   small: { credits: 20, price: 1000000 },   // 10,000 RWF for 20 credits
@@ -12,7 +13,7 @@ const CREDIT_PACKS = {
   large: { credits: 100, price: 4500000 }   // 45,000 RWF for 100 credits (10% discount)
 };
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
   const businessId = (session?.user as any)?.businessId;
 
@@ -70,7 +71,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: invoice.transactionId,
         gateway: 'IREMBO_PAY',
         paymentMethod: 'WEB',
-        status: 'INITIATED',
+        status: 'PENDING',
         amountCents: grossAmountCents,
         currency: 'RWF',
         vatAmountCents,
@@ -82,13 +83,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payerName: (session.user as any).name,
         payerEmail: (session.user as any).email,
         payerPhone: (session.user as any).phone,
-        metadata: {
-          type: 'addon',
-          addon: 'ai_credits',
-          credits: packDetails.credits,
-          pack: pack
-        },
-        rawRequest: invoice as any
+        rawRequest: {
+          ...invoice,
+          meta: {
+            type: 'addon',
+            addon: 'ai_credits',
+            credits: packDetails.credits,
+            pack,
+          },
+        }
       }
     });
 
@@ -104,5 +107,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 }
+
+// Apply commercial enforcement: AI Credits purchase requires active subscription
+// Note: AI credits are an add-on available to all active subscribers
+const handler = requiresActiveSubscription(baseHandler);
 
 export default withErrorHandler(handler);

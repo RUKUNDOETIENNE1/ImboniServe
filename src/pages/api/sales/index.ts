@@ -10,6 +10,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getPaginationParams, getPaginationMeta, createPaginatedResponse } from '@/lib/middleware/pagination'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { IdempotencyService } from '@/lib/services/idempotency.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -64,6 +65,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(403).json({ error: 'Forbidden' })
       }
       const input = { ...rawInput, businessId: effectiveBusinessId }
+      
+      // Idempotency check
+      const idempotencyKey = IdempotencyService.extractKey(req)
+      if (idempotencyKey) {
+        const idempotencyCheck = await IdempotencyService.checkAndLock(
+          idempotencyKey,
+          effectiveBusinessId,
+          '/api/sales',
+          req.body
+        )
+        
+        if (!idempotencyCheck.isNew && idempotencyCheck.existingResponse) {
+          return res
+            .status(idempotencyCheck.existingResponse.statusCode)
+            .json(idempotencyCheck.existingResponse.body)
+        }
+      }
+      
       const sale = await SalesService.createSale(ctx.userId || input.businessId, input)
 
       const business = await (await import('@/lib/prisma')).prisma.business.findUnique({
@@ -92,7 +111,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const ebmText = generateEBMReceiptText(ebmReceipt, 'en')
       const ebmJson = generateEBMJSON(ebmReceipt)
 
-      return res.status(201).json({ sale, ebm: { receipt: ebmReceipt, text: ebmText, json: ebmJson } })
+      const response = { sale, ebm: { receipt: ebmReceipt, text: ebmText, json: ebmJson } }
+      
+      // Store idempotency response
+      if (idempotencyKey) {
+        await IdempotencyService.storeResponse(idempotencyKey, 201, response)
+      }
+      
+      return res.status(201).json(response)
     }
 
     return res.status(405).json({ error: 'Method not allowed' })

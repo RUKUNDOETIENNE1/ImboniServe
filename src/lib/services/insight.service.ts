@@ -47,7 +47,7 @@ export async function computeKPIs(businessId: string, period: PeriodType) {
 
   const [sales, txs, customersInPeriod, customersBefore, subscription] = await Promise.all([
     prisma.sale.findMany({
-      where: { businessId, isPaid: true, createdAt: { gte: start, lt: end } },
+      where: { businessId, isPaid: true, createdAt: { gte: start, lt: end } }, // Sale.isPaid boolean field
       select: { totalAmountCents: true, paymentMethod: true, createdAt: true }
     }),
     prisma.paymentTransaction.findMany({
@@ -115,7 +115,7 @@ export async function computeKPIs(businessId: string, period: PeriodType) {
   const renewalDue = (subscription as any)?.nextBillingDate || null
 
   const attempts = txs.length
-  const paid = txs.filter(t => t.status === 'COMPLETED').length
+  const paid = txs.filter(t => t.status === 'SUCCESS').length
   const paymentSuccessRate = attempts ? +(paid / attempts).toFixed(2) : 0
 
   let trend: 'upward' | 'downward' | 'flat' = 'flat'

@@ -13,6 +13,7 @@ import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalization.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -36,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // If already completed or failed, return current status
-    if (payment.status === 'PAID' || payment.status === 'FAILED') {
+    if (payment.status === 'SUCCESS' || payment.status === 'FAILED') {
       const slipId = (payment.rawRequest as any)?.slipId
       let slip = null
       if (slipId) {
@@ -46,9 +47,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(
         successResponse({
           paymentId: payment.id,
-          status: payment.status.toLowerCase(),
+          status: payment.status === 'SUCCESS' ? 'paid' : 'failed',
           amount: payment.amountCents / 100,
-          message: payment.status === 'PAID' ? 'Payment completed' : 'Payment failed',
+          message: payment.status === 'SUCCESS' ? 'Payment completed' : 'Payment failed',
           sessionStatus: slip?.status || 'unknown',
           slipNumber: slip?.slipNumber,
         })
@@ -64,7 +65,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Determine new status
     const newStatus = InTouchService.isSuccess(statusResponse.responsecode)
-      ? 'PAID'
+      ? 'SUCCESS'
       : InTouchService.isPending(statusResponse.responsecode)
       ? 'PENDING'
       : 'FAILED'
@@ -75,17 +76,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: { id: payment.id },
         data: {
           status: newStatus,
-          paidAt: newStatus === 'PAID' ? new Date() : null,
+          paidAt: newStatus === 'SUCCESS' ? new Date() : null,
           rawStatus: {
             ...(payment.rawStatus as any),
             statusPoll: { ...statusResponse, timestamp: new Date().toISOString() },
           },
         },
       })
+      await ensurePaymentLedgerEvent(payment.id, undefined, {
+        source: 'checkout/tap-and-leave/status',
+        responsecode: statusResponse.responsecode,
+      })
       // Delegate finalization to shared flow
       const slipId = (payment.rawRequest as any)?.slipId
       if (slipId) {
-        if (newStatus === 'PAID') {
+        if (newStatus === 'SUCCESS') {
           await TapLeaveFinalizationService.finalize(payment.id, 'poll')
         } else if (newStatus === 'FAILED') {
           await DiningSessionSlipService.markPaymentFailed(

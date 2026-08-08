@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client';
 import { formatDateTimeRW } from '@/utils/datetimeRW';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { IdempotencyService } from '@/lib/services/idempotency.service';
 
 function normalizePhone(phone: string | undefined): string | undefined {
   if (!phone) return undefined;
@@ -43,11 +44,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       participantId: z.string().cuid().optional(),
       branchId: z.string().cuid().optional(),
       paymentMethod: z.enum(['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'WEB', 'OTHER']).optional(),
-      sessionToken: z.string().optional()
+      sessionToken: z.string().optional(),
+      idempotencyKey: z.string().optional()
     });
 
     const validatedBody = draftOrderSchema.parse(req.body);
-    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken } = validatedBody;
+    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken, idempotencyKey } = validatedBody;
 
     // Validate access token
     const claims = await validateAccessToken(accessToken, req.body.branchId || '');
@@ -72,6 +74,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });
+    }
+    
+    // Idempotency check
+    if (idempotencyKey) {
+      const idempotencyCheck = await IdempotencyService.checkAndLock(
+        idempotencyKey,
+        business.id,
+        '/api/public/order/draft',
+        req.body
+      )
+      
+      if (!idempotencyCheck.isNew && idempotencyCheck.existingResponse) {
+        return res
+          .status(idempotencyCheck.existingResponse.statusCode)
+          .json(idempotencyCheck.existingResponse.body)
+      }
     }
 
     // Validate order source
@@ -352,7 +370,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ? formatDateTimeRW(scheduledAt, 'en')
       : '15-20 minutes';
 
-    return res.status(201).json({
+    const response = {
       orderId: saleId,
       orderNumber,
       paymentTransactionId,
@@ -379,7 +397,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       eta,
       scheduledAt: scheduledAt || null,
       slotAvailable: true
-    });
+    };
+    
+    // Store idempotency response
+    if (idempotencyKey) {
+      await IdempotencyService.storeResponse(idempotencyKey, 201, response)
+    }
+    
+    return res.status(201).json(response);
   } catch (error: any) {
     console.error('Error creating draft order:', error);
     

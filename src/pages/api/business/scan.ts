@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requirePermission } from '@/lib/middleware/permission.middleware';
 import { resolveBusinessContext } from '@/lib/api/business-context';
 import { withRateLimit } from '@/lib/middleware/withRateLimit';
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck';
 import OpenAI from 'openai';
 import { buildAIPrompt, parseAIResponse, validateAIResponse, enforceWordLimit, COMMON_CONFIGS } from '@/lib/ai-prompts';
 import { generateMenuHash, getCachedScan, setCachedScan } from '@/lib/scan-cache';
@@ -368,7 +369,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withRateLimit(
-  requirePermission('settings.read')(handler),
-  { maxRequests: 5, windowMs: 60_000 }
+// Apply commercial enforcement: Business scan requires active subscription
+// Note: Also protected by AI credit system and rate limiting
+export default requiresActiveSubscription(
+  withRateLimit(
+    requirePermission('settings.read')(handler),
+    { maxRequests: 5, windowMs: 60_000 }
+  )
 )

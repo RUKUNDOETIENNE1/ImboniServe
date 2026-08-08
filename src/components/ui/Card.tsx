@@ -3,7 +3,7 @@
  * Provides consistent card styling across the application
  */
 
-import { ReactNode } from 'react'
+import { ReactNode, HTMLAttributes } from 'react'
 
 export interface CardProps {
   children: ReactNode
@@ -62,41 +62,41 @@ export default function Card({
   )
 }
 
-export function CardHeader({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardHeader({ children, className = '', ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={`mb-4 ${className}`} {...rest}>
       {children}
     </div>
   )
 }
 
-export function CardTitle({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardTitle({ children, className = '', ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2 className={`text-lg font-semibold text-slate-800 ${className}`}>
+    <h2 className={`text-lg font-semibold text-slate-800 ${className}`} {...rest}>
       {children}
     </h2>
   )
 }
 
-export function CardDescription({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardDescription({ children, className = '', ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={`text-sm text-slate-500 ${className}`}>
+    <p className={`text-sm text-slate-500 ${className}`} {...rest}>
       {children}
     </p>
   )
 }
 
-export function CardContent({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardContent({ children, className = '', ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={className}>
+    <div className={className} {...rest}>
       {children}
     </div>
   )
 }
 
-export function CardFooter({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardFooter({ children, className = '', ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`mt-6 ${className}`}>
+    <div className={`mt-6 ${className}`} {...rest}>
       {children}
     </div>
   )

@@ -305,7 +305,7 @@ export default function MarketerDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-lg font-semibold text-slate-800">{t('dashboard.marketer.referral_tools', 'Referral Tools')}</h2>
-                    <p className="text-sm text-slate-500">{t('dashboard.marketer.referral_desc', 'Share your unique link to refer restaurants')}</p>
+                    <p className="text-sm text-slate-500">{t('dashboard.marketer.referral_desc', 'Share your unique link to refer hospitality businesses')}</p>
                   </div>
                 </div>
                 <div className="flex flex-col md:flex-row gap-3">

@@ -7,6 +7,10 @@ import bcrypt from 'bcryptjs'
 import { TrialEligibilityService } from '@/lib/services/trial-eligibility.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
 import { BusinessApprovalService } from '@/lib/services/business-approval.service'
+import { AttributionResolver, type AttributionResult } from '@/lib/services/attribution-resolver.service'
+import { AttributionService } from '@/lib/services/attribution.service'
+import { TrialPolicyService } from '@/lib/services/trial-policy.service'
+import { FounderCodeService } from '@/lib/services/founder-code.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -35,8 +39,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'Trial eligibility blocked', reason: evalResult.blockedReason, riskScore: evalResult.riskScore })
     }
     
-    // Read referral cookie for affiliate attribution
-    const refCode = req.cookies.im_ref
+    // Gather all candidate referral codes: canonical cookie, legacy cookie, form field
+    const candidateCodes = [
+      req.cookies.im_ref,
+      req.cookies.referral_code,
+      (input as any).referralCode,
+    ]
+
+    // Resolve attribution deterministically across all code namespaces.
+    // Uses resolveFromCandidates so an invalid cookie code doesn't block
+    // a valid manually-entered code — each candidate is tried in turn.
+    const attribution: AttributionResult | null = await AttributionResolver.resolveFromCandidates(
+      candidateCodes,
+      {
+        email: input.email,
+        phone: input.phone,
+      },
+    )
 
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email },
@@ -64,24 +83,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const hashedPassword = await bcrypt.hash(input.password, 12)
 
-    // Check for affiliate attribution (prevent self-referral)
-    let affiliateId: string | undefined
-    if (refCode) {
-      const affiliate = await prisma.affiliate.findUnique({
-        where: { code: refCode },
-        include: { user: true },
-      })
-
-      if (affiliate && affiliate.status === 'ACTIVE') {
-        // Prevent self-referral: affiliate user cannot refer themselves
-        if (affiliate.user && (affiliate.user.email === input.email || affiliate.user.phone === input.phone)) {
-          // Silently ignore self-referral attempt
-          affiliateId = undefined
-        } else {
-          affiliateId = affiliate.id
-        }
-      }
-    }
+    // Derive affiliateId from unified attribution (self-referral already handled by resolver)
+    const affiliateId = attribution?.source === 'AFFILIATE' ? attribution.entityId : undefined
 
     const user = await prisma.user.create({
       data: {
@@ -113,10 +116,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Trial starts only if auto-approved (low risk) or when manually approved later
     const shouldAutoApprove = riskAssessment.autoApprove && isHospitality
     const approvalStatus = shouldAutoApprove ? 'APPROVED' : 'PENDING'
+    const trialDays = TrialPolicyService.getTrialDays({
+      source: attribution?.source,
+      trialDaysOverride: attribution?.trialDaysOverride,
+    })
     const trialStartDate = shouldAutoApprove && isHospitality ? new Date() : null
-    const trialEndDate = shouldAutoApprove && isHospitality 
-      ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) 
+    const trialEndDate = shouldAutoApprove && isHospitality
+      ? TrialPolicyService.computeTrialEndDate(new Date(), trialDays)
       : null
+
+    // Founding Hospitality Business Program — first 100 hospitality businesses
+    const FOUNDING_LIMIT = 100
+    const foundingCount = await prisma.business.count({
+      where: { isFoundingMember: true },
+    })
+    const isFoundingMember = isHospitality && foundingCount < FOUNDING_LIMIT
 
     const restaurant = await prisma.business.create({
       data: {
@@ -138,8 +152,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         approvedAt: shouldAutoApprove ? new Date() : null,
         riskLevel: riskAssessment.riskLevel,
         duplicateFlags: riskAssessment.duplicateMatches.length > 0 
-          ? riskAssessment.duplicateMatches 
+          ? (riskAssessment.duplicateMatches as any) 
           : undefined,
+        isFoundingMember,
+        foundingJoinedAt: isFoundingMember ? new Date() : null,
       },
     })
 
@@ -148,14 +164,49 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: { businessId: restaurant.id },
     })
 
+    // Persist canonical attribution record (Phase 1A)
+    await AttributionService.recordAttribution({
+      businessId: restaurant.id,
+      attribution,
+      ipAddress,
+      userAgent: req.headers['user-agent'] || undefined,
+    })
+
+    // Founder Code redemption — create redemption record and increment counter
+    if (attribution?.source === 'FOUNDER_CODE') {
+      try {
+        await FounderCodeService.redeemCode({
+          codeId: attribution.entityId,
+          businessId: restaurant.id,
+          userId: user.id,
+          ipAddress,
+          userAgent: req.headers['user-agent'] || undefined,
+        })
+      } catch (err) {
+        console.error('Founder Code redemption error:', err)
+      }
+    }
+
     // Business owner invite attribution (peer-to-peer invite program)
-    const inviteCode = (input as any).inviteCode || req.cookies.im_inv
-    if (inviteCode) {
-      await BusinessInviteService.attributeInvite(inviteCode, restaurant.id)
+    // Use attribution resolver result if source is BUSINESS_INVITE, otherwise check form/cookie
+    if (attribution?.source === 'BUSINESS_INVITE') {
+      await BusinessInviteService.attributeInvite(attribution.code, restaurant.id)
+    } else {
+      const inviteCode = (input as any).inviteCode || req.cookies.im_inv
+      if (inviteCode) {
+        await BusinessInviteService.attributeInvite(inviteCode, restaurant.id)
+      }
     }
 
     // Mark the trial as used for this identity (one-trial-per-email/phone)
     await TrialEligibilityService.markTrialUsed({ email: input.email })
+
+    // Expire referral cookies post-signup (attribution consumed)
+    const expiredCookies = [
+      `im_ref=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
+      `referral_code=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
+    ]
+    res.setHeader('Set-Cookie', expiredCookies)
 
     return res.status(201).json({
       user: {
@@ -167,6 +218,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         id: restaurant.id,
         name: restaurant.name,
       },
+      isFoundingMember,
+      attribution: attribution
+        ? { source: attribution.source, code: attribution.code }
+        : null,
+      trialDays,
     })
   } catch (error) {
     console.error('Signup error:', error)

@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, Building2, Store, TrendingUp, 
   Settings, Bell, Search, ChevronDown, LogOut, Menu, X,
   DollarSign, FileText, UserCog, RefreshCw, Flag, UserCircle,
-  BarChart3, Wallet, Calendar, Mail
+  BarChart3, Wallet, Calendar, Mail, Users2, Tag, Rocket, Landmark, Radar
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import Image from 'next/image'
@@ -14,6 +14,7 @@ import { useTranslation } from '@/lib/i18n'
 
 interface AdminLayoutProps {
   children: ReactNode
+  title?: string
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -25,13 +26,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const navigation = [
     { name: 'Overview', href: '/admin', icon: LayoutDashboard },
-    { name: 'Restaurants', href: '/admin/restaurants', icon: Building2 },
+    { name: 'Businesses', href: '/admin/restaurants', icon: Building2 },
     { name: 'Sales Pipeline', href: '/admin/sales-pipeline', icon: TrendingUp },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Contacts', href: '/admin/contacts', icon: UserCircle },
     { name: 'Marketplace', href: '/admin/marketplace', icon: Store },
     { name: 'Subscriptions', href: '/admin/subscriptions', icon: DollarSign },
     { name: 'Affiliates', href: '/admin/affiliates', icon: UserCog },
+    { name: 'Founder Partners', href: '/admin/founder-partners', icon: Users2 },
+    { name: 'Partnership Applications', href: '/admin/partnership-applications', icon: FileText },
+    { name: 'Growth Workspace', href: '/admin/founder-partners', icon: Rocket },
+    { name: 'Revenue Operations', href: '/admin/revenue-operations', icon: Landmark },
+    { name: 'Operations Intelligence', href: '/admin/operations-intelligence', icon: Radar },
+    { name: 'Founder Codes', href: '/admin/founder-codes', icon: Tag },
     { name: 'Payout Control', href: '/admin/payout-control', icon: Wallet },
     { name: 'Revenue Analytics', href: '/admin/revenue-analytics', icon: BarChart3 },
     { name: 'Demo Leads', href: '/admin/leads', icon: Calendar },
@@ -128,7 +135,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-imboni-blue hover:bg-blue-50 transition-all text-sm"
               >
                 <LayoutDashboard className="w-5 h-5" />
-                <span className="font-medium">Restaurant View</span>
+                <span className="font-medium">Business View</span>
               </button>
             </div>
           )}
@@ -221,7 +228,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-imboni-blue hover:bg-blue-50 transition-all text-sm"
                 >
                   <LayoutDashboard className="w-5 h-5" />
-                  <span className="font-medium">Restaurant View</span>
+                  <span className="font-medium">Business View</span>
                 </button>
               </div>
 
@@ -257,7 +264,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input 
                     type="text" 
-                    placeholder="Search restaurants, users..." 
+                    placeholder="Search businesses, users..." 
                     className="pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 w-80"
                   />
                 </div>

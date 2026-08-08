@@ -158,7 +158,7 @@ export default function AffiliatePortal() {
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-2">Date</th>
-                  <th className="text-left py-2">Restaurant</th>
+                  <th className="text-left py-2">Business</th>
                   <th className="text-left py-2">Type</th>
                   <th className="text-left py-2">Amount</th>
                   <th className="text-left py-2">Status</th>
@@ -168,7 +168,7 @@ export default function AffiliatePortal() {
                 {commissions.map((comm) => (
                   <tr key={comm.id} className="border-b">
                     <td className="py-2">{new Date(comm.createdAt).toLocaleDateString()}</td>
-                    <td className="py-2">{comm.restaurant?.name || 'N/A'}</td>
+                    <td className="py-2">{comm.business?.name || comm.restaurant?.name || 'N/A'}</td>
                     <td className="py-2 capitalize">{comm.type.replace('_', ' ')}</td>
                     <td className="py-2">{(comm.amountCents / 100).toLocaleString()} RWF</td>
                     <td className="py-2">

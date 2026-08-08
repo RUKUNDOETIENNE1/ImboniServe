@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestCampaignShadowEvent } from '@/lib/die/business-as-plugin/campaigns/campaigns.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 function shapeCampaign(p: any) {
   const cfg = (p.config || {}) as any
@@ -26,7 +28,7 @@ function shapeCampaign(p: any) {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user) return res.status(401).json({ error: 'Unauthorized' })
 
@@ -80,6 +82,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           isActive: !!scheduledFor,
         },
       })
+      // Shadow: CAMPAIGN_CREATED/SCHEDULED
+      try {
+        await ingestCampaignShadowEvent({ type: 'CAMPAIGN_CREATED', businessId, campaignId: created.id, channel: 'whatsapp' }).catch(() => {})
+        if (status === 'SCHEDULED') {
+          await ingestCampaignShadowEvent({ type: 'CAMPAIGN_SCHEDULED', businessId, campaignId: created.id, channel: 'whatsapp' }).catch(() => {})
+        }
+      } catch {}
 
       return res.status(201).json({ campaign: shapeCampaign(created) })
     } catch (error) {
@@ -90,3 +99,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).json({ error: 'Method not allowed' })
 }
+
+// Apply commercial enforcement: Marketing campaigns require marketing feature
+export default requiresFeature('hasMarketing')(baseHandler)

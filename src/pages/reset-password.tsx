@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Lock, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { token, email } = router.query
 
@@ -17,23 +19,23 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token || !email) {
-      setError('Invalid reset link. Please request a new password reset.')
+      setError(t('auth.invalid_reset_link', 'Invalid reset link. Please request a new password reset.'))
     }
   }, [token, email])
 
   const validatePassword = (password: string): string[] => {
     const errors: string[] = []
     if (password.length < 8) {
-      errors.push('Password must be at least 8 characters long')
+      errors.push(t('auth.password_min_length', 'Password must be at least 8 characters long'))
     }
     if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain at least one uppercase letter')
+      errors.push(t('auth.password_uppercase', 'Password must contain at least one uppercase letter'))
     }
     if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain at least one lowercase letter')
+      errors.push(t('auth.password_lowercase', 'Password must contain at least one lowercase letter'))
     }
     if (!/[0-9]/.test(password)) {
-      errors.push('Password must contain at least one number')
+      errors.push(t('auth.password_number', 'Password must contain at least one number'))
     }
     return errors
   }
@@ -49,13 +51,13 @@ export default function ResetPasswordPage() {
 
     // Validate passwords match
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('auth.passwords_no_match', 'Passwords do not match'))
       return
     }
 
     // Check validation errors
     if (validationErrors.length > 0) {
-      setError('Please fix the password requirements')
+      setError(t('auth.fix_password_requirements', 'Please fix the password requirements'))
       return
     }
 
@@ -81,10 +83,10 @@ export default function ResetPasswordPage() {
           router.push('/login')
         }, 3000)
       } else {
-        setError(data.error || 'Failed to reset password')
+        setError(data.error || t('auth.reset_failed', 'Failed to reset password'))
       }
     } catch (err) {
-      setError('Network error. Please try again.')
+      setError(t('auth.network_error', 'Network error. Please try again.'))
     } finally {
       setIsLoading(false)
     }
@@ -99,19 +101,19 @@ export default function ResetPasswordPage() {
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Password Reset Successful!
+              {t('auth.reset_success_title', 'Password Reset Successful!')}
             </h1>
             <p className="text-gray-600 mb-6">
-              Your password has been changed. All your active sessions have been logged out for security.
+              {t('auth.reset_success_desc', 'Your password has been changed. All your active sessions have been logged out for security.')}
             </p>
             <p className="text-sm text-gray-500 mb-6">
-              Redirecting to login page...
+              {t('auth.redirecting_to_login', 'Redirecting to login page...')}
             </p>
             <Link
               href="/login"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
-              Go to Login
+              {t('auth.go_to_login', 'Go to Login')}
             </Link>
           </div>
         </div>
@@ -127,17 +129,17 @@ export default function ResetPasswordPage() {
             <Lock className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Reset Your Password
+            {t('auth.reset_password_title', 'Reset Your Password')}
           </h1>
           <p className="text-gray-600">
-            Enter a new password for <strong>{email}</strong>
+            {t('auth.enter_new_password_for', 'Enter a new password for')} <strong>{email}</strong>
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              New Password
+              {t('auth.new_password', 'New Password')}
             </label>
             <div className="relative">
               <input
@@ -145,7 +147,7 @@ export default function ResetPasswordPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => handlePasswordChange(e.target.value)}
-                placeholder="Enter new password"
+                placeholder={t('auth.enter_new_password', 'Enter new password')}
                 required
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -171,21 +173,21 @@ export default function ResetPasswordPage() {
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password
+              {t('auth.confirm_password', 'Confirm Password')}
             </label>
             <input
               id="confirmPassword"
               type={showPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
+              placeholder={t('auth.confirm_new_password', 'Confirm new password')}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {confirmPassword && newPassword !== confirmPassword && (
               <p className="mt-2 text-xs text-red-600 flex items-start">
                 <AlertCircle className="w-3 h-3 mr-1 mt-0.5" />
-                Passwords do not match
+                {t('auth.passwords_no_match', 'Passwords do not match')}
               </p>
             )}
           </div>
@@ -202,7 +204,7 @@ export default function ResetPasswordPage() {
             disabled={isLoading || validationErrors.length > 0 || !token || !email}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Resetting Password...' : 'Reset Password'}
+            {isLoading ? t('auth.resetting_password', 'Resetting Password...') : t('auth.reset_password', 'Reset Password')}
           </button>
 
           <div className="text-center">
@@ -210,7 +212,7 @@ export default function ResetPasswordPage() {
               href="/login"
               className="text-sm text-gray-600 hover:text-gray-900"
             >
-              Back to Login
+              {t('auth.back_to_login', 'Back to Login')}
             </Link>
           </div>
         </form>

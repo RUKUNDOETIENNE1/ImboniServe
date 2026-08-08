@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -108,14 +109,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   } catch (error) {
     console.error('Dashboard stats error:', error)
-    // Fail soft with empty/default stats to avoid UI breaking
-    res.status(200).json({
-      todaySales: { revenue: 0, count: 0, change: '0%' },
-      staff: { total: 0, active: 0 },
-      inventory: { lowStockCount: 0 },
-      tables: []
+    // Return an explicit error to avoid masking failures on the frontend
+    res.status(500).json({
+      error: 'Failed to load dashboard stats. Please try again.',
     })
   }
 }
 
-export default requirePermission('reports.view')(handler)
+// Apply commercial enforcement: Dashboard analytics requires analytics feature
+export default requiresFeature('hasBasicReports')(baseHandler)

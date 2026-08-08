@@ -8,6 +8,9 @@
 
 import { prisma } from '@/lib/prisma'
 import { triggerEvent } from '@/lib/pusher-server'
+import { RoutingService } from './routing.service'
+import { TicketEventService } from './ticket-event.service'
+import { ingestKDSShadowEvent } from '@/lib/die/business-as-plugin/kds/kds.shadow'
 
 export interface KitchenOrderItem {
   menuItemName: string
@@ -51,7 +54,83 @@ export class KitchenDispatchService {
         },
       })
 
-      // 2. Trigger real-time kitchen notification via Pusher
+      // 2. Route items to stations (Phase 1: best-effort, non-blocking)
+      try {
+        const sale = await prisma.sale.findUnique({
+          where: { id: input.saleId },
+          include: {
+            items: {
+              include: {
+                menuItem: {
+                  select: { id: true, category: true },
+                },
+              },
+            },
+          },
+        })
+
+        if (sale?.items) {
+          const stationMap = new Map<string, string[]>() // stationId -> itemIds
+
+          for (const item of sale.items) {
+            const route = await RoutingService.resolveStation({
+              businessId: input.businessId,
+              menuItemId: item.menuItem.id,
+              category: item.menuItem.category || undefined,
+            })
+
+            if (route.stationId) {
+              // Update item with station assignment
+              // NOTE: Setting itemStatus: 'NEW' is the initial state assignment, not a transition.
+              // This does NOT trigger consumption (which only happens on NEW → PREPARING).
+              // This is intentional - consumption should only occur when kitchen starts preparing.
+              await prisma.saleItem.update({
+                where: { id: item.id },
+                data: {
+                  stationId: route.stationId,
+                  routedAt: new Date(),
+                  itemStatus: 'NEW',
+                },
+              })
+
+              // Group items by station for event emission
+              if (!stationMap.has(route.stationId)) {
+                stationMap.set(route.stationId, [])
+              }
+              stationMap.get(route.stationId)!.push(item.id)
+
+              // Record routing event
+              TicketEventService.recordEvent({
+                saleId: input.saleId,
+                saleItemId: item.id,
+                stationId: route.stationId,
+                eventType: 'ITEM_ROUTED',
+                metadata: {
+                  routeSource: route.routeSource,
+                  stationCode: route.stationCode,
+                },
+              }).catch(() => {})
+            }
+          }
+
+          // Emit station-specific events
+          for (const [stationId, itemIds] of stationMap.entries()) {
+            try {
+              await triggerEvent(`private-station-${stationId}`, 'items.routed', {
+                orderId: input.saleId,
+                orderNumber: input.orderNumber,
+                itemIds,
+                timestamp: new Date().toISOString(),
+              })
+            } catch {}
+          }
+        }
+      } catch (routingError) {
+        // Routing failure is non-critical - log but don't fail dispatch
+        console.warn('[Kitchen Dispatch] Station routing failed:', routingError)
+      }
+
+      // 3. Trigger real-time kitchen notification via Pusher (backward compatible)
       const kitchenChannel = `private-kitchen-${input.businessId}`
       
       try {
@@ -69,6 +148,25 @@ export class KitchenDispatchService {
         // Pusher failure is non-critical - log but don't fail
         console.warn('[Kitchen Dispatch] Pusher notification failed:', pusherError)
       }
+
+      // Shadow tap: KDS ORDER_RECEIVED (feature-flagged, non-blocking)
+      ingestKDSShadowEvent({
+        type: 'ORDER_RECEIVED',
+        businessId: input.businessId,
+        saleId: input.saleId,
+        orderNumber: input.orderNumber,
+      }).catch(() => {})
+
+      // 4. Record order creation event
+      TicketEventService.recordEvent({
+        saleId: input.saleId,
+        eventType: 'ORDER_CREATED',
+        metadata: {
+          orderNumber: input.orderNumber,
+          orderSource: input.orderSource,
+          itemCount: input.items.length,
+        },
+      }).catch(() => {})
 
       // 3. Log success
       console.log(`[Kitchen Dispatch] ✅ Order ${input.orderNumber} dispatched to kitchen`, {

@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
   const session = await getServerSession(req, res, authOptions)
@@ -19,3 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const stats = await BusinessInviteService.getInviteStats(user.businessId)
   return res.status(200).json(stats)
 }
+
+// Apply commercial enforcement: Business invite stats require active subscription
+export default requiresActiveSubscription(baseHandler)

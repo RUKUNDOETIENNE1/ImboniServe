@@ -76,7 +76,7 @@ export class RevenueExportService {
         c.periodMonth?.toString() || '',
         c.createdAt.toISOString(),
         c.validatedAt?.toISOString() || '',
-        c.paidOutAt?.toISOString() || ''
+        c.paidAt?.toISOString() || ''
       ])
 
       // Build CSV
@@ -178,9 +178,9 @@ export class RevenueExportService {
         p.approvedBy || '',
         p.rejectedAt?.toISOString() || '',
         p.rejectedBy || '',
-        p.rejectionReason || '',
+        p.rejectReason || '',
         p.processedAt?.toISOString() || '',
-        p.transactionId || ''
+        p.referenceId || ''
       ])
 
       // Build CSV
@@ -217,11 +217,13 @@ export class RevenueExportService {
         select: {
           id: true,
           name: true,
-          email: true,
           phone: true,
           city: true,
           isActive: true,
-          createdAt: true
+          createdAt: true,
+          owner: {
+            select: { email: true },
+          }
         }
       })
 
@@ -255,16 +257,16 @@ export class RevenueExportService {
       const rows = merged.map(m => [
         m.business?.id || '',
         m.business?.name || '',
-        m.business?.email || '',
+        m.business?.owner?.email || '',
         m.business?.phone || '',
         m.business?.city || '',
         m.business?.isActive ? 'Active' : 'Inactive',
-        m.attribution.source || '',
-        m.attribution.campaign || '',
+        m.attribution.utmSource || '',
+        m.attribution.utmCampaign || '',
         m.attribution.utmSource || '',
         m.attribution.utmMedium || '',
         m.attribution.utmCampaign || '',
-        m.attribution.createdAt.toISOString(),
+        m.attribution.attributedAt.toISOString(),
         m.business?.createdAt.toISOString() || ''
       ])
 
@@ -407,11 +409,11 @@ export class RevenueExportService {
         m.phone,
         m.referralCode,
         m.status,
-        ((m.wallet?.availableBalanceCents || 0) / 100).toFixed(2),
-        ((m.wallet?.pendingBalanceCents || 0) / 100).toFixed(2),
-        ((m.wallet?.lockedBalanceCents || 0) / 100).toFixed(2),
-        ((m.wallet?.totalEarnedCents || 0) / 100).toFixed(2),
-        ((m.wallet?.totalPaidOutCents || 0) / 100).toFixed(2),
+        ((m.wallet?.availableBalance || 0) / 100).toFixed(2),
+        ((m.wallet?.pendingBalance || 0) / 100).toFixed(2),
+        ((m.wallet?.lockedBalance || 0) / 100).toFixed(2),
+        ((m.wallet?.totalEarned || 0) / 100).toFixed(2),
+        ((m.wallet?.totalPaidOut || 0) / 100).toFixed(2),
         m._count.referredBusinesses,
         m._count.commissions,
         m._count.payouts,

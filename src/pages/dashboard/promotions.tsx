@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Tag, Plus, X, Clock } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -28,7 +27,6 @@ export default function PromotionsPage() {
     percentOrAmount: '', startDate: '', endDate: '',
     timeStart: '', timeEnd: '', usageLimit: '',
   })
-  const promotionsEnabled = useFeatureFlag('promotions_engine')
 
   async function fetchPromotions() {
     setLoading(true)
@@ -73,18 +71,6 @@ export default function PromotionsPage() {
         fetchPromotions()
       }
     } catch { } finally { setSaving(false) }
-  }
-
-  if (!promotionsEnabled) {
-    return (
-      <DashboardLayout>
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <Tag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-600 font-medium">Promotions Engine unlocks at 25 active clients on Professional plan+</p>
-          <p className="text-sm text-slate-400 mt-1">Create discounts, happy hours, and time-based promotions</p>
-        </div>
-      </DashboardLayout>
-    )
   }
 
   return (

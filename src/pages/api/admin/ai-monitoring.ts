@@ -101,12 +101,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       .slice(0, 20);
 
     // Businesses approaching limits
-    const businessesNearLimit = await prisma.business.findMany({
-      where: {
-        aiCreditsUsed: {
-          gte: prisma.$raw`"aiCreditsLimit" * 0.8` // 80% of limit
-        }
-      },
+    const allBusinesses = await prisma.business.findMany({
       select: {
         id: true,
         name: true,
@@ -120,12 +115,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             aiCreditsMonthly: true
           }
         }
-      },
-      orderBy: {
-        aiCreditsUsed: 'desc'
-      },
-      take: 20
+      }
     });
+
+    const businessesNearLimit = allBusinesses.filter(
+      (b) => b.aiCreditsUsed >= b.aiCreditsLimit * 0.8
+    ).slice(0, 20);
 
     // Daily usage trend
     const dailyUsage = aiUsageLogs.reduce((acc: any, log: any) => {

@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
-import { SmartDiningSlipService } from '@/lib/services/smart-dining-slip.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 import { createTipForSale } from '@/lib/services/digital-tipping.service'
 import { InTouchService } from '@/lib/services/intouch.service'
 import { logger } from '@/lib/logger'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 export type FinalizeSource = 'webhook' | 'poll' | 'cron' | 'sweeper'
 
@@ -18,8 +19,8 @@ export class TapLeaveFinalizationService {
       return { alreadyFinalized: true }
     }
 
-    if ((payment.status as any) !== 'PAID') {
-      try { logger.info('[Tap&Leave Finalize] skip: not PAID', { paymentId, source, status: payment.status }) } catch {}
+    if ((payment.status as any) !== 'SUCCESS') {
+      try { logger.info('[Tap&Leave Finalize] skip: not SUCCESS', { paymentId, source, status: payment.status }) } catch {}
       return { alreadyFinalized: true }
     }
 
@@ -84,17 +85,22 @@ export class TapLeaveFinalizationService {
         try { logger.warn('[Tap&Leave Finalize] tip allocation error', { paymentId: payment.id, err: String(e) }) } catch {}
       }
 
-      // Generate final receipt (idempotent via unique saleId on SmartDiningSlip)
+      // Delegate post-payment side effects to canonical PaymentCompletionService
+      // This handles: sale status update, dining slip, guest recognition, notification,
+      // broadcast, ledger entry, audit log, order token
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: primary.id,
-          clientPhone: payment.payerPhone || undefined,
-          clientEmail: undefined,
-          clientConsentedWhatsApp: false,
-        })
+        await PaymentCompletionService.onPaymentSuccess(
+          payment.id,
+          primary.id,
+          {
+            clientPhone: payment.payerPhone || undefined,
+            clientConsentedWhatsApp: false,
+            source: `tap-leave-${source}`,
+          }
+        )
       } catch (e) {
-        // Ignore duplicate generation errors
-        try { logger.warn('[Tap&Leave Finalize] receipt generation warning', { paymentId: payment.id, err: String(e) }) } catch {}
+        // Idempotent — ignore duplicate processing errors
+        try { logger.warn('[Tap&Leave Finalize] PaymentCompletionService warning', { paymentId: payment.id, err: String(e) }) } catch {}
       }
     }
 
@@ -119,13 +125,13 @@ export class TapLeaveFinalizationService {
   }
 
   /**
-   * Finalization sweeper: recover PAID Tap & Leave payments that missed finalization.
+   * Finalization sweeper: recover SUCCESS Tap & Leave payments that missed finalization.
    * Safe to call multiple times (idempotent via rawStatus.finalizedAt).
    */
   static async runSweeper(): Promise<{ processed: number; skipped: number }> {
     const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
     const candidates = await prisma.paymentTransaction.findMany({
-      where: { status: 'PAID' as any, gateway: 'INTOUCH' as any, updatedAt: { lt: twoMinutesAgo } },
+      where: { status: 'SUCCESS' as any, gateway: 'INTOUCH' as any, updatedAt: { lt: twoMinutesAgo } },
       take: 50,
       orderBy: { updatedAt: 'asc' },
     })
@@ -175,8 +181,9 @@ export class TapLeaveFinalizationService {
         if (isSuccess) {
           await prisma.paymentTransaction.update({
             where: { id: p.id },
-            data: { status: 'PAID' as any, paidAt: new Date(), rawStatus: { ...(p.rawStatus as any), reconciled: status } },
+            data: { status: 'SUCCESS' as any, paidAt: new Date(), rawStatus: { ...(p.rawStatus as any), reconciled: status } },
           })
+          await ensurePaymentLedgerEvent(p.id, 'SUCCESS', { source: 'tap-leave/reconciler', responsecode: status.responsecode })
           await TapLeaveFinalizationService.finalize(p.id, 'cron')
           resolved++
           continue
@@ -187,17 +194,19 @@ export class TapLeaveFinalizationService {
             where: { id: p.id },
             data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), reconciled: status } },
           })
+          await ensurePaymentLedgerEvent(p.id, 'FAILED', { source: 'tap-leave/reconciler', responsecode: status.responsecode })
           await DiningSessionSlipService.markPaymentFailed(slipId, p.id, InTouchService.getErrorMessage(status.responsecode))
           failed++
           continue
         }
 
         const ageMs = now.getTime() - new Date(p.createdAt).getTime()
-        if (ageMs > 5 * 60 * 1000) {
+        if (ageMs > 20 * 60 * 1000) {
           await prisma.paymentTransaction.update({
             where: { id: p.id },
             data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), timeout: true } },
           })
+          await ensurePaymentLedgerEvent(p.id, 'FAILED', { source: 'tap-leave/reconciler', timeout: true })
           await DiningSessionSlipService.markPaymentFailed(slipId, p.id, 'Payment timeout (reconciler)')
           timedOut++
         }

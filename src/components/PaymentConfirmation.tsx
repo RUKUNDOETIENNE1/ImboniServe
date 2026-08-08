@@ -36,7 +36,7 @@ export default function PaymentConfirmation({
     // Generate a simple text receipt
     const receiptText = `
 IMBONI SERVE - DIGITAL RECEIPT
-${businessName || 'Restaurant'}
+${businessName || 'Business'}
 ================================
 
 Order #: ${orderNumber}

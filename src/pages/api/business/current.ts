@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(
+async function baseHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -68,3 +69,6 @@ export default async function handler(
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Business Settings requires active subscription (Starter+)
+export default requiresActiveSubscription(baseHandler)

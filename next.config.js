@@ -1,14 +1,13 @@
-﻿// Environment validation disabled - file doesn't exist
-// TODO: Create env-validator if needed
-// if (process.env.NODE_ENV !== 'test') {
-//   try {
-//     require('./src/lib/env-validator').validateEnv()
-//   } catch (error) {
-//     console.error('\nâŒ Environment validation failed:')
-//     console.error(error.message)
-//     process.exit(1)
-//   }
-// }
+﻿// Environment validation — prevents silent runtime failures from missing config
+if (process.env.NODE_ENV !== 'test' && !process.env.SKIP_ENV_VALIDATION) {
+  try {
+    require('./src/lib/env-validator').validateEnv()
+  } catch (error) {
+    console.error('\n\u26A0 Environment validation failed:')
+    console.error(error.message)
+    process.exit(1)
+  }
+}
 
 // Development security headers (relaxed for HMR and debugging)
 const { withSentryConfig } = require('@sentry/nextjs')
@@ -26,7 +25,7 @@ const securityHeadersDev = [
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://sentry.io ws://localhost:* http://localhost:*",
+      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://sentry.io ws://localhost:* http://localhost:*",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -56,7 +55,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://sentry.io",
+      "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://api.twilio.com https://api.openai.com https://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://sentry.io",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -74,14 +73,19 @@ const hasSentry = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENT
 
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   i18n: {
     locales: ['en', 'fr', 'rw'],
     defaultLocale: 'en',
     localeDetection: false,
   },
-  // Ensure clean NEXTAUTH_URL is available at build/runtime even if env has stray spaces
+  // Ensure clean NEXTAUTH_URL is available at build/runtime even if env has stray spaces.
+  // On Vercel preview deployments NEXTAUTH_URL is not set, so fall back to VERCEL_URL
+  // (which is the actual preview hostname) before falling back to the production domain.
   env: {
-    NEXTAUTH_URL: (process.env.NEXTAUTH_URL || '').trim() || 'https://imboniserve.com',
+    NEXTAUTH_URL: (process.env.NEXTAUTH_URL || '').trim()
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+      || 'https://imboniserve.com',
   },
   eslint: {
     ignoreDuringBuilds: !isCI,
@@ -97,6 +101,14 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', 'recharts', 'date-fns'],
+    outputFileTracingIncludes: {
+      // Bundle Prisma engines + schema
+      '/api/**': [
+        './node_modules/.prisma/client/**',
+        './node_modules/@prisma/client/**',
+        './prisma/**',
+      ],
+    },
   },
   webpack: (config, { dev, isServer }) => {
     // Enable minification for production builds
@@ -104,12 +116,24 @@ const nextConfig = {
       config.optimization.minimize = true
     }
     
+    // Exclude Node.js modules from client bundle
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+      }
+    }
+    
     return config
   },
   // Performance budgets
   onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+    maxInactiveAge: 10 * 60 * 1000,
+    pagesBufferLength: 10,
   },
   images: {
     remotePatterns: [

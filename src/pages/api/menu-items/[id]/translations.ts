@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { TranslationService, SUPPORTED_LOCALES } from '@/lib/services/translation.service'
 import { z } from 'zod'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 const upsertSchema = z.object({
   locale: z.enum(SUPPORTED_LOCALES),
@@ -10,7 +11,7 @@ const upsertSchema = z.object({
   description: z.string().optional(),
 })
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
   if (!session?.user || !businessId) return res.status(401).json({ error: 'Unauthorized' })
@@ -39,3 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).end()
 }
+
+// Apply commercial enforcement: Menu Translations require Professional plan or higher
+export default requiresFeature('hasMultiLanguageMenus')(baseHandler)

@@ -307,7 +307,7 @@ export default function OrderConfirmationPage() {
           </div>
         )}
 
-        {/* Share Restaurant (for non-table orders) */}
+        {/* Share Business (for non-table orders) */}
         {isPaid && !session && (
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 mb-6">
             <div className="text-center">
@@ -315,7 +315,7 @@ export default function OrderConfirmationPage() {
                 ❤️ Love {order.businessName}?
               </h3>
               <p className="text-sm text-gray-700 mb-4">
-                Share this restaurant with friends and <strong className="text-green-700">earn 500 RWF</strong> when they order!
+                Share this business with friends and <strong className="text-green-700">earn 500 RWF</strong> when they order!
               </p>
               <button
                 onClick={async () => {

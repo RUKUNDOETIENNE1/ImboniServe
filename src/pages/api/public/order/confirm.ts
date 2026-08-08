@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { ingestDeliveryShadowEvent } from '@/lib/die/business-as-plugin/delivery/delivery.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -36,6 +37,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: { status: 'CANCELLED' }
       })
 
+      // Shadow: mark delivery cancelled (read-only)
+      try {
+        const o = await prisma.sale.findUnique({ where: { id: orderId }, select: { businessId: true, orderNumber: true } })
+        if (o?.businessId) {
+          ingestDeliveryShadowEvent({
+            type: 'DELIVERY_CANCELLED',
+            businessId: o.businessId,
+            orderId,
+            orderNumber: o.orderNumber || undefined,
+          }).catch(() => {})
+        }
+      } catch {}
+
       return res.status(200).json({
         message: 'Order cancelled',
         orderId
@@ -60,6 +74,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
     })
+
+    // Shadow: delivery created signal for remote-type flows can be inferred later; emit generic created signal here
+    try {
+      ingestDeliveryShadowEvent({
+        type: 'DELIVERY_CREATED',
+        businessId: (await prisma.sale.findUnique({ where: { id: orderId }, select: { businessId: true } }))?.businessId || '',
+        orderId,
+        orderNumber: updated.orderNumber || undefined,
+      }).catch(() => {})
+    } catch {}
 
     return res.status(200).json({
       message: 'Order confirmed and sent to kitchen',

@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Sparkles, Upload, CheckCircle, XCircle, Clock, FileText, Image as ImageIcon, Plus, ExternalLink } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useToast } from '@/components/Toast'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -22,7 +21,6 @@ export default function MenuBuilderPage() {
   const [uploading, setUploading] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [extracting, setExtracting] = useState(false)
-  const aiEnabled = useFeatureFlag('ai_menu_builder')
 
   async function fetchCandidates() {
     setLoading(true)
@@ -73,111 +71,72 @@ export default function MenuBuilderPage() {
     if (!file) return
 
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
     if (!validTypes.includes(file.type)) {
-      showToast('error', 'Please upload a valid image (JPG, PNG) or PDF file')
+      showToast('error', 'Please upload a valid image (JPG, PNG, WebP) or PDF file')
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('error', 'File size must be less than 10MB')
+    // Validate file size (max 25MB)
+    if (file.size > 25 * 1024 * 1024) {
+      showToast('error', 'File size must be less than 25MB')
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     setUploading(true)
     try {
-      // Upload API not enabled yet. Guide user to URL flow.
-      showToast('error', 'Local upload not yet enabled. Paste a public image/PDF URL and click "Use Image URL".')
+      // Upload file to the server using multipart form data
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/menu-builder/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Upload failed')
+      }
+
+      // Check if extraction succeeded
+      if (data.data?.status === 'FAILED') {
+        throw new Error(data.data?.error || 'AI extraction failed. Please try again with a clearer image.')
+      }
+
+      const count = data.data?.candidatesCount || 0
+      showToast('success', `Upload successful! AI extracted ${count} menu item${count === 1 ? '' : 's'}. Review below.`)
+
+      // Reset file input
+      if (fileInputRef.current) fileInputRef.current.value = ''
+
+      // Refresh candidates to show the new ones
+      setStatus('PENDING')
+      setTimeout(() => fetchCandidates(), 500)
+    } catch (err: any) {
+      showToast('error', err.message || 'Failed to upload menu')
       if (fileInputRef.current) fileInputRef.current.value = ''
     } finally {
       setUploading(false)
     }
   }
 
-  if (!aiEnabled) {
-    return (
-      <DashboardLayout>
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* AI Builder Locked */}
-          <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl border-2 border-slate-200 p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-imboni-blue/10 mb-4">
-              <Sparkles className="w-8 h-8 text-imboni-blue" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">AI Menu Builder (Premium)</h3>
-            <p className="text-slate-600 mb-1">🔒 Unlocks at 20 active clients</p>
-            <p className="text-sm text-slate-500 mb-4">Upload a menu image or PDF and let AI extract all items automatically</p>
-            <div className="mt-4 space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <span className="text-sm text-amber-800 font-medium">Keep serving customers to unlock this feature</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
-                <div className="p-3 bg-white border border-slate-200 rounded-lg">
-                  <ImageIcon className="w-5 h-5 text-imboni-blue mb-2" />
-                  <p className="text-xs font-medium text-slate-700">Upload Menu Image</p>
-                  <p className="text-xs text-slate-500 mt-1">JPG, PNG supported</p>
-                </div>
-                <div className="p-3 bg-white border border-slate-200 rounded-lg">
-                  <FileText className="w-5 h-5 text-imboni-orange mb-2" />
-                  <p className="text-xs font-medium text-slate-700">Upload Menu PDF</p>
-                  <p className="text-xs text-slate-500 mt-1">Multi-page PDFs OK</p>
-                </div>
-                <div className="p-3 bg-white border border-slate-200 rounded-lg">
-                  <Sparkles className="w-5 h-5 text-green-600 mb-2" />
-                  <p className="text-xs font-medium text-slate-700">AI Auto-Extract</p>
-                  <p className="text-xs text-slate-500 mt-1">Names, prices, categories</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Manual Menu Creation - Always Available */}
-          <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl border-2 border-imboni-blue/20 p-8">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-imboni-blue rounded-xl">
-                <Plus className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-800 mb-2">Create Menu Manually (Available Now)</h3>
-                <p className="text-slate-600 mb-4">Build your menu from scratch. Add items one by one with full control over names, prices, descriptions, and categories.</p>
-                <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
-                  <p className="text-sm text-slate-700 mb-2 font-medium">💡 Quick Start Guide:</p>
-                  <ol className="text-sm text-slate-600 space-y-1 list-decimal list-inside">
-                    <li>Click "Add New Item" in Menu Management</li>
-                    <li>Enter item name, price, and description</li>
-                    <li>Select or create a category (e.g., "Appetizers", "Main Course")</li>
-                    <li>Save and publish to your menu</li>
-                  </ol>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <a
-                    href="/dashboard/menu"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-imboni-blue text-white rounded-lg hover:bg-imboni-blue/90 transition font-medium shadow-lg shadow-blue-200"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Menu Items Now
-                  </a>
-                  <a
-                    href="/dashboard/inventory"
-                    className="inline-flex items-center gap-2 px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Manage Inventory
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    )
-  }
-
   const confidenceColor = (c: number) => c >= 0.8 ? 'text-green-600' : c >= 0.6 ? 'text-amber-600' : 'text-red-500'
 
   return (
     <DashboardLayout>
+      {uploading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-imboni-orange" />
+            <p className="text-slate-700 font-medium">AI is reading your menu...</p>
+            <p className="text-sm text-slate-500">Extracting items, prices, and categories</p>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -189,7 +148,7 @@ export default function MenuBuilderPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,application/pdf"
+            accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -198,8 +157,8 @@ export default function MenuBuilderPage() {
             disabled={uploading}
             className="flex items-center gap-2 px-4 py-2 bg-imboni-orange text-white rounded-lg hover:bg-accent-dark transition font-medium disabled:opacity-50"
           >
-            <Upload className="w-4 h-4" />
-            {uploading ? 'Uploading...' : 'Upload Menu'}
+            <Upload className={`w-4 h-4 ${uploading ? 'animate-pulse' : ''}`} />
+            {uploading ? 'Processing with AI...' : 'Upload Menu'}
           </button>
           <div className="flex items-center gap-2">
             <input
@@ -249,10 +208,10 @@ export default function MenuBuilderPage() {
                 disabled={uploading}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-imboni-blue text-white rounded-lg hover:bg-imboni-blue/90 transition font-medium disabled:opacity-50"
               >
-                <Upload className="w-5 h-5" />
-                {uploading ? 'Uploading...' : 'Upload Menu Document'}
+                <Upload className={`w-5 h-5 ${uploading ? 'animate-pulse' : ''}`} />
+                {uploading ? 'Processing with AI...' : 'Upload Menu Document'}
               </button>
-              <p className="text-xs text-slate-400 mt-3">Supported: JPG, PNG, PDF (max 10MB)</p>
+              <p className="text-xs text-slate-400 mt-3">Supported: JPG, PNG, WebP, PDF (max 25MB)</p>
             </div>
           ) : (
             <p className="text-sm text-slate-400 mt-1">No {status.toLowerCase()} items found</p>

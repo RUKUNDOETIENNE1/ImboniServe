@@ -5,7 +5,7 @@ import { SmartMenuBuilderService } from '@/lib/services/smart-menu-builder.servi
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
 
@@ -38,4 +38,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(successResponse(result, 'Menu extracted successfully'))
 }
 
-export default withErrorHandler(handler)
+export default withErrorHandler(baseHandler)

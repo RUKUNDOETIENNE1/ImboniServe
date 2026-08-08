@@ -567,8 +567,8 @@ export default function SiteBuilderPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle suppressHydrationWarning>{t('dashboard.site_builder.publish_title')}</CardTitle>
-              <CardDescription suppressHydrationWarning>{t('dashboard.site_builder.publish_desc')}</CardDescription>
+              <CardTitle>{t('dashboard.site_builder.publish_title')}</CardTitle>
+              <CardDescription>{t('dashboard.site_builder.publish_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
@@ -592,8 +592,8 @@ export default function SiteBuilderPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle suppressHydrationWarning>{t('dashboard.site_builder.custom_domain_optional')}</CardTitle>
-              <CardDescription suppressHydrationWarning>{t('dashboard.site_builder.custom_domain_desc')}</CardDescription>
+              <CardTitle>{t('dashboard.site_builder.custom_domain_optional')}</CardTitle>
+              <CardDescription>{t('dashboard.site_builder.custom_domain_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600 mb-4" suppressHydrationWarning>

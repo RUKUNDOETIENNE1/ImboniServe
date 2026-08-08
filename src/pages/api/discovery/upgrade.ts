@@ -4,8 +4,9 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { upgradeToFeatured, upgradeToPremium, DiscoveryTier } from '@/lib/services/discovery-subscription.service';
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers';
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
   const businessId = (session?.user as any)?.businessId;
 
@@ -50,5 +51,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 }
+
+// Apply commercial enforcement: Discovery Featured requires Business plan or higher
+const handler = requiresFeature('hasDiscoveryFeatured')(baseHandler);
 
 export default withErrorHandler(handler);

@@ -38,6 +38,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             data: {
               lockExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // +10 minutes
               updatedAt: new Date()
+            },
+            include: {
+              seat: {
+                select: {
+                  seatNumber: true,
+                  seatLabel: true
+                }
+              }
             }
           })
           return { seatSession: updated, sessionToken: updated.sessionToken, extended: true }

@@ -23,6 +23,8 @@ import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { getPlatformFee, FeeType } from '@/lib/services/platform-fee.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -156,7 +158,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await DiningSessionSlipService.markPaymentTriggered(slip.id, payment.id)
 
     // Prepare callback URL
-    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/checkout/tap-and-leave/webhook`
+    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Development-only: simulation mode to bypass external gateway
     const simulate = (req.query?.simulate === '1') || (req.body && req.body.simulate === true)
@@ -202,13 +204,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: intouchResponse as any,
         status: InTouchService.isSuccess(intouchResponse.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(intouchResponse.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
       },
     })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'checkout/tap-and-leave/initiate',
+      responsecode: intouchResponse.responsecode,
+      sessionId,
+      slipId: slip.id,
+    })
+
+    // Shadow taps: payment lifecycle
+    try {
+      const success = InTouchService.isSuccess(intouchResponse.responsecode)
+      const pending = InTouchService.isPending(intouchResponse.responsecode)
+      if (success) {
+        await ingestDiningSlipShadowEvent({ type: 'SLIP_PAID', businessId: slip.businessId, sessionId, slipId: slip.id, amountCents: finalAmount }).catch(() => {})
+      } else if (!pending) {
+        await ingestDiningSlipShadowEvent({ type: 'PAYMENT_EXCEPTION', businessId: slip.businessId, sessionId, slipId: slip.id, reason: String(intouchResponse.responsecode) }).catch(() => {})
+      }
+    } catch {}
 
     // Check if payment failed immediately
     if (!InTouchService.isSuccess(intouchResponse.responsecode) && !InTouchService.isPending(intouchResponse.responsecode)) {
@@ -218,6 +237,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payment.id,
         InTouchService.getErrorMessage(intouchResponse.responsecode)
       )
+
+      // Shadow: immediate failure
+      try {
+        await ingestDiningSlipShadowEvent({ type: 'PAYMENT_EXCEPTION', businessId: slip.businessId, sessionId, slipId: slip.id, reason: String(intouchResponse.responsecode) }).catch(() => {})
+      } catch {}
 
       return res.status(400).json(
         errorResponse(InTouchService.getErrorMessage(intouchResponse.responsecode), {

@@ -5,6 +5,7 @@ import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { IremboPayService } from '@/lib/services/irembopay.service'
 import { prisma } from '@/lib/prisma'
 import { AuditLogService } from '@/lib/services/audit-log.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -77,7 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: invoice.transactionId,
         gateway: 'IREMBO_PAY',
         paymentMethod: 'WEB',
-        status: 'INITIATED',
+        status: 'PENDING',
         amountCents: grossAmountCents,
         currency: 'RWF',
         vatAmountCents,
@@ -91,6 +92,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payerPhone: dbUser?.phone || '',
         rawRequest: invoice as any
       }
+    })
+    await ensurePaymentLedgerEvent(transaction.id, 'PENDING', {
+      source: 'payments/irembo/create-invoice',
+      invoiceNumber: invoice.invoiceNumber,
     })
 
     // Append-only audit log: payment initiation

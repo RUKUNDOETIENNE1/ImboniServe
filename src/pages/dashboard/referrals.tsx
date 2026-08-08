@@ -69,7 +69,7 @@ export default function ReferralsPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-slate-600">Restaurant Referrals</p>
+                <p className="text-sm text-slate-600">Business Referrals</p>
                 <Users className="w-5 h-5 text-imboni-blue" />
               </div>
               <p className="text-3xl font-bold text-slate-800">
@@ -109,7 +109,7 @@ export default function ReferralsPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
               <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-yellow-500" />
-                Top Restaurant Referrers
+                Top Business Referrers
               </h2>
               <div className="space-y-3">
                 {data?.restaurantReferrals?.leaderboard?.map((affiliate: any, idx: number) => (

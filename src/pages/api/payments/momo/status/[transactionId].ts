@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { MoMoService } from '@/lib/services/momo.service'
-import { AuditLogService } from '@/lib/services/audit-log.service'
-import { NotificationService } from '@/lib/services/notification.service'
-import { broadcast } from '@/lib/realtime'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -55,14 +53,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    // If successful and not already processed, mark order as paid
-    if (status.status === 'SUCCESSFUL' && paymentTx.status !== 'COMPLETED') {
-      await processSuccessfulPayment(paymentTx.id, paymentTx.sale?.id || '')
+    // If successful and not already processed, delegate to PaymentCompletionService
+    if (status.status === 'SUCCESSFUL' && paymentTx.status !== 'SUCCESS') {
+      if (paymentTx.sale?.id) {
+        await PaymentCompletionService.onPaymentSuccess(
+          paymentTx.id,
+          paymentTx.sale.id,
+          { source: 'momo-polling' }
+        )
+      }
     }
 
     // If failed and not already marked failed
     if (status.status === 'FAILED' && paymentTx.status !== 'FAILED') {
-      await processFailedPayment(paymentTx.id, paymentTx.sale?.id || '', status.reason)
+      await PaymentCompletionService.onPaymentFailure(
+        paymentTx.id,
+        paymentTx.sale?.id || '',
+        status.reason,
+        { source: 'momo-polling' }
+      )
     }
 
     return res.status(200).json({
@@ -78,131 +87,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: any) {
     console.error('[MoMo Status] Error:', error)
     return res.status(500).json({ error: 'Failed to check payment status' })
-  }
-}
-
-/**
- * Process successful MoMo payment
- */
-async function processSuccessfulPayment(paymentTxId: string, orderId: string) {
-  try {
-    const now = new Date()
-
-    await prisma.$transaction(async (tx) => {
-      // Update payment transaction
-      await tx.paymentTransaction.update({
-        where: { id: paymentTxId },
-        data: {
-          status: 'COMPLETED',
-          paidAt: now,
-          updatedAt: now
-        }
-      })
-
-      // Update sale/order
-      const sale = await tx.sale.update({
-        where: { id: orderId },
-        data: {
-          paymentStatus: 'PAID',
-          isPaid: true,
-          kitchenReleasedAt: now,
-          updatedAt: now
-        },
-        include: {
-          business: true
-        }
-      })
-
-      // Log success
-      await AuditLogService.log({
-        actorId: 'SYSTEM',
-        action: 'MOMO_PAYMENT_CONFIRMED',
-        entityType: 'Sale',
-        entityId: orderId,
-        metadata: {
-          paymentTxId,
-          orderNumber: sale.orderNumber,
-          amountCents: sale.totalCents,
-          confirmedAt: now.toISOString()
-        }
-      })
-
-      // Send notifications
-      try {
-        await NotificationService.sendOrderNotification(orderId)
-      } catch (error) {
-        console.error('[MoMo] Notification error:', error)
-      }
-
-      // Broadcast real-time update
-      try {
-        await broadcast(`business:${sale.businessId}:orders`, {
-          type: 'ORDER_PAYMENT_CONFIRMED',
-          orderId: orderId,
-          orderNumber: sale.orderNumber,
-          paymentMethod: sale.paymentMethod,
-          timestamp: now.toISOString()
-        })
-      } catch (error) {
-        console.error('[MoMo] Broadcast error:', error)
-      }
-
-      // Create affiliate commission if applicable
-      try {
-        const { createAffiliateCommission } = await import('@/lib/services/affiliate.service')
-        await createAffiliateCommission(orderId)
-      } catch (error) {
-        console.error('[MoMo] Affiliate commission error:', error)
-      }
-    })
-
-    console.log('[MoMo] Payment successfully processed:', orderId)
-  } catch (error) {
-    console.error('[MoMo] Process success error:', error)
-    throw error
-  }
-}
-
-/**
- * Process failed MoMo payment
- */
-async function processFailedPayment(paymentTxId: string, orderId: string, reason?: string) {
-  try {
-    await prisma.$transaction(async (tx) => {
-      // Update payment transaction
-      await tx.paymentTransaction.update({
-        where: { id: paymentTxId },
-        data: {
-          status: 'FAILED',
-          updatedAt: new Date()
-        }
-      })
-
-      // Update sale
-      await tx.sale.update({
-        where: { id: orderId },
-        data: {
-          paymentStatus: 'FAILED',
-          updatedAt: new Date()
-        }
-      })
-
-      // Log failure
-      await AuditLogService.log({
-        actorId: 'SYSTEM',
-        action: 'MOMO_PAYMENT_FAILED',
-        entityType: 'Sale',
-        entityId: orderId,
-        metadata: {
-          paymentTxId,
-          reason: reason || 'Payment failed'
-        }
-      })
-    })
-
-    console.log('[MoMo] Payment marked as failed:', orderId)
-  } catch (error) {
-    console.error('[MoMo] Process failure error:', error)
-    throw error
   }
 }

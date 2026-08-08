@@ -4,9 +4,10 @@ import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
-import { triggerEvent } from '@/lib/pusher-server'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -54,89 +55,77 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'Forbidden' })
     }
 
-    if (sale.paymentStatus === 'PAID') {
+    if (sale.paymentStatus === 'COMPLETED') {
       return res.status(409).json({ error: 'Order already marked as paid' })
     }
 
     const now = new Date()
     
-    const updatedSale = await prisma.$transaction(async (tx: any) => {
-      const updated = await tx.sale.update({
-        where: { id },
-        data: {
-          paymentStatus: 'PAID',
-          isPaid: true,
-          paymentMethod: paymentMethod,
-          paymentReference: reference || `MANUAL-${Date.now()}`,
-          kitchenReleasedAt: sale.kitchenReleasedAt || now,
-          updatedAt: now
-        },
-        include: {
-          business: true,
-          table: true,
-          participant: true,
-          items: {
-            include: {
-              menuItem: true
-            }
-          }
-        }
-      })
-
-      await AuditLogService.log({
-        actorId: ctx.userId,
-        action: 'PAYMENT_CONFIRMED_MANUALLY',
-        entityType: 'Sale',
-        entityId: sale.id,
-        metadata: {
-          orderNumber: sale.orderNumber,
-          paymentMethod,
-          reference: reference || `MANUAL-${Date.now()}`,
-          notes,
-          confirmedBy: ctx.userId,
-          amountCents: sale.totalCents,
-          businessId: sale.businessId,
-        },
-      })
-
-      return updated
+    // Update sale with payment method and reference (PaymentCompletionService handles status/isPaid)
+    await prisma.sale.update({
+      where: { id },
+      data: {
+        paymentMethod: paymentMethod,
+        paymentReference: reference || `MANUAL-${Date.now()}`,
+        kitchenReleasedAt: sale.kitchenReleasedAt || now,
+        updatedAt: now,
+      },
     })
 
-    try {
-      const { NotificationService } = await import('@/lib/services/notification.service')
-      await NotificationService.sendOrderNotification(sale.id)
-    } catch (error) {
-      console.error('Error sending order notification:', error)
-    }
-
-    try {
-      await triggerEvent(`private-business-${sale.businessId}`, 'payment.confirmed', {
-        orderId: sale.id,
+    // Write manual confirmation audit log (specific to manual confirmation action)
+    await AuditLogService.log({
+      actorId: ctx.userId,
+      action: 'PAYMENT_CONFIRMED_MANUALLY',
+      entityType: 'Sale',
+      entityId: sale.id,
+      metadata: {
         orderNumber: sale.orderNumber,
         paymentMethod,
+        reference: reference || `MANUAL-${Date.now()}`,
+        notes,
         confirmedBy: ctx.userId,
-        timestamp: now.toISOString(),
-      })
+        amountCents: sale.totalAmountCents,
+        businessId: sale.businessId,
+      },
+    })
+
+    // Delegate all post-payment side effects to canonical PaymentCompletionService
+    // This handles: sale status update (COMPLETED + isPaid), dining slip, guest recognition,
+    // notification, broadcast, ledger entry, audit log (PAYMENT_COMPLETED), order token
+    try {
+      await PaymentCompletionService.onPaymentSuccess(
+        '', // No payment transaction for manual confirmation
+        sale.id,
+        { source: 'manual-confirmation' }
+      )
     } catch (error) {
-      console.error('Error broadcasting payment confirmation:', error)
+      console.error('Error in PaymentCompletionService:', error)
     }
+
+    const updatedSale = await prisma.sale.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        orderNumber: true,
+        paymentStatus: true,
+        isPaid: true,
+        paymentMethod: true,
+        paymentReference: true,
+        kitchenReleasedAt: true,
+      },
+    })
 
     return res.status(200).json({
       success: true,
-      order: {
-        id: updatedSale.id,
-        orderNumber: updatedSale.orderNumber,
-        paymentStatus: updatedSale.paymentStatus,
-        isPaid: updatedSale.isPaid,
-        paymentMethod: updatedSale.paymentMethod,
-        paymentReference: updatedSale.paymentReference,
-        kitchenReleasedAt: updatedSale.kitchenReleasedAt
-      }
+      order: updatedSale
     })
   } catch (error: any) {
     console.error('Manual payment confirmation error:', error)
     return res.status(500).json({ error: 'Failed to confirm payment' })
   }
 }
+
+// Apply commercial enforcement: Orders require Starter plan or higher
+const handler = requiresFeature('hasOrders')(baseHandler)
 
 export default withRateLimit(requirePermission('payments.create')(handler), { maxRequests: 20, windowMs: 60000 })

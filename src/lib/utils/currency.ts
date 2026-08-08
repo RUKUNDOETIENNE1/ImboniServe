@@ -1,6 +1,22 @@
 /**
  * Global Currency System
  * 
+ * ⚠️ DEPRECATED: This static currency utility is being phased out.
+ * 
+ * ARCHITECTURAL RULE:
+ * Use currency-exchange.service.ts as the SINGLE SOURCE OF TRUTH for:
+ * - Exchange rates (DB-backed, not static)
+ * - Currency conversion
+ * - Display formatting
+ * 
+ * This file remains for backward compatibility during migration only.
+ * DO NOT add new functions. DO NOT use in new code.
+ * 
+ * Migration path:
+ * - Replace formatCurrency() with CurrencyExchangeService.format()
+ * - Replace convertFromRWF() with CurrencyExchangeService.convert()
+ * - Replace EXCHANGE_RATES with DB-backed rates
+ * 
  * Rules:
  * - All prices stored in RWF (base currency)
  * - Conversion ONLY for display

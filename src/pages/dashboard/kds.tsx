@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/components/DashboardLayout'
-import { Clock, CheckCircle, AlertCircle, ChefHat, Flame, Timer, Volume2, VolumeX } from 'lucide-react'
+import { Clock, CheckCircle, AlertCircle, ChefHat, Flame, Timer, Volume2, VolumeX, RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { useRealtimeMulti } from '@/lib/realtime'
+import { performanceMonitor } from '@/lib/monitoring/performance-monitor'
+import { workflowTracker } from '@/lib/monitoring/workflow-tracker'
 
 interface OrderItem {
   id: string
@@ -11,6 +14,10 @@ interface OrderItem {
   quantity: number
   notes?: string
   modifiers?: string[]
+  itemStatus?: string
+  prepStartedAt?: Date | null
+  readyAt?: Date | null
+  deliveredAt?: Date | null
 }
 
 interface KitchenOrder {
@@ -29,9 +36,17 @@ export default function KitchenDisplaySystem() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { t } = useTranslation()
+  const { station: stationParam } = router.query
   const [orders, setOrders] = useState<KitchenOrder[]>([])
   const [filter, setFilter] = useState<'ALL' | 'NEW' | 'PREPARING' | 'READY'>('ALL')
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [stationId, setStationId] = useState<string | null>(null)
+  const [stationName, setStationName] = useState<string>('Kitchen')
+  const [availableStations, setAvailableStations] = useState<Array<{ id: string; name: string; code: string }>>([])
+  const [isConnected, setIsConnected] = useState(true)
+  const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date())
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -39,72 +54,191 @@ export default function KitchenDisplaySystem() {
     }
   }, [status, router])
 
-  // Mock data - replace with real-time API
+  // Phase 4: Start monitoring on mount
   useEffect(() => {
-    const mockOrders: KitchenOrder[] = [
-      {
-        id: '1',
-        orderNumber: 'ORD-001',
-        table: 'Table 5',
-        items: [
-          { id: '1', name: 'Grilled Chicken', quantity: 2, notes: 'No salt', modifiers: ['Extra sauce'] },
-          { id: '2', name: 'Caesar Salad', quantity: 1 }
-        ],
-        status: 'NEW',
-        priority: 'URGENT',
-        orderTime: new Date(Date.now() - 2 * 60000),
-        prepTime: 15,
-        server: 'Alice'
-      },
-      {
-        id: '2',
-        orderNumber: 'ORD-002',
-        table: 'Table 12',
-        items: [
-          { id: '3', name: 'Beef Burger', quantity: 3, modifiers: ['No onions', 'Extra cheese'] },
-          { id: '4', name: 'French Fries', quantity: 3 }
-        ],
-        status: 'PREPARING',
-        priority: 'NORMAL',
-        orderTime: new Date(Date.now() - 8 * 60000),
-        prepTime: 20,
-        server: 'Bob'
-      },
-      {
-        id: '3',
-        orderNumber: 'ORD-003',
-        table: 'Table 3',
-        items: [
-          { id: '5', name: 'Pasta Carbonara', quantity: 1 },
-          { id: '6', name: 'Margherita Pizza', quantity: 1 }
-        ],
-        status: 'READY',
-        priority: 'NORMAL',
-        orderTime: new Date(Date.now() - 18 * 60000),
-        prepTime: 25,
-        server: 'Charlie'
+    if (status === 'authenticated' && stationId) {
+      performanceMonitor.start()
+      const sessionId = workflowTracker.startSession(stationId)
+
+      return () => {
+        performanceMonitor.stop()
+        workflowTracker.completeSession()
       }
-    ]
-    setOrders(mockOrders)
-
-    // Simulate real-time updates
-    const interval = setInterval(() => {
-      // In production, this would be a WebSocket or Pusher subscription
-      console.log('Fetching new orders...')
-    }, 10000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const updateOrderStatus = (orderId: string, newStatus: KitchenOrder['status']) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ))
-
-    // Play sound on status change
-    if (soundEnabled) {
-      playNotificationSound()
     }
+  }, [status, stationId])
+
+  // Load available stations
+  useEffect(() => {
+    if (status !== 'authenticated') return
+
+    const loadStations = async () => {
+      try {
+        const res = await fetch('/api/station/list')
+        if (res.ok) {
+          const data = await res.json()
+          setAvailableStations(data.stations || [])
+
+          // Auto-select station from query param or first available
+          if (stationParam && typeof stationParam === 'string') {
+            const station = data.stations?.find((s: any) => s.code === stationParam || s.id === stationParam)
+            if (station) {
+              setStationId(station.id)
+              setStationName(station.name)
+            }
+          } else if (data.stations?.length > 0) {
+            setStationId(data.stations[0].id)
+            setStationName(data.stations[0].name)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load stations:', err)
+      }
+    }
+
+    loadStations()
+  }, [status, stationParam])
+
+  // Fetch station orders
+  const fetchOrders = useCallback(async () => {
+    if (!stationId) return
+
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch(`/api/station/orders?stationId=${stationId}`)
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch orders')
+      }
+
+      const data = await res.json()
+      setOrders(data.orders || [])
+    } catch (err: any) {
+      console.error('Error fetching orders:', err)
+      setError(err.message || 'Failed to load orders')
+    } finally {
+      setLoading(false)
+    }
+  }, [stationId])
+
+  // Initial load
+  useEffect(() => {
+    if (stationId) {
+      fetchOrders()
+    }
+  }, [stationId, fetchOrders])
+
+  // Real-time updates via Pusher
+  useRealtimeMulti(
+    stationId
+      ? [
+          {
+            channel: `private-station-${stationId}`,
+            event: 'items.routed',
+            onData: () => {
+              fetchOrders()
+              if (soundEnabled) playNotificationSound()
+            },
+          },
+          {
+            channel: `private-station-${stationId}`,
+            event: 'item.updated',
+            onData: (data: any) => {
+              // Update specific item in state
+              setOrders((prev) =>
+                prev.map((order) => {
+                  if (order.id === data.saleId) {
+                    return {
+                      ...order,
+                      items: order.items.map((item) =>
+                        item.id === data.itemId
+                          ? { ...item, itemStatus: data.itemStatus }
+                          : item
+                      ),
+                    }
+                  }
+                  return order
+                })
+              )
+            },
+          },
+        ]
+      : []
+  )
+
+  // Phase 3: Reconnection handling
+  useEffect(() => {
+    if (!stationId) return
+
+    const handleReconnect = () => {
+      console.log('[KDS] Pusher reconnected - fetching snapshot')
+      fetchOrders() // Full refresh on reconnect
+    }
+
+    // Register reconnect handler
+    const realtimeService = (window as any).__realtimeService
+    if (realtimeService) {
+      const cleanup = realtimeService.onReconnect(handleReconnect)
+      return cleanup
+    }
+  }, [stationId, fetchOrders])
+
+  const updateOrderStatus = async (orderId: string, newStatus: KitchenOrder['status']) => {
+    // Phase 4: Track interaction performance
+    await performanceMonitor.trackInteraction(`update-order-${newStatus}`, async () => {
+      try {
+        workflowTracker.trackAction('update', `order-${orderId}-${newStatus}`, true)
+
+        // Get all items for this order
+        const order = orders.find((o) => o.id === orderId)
+        if (!order) return
+
+        // Map KDS status to item status
+        const itemStatusMap: Record<string, string> = {
+          NEW: 'NEW',
+          PREPARING: 'PREPARING',
+          READY: 'READY',
+          SERVED: 'DELIVERED',
+        }
+
+        const itemStatus = itemStatusMap[newStatus]
+
+        // Generate idempotency key for this batch
+        const idempotencyKey = `kds-${orderId}-${newStatus}-${Date.now()}`
+
+        // Update all items in this order
+        await Promise.all(
+          order.items.map((item) =>
+            fetch('/api/station/update-item-status', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Idempotency-Key': `${idempotencyKey}-${item.id}`,
+              },
+              body: JSON.stringify({
+                itemId: item.id,
+                newStatus: itemStatus,
+                stationId,
+                idempotencyKey: `${idempotencyKey}-${item.id}`,
+              }),
+            })
+          )
+        )
+
+        // Optimistically update UI
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+        )
+
+        // Play sound on status change
+        if (soundEnabled) {
+          playNotificationSound()
+        }
+      } catch (err) {
+        console.error('Failed to update order status:', err)
+        workflowTracker.trackAction('error', `order-${orderId}-${newStatus}`, false)
+      }
+    })
   }
 
   const playNotificationSound = () => {
@@ -112,40 +246,39 @@ export default function KitchenDisplaySystem() {
     audio.play().catch(e => console.log('Audio play failed:', e))
   }
 
-  const getFilteredOrders = () => {
+  // Phase 4: Optimize filtering with useMemo
+  const filteredOrders = useMemo(() => {
     if (filter === 'ALL') return orders
     return orders.filter(order => order.status === filter)
-  }
+  }, [orders, filter])
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = useCallback((priority: string) => {
     switch (priority) {
       case 'URGENT': return 'bg-red-500'
       case 'HIGH': return 'bg-orange-500'
       case 'NORMAL': return 'bg-blue-500'
       default: return 'bg-slate-500'
     }
-  }
+  }, [])
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useCallback((status: string) => {
     switch (status) {
-      case 'NEW': return 'border-l-4 border-l-blue-500'
-      case 'PREPARING': return 'border-l-4 border-l-orange-500'
-      case 'READY': return 'border-l-4 border-l-green-500'
-      case 'SERVED': return 'border-l-4 border-l-slate-400'
+      case 'NEW': return 'border-l-4 border-l-blue-600 bg-blue-50'
+      case 'PREPARING': return 'border-l-4 border-l-orange-600 bg-orange-50'
+      case 'READY': return 'border-l-4 border-l-green-600 bg-green-50'
+      case 'SERVED': return 'border-l-4 border-l-slate-400 bg-slate-50'
       default: return ''
     }
-  }
+  }, [])
 
-  const getTimeAgo = (date: Date) => {
+  const getTimeAgo = useCallback((date: Date) => {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
     if (seconds < 60) return `${seconds}s`
     const minutes = Math.floor(seconds / 60)
     if (minutes < 60) return `${minutes}m`
     const hours = Math.floor(minutes / 60)
     return `${hours}h`
-  }
-
-  const filteredOrders = getFilteredOrders()
+  }, [])
 
   if (status === 'loading') {
     return (
@@ -165,12 +298,60 @@ export default function KitchenDisplaySystem() {
           <div className="flex items-center gap-3">
             <ChefHat className="w-8 h-8 text-imboni-blue" />
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">{t('kds.title', 'Kitchen Display System')}</h1>
-              <p className="text-sm text-slate-600">{t('kds.subtitle', 'Real-time order management')}</p>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {stationName} {t('kds.station', 'Station')}
+              </h1>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-slate-600">{t('kds.subtitle', 'Real-time order management')}</p>
+                {/* Phase 4: Connection status */}
+                <div className="flex items-center gap-1">
+                  {isConnected ? (
+                    <Wifi className="w-3 h-3 text-green-600" aria-label="Connected" />
+                  ) : (
+                    <WifiOff className="w-3 h-3 text-red-600" aria-label="Disconnected" />
+                  )}
+                  <span className="text-xs text-slate-500">
+                    {getTimeAgo(lastSyncTime)}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Station Selector */}
+            {availableStations.length > 1 && (
+              <select
+                value={stationId || ''}
+                onChange={(e) => {
+                  const selected = availableStations.find((s) => s.id === e.target.value)
+                  if (selected) {
+                    setStationId(selected.id)
+                    setStationName(selected.name)
+                    router.push(`/dashboard/kds?station=${selected.code}`, undefined, { shallow: true })
+                  }
+                }}
+                className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium hover:bg-slate-50"
+              >
+                {availableStations.map((station) => (
+                  <option key={station.id} value={station.id}>
+                    {station.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Refresh Button */}
+            {/* Refresh Button */}
+            <button
+              onClick={fetchOrders}
+              disabled={loading}
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+              title="Refresh"
+            >
+              <RefreshCw className={`w-5 h-5 text-slate-700 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+
             {/* Sound Toggle */}
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
