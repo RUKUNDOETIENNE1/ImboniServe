@@ -4,6 +4,7 @@ import Head from 'next/head'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -19,6 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 export default function WebhookDetail() {
   const router = useRouter()
   const { id } = router.query
+  const { currency } = useCurrency()
   const [data, setData] = useState<any>(null)
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function WebhookDetail() {
     load()
   }, [id])
 
-  const fmt = (n: number, c = 'RWF') => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
+  const fmt = (n: number, c = currency) => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
   const fdt = (d?: string) => (d ? new Date(d).toLocaleString() : '—')
 
   return (

@@ -6,6 +6,8 @@ import { prisma } from '@/lib/prisma'
 import PortalLayout from '@/components/portal/PortalLayout'
 import EarningsCard from '@/components/portal/EarningsCard'
 import { Loader2, AlertCircle, RefreshCw, Wallet, Clock, CheckCircle, DollarSign } from 'lucide-react'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface EarningsData {
   currentMonth: { commissionCents: number; count: number }
@@ -22,10 +24,6 @@ interface EarningsData {
   }>
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 const payoutStatusColors: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700',
   APPROVED: 'bg-blue-100 text-blue-700',
@@ -36,9 +34,13 @@ const payoutStatusColors: Record<string, string> = {
 }
 
 export default function PortalEarnings() {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const [data, setData] = useState<EarningsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -47,6 +49,7 @@ export default function PortalEarnings() {
       if (!res.ok) throw new Error('Failed to load')
       const json = await res.json()
       setData(json.data)
+      setLastUpdated(new Date())
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -89,6 +92,7 @@ export default function PortalEarnings() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">My Earnings</h1>
           <p className="text-sm text-slate-500">Transparent breakdown of your commission and payouts.</p>
+          <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
         </div>
 
         <EarningsCard

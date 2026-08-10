@@ -52,8 +52,32 @@ export interface MomoPushResponse {
   referenceId: string
 }
 
+/**
+ * Security: Fail-closed payment API base resolution.
+ *
+ * In production, IREMBOPAY_API_BASE MUST be explicitly set.  Silently
+ * falling back to the sandbox URL would cause real customer payments to
+ * be processed against the test environment, which could lose money and
+ * corrupt financial state.
+ *
+ * In development / test, the sandbox URL is retained as a convenience
+ * default so local workflows keep working.
+ */
+const isProductionEnv = process.env.NODE_ENV === 'production'
+const IREMBOPAY_API_BASE_RESOLVED = (() => {
+  const v = process.env.IREMBOPAY_API_BASE
+  if (v) return v
+  if (isProductionEnv) {
+    throw new Error(
+      'SECURITY FATAL: IREMBOPAY_API_BASE is not set in production. ' +
+      'Refusing to default to the sandbox API. Set IREMBOPAY_API_BASE to the production IremboPay API URL.'
+    )
+  }
+  return 'https://api.sandbox.irembopay.com'
+})()
+
 export class IremboPayService {
-  private static readonly API_BASE = process.env.IREMBOPAY_API_BASE || 'https://api.sandbox.irembopay.com'
+  private static readonly API_BASE = IREMBOPAY_API_BASE_RESOLVED
   private static readonly SECRET_KEY = process.env.IREMBOPAY_SECRET_KEY!
   private static readonly PUBLIC_KEY = process.env.IREMBOPAY_PUBLIC_KEY!
   private static readonly PAYMENT_ACCOUNT = process.env.IREMBOPAY_PAYMENT_ACCOUNT!
@@ -192,14 +216,15 @@ export class IremboPayService {
     return this.PUBLIC_KEY
   }
 
-  static calculateVATAmounts(grossAmountCents: number): {
+  static calculateVATAmounts(grossAmountCents: number, taxRate: number = 0): {
     vatAmountCents: number
     exVatAmountCents: number
   } {
-    // VAT = gross * 18 / 118 (for 18% VAT inclusive)
-    const vatAmountCents = Math.round(grossAmountCents * 18 / 118)
+    // VAT = gross * taxRate / (100 + taxRate) (for tax-inclusive pricing)
+    // taxRate defaults to 0 — no tax unless configured by the business
+    const vatAmountCents = Math.round(grossAmountCents * taxRate / (100 + taxRate))
     const exVatAmountCents = grossAmountCents - vatAmountCents
-    
+
     return {
       vatAmountCents,
       exVatAmountCents

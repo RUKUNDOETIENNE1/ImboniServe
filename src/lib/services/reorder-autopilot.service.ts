@@ -281,7 +281,8 @@ export class ReorderAutopilotService {
 
   static async generateDraftPurchaseOrders(
     businessId: string,
-    userId: string
+    userId: string,
+    taxRate: number = 0 // 0 means no tax configured — business should configure their tax rate
   ): Promise<{
     created: number
     skipped: number
@@ -359,7 +360,7 @@ export class ReorderAutopilotService {
         (sum, s) => sum + Math.round(s.estimatedCost * 100),
         0
       )
-      const vatCents = Math.round(subtotalCents * 0.18)
+      const vatCents = Math.round(subtotalCents * (taxRate / 100))
       const totalCents = subtotalCents + vatCents
 
       const poNumber = `DRAFT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
@@ -379,7 +380,7 @@ export class ReorderAutopilotService {
           status: 'DRAFT',
           subtotalCents,
           vatCents,
-          vatRate: 18.0,
+          vatRate: taxRate,
           totalCents,
           notes: `Auto-generated from AI reorder. Justification: ${justification}. Inventory impact: ${inventoryImpact}`,
           createdById: userId,

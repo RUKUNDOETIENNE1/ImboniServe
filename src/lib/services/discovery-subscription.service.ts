@@ -5,6 +5,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'discovery-subscription' });
 
@@ -320,9 +321,13 @@ export async function getDiscoveryStats(businessId: string) {
   const access = await checkDiscoveryAccess(businessId);
 
   // Get monthly order count and GMV from marketplace
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true },
+  });
+  const startOfMonthRaw = new Date();
+  startOfMonthRaw.setDate(1);
+  const startOfMonth = getBusinessDayBoundary(startOfMonthRaw, business?.timezone).start;
 
   const monthlyOrders = await prisma.marketplaceOrder.count({
     where: {

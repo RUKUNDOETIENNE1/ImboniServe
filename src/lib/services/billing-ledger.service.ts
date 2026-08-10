@@ -10,6 +10,13 @@ export interface BillingEventInput {
   message?: string
   metadata?: Record<string, any>
   occurredAt?: Date
+  /**
+   * GPV-D010: When true, skip creating a FinancialLedgerEntry mirror.
+   * Use this when the caller has already created the ledger entry atomically
+   * (e.g., PaymentCompletionService creates it inside a $transaction).
+   * The BillingEvent audit record is still created.
+   */
+  skipLedgerMirror?: boolean
 }
 
 export async function logBillingEvent(input: BillingEventInput): Promise<void> {
@@ -27,10 +34,31 @@ export async function logBillingEvent(input: BillingEventInput): Promise<void> {
     })
 
     // Mirror into FinancialLedgerEntry (single source of truth)
+    // GPV-D010: Skip if the caller already created the ledger entry atomically.
+    if (input.skipLedgerMirror) {
+      // Still send alerts for critical failures
+      if (input.eventType === BillingEventType.PAYMENT_FAILED) {
+        await AlertDeliveryService.deliver({
+          severity: 'error',
+          title: 'Payment failed',
+          details: {
+            businessId: input.businessId,
+            paymentTransactionId: input.paymentTransactionId,
+            message: input.message,
+            metadata: input.metadata,
+          },
+        })
+      }
+      return
+    }
+
     if (input.paymentTransactionId) {
       const tx = await prisma.paymentTransaction.findUnique({ where: { id: input.paymentTransactionId } })
       if (tx) {
-        const domain: LedgerDomain = tx.marketplaceOrderId ? LedgerDomain.MARKETPLACE : (tx.subscriptionId ? LedgerDomain.SUBSCRIPTION : LedgerDomain.PLATFORM)
+        // GPV-D010 FIX: Use SALES domain for regular restaurant sales.
+        // Previously defaulted to PLATFORM, making sales revenue indistinguishable
+        // from platform fees in the ledger.
+        const domain: LedgerDomain = tx.marketplaceOrderId ? LedgerDomain.MARKETPLACE : (tx.subscriptionId ? LedgerDomain.SUBSCRIPTION : LedgerDomain.SALES)
         const occurred = input.occurredAt || new Date()
         const sec = Math.floor(occurred.getTime() / 1000)
         const idempotencyKey = `${tx.id}:${input.eventType}:${sec}`
@@ -69,6 +97,13 @@ export async function logBillingEvent(input: BillingEventInput): Promise<void> {
       const sec = Math.floor(occurred.getTime() / 1000)
       const domain = input.subscriptionId ? LedgerDomain.SUBSCRIPTION : LedgerDomain.PLATFORM
       const idempotencyKey = `${input.businessId}:${input.subscriptionId || 'none'}:${input.eventType}:${sec}`
+
+      // Fetch business currency for the ledger entry
+      const business = await prisma.business.findUnique({
+        where: { id: input.businessId },
+        select: { currency: true }
+      })
+
       try {
         await prisma.financialLedgerEntry.create({
           data: {
@@ -76,7 +111,7 @@ export async function logBillingEvent(input: BillingEventInput): Promise<void> {
             domain,
             eventType: input.eventType,
             amountCents: 0,
-            currency: 'RWF',
+            currency: business?.currency || 'RWF',
             subscriptionId: input.subscriptionId || undefined,
             occurredAt: occurred,
             idempotencyKey,

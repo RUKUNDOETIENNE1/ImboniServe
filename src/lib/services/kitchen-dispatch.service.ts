@@ -42,8 +42,18 @@ export class KitchenDispatchService {
   static async dispatchToKitchen(input: DispatchToKitchenInput): Promise<{
     success: boolean
     error?: string
+    alreadyDispatched?: boolean
   }> {
     try {
+      // 0. Idempotency check — skip if already dispatched
+      const existing = await prisma.sale.findUnique({
+        where: { id: input.saleId },
+        select: { kitchenDispatchStatus: true },
+      })
+      if (existing?.kitchenDispatchStatus === 'dispatched') {
+        return { success: true, alreadyDispatched: true }
+      }
+
       // 1. Update Sale with kitchen dispatch status
       await prisma.sale.update({
         where: { id: input.saleId },

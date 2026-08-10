@@ -6,6 +6,7 @@ import ConfirmModal from '@/components/ConfirmModal'
 import QRCode from 'qrcode'
 import { toast } from 'react-hot-toast'
 import { Save, Download, ExternalLink, Copy, Trash2, Copy as CopyIcon } from 'lucide-react'
+import { sanitizeSvg, escapeSvgValue } from '@/lib/security/svg-sanitizer'
 
 type TemplateListItem = {
   id: string
@@ -203,14 +204,17 @@ export default function QrBuilderPage() {
     let svg = templateSvg
     const selectedTable = tables.find(t => t.id === selectedTableId)
     const logoSrc = (embedAsDataUrl && embeddedLogoDataUrl) ? embeddedLogoDataUrl : (logoUrl || '')
+    // Escape user-provided values before substituting into SVG XML to prevent XSS.
+    // logoSrc and qrDataUrl are URLs/data-URIs and should not be XML-escaped
+    // (they are validated/sanitized separately by sanitizeSvg below).
     const map: Record<string, string> = {
-      'business.name': business.name,
-      'business.phone': business.phone ?? '',
-      'business.address': business.address ?? '',
+      'business.name': escapeSvgValue(business.name),
+      'business.phone': escapeSvgValue(business.phone ?? ''),
+      'business.address': escapeSvgValue(business.address ?? ''),
       'business.logoUrl': logoSrc,
-      'custom.primaryColor': primaryColor,
-      'custom.message': message,
-      'custom.tableNumber': selectedTable?.number || '',
+      'custom.primaryColor': escapeSvgValue(primaryColor),
+      'custom.message': escapeSvgValue(message),
+      'custom.tableNumber': escapeSvgValue(selectedTable?.number || ''),
       'custom.logoUrl': logoSrc,
       'custom.imageUrl': logoSrc,
       'image.url': logoSrc,
@@ -229,7 +233,9 @@ export default function QrBuilderPage() {
       const overlay = `<image href="${logoSrc}" x="24" y="24" width="180" height="180" preserveAspectRatio="xMidYMid meet" />\n</svg>`
       svg = svg.replace(closingTagRegex, overlay)
     }
-    return svg
+    // Sanitize the final SVG to remove any script tags, event handlers,
+    // or dangerous URLs that could have been injected via user-provided values.
+    return sanitizeSvg(svg)
   }, [templateSvg, business, primaryColor, message, selectedTableId, tables, qrDataUrl, logoUrl, embedAsDataUrl, embeddedLogoDataUrl])
 
   const onSave = async () => {

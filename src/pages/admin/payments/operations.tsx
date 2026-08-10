@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -15,6 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 export default function PaymentsOperations() {
+  const { currency } = useCurrency()
   const [metrics, setMetrics] = useState<any>(null)
   const [webhooks, setWebhooks] = useState<any[]>([])
   const [events, setEvents] = useState<any[]>([])
@@ -36,7 +38,7 @@ export default function PaymentsOperations() {
     load()
   }, [])
 
-  const fmt = (n: number) => new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', minimumFractionDigits: 0 }).format((n || 0) / 100)
+  const fmt = (n: number) => new Intl.NumberFormat('en-RW', { style: 'currency', currency, minimumFractionDigits: 0 }).format((n || 0) / 100)
 
   return (
     <DashboardLayout>

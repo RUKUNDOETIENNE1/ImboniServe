@@ -51,13 +51,17 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       const phone = reservation.customerPhone
 
       if (phone) {
+        const business = await prisma.business.findUnique({
+          where: { id: reservation.businessId },
+          select: { currency: true }
+        })
         const payment = await prisma.paymentTransaction.create({
           data: {
             invoiceNumber: `RES-CAN-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
             transactionId: requestTransactionId,
             referenceId: reservation.id,
             amountCents: feeChargedCents,
-            currency: 'RWF',
+            currency: business?.currency || 'RWF',
             vatAmountCents: 0,
             exVatAmountCents: feeChargedCents,
             gatewayFeeEstimatedCents: 0,

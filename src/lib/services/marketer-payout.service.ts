@@ -62,12 +62,20 @@ export class MarketerPayoutService {
       throw new Error('Marketer not found');
     }
 
+    // Determine payout currency from the marketer's most recent commission
+    const latestCommission = await prisma.marketerCommission.findFirst({
+      where: { marketerId: params.marketerId },
+      orderBy: { createdAt: 'desc' },
+      select: { currency: true }
+    });
+    const payoutCurrency = latestCommission?.currency || 'RWF';
+
     // Create payout request
     const payout = await prisma.marketerPayout.create({
       data: {
         marketerId: params.marketerId,
         amountCents: params.amountCents,
-        currency: 'RWF',
+        currency: payoutCurrency,
         method: params.method,
         status: 'PENDING',
         recipientPhone: params.recipientPhone,

@@ -2144,6 +2144,7 @@ model UserLoginOtp {
   userId       String
   hashedOtp    String
   confirmToken String?  @unique
+  pendingToken String?  @unique
   expiresAt    DateTime
   used         Boolean  @default(false)
   ip           String?
@@ -2153,6 +2154,7 @@ model UserLoginOtp {
 
   @@index([userId])
   @@index([confirmToken])
+  @@index([pendingToken])
   @@index([expiresAt])
 }
 
@@ -3056,7 +3058,7 @@ model SupplierPerformanceCache {
 // ============================================
 
 enum ContactType {
-  CLIENT // Restaurant/Hotel customer
+  CLIENT // Hospitality business customer
   SUPPLIER // Supplier representative
   STAFF // Internal staff member
   CUSTOMER // End customer (diner)

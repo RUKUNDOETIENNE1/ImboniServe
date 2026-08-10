@@ -87,16 +87,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const business = await (await import('@/lib/prisma')).prisma.business.findUnique({
         where: { id: effectiveBusinessId },
-        select: { currency: true }
+        select: { currency: true, taxRate: true }
       })
       const currency = business?.currency || 'RWF'
+      const taxRate = business?.taxRate ?? 18 // EBM requires a rate; default to 18 if not configured
 
       // Build EBM receipt using the items and calculated fee
       const orderItems = sale.items.map((it: any) => ({
         name: it.menuItem.name as string,
         quantity: it.quantity as number,
         price: Math.round(it.unitPriceCents / 100) as number,
-        vatRate: 18,
+        vatRate: taxRate,
       }))
 
       const subtotalRWF = orderItems.reduce((sum: number, it: any) => sum + (it.price * it.quantity), 0)
@@ -107,7 +108,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         0
       )
 
-      const ebmReceipt = formatEBMReceipt(orderItems, feeCalc, currency)
+      const ebmReceipt = formatEBMReceipt(orderItems, feeCalc, currency, taxRate)
       const ebmText = generateEBMReceiptText(ebmReceipt, 'en')
       const ebmJson = generateEBMJSON(ebmReceipt)
 

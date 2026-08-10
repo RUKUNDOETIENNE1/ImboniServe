@@ -38,10 +38,11 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     const hasMenu = menuCount > 0
     const hasTables = tableCount > 0
     const hasStaff = userCount > 1 // owner + at least 1 staff
-    // Payment config is considered done if the business has non-default tax settings
-    // (i.e., the owner has visited the payment settings page and saved)
-    const hasPaymentConfig = business?.taxMode === 'INCLUSIVE' ||
-      (business?.taxRate != null && business.taxRate !== 18.0) ||
+    // Payment config is considered done if the business has any tax settings configured.
+    // The default 18% VAT (Rwanda standard) IS a valid configuration — owners who keep
+    // the default should not be blocked from completing onboarding.
+    const hasPaymentConfig = business?.taxMode != null ||
+      (business?.taxRate != null) ||
       (business?.splitPaymentConvenienceFeeEnabled === true)
 
     const steps = [hasMenu, hasTables, hasPaymentConfig, hasStaff]

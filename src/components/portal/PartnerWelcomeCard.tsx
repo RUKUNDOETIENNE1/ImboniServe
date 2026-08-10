@@ -4,6 +4,7 @@
  */
 
 import { Sparkles } from 'lucide-react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface PartnerWelcomeCardProps {
   name: string
@@ -20,13 +21,12 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 export default function PartnerWelcomeCard({
   name, activeTrials, payingBusinesses, monthCommissionCents, trendingCampaignName,
 }: PartnerWelcomeCardProps) {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   return (
     <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 rounded-2xl p-6 text-white shadow-lg">
       <div className="flex items-start justify-between">

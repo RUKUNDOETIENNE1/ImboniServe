@@ -591,6 +591,7 @@ async function buildCustomerJourney(businessId: string) {
       where: { businessId },
       include: { code: { select: { id: true, code: true, trialDays: true, status: true } } },
       orderBy: { createdAt: 'asc' },
+      take: 50,
     }),
     // Subscriptions
     prisma.subscription.findMany({

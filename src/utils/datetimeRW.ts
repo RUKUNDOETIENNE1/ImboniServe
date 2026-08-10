@@ -1,7 +1,8 @@
 export function formatDateTimeRW(
   dateInput: Date | string | number,
   language: 'en' | 'rw' = 'en',
-  withSeconds: boolean = false
+  withSeconds: boolean = false,
+  timezone: string = 'Africa/Kigali'
 ): string {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput)
   const locale = language === 'rw' ? 'rw-RW' : 'en-RW'
@@ -12,7 +13,7 @@ export function formatDateTimeRW(
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'Africa/Kigali',
+    timeZone: timezone, // EGR-016: timezone is configuration, default Rwanda for backward compat
     ...(withSeconds ? { second: '2-digit' } : {})
   }
   return new Intl.DateTimeFormat(locale, options).format(date)

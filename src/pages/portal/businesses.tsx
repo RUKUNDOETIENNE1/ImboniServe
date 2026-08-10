@@ -92,7 +92,7 @@ export default function PortalBusinesses() {
         {businesses.length === 0 ? (
           <div className="bg-white rounded-xl p-8 border border-slate-200/60 shadow-sm text-center">
             <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-2" aria-hidden="true" />
-            <p className="text-sm text-slate-500">No businesses yet. Share your Founder Code to start acquiring restaurants.</p>
+            <p className="text-sm text-slate-500">No businesses yet. Share your Founder Code to start acquiring hospitality businesses.</p>
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden">

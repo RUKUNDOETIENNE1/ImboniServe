@@ -3,6 +3,7 @@
  */
 
 import { Megaphone, Pause, Play, Copy, Archive, BarChart3, Calendar } from 'lucide-react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export interface CampaignData {
   id: string
@@ -27,10 +28,6 @@ interface CampaignPreviewProps {
   onAction?: (action: string, campaignId: string) => void
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 const statusColors: Record<string, string> = {
   DRAFT: 'bg-slate-100 text-slate-600',
   ACTIVE: 'bg-emerald-100 text-emerald-700',
@@ -40,6 +37,9 @@ const statusColors: Record<string, string> = {
 }
 
 export default function CampaignPreview({ campaign, onAction }: CampaignPreviewProps) {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const signupPct = campaign.targetSignups ? Math.min((campaign.actualSignups / campaign.targetSignups) * 100, 100) : 0
   const convPct = campaign.targetConversions ? Math.min((campaign.actualConversions / campaign.targetConversions) * 100, 100) : 0
 

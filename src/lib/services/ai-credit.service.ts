@@ -13,6 +13,7 @@ import { getFeatureCost } from './credits/feature-cost-registry.service';
 import { reserveCredits, commitReservation } from './credits/credit-consumption-engine.service';
 import { getBusinessAnalytics } from './credits/credit-analytics.service';
 import { AICreditLedgerEntryType } from '@prisma/client';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'ai-credit-adapter' });
 
@@ -245,10 +246,15 @@ export async function purchaseExtraCredits(
 export async function initializeAICredits(businessId: string): Promise<void> {
   await getOrCreateWallet(businessId);
 
-  const nextResetDate = new Date();
-  nextResetDate.setMonth(nextResetDate.getMonth() + 1);
-  nextResetDate.setDate(1);
-  nextResetDate.setHours(0, 0, 0, 0);
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true },
+  });
+
+  const nextResetDateRaw = new Date();
+  nextResetDateRaw.setMonth(nextResetDateRaw.getMonth() + 1);
+  nextResetDateRaw.setDate(1);
+  const nextResetDate = getBusinessDayBoundary(nextResetDateRaw, business?.timezone).start;
 
   await prisma.business.update({
     where: { id: businessId },

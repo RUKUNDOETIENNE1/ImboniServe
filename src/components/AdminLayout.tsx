@@ -5,7 +5,8 @@ import {
   LayoutDashboard, Users, Building2, Store, TrendingUp, 
   Settings, Bell, Search, ChevronDown, LogOut, Menu, X,
   DollarSign, FileText, UserCog, RefreshCw, Flag, UserCircle,
-  BarChart3, Wallet, Calendar, Mail, Users2, Tag, Rocket, Landmark, Radar
+  BarChart3, Wallet, Calendar, Mail, Users2, Tag, Rocket, Landmark, Radar,
+  Crown, Activity, Megaphone, Network, Heart, Brain
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import Image from 'next/image'
@@ -25,6 +26,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navigation = [
+    { name: 'CEO Command Center', href: '/admin/executive/ceo', icon: Crown },
+    { name: 'CFO Command Center', href: '/admin/executive/cfo', icon: Landmark },
+    { name: 'COO Command Center', href: '/admin/executive/coo', icon: Activity },
+    { name: 'CMO Command Center', href: '/admin/executive/cmo', icon: Megaphone },
+    { name: 'Partnership Command Center', href: '/admin/executive/partnership-director', icon: Network },
+    { name: 'Customer Success Center', href: '/admin/executive/customer-success-director', icon: Heart },
+    { name: 'Executive Intelligence', href: '/admin/executive/executive-intelligence', icon: Brain },
     { name: 'Overview', href: '/admin', icon: LayoutDashboard },
     { name: 'Businesses', href: '/admin/restaurants', icon: Building2 },
     { name: 'Sales Pipeline', href: '/admin/sales-pipeline', icon: TrendingUp },

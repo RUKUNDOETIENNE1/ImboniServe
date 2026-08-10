@@ -122,6 +122,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
         select: { amountCents: true, occurredAt: true },
         orderBy: { occurredAt: 'asc' },
+        take: 10000,
       })
 
       const monthlyTrend = computeMonthlyTrend(ledgerTrend)

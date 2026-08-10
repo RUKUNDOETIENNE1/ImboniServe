@@ -17,7 +17,17 @@ export class FounderCommissionService {
     amountCents: number
     currency?: string
   }) {
-    const { businessId, invoiceId, amountCents, currency = 'RWF' } = params
+    const { businessId, invoiceId, amountCents, currency } = params
+
+    // If currency is not provided, fetch it from the business
+    let resolvedCurrency = currency
+    if (!resolvedCurrency) {
+      const business = await prisma.business.findUnique({
+        where: { id: businessId },
+        select: { currency: true }
+      })
+      resolvedCurrency = business?.currency || 'RWF'
+    }
 
     const attribution = await prisma.acquisitionAttribution.findUnique({
       where: { businessId },
@@ -85,7 +95,7 @@ export class FounderCommissionService {
         invoiceId: invoiceId ?? null,
         type: 'RECURRING_REVENUE',
         amountCents: commissionAmountCents,
-        currency,
+        currency: resolvedCurrency,
         ratePercent: commissionRate,
         status: 'PENDING',
         lockedUntil,
@@ -123,7 +133,7 @@ export class FounderCommissionService {
             invoiceId: invoiceId ?? null,
             type: 'SIGNUP_BONUS',
             amountCents: agreementBonus,
-            currency,
+            currency: resolvedCurrency,
             ratePercent: 0,
             status: 'PENDING',
             lockedUntil,
@@ -265,11 +275,18 @@ export class FounderCommissionService {
       throw new Error(`Minimum payout is 10,000 RWF. You have ${totalValidated / 100} RWF available.`)
     }
 
+    // Fetch currency from the first validated commission
+    const firstValidatedCommission = await prisma.founderCommission.findFirst({
+      where: { partnerId: params.partnerId, status: 'VALIDATED' },
+      select: { currency: true }
+    })
+    const payoutCurrency = firstValidatedCommission?.currency || 'RWF'
+
     const payout = await prisma.founderPartnerPayout.create({
       data: {
         partnerId: params.partnerId,
         amountCents: totalValidated,
-        currency: 'RWF',
+        currency: payoutCurrency,
         method: params.method,
         status: 'PENDING',
         recipientPhone: params.recipientPhone,

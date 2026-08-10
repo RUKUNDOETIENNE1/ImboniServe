@@ -4,6 +4,7 @@ import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
 import { isDigitalTippingEnabled, calculateRoundUpTip } from '@/lib/services/digital-tipping.service'
+import { prisma } from '@/lib/prisma'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -28,12 +29,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const suggestion = calculateRoundUpTip(slip.runningTotalCents)
 
+    const business = await prisma.business.findUnique({
+      where: { id: slip.businessId },
+      select: { currency: true }
+    })
+
     return res.status(200).json(successResponse({
       enabled: suggestion.enabled,
       billAmountCents: suggestion.originalAmountCents,
       suggestedAmountCents: suggestion.suggestedAmountCents,
       tipAmountCents: suggestion.tipAmountCents,
-      currency: 'RWF',
+      currency: business?.currency || 'RWF',
     }))
   } catch (error: any) {
     console.error('[Tip Suggestion Session] Error:', error)

@@ -25,8 +25,16 @@ import { SecurityEventService } from '@/lib/services/security-event.service'
 import { logAuthDebug, hashIdentifier, redactedEmail } from '@/lib/utils/auth-debug'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 
+/**
+ * Security: Fail-closed — NEXTAUTH_SECRET is required by env-validator.
+ * If missing in production, refuse to hash rather than using an empty secret.
+ */
 function hashToken(token: string): string {
-  return crypto.createHash('sha256').update(token + (process.env.NEXTAUTH_SECRET || '')).digest('hex')
+  const secret = process.env.NEXTAUTH_SECRET
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('SECURITY FATAL: NEXTAUTH_SECRET is not set. Cannot hash token.')
+  }
+  return crypto.createHash('sha256').update(token + (secret || '')).digest('hex')
 }
 
 function getIP(req: NextApiRequest): string {

@@ -48,7 +48,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Calculate amounts (VAT-inclusive pricing)
     const grossAmountCents = subscription.plan.priceCents
-    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents)
+    const taxRate = subscription.business.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents, taxRate)
     const gatewayFeeEstimatedCents = IremboPayService.calculateGatewayFee(grossAmountCents)
     const netToBusinessCents = IremboPayService.calculateNetToBusinessCents(
       grossAmountCents,
@@ -80,7 +81,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         paymentMethod: 'WEB',
         status: 'PENDING',
         amountCents: grossAmountCents,
-        currency: 'RWF',
+        // Note: IremboPay may only support RWF — this is a provider constraint.
+        // We still read from business.currency for the transaction record.
+        currency: subscription.business.currency,
         vatAmountCents,
         exVatAmountCents,
         gatewayFeeEstimatedCents,

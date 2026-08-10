@@ -2,9 +2,11 @@ import { useState } from 'react'
 import PublicLayout from '@/components/PublicLayout'
 import { useTranslation } from '@/lib/i18n'
 import { Gift, Share2, Users, CheckCircle, Clock, Wallet, Smartphone, Award, Check } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export default function ReferPage() {
   const { t } = useTranslation()
+  const { showToast } = useToast()
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [referralCode, setReferralCode] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export default function ReferPage() {
       })
     } else {
       navigator.clipboard.writeText(message)
-      alert(t('refer.copied_alert', 'Referral link copied to clipboard!'))
+      showToast('success', t('refer.copied_alert', 'Referral link copied to clipboard!'))
     }
   }
 

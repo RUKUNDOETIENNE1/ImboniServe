@@ -16,6 +16,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { Prisma, PrismaClient } from '@prisma/client'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -284,6 +285,12 @@ export class FinancialTruthService {
     source: CostSource
     salesCount: number
   }[]> {
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const timezone = business?.timezone
+
     const days: Date[] = []
     const current = new Date(startDate)
     while (current <= endDate) {
@@ -293,10 +300,7 @@ export class FinancialTruthService {
 
     const results = await Promise.all(
       days.map(async (day) => {
-        const dayStart = new Date(day)
-        dayStart.setHours(0, 0, 0, 0)
-        const dayEnd = new Date(day)
-        dayEnd.setHours(23, 59, 59, 999)
+        const { start: dayStart, end: dayEnd } = getBusinessDayBoundary(day, timezone)
 
         const periodCost = await this.getPeriodCost(businessId, dayStart, dayEnd)
 

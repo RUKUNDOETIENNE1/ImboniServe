@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useTranslation } from '@/lib/i18n'
+import { useCurrency } from '@/contexts/LocaleContext'
 import { 
   TrendingUp, TrendingDown, AlertTriangle, CheckCircle, 
   Users, DollarSign, Activity, Building2, ArrowUpRight, ArrowDownRight,
@@ -112,6 +113,7 @@ interface CEODashboardData {
 export default function CEODashboard() {
   const { data: session } = useSession()
   const { t } = useTranslation()
+  const { currency } = useCurrency()
   
   const [data, setData] = useState<CEODashboardData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -220,7 +222,7 @@ export default function CEODashboard() {
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* 2. REVENUE & GROWTH PANEL */}
-          <RevenuePanel data={data.revenue} />
+          <RevenuePanel data={data.revenue} currency={currency} />
 
           {/* 3. CUSTOMER & RETENTION PANEL */}
           <CustomerPanel data={data.customers} />
@@ -231,7 +233,7 @@ export default function CEODashboard() {
           <OperationsPanel data={data.operations} />
 
           {/* 5. HOSPITALITY PERFORMANCE PANEL */}
-          <HospitalityPanel data={data.hospitality} />
+          <HospitalityPanel data={data.hospitality} currency={currency} />
         </div>
       </div>
     </DashboardLayout>
@@ -405,8 +407,8 @@ function ExecutiveInsightStrip({ insight }: { insight: ExecutiveInsight }) {
 }
 
 // 2. Revenue & Growth Panel Component
-function RevenuePanel({ data }: { data: RevenueData }) {
-  const formatCurrency = (amount: number) => `RWF ${amount.toLocaleString()}`
+function RevenuePanel({ data, currency }: { data: RevenueData; currency: string }) {
+  const formatCurrency = (amount: number) => `${currency} ${amount.toLocaleString()}`
   const formatPercent = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
 
   return (
@@ -658,8 +660,8 @@ function OperationsPanel({ data }: { data: OperationsData }) {
 }
 
 // 5. Hospitality Performance Panel Component
-function HospitalityPanel({ data }: { data: HospitalityData }) {
-  const formatCurrency = (amount: number) => `RWF ${amount.toLocaleString()}`
+function HospitalityPanel({ data, currency }: { data: HospitalityData; currency: string }) {
+  const formatCurrency = (amount: number) => `${currency} ${amount.toLocaleString()}`
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

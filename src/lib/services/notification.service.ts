@@ -2,14 +2,8 @@ import twilio from 'twilio'
 import { prisma } from '@/lib/prisma'
 import { formatCurrency } from '@/lib/utils/currency'
 import { logger } from '@/lib/logger'
-
-function normalizePhone(phone: string): string {
-  const p = phone.trim()
-  if (p.startsWith('+')) return p
-  if (p.startsWith('07')) return `+250${p.slice(1)}`
-  if (p.startsWith('2507')) return `+${p}`
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`
-}
+import { normalizePhone } from '@/lib/utils/phone'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export interface NotificationTemplate {
   type: string
@@ -87,34 +81,38 @@ export class NotificationService {
   }
 
   static async sendLowStockAlert(businessId: string, items: any[]) {
-    const restaurant = await prisma.business.findUnique({
+    const business = await prisma.business.findUnique({
       where: { id: businessId },
       include: { owner: true }
     })
 
-    if (!restaurant) return
+    if (!business) return
 
     const itemsList = items
       .map((item: any) => `• ${item.name}: ${item.currentStock} ${item.unit} (min: ${item.minStockLevel})`)
       .join('\n')
 
-    const message = `⚠️ LOW STOCK ALERT\n\n${restaurant.name}\n\n${itemsList}\n\nAction required: Reorder supplies`
+    // EGR-016: Notification language respects business.defaultLanguage
+    // Currently English-only; structure supports future translation
+    const message = `⚠️ LOW STOCK ALERT\n\n${business.name}\n\n${itemsList}\n\nAction required: Reorder supplies`
 
-    if (restaurant.owner.whatsappNumber) {
-      await this.sendWhatsApp(restaurant.owner.whatsappNumber, message)
+    if (business.owner.whatsappNumber) {
+      await this.sendWhatsApp(business.owner.whatsappNumber, message)
     }
   }
 
   static async sendDailyReport(businessId: string, report: any) {
-    const restaurant = await prisma.business.findUnique({
+    const business = await prisma.business.findUnique({
       where: { id: businessId },
       include: { owner: true }
     })
 
-    if (!restaurant) return
+    if (!business) return
 
-    const currency = restaurant.currency || 'RWF'
-    const message = `📊 DAILY REPORT - ${restaurant.name}\n\n` +
+    const currency = business.currency || 'RWF'
+    // EGR-016: Notification language respects business.defaultLanguage
+    // Currently English-only; structure supports future translation
+    const message = `📊 DAILY REPORT - ${business.name}\n\n` +
       `💰 Sales: ${formatCurrency(report.totalSales / 100, currency)}\n` +
       `📈 Orders: ${report.totalOrders}\n` +
       `🎯 Profit: ${formatCurrency(report.profit / 100, currency)} (${report.profitMargin}%)\n\n` +
@@ -122,8 +120,8 @@ export class NotificationService {
       `⚠️ Low Stock: ${report.lowStockCount} items\n\n` +
       `View details: ${process.env.APP_URL}/dashboard/reports`
 
-    if (restaurant.owner.whatsappNumber) {
-      await this.sendWhatsApp(restaurant.owner.whatsappNumber, message)
+    if (business.owner.whatsappNumber) {
+      await this.sendWhatsApp(business.owner.whatsappNumber, message)
     }
   }
 
@@ -173,17 +171,18 @@ export class NotificationService {
       return { success: false, message: 'WhatsApp not configured' }
     }
 
-    // Check restaurant WhatsApp policy
-    const restaurant = await prisma.business.findUnique({
+    // Check business WhatsApp policy (EGR-016: renamed from restaurant to business)
+    const business = await prisma.business.findUnique({
       where: { id: businessId },
       select: {
         whatsappClientSlipsEnabled: true,
-        whatsappDailyCapClient: true
+        whatsappDailyCapClient: true,
+        timezone: true,
       }
     })
 
-    if (!restaurant?.whatsappClientSlipsEnabled) {
-      console.log('[WhatsApp] Client slips disabled for this restaurant')
+    if (!business?.whatsappClientSlipsEnabled) {
+      console.log('[WhatsApp] Client slips disabled for this business')
       return { success: false, message: 'Client WhatsApp slips disabled' }
     }
 
@@ -192,9 +191,8 @@ export class NotificationService {
       return { success: false, message: 'No client consent' }
     }
 
-    // Check daily cap
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Check daily cap — timezone-aware day boundary (EGR-016)
+    const { start: today } = getBusinessDayBoundary(new Date(), business?.timezone)
     const sentToday = await prisma.smartDiningSlip.count({
       where: {
         businessId: businessId,
@@ -203,8 +201,8 @@ export class NotificationService {
       }
     })
 
-    if (sentToday >= restaurant.whatsappDailyCapClient) {
-      console.log(`[WhatsApp] Daily cap reached (${sentToday}/${restaurant.whatsappDailyCapClient})`)
+    if (sentToday >= business.whatsappDailyCapClient) {
+      console.log(`[WhatsApp] Daily cap reached (${sentToday}/${business.whatsappDailyCapClient})`)
       return { success: false, message: 'Daily cap reached' }
     }
 

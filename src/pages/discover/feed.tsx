@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Heart, Share2, MessageCircle, MapPin, Phone, Utensils } from 'lucide-react'
 import Link from 'next/link'
 import VideoPlayer from '@/components/VideoPlayer'
+import { useToast } from '@/components/Toast'
 
 type FeedItem = {
   id: string
@@ -26,6 +27,7 @@ export default function DiscoveryFeedPage() {
   const [items, setItems] = useState<FeedItem[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const { showToast } = useToast()
 
   useEffect(() => {
     fetchFeed()
@@ -89,7 +91,7 @@ export default function DiscoveryFeedPage() {
       navigator.share({ title: item.title || 'Check this out!', url })
     } else {
       navigator.clipboard.writeText(url)
-      alert('Link copied to clipboard!')
+      showToast('success', 'Link copied to clipboard!')
     }
     handleEngage(item.id, 'SHARE')
   }

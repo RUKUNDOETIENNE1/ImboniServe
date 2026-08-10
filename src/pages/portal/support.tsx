@@ -5,6 +5,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import PortalLayout from '@/components/portal/PortalLayout'
 import { Loader2, AlertCircle, RefreshCw, LifeBuoy, Send, MessageSquare, CheckCircle, Clock } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 interface Ticket {
   id: string
@@ -22,6 +23,7 @@ const ticketStatusColors: Record<string, string> = {
 }
 
 export default function PortalSupport() {
+  const { showToast } = useToast()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,7 +65,7 @@ export default function PortalSupport() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(`Failed: ${err.error}`)
+        showToast('error', `Failed: ${err.error}`)
         return
       }
       setSubject('')
@@ -71,7 +73,7 @@ export default function PortalSupport() {
       setCategory('general')
       loadData()
     } catch (err: any) {
-      alert(`Failed: ${err.message}`)
+      showToast('error', `Failed: ${err.message}`)
     } finally {
       setSubmitting(false)
     }

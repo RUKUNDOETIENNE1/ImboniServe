@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { appendLedgerEntry } from './credit-ledger.service';
 import { AICreditLedgerEntryType } from '@prisma/client';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'credit-wallet' });
 
@@ -51,6 +52,7 @@ export async function getOrCreateWallet(businessId: string): Promise<CreditWalle
     const business = await prisma.business.findUnique({
       where: { id: businessId },
       select: {
+        timezone: true,
         plan: { select: { code: true, aiCreditsMonthly: true } },
       },
     });
@@ -60,10 +62,10 @@ export async function getOrCreateWallet(businessId: string): Promise<CreditWalle
     const monthlyAllocation = planMonthly || PLAN_ALLOCATION_MAP[planCode] || 0;
 
     const now = new Date();
-    const nextRenewal = new Date(now);
-    nextRenewal.setMonth(nextRenewal.getMonth() + 1);
-    nextRenewal.setDate(1);
-    nextRenewal.setHours(0, 0, 0, 0);
+    const nextRenewalDate = new Date(now);
+    nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+    nextRenewalDate.setDate(1);
+    const nextRenewal = getBusinessDayBoundary(nextRenewalDate, business?.timezone).start;
 
     wallet = await prisma.aICreditWallet.create({
       data: {
@@ -128,6 +130,7 @@ export async function renewMonthlyAllocation(businessId: string): Promise<{ rene
   const business = await prisma.business.findUnique({
     where: { id: businessId },
     select: {
+      timezone: true,
       plan: { select: { code: true, aiCreditsMonthly: true } },
     },
   });
@@ -137,10 +140,10 @@ export async function renewMonthlyAllocation(businessId: string): Promise<{ rene
   const monthlyAllocation = planMonthly || PLAN_ALLOCATION_MAP[planCode] || 0;
 
   const now = new Date();
-  const nextRenewal = new Date(now);
-  nextRenewal.setMonth(nextRenewal.getMonth() + 1);
-  nextRenewal.setDate(1);
-  nextRenewal.setHours(0, 0, 0, 0);
+  const nextRenewalDate = new Date(now);
+  nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+  nextRenewalDate.setDate(1);
+  const nextRenewal = getBusinessDayBoundary(nextRenewalDate, business?.timezone).start;
 
   // Check max balance policy
   const maxBalance = wallet.maxBalance;

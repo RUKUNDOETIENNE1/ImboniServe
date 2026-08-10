@@ -6,6 +6,7 @@ import { successResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/
 import { TrialPolicyService } from '@/lib/services/trial-policy.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { normalizeSalesStatus, toSalesStatusToken } from '@/lib/sales-pipeline/status'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -20,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Fetch all businesses with trial & sales data
-  const todayStart = new Date(new Date().setHours(0, 0, 0, 0))
+  const { start: todayStart } = getBusinessDayBoundary(new Date())
   const { q, status, page = '1', pageSize = '50' } = req.query as any
   const take = Math.min(parseInt(pageSize as string) || 50, 100)
   const skip = Math.max(((parseInt(page as string) || 1) - 1) * take, 0)

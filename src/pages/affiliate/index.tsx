@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { Users, DollarSign, CheckCircle, Clock } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export default function AffiliatePortal() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showToast } = useToast()
   const [affiliate, setAffiliate] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
   const [commissions, setCommissions] = useState<any[]>([])
@@ -38,7 +40,7 @@ export default function AffiliatePortal() {
   const copyReferralLink = () => {
     const link = `${window.location.origin}/?ref=${affiliate.code}`
     navigator.clipboard.writeText(link)
-    alert('Referral link copied!')
+    showToast('success', 'Referral link copied!')
   }
 
   const requestPayout = async () => {
@@ -47,14 +49,14 @@ export default function AffiliatePortal() {
     try {
       const res = await fetch('/api/affiliate/payout', { method: 'POST' })
       if (res.ok) {
-        alert('Payout requested successfully!')
+        showToast('success', 'Payout requested successfully!')
         loadAffiliateData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to request payout')
+        showToast('error', error.error || 'Failed to request payout')
       }
     } catch (error) {
-      alert('Failed to request payout')
+      showToast('error', 'Failed to request payout')
     }
   }
 

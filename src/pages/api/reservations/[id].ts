@@ -47,14 +47,36 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
       return res.status(404).json({ error: 'Reservation not found' })
     }
 
-    // Update status if provided
-    if (status) {
-      await ReservationService.updateStatus(id, status)
-    }
-
-    // Update table if provided
+    // Update table if provided — process BEFORE status so that confirmReservation()
+    // can auto-reserve the newly-assigned table in the same request.
     if (tableId !== undefined) {
       await ReservationService.updateTable(id, tableId || null)
+    }
+
+    // Update status if provided — route to authoritative domain methods
+    // so that business invariants (timestamps, table sync, forfeit) are enforced.
+    if (status) {
+      switch (status) {
+        case 'CONFIRMED':
+          await ReservationService.confirmReservation(id)
+          break
+        case 'COMPLETED':
+          await ReservationService.completeReservation(id)
+          break
+        case 'CANCELLED':
+          await ReservationService.cancelReservation(id, req.body.reason)
+          break
+        case 'NO_SHOW':
+          await ReservationService.markNoShow(id, req.body.forfeitCents || 0, req.body.reason || 'Marked as no-show')
+          break
+        case 'SEATED':
+          // SEATED is a simple status marker — table is already RESERVED from confirmation.
+          // No additional side effects needed beyond the status change.
+          await ReservationService.updateStatus(id, status)
+          break
+        default:
+          return res.status(400).json({ error: `Invalid status: ${status}` })
+      }
     }
 
     // Update deposit status if provided
@@ -92,6 +114,11 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
     })
   } catch (error: any) {
     console.error('Update reservation error:', error)
+    // Domain methods throw Error with descriptive messages for business rule violations
+    // (e.g., "Reservation is cancelled"). Return 409 for conflict, 500 for unexpected.
+    if (error.message?.includes('cancelled')) {
+      return res.status(409).json({ error: error.message })
+    }
     return res.status(500).json({ error: 'Failed to update reservation' })
   }
 }

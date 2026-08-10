@@ -16,6 +16,8 @@ import FinancialTimeline from '@/components/partnerships/FinancialTimeline'
 import ExceptionCenter from '@/components/partnerships/ExceptionCenter'
 import RevenueTrendChart from '@/components/partnerships/RevenueTrendChart'
 import AuditTimeline from '@/components/partnerships/AuditTimeline'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -33,11 +35,12 @@ interface Props {
   userRoles: string[]
 }
 
-function formatCurrency(cents: number): string {
-  return `${(cents / 100).toLocaleString()} RWF`
+function formatCurrency(cents: number, currency: string): string {
+  return `${(cents / 100).toLocaleString()} ${currency}`
 }
 
 export default function RevenueOperationsWorkspace({ userRoles }: Props) {
+  const { currency } = useCurrency()
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState(false)
   const [data, setData] = useState<any>(null)
@@ -47,6 +50,7 @@ export default function RevenueOperationsWorkspace({ userRoles }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const canManage = userRoles.some((r) => ['ADMIN', 'FINANCE', 'CFO'].includes(r))
 
@@ -64,6 +68,7 @@ export default function RevenueOperationsWorkspace({ userRoles }: Props) {
       }
       const result = await res.json()
       setData(result)
+      setLastUpdated(new Date())
     } catch {
       setError('Failed to load revenue operations')
     } finally {
@@ -132,7 +137,10 @@ export default function RevenueOperationsWorkspace({ userRoles }: Props) {
       <div className="p-4 lg:p-6 max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-lg font-bold text-slate-800">Revenue Operations Center</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg font-bold text-slate-800">Revenue Operations Center</h1>
+            <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} />
+          </div>
           <button
             onClick={() => loadData()}
             disabled={acting}
@@ -153,15 +161,15 @@ export default function RevenueOperationsWorkspace({ userRoles }: Props) {
         <div>
           <SectionHeader icon={BarChart3} title="Revenue Summary" />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            <RevenueSummaryCard label="MRR (Founder Partners)" value={formatCurrency(summary.mrrCents)} icon="trending-up" accent="green" />
-            <RevenueSummaryCard label="Total Revenue" value={formatCurrency(summary.totalRevenueCents)} icon="dollar" accent="blue" />
-            <RevenueSummaryCard label="Commission Accrued" value={formatCurrency(summary.totalCommissionAccruedCents)} icon="wallet" accent="purple" />
-            <RevenueSummaryCard label="Total Approved" value={formatCurrency(summary.totalApprovedCents)} icon="dollar" accent="blue" />
-            <RevenueSummaryCard label="Total Paid" value={formatCurrency(summary.totalPaidCents)} icon="dollar" accent="green" />
-            <RevenueSummaryCard label="Outstanding Liability" value={formatCurrency(summary.outstandingLiabilityCents)} icon="alert" accent="red" />
+            <RevenueSummaryCard label="MRR (Founder Partners)" value={formatCurrency(summary.mrrCents, currency)} icon="trending-up" accent="green" />
+            <RevenueSummaryCard label="Total Revenue" value={formatCurrency(summary.totalRevenueCents, currency)} icon="dollar" accent="blue" />
+            <RevenueSummaryCard label="Commission Accrued" value={formatCurrency(summary.totalCommissionAccruedCents, currency)} icon="wallet" accent="purple" />
+            <RevenueSummaryCard label="Total Approved" value={formatCurrency(summary.totalApprovedCents, currency)} icon="dollar" accent="blue" />
+            <RevenueSummaryCard label="Total Paid" value={formatCurrency(summary.totalPaidCents, currency)} icon="dollar" accent="green" />
+            <RevenueSummaryCard label="Outstanding Liability" value={formatCurrency(summary.outstandingLiabilityCents, currency)} icon="alert" accent="red" />
             <RevenueSummaryCard label="Pending Payouts" value={String(summary.pendingPayoutsCount)} icon="clock" accent="amber" />
-            <RevenueSummaryCard label="Forecast Next Month" value={formatCurrency(summary.forecastNextMonthCents)} icon="chart" accent="purple" />
-            <RevenueSummaryCard label="Avg Revenue / Partner" value={formatCurrency(summary.avgRevenuePerPartnerCents)} icon="users" accent="blue" />
+            <RevenueSummaryCard label="Forecast Next Month" value={formatCurrency(summary.forecastNextMonthCents, currency)} icon="chart" accent="purple" />
+            <RevenueSummaryCard label="Avg Revenue / Partner" value={formatCurrency(summary.avgRevenuePerPartnerCents, currency)} icon="users" accent="blue" />
             <RevenueSummaryCard
               label="Highest Revenue Partner"
               value={summary.highestRevenuePartner?.name ?? '—'}

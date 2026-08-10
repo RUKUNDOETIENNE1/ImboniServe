@@ -7,8 +7,9 @@ import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import crypto from 'crypto'
 import { CustomerService } from '@/lib/services/customer.service'
-import { normalizePhone } from '@/lib/services/guest-recognition.service'
+import { normalizePhone } from '@/lib/utils/phone'
 import { NotificationService } from '@/lib/services/notification.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 const log = logger.child({ service: 'reservation' })
 
@@ -103,10 +104,14 @@ export class ReservationService {
     const where: any = { businessId }
 
     if (filters?.date) {
-      const startOfDay = new Date(filters.date)
-      startOfDay.setHours(0, 0, 0, 0)
-      const endOfDay = new Date(filters.date)
-      endOfDay.setHours(23, 59, 59, 999)
+      const business = await prisma.business.findUnique({
+        where: { id: businessId },
+        select: { timezone: true }
+      })
+      const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(
+        filters.date,
+        business?.timezone
+      )
 
       where.reservationDate = {
         gte: startOfDay,
@@ -197,23 +202,38 @@ export class ReservationService {
 
   /**
    * Confirm a reservation (mark as CONFIRMED with timestamp)
+   * If a table is assigned, automatically sets table status to RESERVED.
+   * This prevents double-booking — a confirmed reservation must hold the table.
    */
   static async confirmReservation(reservationId: string) {
     const existing = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { id: true, confirmedAt: true, status: true }
+      select: { id: true, confirmedAt: true, status: true, tableId: true }
     })
 
     if (!existing) throw new Error('Reservation not found')
     if (existing.status === 'CANCELLED') throw new Error('Reservation is cancelled')
     if (existing.confirmedAt) return existing // idempotent
 
-    const reservation = await prisma.reservation.update({
-      where: { id: reservationId },
-      data: {
-        confirmedAt: new Date(),
-        status: 'CONFIRMED'
+    const reservation = await prisma.$transaction(async (tx) => {
+      const updated = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          confirmedAt: new Date(),
+          status: 'CONFIRMED'
+        }
+      })
+
+      // OPS-CRIT-001: Auto-reserve the table when reservation is confirmed
+      if (existing.tableId) {
+        await tx.table.update({
+          where: { id: existing.tableId },
+          data: { status: 'RESERVED' }
+        })
+        log.info('Table auto-reserved', { reservationId, tableId: existing.tableId })
       }
+
+      return updated
     })
 
     log.info('Reservation confirmed', { reservationId })
@@ -223,15 +243,34 @@ export class ReservationService {
 
   /**
    * Mark a reservation as no-show with deposit forfeiture
+   * Releases the reserved table back to AVAILABLE.
    */
   static async markNoShow(reservationId: string, forfeitCents: number, reason: string) {
-    const reservation = await prisma.reservation.update({
+    const existing = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      data: {
-        status: 'NO_SHOW',
-        forfeitCents,
-        noShowReason: reason
+      select: { id: true, tableId: true }
+    })
+
+    const reservation = await prisma.$transaction(async (tx) => {
+      const updated = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          status: 'NO_SHOW',
+          forfeitCents,
+          noShowReason: reason
+        }
+      })
+
+      // OPS-CRIT-001: Release the table when reservation is no-show
+      if (existing?.tableId) {
+        await tx.table.update({
+          where: { id: existing.tableId },
+          data: { status: 'AVAILABLE' }
+        })
+        log.info('Table released (no-show)', { reservationId, tableId: existing.tableId })
       }
+
+      return updated
     })
 
     log.info('Reservation marked no-show', { reservationId, forfeitCents, reason })
@@ -241,14 +280,33 @@ export class ReservationService {
 
   /**
    * Complete a reservation (customer showed up)
+   * Releases the reserved table back to AVAILABLE.
    */
   static async completeReservation(reservationId: string) {
-    const reservation = await prisma.reservation.update({
+    const existing = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      data: {
-        status: 'COMPLETED',
-        completedAt: new Date()
+      select: { id: true, tableId: true }
+    })
+
+    const reservation = await prisma.$transaction(async (tx) => {
+      const updated = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          status: 'COMPLETED',
+          completedAt: new Date()
+        }
+      })
+
+      // OPS-CRIT-001: Release the table when reservation is completed
+      if (existing?.tableId) {
+        await tx.table.update({
+          where: { id: existing.tableId },
+          data: { status: 'AVAILABLE' }
+        })
+        log.info('Table released (completed)', { reservationId, tableId: existing.tableId })
       }
+
+      return updated
     })
 
     log.info('Reservation completed', { reservationId })
@@ -258,16 +316,35 @@ export class ReservationService {
 
   /**
    * Forfeit deposit for a reservation (cron no-show processing)
+   * Releases the reserved table back to AVAILABLE.
    */
   static async forfeitDeposit(reservationId: string, forfeitCents: number, reason: string) {
-    const reservation = await prisma.reservation.update({
+    const existing = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      data: {
-        depositStatus: 'FORFEITED' as any,
-        forfeitCents,
-        noShowReason: reason,
-        status: 'CANCELLED',
+      select: { id: true, tableId: true }
+    })
+
+    const reservation = await prisma.$transaction(async (tx) => {
+      const updated = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          depositStatus: 'FORFEITED' as any,
+          forfeitCents,
+          noShowReason: reason,
+          status: 'CANCELLED',
+        }
+      })
+
+      // OPS-CRIT-001: Release the table when deposit is forfeited (no-show)
+      if (existing?.tableId) {
+        await tx.table.update({
+          where: { id: existing.tableId },
+          data: { status: 'AVAILABLE' }
+        })
+        log.info('Table released (forfeit)', { reservationId, tableId: existing.tableId })
       }
+
+      return updated
     })
 
     log.info('Reservation deposit forfeited', { reservationId, forfeitCents, reason })
@@ -291,14 +368,33 @@ export class ReservationService {
 
   /**
    * Cancel reservation
+   * Releases the reserved table back to AVAILABLE.
    */
   static async cancelReservation(reservationId: string, reason?: string) {
-    const reservation = await prisma.reservation.update({
+    const existing = await prisma.reservation.findUnique({
       where: { id: reservationId },
-      data: { 
-        status: 'CANCELLED',
-        specialRequests: reason ? `CANCELLED: ${reason}` : 'CANCELLED'
+      select: { id: true, tableId: true }
+    })
+
+    const reservation = await prisma.$transaction(async (tx) => {
+      const updated = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          status: 'CANCELLED',
+          specialRequests: reason ? `CANCELLED: ${reason}` : 'CANCELLED'
+        }
+      })
+
+      // OPS-CRIT-001: Release the table when reservation is cancelled
+      if (existing?.tableId) {
+        await tx.table.update({
+          where: { id: existing.tableId },
+          data: { status: 'AVAILABLE' }
+        })
+        log.info('Table released (cancelled)', { reservationId, tableId: existing.tableId })
       }
+
+      return updated
     })
 
     log.info('Reservation cancelled', { reservationId, reason })
@@ -341,15 +437,12 @@ export class ReservationService {
   static async sendReminders() {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    tomorrow.setHours(0, 0, 0, 0)
-
-    const endOfTomorrow = new Date(tomorrow)
-    endOfTomorrow.setHours(23, 59, 59, 999)
+    const { start: tomorrowStart, end: endOfTomorrow } = getBusinessDayBoundary(tomorrow)
 
     const reservations = await prisma.reservation.findMany({
       where: {
         reservationDate: {
-          gte: tomorrow,
+          gte: tomorrowStart,
           lte: endOfTomorrow
         },
         status: 'CONFIRMED',
@@ -386,10 +479,14 @@ export class ReservationService {
    * Get available time slots
    */
   static async getAvailableSlots(businessId: string, date: Date) {
-    const startOfDay = new Date(date)
-    startOfDay.setHours(0, 0, 0, 0)
-    const endOfDay = new Date(date)
-    endOfDay.setHours(23, 59, 59, 999)
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(
+      date,
+      business?.timezone
+    )
 
     const reservations = await prisma.reservation.findMany({
       where: {

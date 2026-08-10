@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { CheckCircle, MapPin, Phone, CreditCard, Truck, AlertCircle, Loader } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
+import { useCurrency } from '@/contexts/LocaleContext'
+import { useToast } from '@/components/Toast'
 
 interface CartItem {
   productId: string
@@ -28,6 +30,8 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const { cart, clearCart } = useCart()
+  const { currency } = useCurrency()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   const [placingOrder, setPlacingOrder] = useState(false)
   const [deliveryAddress, setDeliveryAddress] = useState('')
@@ -81,7 +85,7 @@ export default function CheckoutPage() {
 
   const placeOrder = async () => {
     if (!deliveryAddress || !deliveryPhone) {
-      alert('Please fill in delivery address and phone number')
+      showToast('warning', 'Please fill in delivery address and phone number')
       return
     }
 
@@ -123,7 +127,7 @@ export default function CheckoutPage() {
       router.push(`/store/order-confirmation?orderIds=${data.orderIds.join(',')}`)
     } catch (error) {
       console.error('Order placement error:', error)
-      alert('Failed to place order. Please try again.')
+      showToast('error', 'Failed to place order. Please try again.')
     } finally {
       setPlacingOrder(false)
     }
@@ -269,14 +273,14 @@ export default function CheckoutPage() {
                             {item.productName} × {item.quantity} {item.unit}
                           </span>
                           <span className="font-semibold text-gray-900">
-                            {((item.unitPriceCents * item.quantity) / 100).toLocaleString()} RWF
+                            {((item.unitPriceCents * item.quantity) / 100).toLocaleString()} {currency}
                           </span>
                         </div>
                       ))}
                     </div>
                     <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between font-semibold">
                       <span>Subtotal</span>
-                      <span>{(group.subtotal / 100).toLocaleString()} RWF</span>
+                      <span>{(group.subtotal / 100).toLocaleString()} {currency}</span>
                     </div>
                   </div>
                 ))}
@@ -292,7 +296,7 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>{(totalCents / 100).toLocaleString()} RWF</span>
+                  <span>{(totalCents / 100).toLocaleString()} {currency}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Delivery Fee</span>
@@ -301,7 +305,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-gray-200 pt-3 mt-3">
                   <div className="flex justify-between text-xl font-bold text-gray-900">
                     <span>Total</span>
-                    <span>{(totalCents / 100).toLocaleString()} RWF</span>
+                    <span>{(totalCents / 100).toLocaleString()} {currency}</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">+ delivery fees to be confirmed</p>
                 </div>

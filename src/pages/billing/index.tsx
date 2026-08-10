@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface Subscription {
   id: string
@@ -55,6 +56,7 @@ interface BillingEvent {
 
 export default function BillingDashboard() {
   const { data: session, status } = useSession()
+  const { currency } = useCurrency()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
@@ -101,10 +103,10 @@ export default function BillingDashboard() {
     }
   }
 
-  const formatCurrency = (cents: number, currency: string = 'RWF') => {
+  const formatCurrency = (cents: number, curr: string = currency) => {
     return new Intl.NumberFormat('en-RW', {
       style: 'currency',
-      currency,
+      currency: curr,
       minimumFractionDigits: 0,
     }).format(cents / 100)
   }

@@ -111,6 +111,7 @@ export class PartnershipOperationalQueryService {
         },
       },
       orderBy: { createdAt: 'asc' },
+      take: 50,
     })
 
     const canonical = await prisma.acquisitionAttribution.findFirst({
@@ -381,6 +382,7 @@ export class PartnershipOperationalQueryService {
         partnership: { select: { id: true, name: true, email: true, phone: true } },
       },
       orderBy: { expiresAt: 'asc' },
+      take: 100,
     })
   }
 
@@ -396,18 +398,21 @@ export class PartnershipOperationalQueryService {
       prisma.partnership.findMany({
         where: { status: 'SUSPENDED' },
         select: { id: true, name: true, email: true, status: true, region: true },
+        take: 100,
       }),
       prisma.partnershipHealthScore.findMany({
         where: { grade: { in: ['D', 'F'] } },
         include: {
           partnership: { select: { id: true, name: true, email: true, status: true } },
         },
+        take: 100,
       }),
       prisma.partnershipRiskProfile.findMany({
         where: { riskLevel: 'HIGH' },
         include: {
           partnership: { select: { id: true, name: true, email: true, status: true } },
         },
+        take: 100,
       }),
       this.getExpiringAgreements(30),
     ])
@@ -511,6 +516,7 @@ export class PartnershipOperationalQueryService {
           select: { id: true, version: true, status: true },
         },
       },
+      take: 50,
     })
   }
 
@@ -546,6 +552,7 @@ export class PartnershipOperationalQueryService {
         },
       },
       orderBy: { createdAt: 'asc' },
+      take: 100,
     })
   }
 
@@ -604,6 +611,7 @@ export class PartnershipOperationalQueryService {
     const events = await prisma.partnershipEvent.findMany({
       where: { entityId: commissionId, entityType: 'partnership_commission' },
       orderBy: { createdAt: 'asc' },
+      take: 50,
     })
 
     return {
@@ -647,6 +655,7 @@ export class PartnershipOperationalQueryService {
     const events = await prisma.partnershipEvent.findMany({
       where: { entityId: payoutId, entityType: 'partnership_payout' },
       orderBy: { createdAt: 'asc' },
+      take: 50,
     })
 
     return {

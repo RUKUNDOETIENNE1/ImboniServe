@@ -12,7 +12,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
-import { normalizePhone } from './guest-recognition.service'
+import { normalizePhone } from '@/lib/utils/phone'
 
 const log = logger.child({ service: 'contact-customer-bridge' })
 

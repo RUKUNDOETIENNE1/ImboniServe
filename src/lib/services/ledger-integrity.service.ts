@@ -105,6 +105,12 @@ export class LedgerIntegrityService {
       const exists = await prisma.financialLedgerEntry.count({ where: { subscriptionId: s.id, eventType: event } })
       if (exists > 0) continue
 
+      // Fetch business currency for the ledger entry
+      const business = await prisma.business.findUnique({
+        where: { id: s.businessId },
+        select: { currency: true }
+      })
+
       try {
         await prisma.financialLedgerEntry.create({
           data: {
@@ -112,7 +118,7 @@ export class LedgerIntegrityService {
             domain: LedgerDomain.SUBSCRIPTION,
             eventType: event,
             amountCents: 0,
-            currency: 'RWF',
+            currency: business?.currency || 'RWF',
             subscriptionId: s.id,
             occurredAt: s.updatedAt || new Date(),
           },

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -17,11 +18,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     const { businessId: userBusinessId, roles: userRoles } = ctx
 
     const now = new Date()
-    const start = new Date(now)
-    start.setHours(0, 0, 0, 0)
 
     const where: any = {
-      createdAt: { gte: start },
       status: { not: 'CANCELLED' },
     }
 
@@ -35,6 +33,14 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     } else if (userBusinessId) {
       where.businessId = userBusinessId
     }
+
+    // Fetch business timezone for timezone-aware day boundary
+    const business = where.businessId ? await prisma.business.findUnique({
+      where: { id: where.businessId },
+      select: { timezone: true },
+    }) : null
+    const { start } = getBusinessDayBoundary(now, business?.timezone)
+    where.createdAt = { gte: start }
 
     const orders = await prisma.sale.findMany({
       where,

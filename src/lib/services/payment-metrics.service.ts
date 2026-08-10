@@ -1,13 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import { PaymentTransactionStatus } from '@prisma/client'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 type SourceKey = 'webhook' | 'poll' | 'cron' | 'sweeper' | 'unknown'
 
 export class PaymentMetricsService {
-  static startOfToday(): Date {
-    const d = new Date()
-    d.setHours(0, 0, 0, 0)
-    return d
+  static startOfToday(timezone: string = 'Africa/Kigali'): Date {
+    return getBusinessDayBoundary(new Date(), timezone).start
   }
 
   static async getDailyPaymentMetrics() {

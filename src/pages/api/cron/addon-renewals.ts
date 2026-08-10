@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { IremboPayService } from '@/lib/services/irembopay.service';
 import { logger } from '@/lib/logger';
 import { AlertDeliveryService } from '@/lib/services/alert-delivery.service';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'addon-renewals' });
 
@@ -29,8 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     log.info('Starting add-on renewal processing');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const { start: today } = getBusinessDayBoundary(new Date());
 
     // Find active add-on transactions that need renewal (30 days old)
     const thirtyDaysAgo = new Date(today);
@@ -53,6 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           select: {
             id: true,
             name: true,
+            currency: true,
+            timezone: true,
             owner: {
               select: {
                 email: true,
@@ -117,7 +119,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             paymentMethod: 'WEB',
             status: 'PENDING',
             amountCents: transaction.amountCents,
-            currency: 'RWF',
+            currency: transaction.business.currency,
             vatAmountCents: transaction.vatAmountCents,
             exVatAmountCents: transaction.exVatAmountCents,
             gatewayFeeEstimatedCents: transaction.gatewayFeeEstimatedCents,

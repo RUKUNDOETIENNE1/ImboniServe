@@ -4,6 +4,9 @@ import { useRouter } from 'next/router'
 import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { UserCog, Plus, Users2, CheckCircle, XCircle, Pause, Play, DollarSign, TrendingUp, Users, Award } from 'lucide-react'
+import { useToast } from '@/components/Toast'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -19,12 +22,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 export default function AdminFounderPartners() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showToast } = useToast()
+  const { currency } = useCurrency()
   const [partners, setPartners] = useState<any[]>([])
   const [payouts, setPayouts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newPartner, setNewPartner] = useState({ name: '', email: '', phone: '', organization: '', region: '', partnerType: 'FOUNDER' })
   const [tab, setTab] = useState<'partners' | 'payouts'>('partners')
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -51,6 +57,7 @@ export default function AdminFounderPartners() {
     } catch (error) {
       console.error('Failed to load data:', error)
     } finally {
+      setLastUpdated(new Date())
       setLoading(false)
     }
   }
@@ -63,16 +70,16 @@ export default function AdminFounderPartners() {
         body: JSON.stringify(newPartner),
       })
       if (res.ok) {
-        alert('Partner created successfully!')
+        showToast('success', 'Partner created successfully!')
         setShowCreateForm(false)
         setNewPartner({ name: '', email: '', phone: '', organization: '', region: '', partnerType: 'FOUNDER' })
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to create partner')
+        showToast('error', error.error || 'Failed to create partner')
       }
     } catch {
-      alert('Failed to create partner')
+      showToast('error', 'Failed to create partner')
     }
   }
 
@@ -85,14 +92,14 @@ export default function AdminFounderPartners() {
         body: JSON.stringify({ reviewNotes }),
       })
       if (res.ok) {
-        alert('Partner approved!')
+        showToast('success', 'Partner approved!')
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to approve partner')
+        showToast('error', error.error || 'Failed to approve partner')
       }
     } catch {
-      alert('Failed to approve partner')
+      showToast('error', 'Failed to approve partner')
     }
   }
 
@@ -106,11 +113,11 @@ export default function AdminFounderPartners() {
         body: JSON.stringify({ reason }),
       })
       if (res.ok) {
-        alert('Partner suspended!')
+        showToast('success', 'Partner suspended!')
         loadData()
       }
     } catch {
-      alert('Failed to suspend partner')
+      showToast('error', 'Failed to suspend partner')
     }
   }
 
@@ -120,11 +127,11 @@ export default function AdminFounderPartners() {
         method: 'POST',
       })
       if (res.ok) {
-        alert('Partner reactivated!')
+        showToast('success', 'Partner reactivated!')
         loadData()
       }
     } catch {
-      alert('Failed to reactivate partner')
+      showToast('error', 'Failed to reactivate partner')
     }
   }
 
@@ -145,14 +152,14 @@ export default function AdminFounderPartners() {
         body: JSON.stringify(body),
       })
       if (res.ok) {
-        alert(`Payout ${action === 'approve' ? 'approved' : action === 'mark_paid' ? 'marked as paid' : 'rejected'}!`)
+        showToast('success', `Payout ${action === 'approve' ? 'approved' : action === 'mark_paid' ? 'marked as paid' : 'rejected'}!`)
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to process payout')
+        showToast('error', error.error || 'Failed to process payout')
       }
     } catch {
-      alert('Failed to process payout')
+      showToast('error', 'Failed to process payout')
     }
   }
 
@@ -184,6 +191,7 @@ export default function AdminFounderPartners() {
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Founder Partner Management</h1>
             <p className="text-sm text-slate-500 mt-1">Manage founder partners, applications, and payouts</p>
+            <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
@@ -365,7 +373,7 @@ export default function AdminFounderPartners() {
                       <div className="text-xs text-slate-500">{p.partner?.email}</div>
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-slate-700">
-                      {p.amountCents?.toLocaleString()} RWF
+                      {p.amountCents?.toLocaleString()} {currency}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">{p.method}</td>
                     <td className="px-6 py-4">

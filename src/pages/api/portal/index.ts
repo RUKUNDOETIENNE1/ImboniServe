@@ -29,8 +29,8 @@ async function getPartnership(userId: string) {
   })
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
+function formatCurrency(cents: number, currency: string = 'RWF'): string {
+  return new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
 }
 
 // ─── Snapshot ──────────────────────────────────────────────────────────────
@@ -182,15 +182,19 @@ async function getGrowth(partnershipId: string) {
     _sum: { amountCents: true },
   })
 
-  // 6-month trend
+  // 6-month trend (limited to 10000 records to prevent unbounded memory usage)
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
   const allCommissions = await prisma.partnershipCommission.findMany({
     where: { partnershipId, createdAt: { gte: sixMonthsAgo } },
     select: { amountCents: true, createdAt: true, type: true },
+    take: 10000,
+    orderBy: { createdAt: 'asc' },
   })
   const allRedemptions = await prisma.partnershipCodeRedemption.findMany({
     where: { code: { partnershipId }, createdAt: { gte: sixMonthsAgo } },
     select: { createdAt: true },
+    take: 10000,
+    orderBy: { createdAt: 'asc' },
   })
 
   const monthlyTrend: Array<{ month: string; signups: number; conversions: number; commissionCents: number }> = []
@@ -216,6 +220,7 @@ async function getGrowth(partnershipId: string) {
   }
   const growthRedemptionBizIds = await prisma.partnershipCodeRedemption.findMany({
     where: { code: { partnershipId } }, select: { businessId: true },
+    take: 5000,
   })
   const growthBizIds = growthRedemptionBizIds.map((r) => r.businessId)
   const stalled = growthBizIds.length > 0

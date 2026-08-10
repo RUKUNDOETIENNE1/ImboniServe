@@ -150,7 +150,10 @@ interface MenuRecordWithBusiness {
 async function ensureQrMenuTable(prisma: PrismaClient): Promise<void> {
   if (!ensureTablePromise) {
     ensureTablePromise = (async () => {
-      const sql = `CREATE TABLE IF NOT EXISTS "plugin_data_qr_menu" (
+      // Use parameterized $executeRaw (tagged template) instead of $executeRawUnsafe
+      // to prevent SQL injection. The SQL is static, but $executeRawUnsafe bypasses
+      // Prisma's safety checks and is flagged as a security risk.
+      await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "plugin_data_qr_menu" (
         "id" text PRIMARY KEY,
         "businessId" text NOT NULL,
         "menuItems" jsonb NOT NULL,
@@ -164,15 +167,8 @@ async function ensureQrMenuTable(prisma: PrismaClient): Promise<void> {
         "createdAt" timestamptz NOT NULL DEFAULT NOW(),
         "updatedAt" timestamptz NOT NULL DEFAULT NOW()
       );`
-
-      const indexBusiness =
-        'CREATE INDEX IF NOT EXISTS plugin_data_qr_menu_business_idx ON "plugin_data_qr_menu" ("businessId");'
-      const indexStatus =
-        'CREATE INDEX IF NOT EXISTS plugin_data_qr_menu_status_idx ON "plugin_data_qr_menu" ("status");'
-
-      await prisma.$executeRawUnsafe(sql)
-      await prisma.$executeRawUnsafe(indexBusiness)
-      await prisma.$executeRawUnsafe(indexStatus)
+      await prisma.$executeRaw`CREATE INDEX IF NOT EXISTS plugin_data_qr_menu_business_idx ON "plugin_data_qr_menu" ("businessId");`
+      await prisma.$executeRaw`CREATE INDEX IF NOT EXISTS plugin_data_qr_menu_status_idx ON "plugin_data_qr_menu" ("status");`
     })().catch((err) => {
       ensureTablePromise = null
       throw err

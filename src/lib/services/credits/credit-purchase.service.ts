@@ -42,11 +42,11 @@ const DEFAULT_PACKAGES: Array<{
 /**
  * Seed default credit packages
  */
-export async function seedDefaultPackages(): Promise<void> {
+export async function seedDefaultPackages(currency: string = 'RWF'): Promise<void> {
   for (const pkg of DEFAULT_PACKAGES) {
     await prisma.aICreditPackage.upsert({
       where: { code: pkg.code },
-      create: { ...pkg, currency: 'RWF', isActive: true },
+      create: { ...pkg, currency, isActive: true },
       update: {},
     });
   }

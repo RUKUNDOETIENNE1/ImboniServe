@@ -1,11 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { prisma } from '@/lib/prisma'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
-function startOfDay(d = new Date()) {
-  const x = new Date(d)
-  x.setHours(0, 0, 0, 0)
-  return x
+function startOfDay(d: Date, timezone?: string) {
+  return getBusinessDayBoundary(d, timezone).start
 }
 
 function addDays(d: Date, days: number) {
@@ -22,7 +21,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const p: any = prisma
-    const todayStart = startOfDay()
+    // Fetch business timezone for timezone-aware day boundary
+    const business = await prisma.business.findUnique({
+      where: { id: ctx.businessId },
+      select: { timezone: true },
+    })
+    const tz = business?.timezone
+    const todayStart = startOfDay(new Date(), tz)
 
     const [docsToday, approvedToday, anomaliesToday] = await Promise.all([
       p.scannedDocument.count({ where: { businessId: ctx.businessId, createdAt: { gte: todayStart } } }),
@@ -69,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })()
 
     const days = 7
-    const start = startOfDay(addDays(new Date(), -(days - 1)))
+    const start = startOfDay(addDays(new Date(), -(days - 1)), tz)
 
     // Build date windows upfront
     const windows = Array.from({ length: days }, (_, i) => ({

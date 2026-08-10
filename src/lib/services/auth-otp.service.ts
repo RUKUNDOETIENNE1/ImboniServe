@@ -22,13 +22,28 @@ function generateNumericOTP(): string {
   return crypto.randomInt(100000, 999999).toString()
 }
 
+/**
+ * Security: NEXTAUTH_SECRET is required by env-validator at startup.
+ * If it is somehow missing (e.g. a code path that bypasses validation),
+ * we fail closed rather than hashing with an empty secret, which would
+ * make OTPs and confirm tokens trivially forgeable.
+ */
+function getAuthSecret(): string {
+  const v = process.env.NEXTAUTH_SECRET
+  if (v) return v
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SECURITY FATAL: NEXTAUTH_SECRET is not set. Cannot hash OTP/token.')
+  }
+  return ''
+}
+
 function hashOTP(otp: string): string {
-  return crypto.createHash('sha256').update(otp + (process.env.NEXTAUTH_SECRET || '')).digest('hex')
+  return crypto.createHash('sha256').update(otp + getAuthSecret()).digest('hex')
 }
 
 /** Hash an opaque token before storing in the database. Raw value is returned to client only. */
 function hashToken(token: string): string {
-  return crypto.createHash('sha256').update(token + (process.env.NEXTAUTH_SECRET || '')).digest('hex')
+  return crypto.createHash('sha256').update(token + getAuthSecret()).digest('hex')
 }
 
 function generateConfirmToken(): string {

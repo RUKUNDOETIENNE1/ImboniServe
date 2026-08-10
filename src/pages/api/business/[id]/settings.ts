@@ -102,6 +102,21 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
+    // GPV-D009 FIX: Sync TaxConfiguration.isInclusive with business.taxMode
+    // When a business owner changes their tax mode in settings, update the
+    // corresponding TaxConfiguration records to prevent isInclusive vs taxMode mismatch.
+    if (taxMode) {
+      try {
+        await prisma.taxConfiguration.updateMany({
+          where: { businessId: sessionBusinessId, taxType: 'VAT' },
+          data: { isInclusive: taxMode === 'INCLUSIVE' }
+        });
+      } catch (syncError) {
+        // Tax config sync failure should not block settings update
+        console.error('[Settings] TaxConfiguration sync failed:', syncError);
+      }
+    }
+
     return res.status(200).json(updatedBusiness);
   } catch (error) {
     console.error('Error updating business settings:', error);

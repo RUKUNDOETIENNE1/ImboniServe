@@ -31,6 +31,7 @@ export default function Signup() {
     phone: '',
     businessName: '',
     city: 'Kigali',
+    country: 'RW', // EGR-016: Country is configurable, defaults to Rwanda
     planCode: 'STARTER', // Default entry plan for trial (overridden by ?plan=)
     businessType: 'RESTAURANT', // RESTAURANT, HOTEL, CAFE, BAR, SUPPLIER
     latitude: null as number | null,
@@ -290,6 +291,47 @@ export default function Signup() {
                   label={t('auth.city_location', 'City / Location')}
                   placeholder="e.g. Kigali, Nairobi, London"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('auth.country', 'Country')}
+                </label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
+                  suppressHydrationWarning
+                >
+                  <option value="RW">Rwanda</option>
+                  <option value="KE">Kenya</option>
+                  <option value="UG">Uganda</option>
+                  <option value="TZ">Tanzania</option>
+                  <option value="ZA">South Africa</option>
+                  <option value="NG">Nigeria</option>
+                  <option value="GH">Ghana</option>
+                  <option value="EG">Egypt</option>
+                  <option value="MA">Morocco</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="FR">France</option>
+                  <option value="DE">Germany</option>
+                  <option value="IT">Italy</option>
+                  <option value="ES">Spain</option>
+                  <option value="BE">Belgium</option>
+                  <option value="NL">Netherlands</option>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="AE">United Arab Emirates</option>
+                  <option value="SA">Saudi Arabia</option>
+                  <option value="QA">Qatar</option>
+                  <option value="IN">India</option>
+                  <option value="CN">China</option>
+                  <option value="JP">Japan</option>
+                  <option value="AU">Australia</option>
+                  <option value="BR">Brazil</option>
+                  <option value="MX">Mexico</option>
+                </select>
               </div>
             </div>
 

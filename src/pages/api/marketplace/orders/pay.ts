@@ -65,8 +65,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Generate order-based identifiers
     const orderRef = `ORD-${order.orderNumber}-${Date.now()}`
 
-    // VAT breakdown (assumes total includes VAT @ 18%)
-    const VAT_RATE = 0.18
+    // VAT breakdown (assumes total includes VAT at business-configured rate)
+    const taxRate = order.business.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
+    const VAT_RATE = taxRate / 100
     const exVatAmountCents = Math.round(order.totalAmountCents / (1 + VAT_RATE))
     const vatAmountCents = order.totalAmountCents - exVatAmountCents
 
@@ -81,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             invoiceNumber,
             transactionId: orderRef,
             amountCents: order.totalAmountCents,
-            currency: 'RWF',
+            currency: order.business.currency,
             vatAmountCents,
             exVatAmountCents,
             gatewayFeeEstimatedCents: Math.round(order.totalAmountCents * 0.02),
@@ -125,7 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Initiate payment with provider
     const paymentResponse = await provider.createPayment({
       amount: order.totalAmountCents,
-      currency: 'RWF',
+      currency: order.business.currency,
       customerPhone: customerPhone || order.business.phone || '',
       customerEmail: customerEmail,
       customerName: customerName,

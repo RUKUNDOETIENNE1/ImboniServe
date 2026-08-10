@@ -97,7 +97,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       weeklyRevenue,
       monthlyRevenue,
       annualRevenue,
-      currency: 'RWF',
+      // Admin aggregation across multiple businesses; use the first entry's currency as display default
+      currency: entries[0]?.currency || 'RWF',
     })
   } catch (e: any) {
     res.status(500).json({ error: e.message })

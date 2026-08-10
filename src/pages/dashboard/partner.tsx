@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
 import { TrendingUp, Users, DollarSign, Award, Copy, Users2, Clock, CheckCircle, Activity, Wallet } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -18,6 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 export default function PartnerDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showToast } = useToast()
   const [dashboard, setDashboard] = useState<any>(null)
   const [commissions, setCommissions] = useState<any[]>([])
   const [commissionStats, setCommissionStats] = useState<any>(null)
@@ -65,22 +67,22 @@ export default function PartnerDashboard() {
         body: JSON.stringify(application),
       })
       if (res.ok) {
-        alert('Application submitted! Our team will review it within 5 business days.')
+        showToast('success', 'Application submitted! Our team will review it within 5 business days.')
         setShowApplyForm(false)
         loadData()
       } else {
         const err = await res.json()
-        alert(err.error || 'Failed to submit application')
+        showToast('error', err.error || 'Failed to submit application')
       }
     } catch {
-      alert('Failed to submit application')
+      showToast('error', 'Failed to submit application')
     }
   }
 
   const copyShareLink = (code: string) => {
     const link = `${window.location.origin}/f/${code}`
     navigator.clipboard.writeText(link)
-    alert(`Share link copied: ${link}`)
+    showToast('success', `Share link copied: ${link}`)
   }
 
   const requestPayout = async () => {
@@ -94,14 +96,14 @@ export default function PartnerDashboard() {
         body: JSON.stringify({ method, recipientPhone: phone }),
       })
       if (res.ok) {
-        alert('Payout requested!')
+        showToast('success', 'Payout requested!')
         loadData()
       } else {
         const err = await res.json()
-        alert(err.error || 'Failed to request payout')
+        showToast('error', err.error || 'Failed to request payout')
       }
     } catch {
-      alert('Failed to request payout')
+      showToast('error', 'Failed to request payout')
     }
   }
 
@@ -151,7 +153,7 @@ export default function PartnerDashboard() {
                   <label className="text-sm font-medium text-slate-600 mb-1 block">Network Size</label>
                   <input
                     type="text"
-                    placeholder="e.g. 500+ restaurant owners"
+                    placeholder="e.g. 500+ hospitality business owners"
                     value={application.networkSize}
                     onChange={(e) => setApplication({ ...application, networkSize: e.target.value })}
                     className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600"

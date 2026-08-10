@@ -1,11 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { prisma } from '@/lib/prisma'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
-function startOfDay(d = new Date()) {
-  const x = new Date(d)
-  x.setHours(0, 0, 0, 0)
-  return x
+function startOfDay(d: Date, timezone?: string) {
+  return getBusinessDayBoundary(d, timezone).start
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -16,7 +15,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const p: any = prisma
-    const since = startOfDay()
+    // Fetch business timezone for timezone-aware day boundary
+    const business = await prisma.business.findUnique({
+      where: { id: ctx.businessId },
+      select: { timezone: true },
+    })
+    const tz = business?.timezone
+    const since = startOfDay(new Date(), tz)
 
     const [ocrProcessing, extracted, review, approved, applied, failed] = await Promise.all([
       p.scanJob.count({ where: { businessId: ctx.businessId, status: 'OCR_PROCESSING' } }),

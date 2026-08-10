@@ -92,9 +92,12 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     // Delegate all post-payment side effects to canonical PaymentCompletionService
     // This handles: sale status update (COMPLETED + isPaid), dining slip, guest recognition,
     // notification, broadcast, ledger entry, audit log (PAYMENT_COMPLETED), order token
+    // GPV-D010 FIX: Pass the sale's paymentTransactionId instead of empty string.
+    // This ensures the PaymentTransaction is updated to SUCCESS and a proper
+    // FinancialLedgerEntry is created in the canonical financial source of truth.
     try {
       await PaymentCompletionService.onPaymentSuccess(
-        '', // No payment transaction for manual confirmation
+        sale.paymentTransactionId || '',
         sale.id,
         { source: 'manual-confirmation' }
       )

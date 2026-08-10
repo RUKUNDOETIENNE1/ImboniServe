@@ -7,8 +7,10 @@ import PortalLayout from '@/components/portal/PortalLayout'
 import CampaignPreview from '@/components/portal/CampaignPreview'
 import type { CampaignData } from '@/components/portal/CampaignPreview'
 import { Loader2, AlertCircle, RefreshCw, Plus, X } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export default function PortalCampaigns() {
+  const { showToast } = useToast()
   const [campaigns, setCampaigns] = useState<CampaignData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,12 +43,12 @@ export default function PortalCampaigns() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(`Action failed: ${err.error || 'Unknown error'}`)
+        showToast('error', `Action failed: ${err.error || 'Unknown error'}`)
         return
       }
       loadData()
     } catch (err: any) {
-      alert(`Action failed: ${err.message}`)
+      showToast('error', `Action failed: ${err.message}`)
     }
   }
 
@@ -69,13 +71,13 @@ export default function PortalCampaigns() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(`Failed: ${err.error}`)
+        showToast('error', `Failed: ${err.error}`)
         return
       }
       setShowCreate(false)
       loadData()
     } catch (err: any) {
-      alert(`Failed: ${err.message}`)
+      showToast('error', `Failed: ${err.message}`)
     } finally {
       setCreating(false)
     }

@@ -1,21 +1,10 @@
 import { prisma } from '../prisma'
 import { generateInsightFromKPIs, estimateCostCents } from '../ai/openai-insight.service'
+import { getBusinessDayBoundary, getLocalDateString } from '@/lib/utils/timezone'
 
 export type PeriodType = 'WEEKLY' | 'MONTHLY'
 
 type PeriodRange = { start: Date; end: Date }
-
-function getKigaliNow() {
-  const now = new Date()
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000
-  return new Date(utc + 2 * 3600000)
-}
-
-function startOfDayKigali(d: Date) {
-  const z = new Date(d)
-  z.setHours(0, 0, 0, 0)
-  return z
-}
 
 function addDays(d: Date, days: number) {
   const z = new Date(d)
@@ -23,17 +12,21 @@ function addDays(d: Date, days: number) {
   return z
 }
 
-function getPeriodRange(period: PeriodType): PeriodRange {
-  const now = getKigaliNow()
-  const todayStart = startOfDayKigali(now)
+function getPeriodRange(period: PeriodType, timezone: string = 'Africa/Kigali'): PeriodRange {
+  const now = new Date()
+  const { start: todayStart } = getBusinessDayBoundary(now, timezone)
+  // Derive local calendar fields in the business timezone
+  const localStr = getLocalDateString(now, timezone) // "YYYY-MM-DD"
+  const [y, m] = localStr.split('-').map(Number)
+  const localMidnightUTC = new Date(`${localStr}T00:00:00.000Z`)
   if (period === 'WEEKLY') {
-    const dow = todayStart.getDay() === 0 ? 7 : todayStart.getDay()
+    const dow = localMidnightUTC.getUTCDay() === 0 ? 7 : localMidnightUTC.getUTCDay()
     const monday = addDays(todayStart, -(dow - 1))
     const nextMonday = addDays(monday, 7)
     return { start: monday, end: nextMonday }
   } else {
-    const first = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1)
-    const nextFirst = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 1)
+    const first = getBusinessDayBoundary(new Date(Date.UTC(y, m - 1, 1)), timezone).start
+    const nextFirst = getBusinessDayBoundary(new Date(Date.UTC(y, m, 1)), timezone).start
     return { start: first, end: nextFirst }
   }
 }
@@ -43,7 +36,11 @@ function toKey(date: Date) {
 }
 
 export async function computeKPIs(businessId: string, period: PeriodType) {
-  const { start, end } = getPeriodRange(period)
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true }
+  })
+  const { start, end } = getPeriodRange(period, business?.timezone)
 
   const [sales, txs, customersInPeriod, customersBefore, subscription] = await Promise.all([
     prisma.sale.findMany({
@@ -129,7 +126,7 @@ export async function computeKPIs(businessId: string, period: PeriodType) {
   }
 
   return {
-    period: { type: period.toLowerCase(), start, end, tz: 'Africa/Kigali' },
+    period: { type: period.toLowerCase(), start, end, tz: business?.timezone || 'Africa/Kigali' },
     revenue: { total: revenueTotal, growthPct, avgDaily, bestDay, worstDay },
     transactions: { count: txCount, aov, byMethod: methodBreakdown },
     timePatterns: { peakHour, lowHour },
@@ -141,7 +138,12 @@ export async function computeKPIs(businessId: string, period: PeriodType) {
 
 export async function getOrGenerateInsight(params: { businessId: string; period: PeriodType; language?: string; trigger?: 'AUTO' | 'MANUAL'; force?: boolean; quota?: number }) {
   const { businessId, period, language = 'en', trigger = 'MANUAL', force = false, quota = 4 } = params
-  const { start, end } = getPeriodRange(period)
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true }
+  })
+  const timezone = business?.timezone
+  const { start, end } = getPeriodRange(period, timezone)
 
   const existing = await prisma.businessInsightReport.findUnique({
     where: { businessId_periodType_periodStart: { businessId, periodType: period, periodStart: start } }
@@ -149,8 +151,9 @@ export async function getOrGenerateInsight(params: { businessId: string; period:
   if (existing && !force) return existing
 
   if (trigger === 'MANUAL') {
-    const now = getKigaliNow()
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const localStr = getLocalDateString(new Date(), timezone)
+    const [y, m] = localStr.split('-').map(Number)
+    const monthStart = getBusinessDayBoundary(new Date(Date.UTC(y, m - 1, 1)), timezone).start
     const count = await prisma.businessInsightReport.count({
       where: { businessId, triggerSource: 'MANUAL', createdAt: { gte: monthStart } }
     })

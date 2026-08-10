@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import PortalLayout from '@/components/portal/PortalLayout'
 import OpportunityCard from '@/components/portal/OpportunityCard'
 import { Loader2, AlertCircle, RefreshCw, TrendingUp, TrendingDown, Users, Target, DollarSign } from 'lucide-react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface GrowthData {
   currentMonth: { signups: number; conversions: number; commissionCents: number }
@@ -15,11 +16,10 @@ interface GrowthData {
   opportunities: Array<{ type: string; label: string; action: string }>
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 export default function PortalGrowth() {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const [data, setData] = useState<GrowthData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

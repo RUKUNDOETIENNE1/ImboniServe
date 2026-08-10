@@ -106,8 +106,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const orderId = `SUB-${business.id.substring(0, 8)}-${Date.now()}`
     const invoiceNumber = await InvoiceNumberService.next('INV')
 
-    // VAT breakdown (assumes total includes VAT @ 18%)
-    const VAT_RATE = 0.18
+    // VAT breakdown (assumes total includes VAT at business-configured rate)
+    const taxRate = business.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
+    const VAT_RATE = taxRate / 100
     const exVatAmountCents = Math.round(amountCents / (1 + VAT_RATE))
     const vatAmountCents = amountCents - exVatAmountCents
 

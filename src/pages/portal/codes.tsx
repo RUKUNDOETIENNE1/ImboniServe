@@ -59,7 +59,7 @@ export default function PortalCodes() {
       <div className="space-y-6">
         <div>
           <h1 className="text-xl font-bold text-slate-800">My Founder Codes</h1>
-          <p className="text-sm text-slate-500">Share your codes with restaurants to earn commissions.</p>
+          <p className="text-sm text-slate-500">Share your codes with hospitality businesses to earn commissions.</p>
         </div>
 
         {codes.length === 0 ? (

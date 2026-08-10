@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { Plus, Key, Pause, Play, XCircle, Copy } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -19,6 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 export default function AdminFounderCodes() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showToast } = useToast()
   const [codes, setCodes] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -69,16 +71,16 @@ export default function AdminFounderCodes() {
         }),
       })
       if (res.ok) {
-        alert('Founder Code created successfully!')
+        showToast('success', 'Founder Code created successfully!')
         setShowCreateForm(false)
         setNewCode({ code: '', partnerId: '', trialDays: 30, maxRedemptions: '', label: '', expiresAt: '' })
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to create code')
+        showToast('error', error.error || 'Failed to create code')
       }
     } catch {
-      alert('Failed to create code')
+      showToast('error', 'Failed to create code')
     }
   }
 
@@ -90,21 +92,21 @@ export default function AdminFounderCodes() {
         body: JSON.stringify({ status: newStatus }),
       })
       if (res.ok) {
-        alert(`Code ${newStatus.toLowerCase()}!`)
+        showToast('success', `Code ${newStatus.toLowerCase()}!`)
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to update code')
+        showToast('error', error.error || 'Failed to update code')
       }
     } catch {
-      alert('Failed to update code')
+      showToast('error', 'Failed to update code')
     }
   }
 
   const copyShareLink = (code: string) => {
     const link = `${window.location.origin}/f/${code}`
     navigator.clipboard.writeText(link)
-    alert(`Share link copied: ${link}`)
+    showToast('success', `Share link copied: ${link}`)
   }
 
   const statusBadge = (status: string) => {

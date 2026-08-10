@@ -75,6 +75,7 @@ export class PartnershipPayoutService {
       data: {
         partnershipId: input.partnershipId,
         amountCents: input.amountCents,
+        // TODO: The 'RWF' fallback should be replaced with explicit currency from the caller.
         currency: input.currency ?? 'RWF',
         method: input.method,
         status: 'PENDING',
@@ -91,6 +92,7 @@ export class PartnershipPayoutService {
       payload: {
         partnershipId: input.partnershipId,
         amountCents: input.amountCents,
+        // TODO: The 'RWF' fallback should be replaced with explicit currency from the caller.
         currency: input.currency ?? 'RWF',
         method: input.method,
       },
@@ -100,6 +102,7 @@ export class PartnershipPayoutService {
     await PartnershipService.logActivity(
       input.partnershipId,
       'PAYOUT_REQUESTED',
+      // TODO: The 'RWF' fallback should be replaced with explicit currency from the caller.
       `Payout requested: ${input.amountCents / 100} ${input.currency ?? 'RWF'} via ${input.method}`,
       input.createdBy,
       { payoutId: payout.id },

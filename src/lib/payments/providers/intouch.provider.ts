@@ -4,6 +4,7 @@
  */
 
 import crypto from 'crypto'
+import { fetchWithTimeout, FetchTimeoutError } from '@/lib/utils/fetch-with-timeout'
 import {
   IPaymentProvider,
   PaymentProviderType,
@@ -143,13 +144,36 @@ export class InTouchProvider implements IPaymentProvider {
       })
 
       // POST to /api/requestpayment/ endpoint
-      const response = await fetch(`${this.config.apiUrl}/requestpayment/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(payload as any).toString(),
-      })
+      // REL-HIGH-001 (OEC-001C): 30s timeout — payment initiation must not hang indefinitely
+      let response: Response
+      try {
+        response = await fetchWithTimeout(
+          `${this.config.apiUrl}/requestpayment/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(payload as any).toString(),
+          },
+          30_000,
+        )
+      } catch (err: any) {
+        if (err instanceof FetchTimeoutError) {
+          console.error('[InTouch] Request timed out:', err.message)
+          return {
+            success: false,
+            error: 'InTouch API request timed out',
+            errorCode: 'TIMEOUT',
+          }
+        }
+        console.error('[InTouch] Network error:', err?.message)
+        return {
+          success: false,
+          error: `InTouch network error: ${err?.message ?? String(err)}`,
+          errorCode: 'NETWORK_ERROR',
+        }
+      }
 
       if (!response.ok) {
         console.error('[InTouch] HTTP error:', response.status, response.statusText)

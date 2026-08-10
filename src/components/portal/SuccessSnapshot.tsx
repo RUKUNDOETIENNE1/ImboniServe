@@ -3,6 +3,7 @@
  */
 
 import { TrendingUp, TrendingDown, Users, CreditCard, DollarSign, Activity } from 'lucide-react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface SuccessSnapshotProps {
   metrics: {
@@ -16,11 +17,10 @@ interface SuccessSnapshotProps {
   }
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 export default function SuccessSnapshot({ metrics }: SuccessSnapshotProps) {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const commissionTrend = metrics.prevMonthCommissionCents > 0
     ? ((metrics.monthCommissionCents - metrics.prevMonthCommissionCents) / metrics.prevMonthCommissionCents) * 100
     : metrics.monthCommissionCents > 0 ? 100 : 0

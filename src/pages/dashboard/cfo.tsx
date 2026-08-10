@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import { useCurrency } from '@/contexts/LocaleContext'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -128,6 +129,7 @@ interface CfoNarrative {
 export default function CFODashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { currency } = useCurrency()
   const [data, setData] = useState<CFODashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -266,33 +268,36 @@ export default function CFODashboard() {
           {data.narratives?.financialHealth && (
             <CfoInterpretationBox narrative={data.narratives.financialHealth} />
           )}
-          <FinancialHealthOverview 
+          <FinancialHealthOverview
             data={data.financialHealth}
             metricInsights={data.insights?.metricInsights}
+            currency={currency}
           />
 
           {/* Revenue Intelligence */}
           {data.narratives?.revenueIntelligence && (
             <CfoInterpretationBox narrative={data.narratives.revenueIntelligence} />
           )}
-          <RevenueIntelligence 
+          <RevenueIntelligence
             data={data.revenueIntelligence}
             metricInsights={data.insights?.metricInsights}
+            currency={currency}
           />
 
           {/* Subscription Intelligence */}
           {data.narratives?.subscriptionIntelligence && (
             <CfoInterpretationBox narrative={data.narratives.subscriptionIntelligence} />
           )}
-          <SubscriptionIntelligence data={data.subscriptionIntelligence} />
+          <SubscriptionIntelligence data={data.subscriptionIntelligence} currency={currency} />
 
           {/* Financial Operations Intelligence */}
           {data.narratives?.operations && (
             <CfoInterpretationBox narrative={data.narratives.operations} />
           )}
-          <FinancialOperations 
+          <FinancialOperations
             data={data.operationsIntelligence}
             metricInsights={data.insights?.metricInsights}
+            currency={currency}
           />
 
         </div>
@@ -415,11 +420,11 @@ function FinancialPriorities({ priorities }: { priorities: any[] }) {
  * Financial Health Overview Component
  * Executive snapshot of financial health
  */
-function FinancialHealthOverview({ data, metricInsights }: { data: any, metricInsights?: any }) {
+function FinancialHealthOverview({ data, metricInsights, currency }: { data: any, metricInsights?: any, currency: string }) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value)
@@ -554,11 +559,11 @@ function FinancialHealthOverview({ data, metricInsights }: { data: any, metricIn
  * Revenue Intelligence Component
  * Where is money coming from and what threatens it?
  */
-function RevenueIntelligence({ data, metricInsights }: { data: any, metricInsights?: any }) {
+function RevenueIntelligence({ data, metricInsights, currency }: { data: any, metricInsights?: any, currency: string }) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value)
@@ -699,7 +704,7 @@ function RevenueIntelligence({ data, metricInsights }: { data: any, metricInsigh
  * Subscription Intelligence Component
  * What subscription problems need attention?
  */
-function SubscriptionIntelligence({ data }: { data: any }) {
+function SubscriptionIntelligence({ data, currency }: { data: any, currency: string }) {
   const formatNumber = (value: number) => {
     return new Intl.NumberFormat('en-US').format(value)
   }
@@ -707,7 +712,7 @@ function SubscriptionIntelligence({ data }: { data: any }) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value)
@@ -794,11 +799,11 @@ function SubscriptionIntelligence({ data }: { data: any }) {
  * Financial Operations Component
  * What operational issues threaten revenue realization?
  */
-function FinancialOperations({ data, metricInsights }: { data: any, metricInsights?: any }) {
+function FinancialOperations({ data, metricInsights, currency }: { data: any, metricInsights?: any, currency: string }) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value)

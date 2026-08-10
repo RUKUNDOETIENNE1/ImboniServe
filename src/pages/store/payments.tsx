@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import DashboardLayout from '@/components/DashboardLayout'
 import Link from 'next/link'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export default function MarketplacePayments() {
+  const { currency } = useCurrency()
   const [payments, setPayments] = useState<any[]>([])
 
   useEffect(() => {
@@ -17,7 +19,7 @@ export default function MarketplacePayments() {
     load()
   }, [])
 
-  const fmt = (n: number, c = 'RWF') => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
+  const fmt = (n: number, c = currency) => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
   const fdt = (d: string) => new Date(d).toLocaleString()
 
   return (

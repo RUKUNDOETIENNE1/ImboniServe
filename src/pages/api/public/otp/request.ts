@@ -2,15 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { NotificationService } from '@/lib/services/notification.service'
-
-function normalizePhone(phone: string): string {
-  let p = phone.trim()
-  if (p.startsWith('+')) return p
-  // Rwanda default: if starts with 07/078/079 -> +2507..
-  if (p.startsWith('07')) return `+250${p.slice(1)}`
-  if (p.startsWith('2507')) return `+${p}`
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`
-}
+import { normalizePhone } from '@/lib/utils/phone'
+import crypto from 'crypto'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -52,8 +45,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    // Create a 6-digit OTP code
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    // Create a 6-digit OTP code (cryptographically secure)
+    const code = crypto.randomInt(100000, 999999).toString()
     const identifier = `qr:${branchId}:${phoneE164}`
 
     // Clear previous tokens for this identifier

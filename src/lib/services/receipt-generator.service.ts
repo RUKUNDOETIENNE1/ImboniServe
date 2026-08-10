@@ -27,6 +27,7 @@ interface ReceiptData {
   vat: number
   total: number
   currency: string
+  taxRate?: number
   paymentMethod?: string
   paymentReference?: string
   transactionId?: string
@@ -131,7 +132,7 @@ export class ReceiptGeneratorService {
       <span>${fmt(data.subtotal)}</span>
     </div>
     <div class="summary-row">
-      <span>VAT (18%)</span>
+      <span>VAT (${data.taxRate ?? 0}%)</span>
       <span>${fmt(data.vat)}</span>
     </div>
     <div class="summary-row total">

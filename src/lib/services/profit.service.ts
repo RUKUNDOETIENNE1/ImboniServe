@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { PaymentStatus } from '@prisma/client'
 import { FinancialTruthService, CostSource } from './financial-truth.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export class ProfitService {
   /**
@@ -11,10 +12,14 @@ export class ProfitService {
    */
   static async calculateDailyProfit(businessId: string, date?: Date) {
     const targetDate = date || new Date()
-    const startOfDay = new Date(targetDate)
-    startOfDay.setHours(0, 0, 0, 0)
-    const endOfDay = new Date(targetDate)
-    endOfDay.setHours(23, 59, 59, 999)
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(
+      targetDate,
+      business?.timezone
+    )
 
     // Get revenue from sales
     const sales = await prisma.sale.findMany({
@@ -66,10 +71,15 @@ export class ProfitService {
    * Falls back to estimated costs for historical data without consumption records.
    */
   static async calculateWeeklyProfit(businessId: string, startDate?: Date) {
-    const start = startDate || new Date()
-    start.setHours(0, 0, 0, 0)
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const timezone = business?.timezone
+    const refDate = startDate || new Date()
+    const { start } = getBusinessDayBoundary(refDate, timezone)
     start.setDate(start.getDate() - start.getDay())
-    
+
     const end = new Date(start)
     end.setDate(end.getDate() + 7)
 
@@ -83,9 +93,7 @@ export class ProfitService {
     // Get revenue for each day
     const dailyBreakdown = await Promise.all(
       dailyCosts.map(async (dayCost) => {
-        const dayStart = new Date(dayCost.date)
-        const dayEnd = new Date(dayCost.date)
-        dayEnd.setHours(23, 59, 59, 999)
+        const { start: dayStart, end: dayEnd } = getBusinessDayBoundary(dayCost.date, timezone)
 
         const daySales = await prisma.sale.findMany({
           where: {

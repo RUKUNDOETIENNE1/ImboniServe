@@ -5,6 +5,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import PortalLayout from '@/components/portal/PortalLayout'
 import { Loader2, AlertCircle, RefreshCw, Save, FileText, Mail, Calendar } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 interface ProfileData {
   id: string
@@ -22,6 +23,7 @@ interface ProfileData {
 }
 
 export default function PortalProfile() {
+  const { showToast } = useToast()
   const [data, setData] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -64,14 +66,14 @@ export default function PortalProfile() {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(`Failed: ${err.error}`)
+        showToast('error', `Failed: ${err.error}`)
         return
       }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
       loadData()
     } catch (err: any) {
-      alert(`Failed: ${err.message}`)
+      showToast('error', `Failed: ${err.message}`)
     } finally {
       setSaving(false)
     }

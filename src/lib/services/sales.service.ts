@@ -5,6 +5,7 @@ import type { PaymentMethod } from '@/lib/pricing/fee-config'
 import { PaymentCompletionService } from './payment-completion.service'
 import { FinancialTruthService, CostSource } from './financial-truth.service'
 import { GuestRecognitionService } from './guest-recognition.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export class SalesService {
   static async createSale(userId: string, input: CreateSaleInput) {
@@ -46,10 +47,14 @@ export class SalesService {
         customerPhone: input.clientPhone || null,
         totalAmountCents,
         paymentMethod: input.paymentMethod,
-        paymentStatus: input.paymentMethod === 'CASH' ? 'COMPLETED' : 'PENDING',
+        // GPV-D010 FIX: Don't pre-set COMPLETED for CASH — let PaymentCompletionService
+        // handle the full atomic transition (status, paymentStatus, isPaid, ledger entry).
+        // Pre-setting paymentStatus='COMPLETED' causes the idempotent guard in
+        // PaymentCompletionService to skip, which means no ledger entry is created.
+        paymentStatus: 'PENDING',
         paymentReference: input.paymentReference,
         notes: input.notes,
-        isPaid: input.paymentMethod === 'CASH',
+        isPaid: false,
         items: {
           create: input.items.map(item => ({
             menuItemId: item.menuItemId,
@@ -78,9 +83,11 @@ export class SalesService {
 
     if (input.paymentMethod === 'CASH') {
       // Route through canonical PaymentCompletionService for all post-payment side effects
+      // GPV-D010 FIX: PaymentCompletionService now handles the full atomic transition
+      // including status='COMPLETED', ledger entry creation, and all side effects.
       try {
         await PaymentCompletionService.onPaymentSuccess(
-          '', // CASH has no payment transaction
+          '', // CASH has no payment transaction — service will create ledger from sale data
           sale.id,
           {
             clientPhone: input.clientPhone,
@@ -177,9 +184,21 @@ export class SalesService {
       }
     }
 
+    // GPV-D010 FIX: If the update is marking the sale as COMPLETED, don't set
+    // paymentStatus/isPaid in the update — let PaymentCompletionService handle
+    // the full atomic transition (status, paymentStatus, isPaid, ledger entry).
+    // Otherwise the idempotent guard in PaymentCompletionService skips, and no
+    // ledger entry is created.
+    const isCompletingPayment = input.paymentStatus === 'COMPLETED' && input.isPaid
+    const updateData = { ...input }
+    if (isCompletingPayment) {
+      delete updateData.paymentStatus
+      delete updateData.isPaid
+    }
+
     const sale = await prisma.sale.update({
       where: { id },
-      data: input,
+      data: updateData,
       include: {
         items: {
           include: {
@@ -189,10 +208,16 @@ export class SalesService {
       },
     })
 
-    if (input.paymentStatus === 'COMPLETED' && input.isPaid) {
+    if (isCompletingPayment) {
       // Route through canonical PaymentCompletionService
+      // GPV-D010 FIX: Pass the sale's paymentTransactionId so the ledger entry
+      // is created with the correct transaction reference.
       try {
-        await PaymentCompletionService.onPaymentSuccess('', sale.id, { source: 'sale-update' })
+        await PaymentCompletionService.onPaymentSuccess(
+          sale.paymentTransactionId || '',
+          sale.id,
+          { source: 'sale-update' }
+        )
       } catch (error) {
         console.error('Failed to process payment completion on sale update:', error)
       }
@@ -284,10 +309,14 @@ export class SalesService {
    */
   static async getDailySales(businessId: string, date?: Date) {
     const targetDate = date || new Date()
-    const startOfDay = new Date(targetDate)
-    startOfDay.setHours(0, 0, 0, 0)
-    const endOfDay = new Date(targetDate)
-    endOfDay.setHours(23, 59, 59, 999)
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(
+      targetDate,
+      business?.timezone
+    )
 
     const sales = await prisma.sale.findMany({
       where: {

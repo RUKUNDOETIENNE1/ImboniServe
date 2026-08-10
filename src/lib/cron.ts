@@ -182,12 +182,22 @@ export class CronService {
         }
         const candidates: any[] = await prisma.business.findMany(findArgs)
 
+        // Batch update: collect all eligible business IDs and update in a single query
+        const eligibleBusinessIds: string[] = []
         for (const biz of candidates) {
           if (!biz.trialStartDate) continue
           const end = TrialPolicyService.computeTrialEndDate(new Date(biz.trialStartDate), TrialPolicyService.getDefaultTrialDays())
           if (end.getTime() >= now.getTime() && end.getTime() <= threeDaysAhead.getTime()) {
-            await prisma.business.update({ where: { id: biz.id }, data: { salesStatus: 'Trial Ending Soon' } } as any)
+            eligibleBusinessIds.push(biz.id)
           }
+        }
+
+        // Single batch update instead of sequential per-business updates
+        if (eligibleBusinessIds.length > 0) {
+          await prisma.business.updateMany({
+            where: { id: { in: eligibleBusinessIds } },
+            data: { salesStatus: 'Trial Ending Soon' },
+          } as any)
         }
       } catch (err) {
         logger.error('Sales trial status update scheduler error', { error: String(err) })
@@ -220,25 +230,41 @@ export class CronService {
           },
         })
 
+        // Filter eligible businesses first, then process in parallel batches
+        const eligible: typeof businesses = []
         for (const business of businesses) {
-          try {
-            const tz = business.timezone || 'Africa/Kigali'
-            const targetTime = business.dailyReportLocalTime || '07:30'
-            const localHHMM = toLocalHHMM(now, tz)
-            const localDate = toLocalDateString(now, tz)
+          const tz = business.timezone || 'Africa/Kigali'
+          const targetTime = business.dailyReportLocalTime || '07:30'
+          const localHHMM = toLocalHHMM(now, tz)
+          const localDate = toLocalDateString(now, tz)
 
-            if (localHHMM === targetTime && business.lastDailyReportSentForDate !== localDate) {
-              await prisma.business.update({
-                where: { id: business.id },
-                data: { lastDailyReportSentForDate: localDate },
-              })
-              const report = await ReportService.generateDailyReport(business.id, now)
-              await NotificationService.sendDailyReport(business.id, report)
-              logger.info(`Daily report sent for ${business.name}`, { businessId: business.id, localDate, localTime: localHHMM })
-            }
-          } catch (err) {
-            logger.error(`Daily report failed for business ${business.id}`, { error: String(err) })
+          if (localHHMM === targetTime && business.lastDailyReportSentForDate !== localDate) {
+            eligible.push(business)
           }
+        }
+
+        // Process eligible businesses in parallel batches of 5
+        const REPORT_BATCH_SIZE = 5
+        for (let i = 0; i < eligible.length; i += REPORT_BATCH_SIZE) {
+          const batch = eligible.slice(i, i + REPORT_BATCH_SIZE)
+          await Promise.allSettled(
+            batch.map(async (business) => {
+              try {
+                const tz = business.timezone || 'Africa/Kigali'
+                const localDate = toLocalDateString(now, tz)
+
+                await prisma.business.update({
+                  where: { id: business.id },
+                  data: { lastDailyReportSentForDate: localDate },
+                })
+                const report = await ReportService.generateDailyReport(business.id, now)
+                await NotificationService.sendDailyReport(business.id, report)
+                logger.info(`Daily report sent for ${business.name}`, { businessId: business.id, localDate, localTime: toLocalHHMM(now, tz) })
+              } catch (err) {
+                logger.error(`Daily report failed for ${business.name}`, { businessId: business.id, error: String(err) })
+              }
+            })
+          )
         }
       } catch (err) {
         logger.error('Per-business daily report scheduler error', { error: String(err) })
@@ -309,13 +335,11 @@ export class CronService {
 
   private static scheduleInsightGeneration() {
     const checkTime = () => {
+      // EGR-016: Use timezone-aware time instead of manual UTC+2 offset
       const now = new Date()
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000
-      const kigali = new Date(utc + 2 * 3600000)
-      const hour = kigali.getHours()
-      const minute = kigali.getMinutes()
+      const localHHMM = toLocalHHMM(now, 'Africa/Kigali')
 
-      if (hour === 1 && minute === 0) {
+      if (localHHMM === '01:00') {
         this.generateInsights()
       }
     }
@@ -376,6 +400,9 @@ export class CronService {
   private static scheduleReconciliation() {
     const reconcile = async () => {
       try {
+        // Platform-level reconciliation runs at 02:00 in the primary market timezone.
+        // EGR-016: This is a platform operation, not a per-business operation.
+        // When multi-region deployment is needed, this should be parameterized.
         const now = new Date()
         const tz = 'Africa/Kigali'
         const localHHMM = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: tz })
@@ -589,12 +616,11 @@ export class CronService {
       }
     }
 
-    // Run daily at 10:00 Kigali time
+    // Run daily at 10:00 in the primary market timezone (EGR-016: timezone-aware)
     const interval = setInterval(() => {
       const now = new Date()
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000
-      const kigali = new Date(utc + 2 * 3600000)
-      if (kigali.getHours() === 10 && kigali.getMinutes() === 0) tick()
+      const localHHMM = toLocalHHMM(now, 'Africa/Kigali')
+      if (localHHMM === '10:00') tick()
     }, 60 * 1000)
     this.intervals.set('whatsapp-reorder-funnel', interval)
   }
@@ -618,8 +644,13 @@ export class CronService {
           select: { id: true, depositCents: true },
         })
 
-        for (const r of toForfeit) {
-          await ReservationService.forfeitDeposit(r.id, r.depositCents || 0, 'NO_SHOW')
+        // Process forfeits in parallel batches of 10 to avoid sequential N+1
+        const FORFEIT_BATCH_SIZE = 10
+        for (let i = 0; i < toForfeit.length; i += FORFEIT_BATCH_SIZE) {
+          const batch = toForfeit.slice(i, i + FORFEIT_BATCH_SIZE)
+          await Promise.allSettled(
+            batch.map((r) => ReservationService.forfeitDeposit(r.id, r.depositCents || 0, 'NO_SHOW'))
+          )
         }
       } catch (err) {
         logger.error('No-show forfeit job error', { error: String(err) })

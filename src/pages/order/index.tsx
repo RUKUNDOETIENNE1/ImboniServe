@@ -14,6 +14,8 @@ import { abServeForMenuItem, abTrackEvent } from '@/lib/ab-testing/client';
 import type { MenuItemDetail } from '@/components/MenuItemDetailModal';
 import type { SessionInfo } from '@/lib/sessionManager';
 import { getSessionInfo, joinTableSession, getGroupOrderSummary, validateSession, setParticipantName } from '@/lib/sessionManager';
+import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/contexts/LocaleContext';
 
 type MenuItem = MenuItemDetail & {
   translations?: Array<{
@@ -32,6 +34,8 @@ type CartItem = {
 
 export default function OrderPage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { currency } = useCurrency();
   const { branchId, tableId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
 
   const [loading, setLoading] = useState(true);
@@ -570,7 +574,7 @@ export default function OrderPage() {
         return;
       }
 
-      alert('Order confirmed and sent to kitchen!');
+      showToast('success', 'Order confirmed and sent to kitchen!');
       setShowConfirmation(false);
       setCart({});
     } catch (e: any) {
@@ -602,7 +606,7 @@ export default function OrderPage() {
 
   function formatRwf(cents: number) {
     // Deprecated: kept for compatibility; use <CurrencyDisplay inCents /> instead
-    return `${Math.round(cents).toLocaleString()}`;
+    return `${Math.round(cents).toLocaleString()} ${currency}`;
   }
 
   if (showConfirmation) {
@@ -721,7 +725,7 @@ export default function OrderPage() {
                 } catch {}
               } else {
                 navigator.clipboard.writeText(window.location.href);
-                alert('Link copied! Share it to earn 500 RWF when friends order.');
+                showToast('success', 'Link copied! Share it to earn 500 RWF when friends order.');
               }
             }}
             style={{

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
@@ -6,13 +7,22 @@ import { realtimeService } from '@/lib/realtime'
 import { WaiterCallsPluginAdapter } from '@/lib/die/business-as-plugin/waiter-calls/waiter-calls.adapter'
 import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
 import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
+import { withRateLimit } from '@/lib/middleware/withRateLimit'
+import { withCsrf } from '@/lib/middleware/csrf'
+
+const createWaiterCallSchema = z.object({
+  tableId: z.string().min(1).max(100),
+  sessionId: z.string().max(200).optional(),
+  reason: z.enum(['water', 'assistance', 'bill', 'other']),
+  customMessage: z.string().max(500).optional(),
+})
 
 /**
  * Waiter Call API
  * POST - Create new waiter call (public endpoint - works without auth)
  * GET - List waiter calls for business (requires auth)
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     return handleCreateWaiterCall(req, res)
   }
@@ -26,17 +36,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handleCreateWaiterCall(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { tableId, sessionId, reason, customMessage } = req.body
-
-    if (!tableId || !reason) {
-      return res.status(400).json({ error: 'tableId and reason are required' })
+    const parseResult = createWaiterCallSchema.safeParse(req.body)
+    if (!parseResult.success) {
+      return res.status(400).json({ error: 'Invalid request', details: parseResult.error.flatten() })
     }
 
-    // Validate reason
-    const validReasons = ['water', 'assistance', 'bill', 'other']
-    if (!validReasons.includes(reason)) {
-      return res.status(400).json({ error: 'Invalid reason' })
-    }
+    const { tableId, sessionId, reason, customMessage } = parseResult.data
 
     // Validate table exists and get business info
     const table = await prisma.table.findUnique({
@@ -202,3 +207,8 @@ async function handleListWaiterCalls(req: NextApiRequest, res: NextApiResponse) 
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+export default withCsrf(withRateLimit(handler, {
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30, // 30 calls per minute per IP
+}))

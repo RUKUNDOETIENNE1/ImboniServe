@@ -3,6 +3,7 @@ import Head from 'next/head'
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { renderPluginPublicRoute, resolveBusinessId } from '@/lib/die/plugins/runtime/plugin-platform'
 import type { QRMenuPublicPayload } from '@/lib/die/plugins/built-in/qr-menu.plugin'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface MenuItem {
   name: string
@@ -69,18 +70,19 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ params
   }
 }
 
-function formatCurrency(amount: number): string {
-  if (!Number.isFinite(amount)) return '—'
-  const formatter = new Intl.NumberFormat('en-RW', {
-    style: 'currency',
-    currency: 'RWF',
-    maximumFractionDigits: 0,
-  })
-  return formatter.format(Math.max(0, amount))
-}
-
 export default function QRMenuPage({ payload }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { currency } = useCurrency()
   const [copied, setCopied] = useState(false)
+
+  const formatCurrency = (amount: number): string => {
+    if (!Number.isFinite(amount)) return '—'
+    const formatter = new Intl.NumberFormat('en-RW', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    })
+    return formatter.format(Math.max(0, amount))
+  }
 
   const sections = useMemo<MenuSection[]>(() => {
     const items = Array.isArray(payload.menuItems) ? payload.menuItems : []

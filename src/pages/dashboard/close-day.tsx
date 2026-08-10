@@ -3,6 +3,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
 import { CheckCircle2, Loader2, Lock, AlertTriangle, Calendar, Receipt, TrendingUp, Download, Clock } from 'lucide-react'
 import { useToast } from '@/components/Toast'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   CASH: 'Cash',
@@ -33,6 +34,8 @@ export default function CloseDayPage() {
   const [closing, setClosing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [showPendingWarning, setShowPendingWarning] = useState(false)
 
   const fetchReport = async (date?: string) => {
     setLoading(true)
@@ -43,6 +46,7 @@ export default function CloseDayPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'Failed to load Z-Report')
       setData(json)
+      setLastUpdated(new Date())
     } catch (e: any) {
       setError(e.message || 'Failed to load Z-Report')
     } finally {
@@ -55,6 +59,17 @@ export default function CloseDayPage() {
   }, [selectedDate])
 
   const handleCloseDay = async () => {
+    if (!data) return
+    // If there are pending orders, show a warning dialog before proceeding
+    if (data.summary.pendingOrders > 0) {
+      setShowPendingWarning(true)
+      return
+    }
+    executeCloseDay()
+  }
+
+  const executeCloseDay = async () => {
+    setShowPendingWarning(false)
     if (!data) return
     setClosing(true)
     try {
@@ -112,6 +127,7 @@ export default function CloseDayPage() {
               <p className="text-sm text-slate-500 mt-1">
                 End-of-day reconciliation and sales summary
               </p>
+              <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
             </div>
             <div className="flex items-center gap-3">
               <input
@@ -176,6 +192,42 @@ export default function CloseDayPage() {
                   {closing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                   {closing ? 'Closing...' : 'Close Day'}
                 </button>
+              </div>
+            )}
+
+            {/* Pending Orders Warning Dialog */}
+            {showPendingWarning && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                      <AlertTriangle className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">Pending Orders Detected</h3>
+                  </div>
+                  <p className="text-sm text-slate-600 mb-2">
+                    There {data.summary.pendingOrders === 1 ? 'is' : 'are'} <strong className="text-amber-700">{data.summary.pendingOrders} pending order{data.summary.pendingOrders === 1 ? '' : 's'}</strong> for this day.
+                  </p>
+                  <p className="text-sm text-slate-600 mb-4">
+                    Closing the day will finalize the Z-Report without resolving these orders.
+                    Pending orders may represent unpaid bills or incomplete transactions.
+                    Please verify all orders are completed before closing.
+                  </p>
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => setShowPendingWarning(false)}
+                      className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
+                    >
+                      Go Back & Review
+                    </button>
+                    <button
+                      onClick={executeCloseDay}
+                      className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium"
+                    >
+                      Close Day Anyway
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -398,6 +450,68 @@ export default function CloseDayPage() {
                   </div>
                 )}
               </div>
+
+              {/* Ledger Cross-Check — verifies Z-Report totals against canonical financial ledger */}
+              {data.ledgerCrossCheck && (
+                <div className={`mt-3 p-3 rounded-lg border ${data.ledgerCrossCheck.match ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-300'}`}>
+                  <div className="flex items-center gap-2">
+                    {data.ledgerCrossCheck.match ? (
+                      <span className="text-green-600 text-sm font-medium">&#10003; Ledger Verified</span>
+                    ) : (
+                      <span className="text-amber-700 text-sm font-medium">&#9888; Ledger Variance Detected</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1">{data.ledgerCrossCheck.message}</p>
+                  <div className="flex items-center justify-between mt-2 text-xs">
+                    <span className="text-slate-500">Ledger entries: {data.ledgerCrossCheck.ledgerEntryCount ?? '—'}</span>
+                    <span className="text-slate-500">
+                      Ledger total: <CurrencyDisplay amount={(data.ledgerCrossCheck.ledgerTotalRevenueCents || 0) / 100} />
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Outstanding Liabilities — pending commissions, payouts, refunds */}
+              {data.outstandingLiabilities && data.outstandingLiabilities.totalLiabilitiesCents > 0 && (
+                <div className="mt-3 p-4 rounded-lg border border-orange-200 bg-orange-50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm font-medium text-orange-800">Outstanding Liabilities</span>
+                  </div>
+                  <div className="space-y-1.5 text-xs">
+                    {data.outstandingLiabilities.outstandingCommissionsCents > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Pending Commissions</span>
+                        <span className="font-medium text-slate-800">
+                          <CurrencyDisplay amount={data.outstandingLiabilities.outstandingCommissionsCents / 100} />
+                        </span>
+                      </div>
+                    )}
+                    {data.outstandingLiabilities.pendingPayoutsCents > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Pending Payouts</span>
+                        <span className="font-medium text-slate-800">
+                          <CurrencyDisplay amount={data.outstandingLiabilities.pendingPayoutsCents / 100} />
+                        </span>
+                      </div>
+                    )}
+                    {data.outstandingLiabilities.pendingRefundsCents > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">Pending Refunds</span>
+                        <span className="font-medium text-slate-800">
+                          <CurrencyDisplay amount={data.outstandingLiabilities.pendingRefundsCents / 100} />
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-2 border-t border-orange-200">
+                      <span className="font-semibold text-orange-800">Total Liabilities</span>
+                      <span className="font-bold text-orange-900">
+                        <CurrencyDisplay amount={data.outstandingLiabilities.totalLiabilitiesCents / 100} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -18,6 +18,7 @@ import { Clock, CheckCircle, Package, Truck, UtensilsCrossed, AlertCircle, Refre
 import type { GetServerSideProps } from 'next'
 import { useRealtimeMulti } from '@/lib/realtime'
 import { useTranslation } from '@/lib/i18n'
+import { useToast } from '@/components/Toast'
 import StaffGuestIntelligence from '@/components/staff/StaffGuestIntelligence'
 
 const ALLOWED_ROLES = new Set(['OWNER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK', 'ADMIN', 'MANAGER'])
@@ -164,6 +165,7 @@ function OrderCard({ order, onPickup, onDeliver, businessId }: {
 
 export default function WaiterDashboard({ businessId }: { businessId: string }) {
   const { t } = useTranslation()
+  const { showToast } = useToast()
   const [queue, setQueue] = useState<WaiterQueue | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -211,7 +213,7 @@ export default function WaiterDashboard({ businessId }: { businessId: string }) 
       await fetchQueue()
     } catch (err) {
       console.error('Error picking up order:', err)
-      alert('Failed to mark order as picked up')
+      showToast('error', 'Failed to mark order as picked up')
     }
   }
 
@@ -226,7 +228,7 @@ export default function WaiterDashboard({ businessId }: { businessId: string }) 
       await fetchQueue()
     } catch (err) {
       console.error('Error delivering order:', err)
-      alert('Failed to mark order as delivered')
+      showToast('error', 'Failed to mark order as delivered')
     }
   }
 

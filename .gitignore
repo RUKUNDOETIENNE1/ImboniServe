@@ -59,3 +59,8 @@ next-env.d.ts
 # Prisma
 /prisma/migrations/dev.db
 /prisma/migrations/dev.db-journal
+
+# PE-001A: Temporary test output captures
+test-output.txt
+tests-output.txt
+tsc-output.txt

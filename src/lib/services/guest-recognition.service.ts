@@ -18,6 +18,7 @@ import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import { CustomerService } from '@/lib/services/customer.service'
 import { LoyaltyService } from '@/lib/services/loyalty.service'
+import { normalizePhone } from '@/lib/utils/phone'
 
 const log = logger.child({ service: 'guest-recognition' })
 
@@ -113,18 +114,6 @@ function getNextTierThreshold(tier: string): { threshold: number | null; label: 
   const current = VIP_TIER_CONFIG[currentIdx]
   const progress = current.minVisits > 0 ? Math.min(1, 1) : 0 // Will be calculated with actual values
   return { threshold: next.minVisits, label: next.label, progress }
-}
-
-// ---------------------------------------------------------------------------
-// Phone normalization (reused from existing pattern)
-// ---------------------------------------------------------------------------
-
-export function normalizePhone(phone: string): string {
-  const p = phone.trim()
-  if (p.startsWith('+')) return p
-  if (p.startsWith('07')) return `+250${p.slice(1)}`
-  if (p.startsWith('2507')) return `+${p}`
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`
 }
 
 // ---------------------------------------------------------------------------

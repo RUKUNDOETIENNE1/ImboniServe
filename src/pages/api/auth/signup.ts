@@ -11,6 +11,8 @@ import { AttributionResolver, type AttributionResult } from '@/lib/services/attr
 import { AttributionService } from '@/lib/services/attribution.service'
 import { TrialPolicyService } from '@/lib/services/trial-policy.service'
 import { FounderCodeService } from '@/lib/services/founder-code.service'
+import { getCountryDefaults } from '@/lib/utils/country-config'
+import { TaxService } from '@/lib/services/tax.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -132,15 +134,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
     const isFoundingMember = isHospitality && foundingCount < FOUNDING_LIMIT
 
+    // EGR-016: Geography is configuration, never code.
+    // Derive currency, timezone, and tax defaults from the business's country.
+    const country = (input as any).country || 'RW'
+    const countryDefaults = getCountryDefaults(country)
+
     const restaurant = await prisma.business.create({
       data: {
         name: input.businessName,
         city: input.city,
-        country: 'RW',
+        country,
         phone: input.phone,
         ownerId: user.id,
         planId: plan.id,
-        currency: 'RWF',
+        currency: countryDefaults.currency,
+        timezone: countryDefaults.timezone,
+        taxRate: countryDefaults.taxRate,
+        taxMode: countryDefaults.taxMode,
         isActive: true,
         referredByAffiliateId: affiliateId,
         businessType,
@@ -158,6 +168,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         foundingJoinedAt: isFoundingMember ? new Date() : null,
       },
     })
+
+    // Initialize country-specific tax configuration (EGR-016)
+    try {
+      await TaxService.createDefaultTaxConfig(restaurant.id, country)
+    } catch (taxConfigError) {
+      // Tax config initialization failure should not block signup
+      console.error('[Signup] Tax config initialization failed:', taxConfigError)
+    }
 
     await prisma.user.update({
       where: { id: user.id },

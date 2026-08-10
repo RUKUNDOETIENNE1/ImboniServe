@@ -123,7 +123,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: requestTransactionId,
         referenceId: sessionId, // Link to session, not individual order
         amountCents: amountRwfCents,
-        currency: 'RWF',
+        currency: businessCurrency,
         vatAmountCents: 0,
         exVatAmountCents: amountRwfCents,
         gatewayFeeEstimatedCents: gatewayFee,

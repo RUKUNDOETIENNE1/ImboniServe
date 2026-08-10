@@ -2,10 +2,12 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export default function PaymentDetails() {
   const router = useRouter()
   const { id } = router.query
+  const { currency } = useCurrency()
   const [payment, setPayment] = useState<any>(null)
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function PaymentDetails() {
     load()
   }, [id])
 
-  const fmt = (n: number, c = 'RWF') => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
+  const fmt = (n: number, c = currency) => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
   const fdt = (d?: string) => (d ? new Date(d).toLocaleString() : '—')
 
   return (

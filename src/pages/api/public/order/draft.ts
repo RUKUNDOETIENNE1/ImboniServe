@@ -10,15 +10,7 @@ import { formatDateTimeRW } from '@/utils/datetimeRW';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { IdempotencyService } from '@/lib/services/idempotency.service';
-
-function normalizePhone(phone: string | undefined): string | undefined {
-  if (!phone) return undefined;
-  const p = phone.trim();
-  if (p.startsWith('+')) return p;
-  if (p.startsWith('07')) return `+250${p.slice(1)}`;
-  if (p.startsWith('2507')) return `+${p}`;
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`;
-}
+import { normalizePhone } from '@/lib/utils/phone';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -101,7 +93,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'In-venue QR ordering not enabled' });
     }
 
-    const phoneE164 = normalizePhone(phone);
+    const phoneE164 = phone ? normalizePhone(phone) : undefined;
     if (isRemote) {
       if (!phoneE164) {
         return res.status(400).json({ error: 'Phone is required for remote orders' });
@@ -216,7 +208,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             paymentMethod: selectedPaymentMethod as any,
             status: 'PENDING',
             amountCents: amountToCharge,
-            currency: 'RWF',
+            currency: business.currency,
             vatAmountCents: pricing.vatCents,
             exVatAmountCents: pricing.subtotalCents,
             gatewayFeeEstimatedCents: isManualPayment ? 0 : Math.round(amountToCharge * 0.0342),

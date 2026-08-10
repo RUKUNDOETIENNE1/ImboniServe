@@ -8,6 +8,7 @@
  */
 
 import crypto from 'crypto'
+import { fetchWithTimeout, FetchTimeoutError } from '@/lib/utils/fetch-with-timeout'
 import {
   IPaymentProvider,
   PaymentProviderType,
@@ -160,16 +161,39 @@ export class IremboPayProvider implements IPaymentProvider {
         currency: request.currency,
       })
 
-      const response = await fetch(`${this.config.apiUrl}/v1/payments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Merchant-ID': this.config.merchantId,
-          'X-API-Key': this.config.apiKey,
-          'X-Signature': signature,
-        },
-        body: payloadString,
-      })
+      // REL-HIGH-001 (OEC-001C): 30s timeout — payment initiation must not hang indefinitely
+      let response: Response
+      try {
+        response = await fetchWithTimeout(
+          `${this.config.apiUrl}/v1/payments`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Merchant-ID': this.config.merchantId,
+              'X-API-Key': this.config.apiKey,
+              'X-Signature': signature,
+            },
+            body: payloadString,
+          },
+          30_000,
+        )
+      } catch (err: any) {
+        if (err instanceof FetchTimeoutError) {
+          console.error('[IremboPay] Request timed out:', err.message)
+          return {
+            success: false,
+            error: 'IremboPay API request timed out',
+            errorCode: 'TIMEOUT',
+          }
+        }
+        console.error('[IremboPay] Network error:', err?.message)
+        return {
+          success: false,
+          error: `IremboPay network error: ${err?.message ?? String(err)}`,
+          errorCode: 'NETWORK_ERROR',
+        }
+      }
 
       if (!response.ok) {
         console.error('[IremboPay] HTTP error:', response.status, response.statusText)
@@ -245,18 +269,40 @@ export class IremboPayProvider implements IPaymentProvider {
 
       console.log('[IremboPay] Verifying payment:', request.transactionId)
 
-      const response = await fetch(
-        `${this.config.apiUrl}/v1/payments/${request.transactionId}`,
-        {
-          method: 'GET',
-          headers: {
-            'X-Merchant-ID': this.config.merchantId,
-            'X-API-Key': this.config.apiKey,
-            'X-Signature': signature,
-            'X-Timestamp': timestamp,
+      // REL-HIGH-001 (OEC-001C): 15s timeout for verification (shorter than initiation)
+      let response: Response
+      try {
+        response = await fetchWithTimeout(
+          `${this.config.apiUrl}/v1/payments/${request.transactionId}`,
+          {
+            method: 'GET',
+            headers: {
+              'X-Merchant-ID': this.config.merchantId,
+              'X-API-Key': this.config.apiKey,
+              'X-Signature': signature,
+              'X-Timestamp': timestamp,
+            },
           },
+          15_000,
+        )
+      } catch (err: any) {
+        if (err instanceof FetchTimeoutError) {
+          console.error('[IremboPay] Verification timed out:', err.message)
+          return {
+            success: false,
+            status: TransactionStatus.PENDING,
+            transactionId: request.transactionId,
+            error: 'IremboPay verification timed out',
+          }
         }
-      )
+        console.error('[IremboPay] Verification network error:', err?.message)
+        return {
+          success: false,
+          status: TransactionStatus.PENDING,
+          transactionId: request.transactionId,
+          error: `IremboPay network error: ${err?.message ?? String(err)}`,
+        }
+      }
 
       if (!response.ok) {
         console.error('[IremboPay] Verification HTTP error:', response.status)

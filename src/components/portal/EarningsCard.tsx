@@ -3,6 +3,7 @@
  */
 
 import { Wallet, Clock, CheckCircle, DollarSign, TrendingUp } from 'lucide-react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 interface EarningsCardProps {
   currentMonthCents: number
@@ -14,13 +15,12 @@ interface EarningsCardProps {
   compact?: boolean
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 export default function EarningsCard({
   currentMonthCents, lifetimeCents, pendingCents, approvedCents, paidCents, upcomingPayoutCents, compact,
 }: EarningsCardProps) {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const items = [
     { label: 'Current Month', value: currentMonthCents, icon: TrendingUp, color: 'text-blue-600' },
     { label: 'Lifetime Earnings', value: lifetimeCents, icon: Wallet, color: 'text-slate-700' },

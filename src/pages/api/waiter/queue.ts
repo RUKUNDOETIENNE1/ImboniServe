@@ -16,6 +16,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 interface StationProgress {
   stationId: string
@@ -63,6 +64,13 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const businessId = ctx.businessId
 
+    // Fetch business timezone for timezone-aware day boundary
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true },
+    })
+    const { start: dayStart } = getBusinessDayBoundary(new Date(), business?.timezone)
+
     // Fetch active orders with their items and station assignments
     const orders = await prisma.sale.findMany({
       where: {
@@ -73,7 +81,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         },
         // Only show orders from today (operational view)
         createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          gte: dayStart,
         },
       },
       include: {

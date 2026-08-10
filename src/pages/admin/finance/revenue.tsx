@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import type { GetServerSideProps } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -15,6 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 export default function RevenueReport() {
+  const { currency } = useCurrency()
   const [data, setData] = useState<any>(null)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -34,7 +36,7 @@ export default function RevenueReport() {
     load()
   }, [])
 
-  const fmt = (n: number, c = 'RWF') => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
+  const fmt = (n: number, c = currency) => new Intl.NumberFormat('en-RW', { style: 'currency', currency: c, minimumFractionDigits: 0 }).format((n || 0) / 100)
 
   return (
     <DashboardLayout>

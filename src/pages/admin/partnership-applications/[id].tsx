@@ -28,6 +28,7 @@ import {
   ChevronRight,
   Rocket,
 } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -83,6 +84,7 @@ export default function ApplicationDetailPage({ userRoles }: { userRoles: string
   const router = useRouter()
   const { id } = router.query
   const { status: authStatus } = useSession()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
   const [application, setApplication] = useState<ApplicationDetail | null>(null)
   const [timeline, setTimeline] = useState<any[]>([])
@@ -143,11 +145,11 @@ export default function ApplicationDetailPage({ userRoles }: { userRoles: string
         await loadData()
       } else {
         const err = await res.json()
-        alert(err.error || 'Action failed')
+        showToast('error', err.error || 'Action failed')
       }
     } catch (err) {
       console.error('Action failed:', err)
-      alert('Action failed')
+      showToast('error', 'Action failed')
     } finally {
       setActionLoading(false)
     }
@@ -161,7 +163,7 @@ export default function ApplicationDetailPage({ userRoles }: { userRoles: string
 
   const handleReject = () => {
     if (!rejectReason.trim()) {
-      alert('Rejection reason is required')
+      showToast('warning', 'Rejection reason is required')
       return
     }
     performAction('reject', { reason: rejectReason })

@@ -4,6 +4,7 @@
 
 import { Tag, Copy, Share2, QrCode, Users, TrendingUp, Clock, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export interface FounderCodeData {
   id: string
@@ -28,10 +29,6 @@ interface FounderCodeCardProps {
   shareUrl?: string
 }
 
-function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', maximumFractionDigits: 0 }).format(cents / 100)
-}
-
 const statusColors: Record<string, string> = {
   ACTIVE: 'bg-emerald-100 text-emerald-700',
   PAUSED: 'bg-amber-100 text-amber-700',
@@ -41,6 +38,9 @@ const statusColors: Record<string, string> = {
 }
 
 export default function FounderCodeCard({ code, shareUrl }: FounderCodeCardProps) {
+  const { currency } = useCurrency()
+  const formatCurrency = (cents: number): string =>
+    new Intl.NumberFormat('en-RW', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {

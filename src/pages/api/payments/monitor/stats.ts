@@ -4,6 +4,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -25,11 +26,14 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'No business associated', code: 'NO_BUSINESS' })
     }
 
+    // Get business timezone for timezone-aware day boundary
+    const business = await prisma.business.findUnique({
+      where: { id: user.businessId },
+      select: { timezone: true },
+    })
     // Get today's date range
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    const { start: today, end: todayEnd } = getBusinessDayBoundary(new Date(), business?.timezone)
+    const tomorrow = new Date(todayEnd.getTime() + 1)
 
     // Fetch today's stats
     const [todayTransactions, pendingCount, failedCount, recentPayments] = await Promise.all([

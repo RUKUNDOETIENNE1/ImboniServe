@@ -32,6 +32,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    // Fetch business currency for the transaction record
+    // Note: InTouch may only support RWF — this is a provider constraint.
+    // We still read from business.currency for the transaction record.
+    const business = await prisma.business.findUnique({
+      where: { id: ctx.businessId },
+      select: { currency: true }
+    })
+
     // Generate unique transaction ID
     const requestTransactionId = InTouchService.generateRequestTransactionId()
 
@@ -55,7 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: requestTransactionId,
         referenceId: orderId,
         amountCents: totalAmount * 100,
-        currency: 'RWF',
+        currency: business?.currency || 'RWF',
         vatAmountCents: 0,
         exVatAmountCents: totalAmount * 100,
         gatewayFeeEstimatedCents: gatewayFee * 100, // 3% InTouch fee (internal)

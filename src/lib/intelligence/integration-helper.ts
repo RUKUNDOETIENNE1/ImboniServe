@@ -13,6 +13,7 @@ import type {
   StructuredIntelligenceReport,
   PipelineContext,
 } from '@/lib/intelligence'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export interface ReportCacheOptions {
   businessId: string
@@ -243,7 +244,7 @@ export async function getHistoricalEvidence(businessId: string, type: string) {
 /**
  * Build time range from period selection
  */
-export function buildTimeRange(period: string, customRange?: { start: string; end: string }): {
+export function buildTimeRange(period: string, customRange?: { start: string; end: string }, timezone: string = 'Africa/Kigali'): {
   start: string
   end: string
   label: string
@@ -252,10 +253,7 @@ export function buildTimeRange(period: string, customRange?: { start: string; en
 
   switch (period) {
     case 'today':
-      const todayStart = new Date(now)
-      todayStart.setHours(0, 0, 0, 0)
-      const todayEnd = new Date(now)
-      todayEnd.setHours(23, 59, 59, 999)
+      const { start: todayStart, end: todayEnd } = getBusinessDayBoundary(now, timezone)
       return {
         start: todayStart.toISOString(),
         end: todayEnd.toISOString(),
@@ -265,10 +263,7 @@ export function buildTimeRange(period: string, customRange?: { start: string; en
     case 'yesterday':
       const yesterday = new Date(now)
       yesterday.setDate(yesterday.getDate() - 1)
-      const yesterdayStart = new Date(yesterday)
-      yesterdayStart.setHours(0, 0, 0, 0)
-      const yesterdayEnd = new Date(yesterday)
-      yesterdayEnd.setHours(23, 59, 59, 999)
+      const { start: yesterdayStart, end: yesterdayEnd } = getBusinessDayBoundary(yesterday, timezone)
       return {
         start: yesterdayStart.toISOString(),
         end: yesterdayEnd.toISOString(),
@@ -276,9 +271,9 @@ export function buildTimeRange(period: string, customRange?: { start: string; en
       }
 
     case 'this_week':
-      const weekStart = new Date(now)
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay())
-      weekStart.setHours(0, 0, 0, 0)
+      const sunday = new Date(now)
+      sunday.setDate(sunday.getDate() - sunday.getDay())
+      const { start: weekStart } = getBusinessDayBoundary(sunday, timezone)
       return {
         start: weekStart.toISOString(),
         end: now.toISOString(),

@@ -2,6 +2,7 @@ import type { BusinessInsight } from '@/lib/die/business-intelligence/reasoning-
 import type { SystemCorrelationReport } from '@/lib/die/intelligence-core/types'
 import { shadowObservability } from '@/lib/die/business-as-plugin/shadow/shadow-observability'
 import { analyzeSeries, type TrendDirection } from '@/lib/die/intelligence-core/trend-utils'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export type FeedItem = ReturnType<typeof shadowObservability.list>[number]
 
@@ -189,7 +190,7 @@ function compareWindows(curStart: number, curEnd: number, prevStart: number, pre
   return { current: cur, previous: prev, direction: a.direction, momentum: a.momentum, acceleration: a.acceleration }
 }
 
-export function getTemporalComparisons() {
+export function getTemporalComparisons(timezone: string = 'Africa/Kigali') {
   const now = Date.now()
   const h = 60 * 60 * 1000
   const d = 24 * 60 * 60 * 1000
@@ -202,15 +203,15 @@ export function getTemporalComparisons() {
     risk: compareWindows(now - h, now, now - 2*h, now - h, (s) => s.riskCount),
     anomaly: compareWindows(now - h, now, now - 2*h, now - h, (s) => s.anomalyCount),
   }
-  const todayStart = new Date(); todayStart.setHours(0,0,0,0)
-  const yesterdayStart = new Date(todayStart.getTime() - d)
+  const todayStart = getBusinessDayBoundary(new Date(), timezone).start.getTime()
+  const yesterdayStart = todayStart - d
   const day = {
-    demand: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.demand),
-    operationalPressure: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.operationalPressure),
-    supplyRisk: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.supplyRisk),
-    customerActivity: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.customerActivity),
-    risk: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.riskCount),
-    anomaly: compareWindows(todayStart.getTime(), now, yesterdayStart.getTime(), todayStart.getTime(), (s) => s.anomalyCount),
+    demand: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.demand),
+    operationalPressure: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.operationalPressure),
+    supplyRisk: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.supplyRisk),
+    customerActivity: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.customerActivity),
+    risk: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.riskCount),
+    anomaly: compareWindows(todayStart, now, yesterdayStart, todayStart, (s) => s.anomalyCount),
   }
   const week = {
     demand: compareWindows(now - w, now, now - 2*w, now - w, (s) => s.demand),

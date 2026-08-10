@@ -14,6 +14,7 @@ import ExceptionPanel, { OpsException } from '@/components/partnerships/Exceptio
 import ResolutionPanel from '@/components/partnerships/ResolutionPanel'
 import SystemHealthWidget from '@/components/partnerships/SystemHealthWidget'
 import { Loader2, AlertCircle, RefreshCw, Search, Activity, GitBranch, Link2, Megaphone, History, AlertTriangle, Wrench, Heart } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 interface OperationsData {
   searchResults: { query: string; results: SearchResult[]; total: number } | null
@@ -42,6 +43,7 @@ function SectionHeader({ icon: Icon, title }: { icon: any; title: string }) {
 }
 
 export default function OperationsIntelligenceWorkspace({ canResolve }: Props) {
+  const { showToast } = useToast()
   const [data, setData] = useState<OperationsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -109,15 +111,15 @@ export default function OperationsIntelligenceWorkspace({ canResolve }: Props) {
       })
       if (!res.ok) {
         const err = await res.json()
-        alert(`Action failed: ${err.error || 'Unknown error'}`)
+        showToast('error', `Action failed: ${err.error || 'Unknown error'}`)
         return
       }
       // Reload data after successful action
       loadData({ entityId: selectedEntityId ?? undefined })
     } catch (err: any) {
-      alert(`Action failed: ${err.message}`)
+      showToast('error', `Action failed: ${err.message}`)
     }
-  }, [loadData, selectedEntityId])
+  }, [loadData, selectedEntityId, showToast])
 
   const handleExceptionAction = useCallback((action: string, exception: OpsException) => {
     if (exception.affectedEntities && exception.affectedEntities.length > 0) {

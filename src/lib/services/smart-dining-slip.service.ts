@@ -330,7 +330,7 @@ export class SmartDiningSlipService {
       select: { taxMode: true, taxRate: true }
     })
     
-    const taxRate = buyerBusiness?.taxRate || 18.0
+    const taxRate = buyerBusiness?.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
     const taxMode = buyerBusiness?.taxMode || 'EXCLUSIVE'
     
     let vatCents: number

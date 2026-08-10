@@ -1,11 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { prisma } from '@/lib/prisma'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
-function startOfDay(d = new Date()) {
-  const x = new Date(d)
-  x.setHours(0, 0, 0, 0)
-  return x
+function startOfDay(d: Date, timezone?: string) {
+  return getBusinessDayBoundary(d, timezone).start
 }
 
 // Server-side connection cap to prevent DB overload from many simultaneous SSE clients
@@ -25,6 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
   const { businessId } = ctx
+
+  // Fetch business timezone for timezone-aware day boundary
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true },
+  })
+  const tz = business?.timezone
 
   // SSE headers
   res.setHeader('Content-Type', 'text/event-stream')
@@ -77,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         take: 20,
       })
 
-      const todayStart = startOfDay()
+      const todayStart = startOfDay(new Date(), tz)
       const hourStart = new Date(Date.now() - 60 * 60 * 1000)
 
       const [ocrProcessingCount, extractedCount, reviewCount, approvedCount, appliedCount, failedCount] = await Promise.all([

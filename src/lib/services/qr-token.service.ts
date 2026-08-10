@@ -7,8 +7,39 @@ import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
-const QR_SECRET = process.env.IMBONI_QR_SECRET || 'default-qr-secret-change-in-production';
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'default-jwt-secret';
+/**
+ * Security: Fail-closed secret resolution.
+ *
+ * In production, missing secrets MUST cause an explicit error rather than
+ * silently falling back to a predictable default.  A predictable default
+ * would allow anyone who reads the source code to forge QR signatures and
+ * JWT access tokens.
+ *
+ * In development / test, a fixed default is retained so local workflows
+ * keep working without requiring every developer to set env vars, but a
+ * console warning is emitted so the default is never mistaken for a real
+ * secret.
+ */
+const isProduction = process.env.NODE_ENV === 'production'
+
+function resolveSecret(envVar: string, devDefault: string, label: string): string {
+  const value = process.env[envVar]
+  if (value) return value
+  if (isProduction) {
+    throw new Error(
+      `SECURITY FATAL: ${envVar} is not set in production. ` +
+      `Refusing to use default ${label} secret. Set ${envVar} in the production environment.`
+    )
+  }
+  console.warn(
+    `⚠️  SECURITY WARNING: ${envVar} is not set. Using development default for ${label}. ` +
+    `This MUST NOT be used in production.`
+  )
+  return devDefault
+}
+
+const QR_SECRET = resolveSecret('IMBONI_QR_SECRET', 'default-qr-secret-change-in-production', 'QR token')
+const JWT_SECRET = resolveSecret('NEXTAUTH_SECRET', 'default-jwt-secret', 'JWT access token')
 const TOKEN_TTL_MINUTES = 10;
 
 export interface QRTokenClaims {

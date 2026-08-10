@@ -14,6 +14,7 @@
  */
 
 import crypto from 'crypto'
+import { normalizePhoneForProvider } from '@/lib/utils/phone'
 
 interface RequestPaymentParams {
   amount: number
@@ -72,31 +73,6 @@ export class InTouchService {
   }
 
   /**
-   * Normalize phone number to Rwanda format (07XXXXXXXX)
-   */
-  private static normalizePhone(phone: string): string {
-    // Remove all non-digit characters
-    let cleaned = phone.replace(/\D/g, '')
-    
-    // Handle international format (+250788123456 or 250788123456)
-    if (cleaned.startsWith('250')) {
-      cleaned = '0' + cleaned.substring(3)
-    }
-    
-    // Ensure it starts with 07
-    if (!cleaned.startsWith('07')) {
-      throw new Error('Invalid phone number format. Must start with 07 or +250')
-    }
-    
-    // Ensure it's 10 digits
-    if (cleaned.length !== 10) {
-      throw new Error('Invalid phone number length. Must be 10 digits (07XXXXXXXX)')
-    }
-    
-    return cleaned
-  }
-
-  /**
    * Request payment from customer (debit)
    * Customer will receive USSD prompt to approve via *182#
    */
@@ -107,7 +83,7 @@ export class InTouchService {
 
     const timestamp = this.generateTimestamp()
     const password = this.generatePassword(timestamp)
-    const mobilePhoneNo = this.normalizePhone(params.mobilePhoneNo)
+    const mobilePhoneNo = normalizePhoneForProvider(params.mobilePhoneNo)
 
     const payload = {
       username: this.USERNAME,
@@ -159,7 +135,7 @@ export class InTouchService {
 
     const timestamp = this.generateTimestamp()
     const password = this.generatePassword(timestamp)
-    const mobilePhoneNo = this.normalizePhone(params.mobilePhoneNo)
+    const mobilePhoneNo = normalizePhoneForProvider(params.mobilePhoneNo)
 
     const payload = {
       username: this.USERNAME,

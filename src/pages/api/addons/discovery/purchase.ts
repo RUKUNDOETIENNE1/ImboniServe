@@ -38,7 +38,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const business = await prisma.business.findUnique({
       where: { id: businessId },
-      select: { id: true, name: true }
+      select: { id: true, name: true, taxRate: true, currency: true }
     });
 
     if (!business) {
@@ -47,7 +47,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
     // Calculate amounts
     const grossAmountCents = PRICING[tier as keyof typeof PRICING];
-    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents);
+    const taxRate = business.taxRate ?? 0; // 0 means no tax configured — business should configure their tax rate
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents, taxRate);
     const gatewayFeeEstimatedCents = IremboPayService.calculateGatewayFee(grossAmountCents);
     const netToBusinessCents = IremboPayService.calculateNetToBusinessCents(
       grossAmountCents,
@@ -77,7 +78,7 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         paymentMethod: 'WEB',
         status: 'PENDING',
         amountCents: grossAmountCents,
-        currency: 'RWF',
+        currency: business.currency,
         vatAmountCents,
         exVatAmountCents,
         gatewayFeeEstimatedCents,

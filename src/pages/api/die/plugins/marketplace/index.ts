@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PluginMarketplaceService } from '@/lib/die/plugins/marketplace/plugin-marketplace.service'
+import { requirePermission } from '@/lib/middleware/permission.middleware'
 
 const service = new PluginMarketplaceService()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
       const list = await service.listAvailablePlugins()
@@ -16,3 +17,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: e?.message ?? 'Internal error' })
   }
 }
+
+export default requirePermission('die.view')(handler)

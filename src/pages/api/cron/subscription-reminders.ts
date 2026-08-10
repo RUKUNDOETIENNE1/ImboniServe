@@ -8,15 +8,17 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { EmailService } from '@/lib/services/email.service'
 import { SubscriptionStatus } from '@prisma/client'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  // Verify cron secret for security
-  const cronSecret = req.headers['x-cron-secret'] || req.query.secret
-  if (cronSecret !== process.env.CRON_SECRET) {
+  // Verify cron secret for security — fail closed, standard Bearer auth
+  const authHeader = req.headers.authorization
+  const expectedSecret = process.env.CRON_SECRET
+  if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
@@ -37,12 +39,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]
 
     for (const window of reminderWindows) {
-      const targetDate = new Date(now)
-      targetDate.setDate(targetDate.getDate() + window.days)
-      targetDate.setHours(0, 0, 0, 0)
-
-      const nextDay = new Date(targetDate)
-      nextDay.setDate(nextDay.getDate() + 1)
+      const targetRef = new Date(now)
+      targetRef.setDate(targetRef.getDate() + window.days)
+      const { start: targetDate, end: dayEnd } = getBusinessDayBoundary(targetRef)
+      const nextDay = new Date(dayEnd.getTime() + 1)
 
       // Find subscriptions expiring in this window
       const subscriptions = await prisma.subscription.findMany({
@@ -58,7 +58,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         include: {
           business: {
-            include: {
+            select: {
+              name: true,
+              timezone: true,
               owner: true,
             },
           },
@@ -68,55 +70,63 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`[Subscription Reminders] Found ${subscriptions.length} subscriptions for ${window.label}`)
 
-      for (const subscription of subscriptions) {
-        try {
-          const owner = subscription.business.owner
-          const plan = subscription.plan
+      // Process reminders in parallel batches of 10 to avoid sequential N+1 pattern
+      const BATCH_SIZE = 10
+      for (let i = 0; i < subscriptions.length; i += BATCH_SIZE) {
+        const batch = subscriptions.slice(i, i + BATCH_SIZE)
+        const results = await Promise.allSettled(
+          batch.map(async (subscription) => {
+            try {
+              const owner = subscription.business.owner
+              const plan = subscription.plan
 
-          // Send reminder email
-          const emailResult = await EmailService.sendSubscriptionReminder({
-            to: owner.email,
-            name: owner.name,
-            businessName: subscription.business.name,
-            planName: plan.name,
-            expiryDate: subscription.endDate,
-            daysUntilExpiry: window.days,
-            renewalUrl: `${process.env.APP_URL}/dashboard/billing?action=renew&subscriptionId=${subscription.id}`,
+              // Send reminder email
+              const emailResult = await EmailService.sendSubscriptionReminder({
+                to: owner.email,
+                name: owner.name,
+                businessName: subscription.business.name,
+                planName: plan.name,
+                expiryDate: subscription.endDate,
+                daysUntilExpiry: window.days,
+                renewalUrl: `${process.env.APP_URL}/dashboard/billing?action=renew&subscriptionId=${subscription.id}`,
+              })
+
+              if (emailResult.success) {
+                return {
+                  subscriptionId: subscription.id,
+                  businessId: subscription.businessId,
+                  email: owner.email,
+                  window: window.label,
+                  status: 'sent' as const,
+                }
+              } else {
+                console.error('[Subscription Reminders] Email failed:', emailResult.error)
+                return {
+                  subscriptionId: subscription.id,
+                  businessId: subscription.businessId,
+                  email: owner.email,
+                  window: window.label,
+                  status: 'failed' as const,
+                  error: emailResult.error,
+                }
+              }
+            } catch (error: any) {
+              console.error('[Subscription Reminders] Error sending reminder:', error)
+              return {
+                subscriptionId: subscription.id,
+                businessId: subscription.businessId,
+                window: window.label,
+                status: 'error' as const,
+                error: error.message,
+              }
+            }
           })
+        )
 
-          if (emailResult.success) {
-            reminders.push({
-              subscriptionId: subscription.id,
-              businessId: subscription.businessId,
-              email: owner.email,
-              window: window.label,
-              status: 'sent',
-            })
-          } else {
-            console.error('[Subscription Reminders] Email failed:', emailResult.error)
-            reminders.push({
-              subscriptionId: subscription.id,
-              businessId: subscription.businessId,
-              email: owner.email,
-              window: window.label,
-              status: 'failed',
-              error: emailResult.error,
-            })
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            reminders.push(result.value)
           }
-
-          // Optional: Send SMS/WhatsApp (future)
-          // if (owner.phone && owner.whatsappEnabled) {
-          //   await NotificationService.sendWhatsApp(owner.phone, reminderMessage)
-          // }
-        } catch (error: any) {
-          console.error('[Subscription Reminders] Error sending reminder:', error)
-          reminders.push({
-            subscriptionId: subscription.id,
-            businessId: subscription.businessId,
-            window: window.label,
-            status: 'error',
-            error: error.message,
-          })
         }
       }
     }

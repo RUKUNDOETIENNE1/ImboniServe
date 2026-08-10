@@ -8,6 +8,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -44,8 +45,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Get today's orders that have items assigned to this station
-    const startOfDay = new Date()
-    startOfDay.setHours(0, 0, 0, 0)
+    const business = await prisma.business.findUnique({
+      where: { id: station.businessId },
+      select: { timezone: true }
+    })
+    const { start: startOfDay } = getBusinessDayBoundary(new Date(), business?.timezone)
 
     const sales = await prisma.sale.findMany({
       where: {

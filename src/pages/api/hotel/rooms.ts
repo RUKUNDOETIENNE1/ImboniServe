@@ -4,7 +4,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { CustomerService } from '@/lib/services/customer.service'
-import { normalizePhone } from '@/lib/services/guest-recognition.service'
+import { normalizePhone } from '@/lib/utils/phone'
 
 const createSchema = z.object({
   roomNumber: z.string().min(1),

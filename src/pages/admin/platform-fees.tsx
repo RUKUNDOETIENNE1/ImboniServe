@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import type { GetServerSideProps } from 'next';
 import Card from '@/components/ui/Card';
+import { useToast } from '@/components/Toast';
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
+import { useCurrency } from '@/contexts/LocaleContext';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -26,11 +29,14 @@ interface FeeConfig {
 
 export default function PlatformFeesAdmin() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { currency } = useCurrency();
   const [fees, setFees] = useState<FeeConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingFee, setEditingFee] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number>(0);
   const [saving, setSaving] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     fetchFees();
@@ -41,6 +47,7 @@ export default function PlatformFeesAdmin() {
       const response = await fetch('/api/admin/platform-fees');
       const data = await response.json();
       setFees(data.fees || []);
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching fees:', error);
     } finally {
@@ -69,11 +76,11 @@ export default function PlatformFeesAdmin() {
         await fetchFees();
         setEditingFee(null);
       } else {
-        alert('Failed to update fee');
+        showToast('error', 'Failed to update fee');
       }
     } catch (error) {
       console.error('Error updating fee:', error);
-      alert('Error updating fee');
+      showToast('error', 'Error updating fee');
     } finally {
       setSaving(false);
     }
@@ -118,6 +125,7 @@ export default function PlatformFeesAdmin() {
           <p className="text-gray-600 mt-2">
             Manage all platform fees from a centralized dashboard. Changes take effect immediately.
           </p>
+          <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
         </div>
 
         {/* Fee Cards */}
@@ -195,7 +203,7 @@ export default function PlatformFeesAdmin() {
                   <div className="bg-gray-50 rounded-lg p-3 text-sm">
                     <div className="font-medium text-gray-700 mb-1">Example:</div>
                     <div className="text-gray-600">
-                      On RWF 100,000: <span className="font-semibold">RWF {(100000 * fee.feePercent / 100).toLocaleString()}</span> fee
+                      On {currency} 100,000: <span className="font-semibold">{currency} {(100000 * fee.feePercent / 100).toLocaleString()}</span> fee
                     </div>
                   </div>
                 </div>
