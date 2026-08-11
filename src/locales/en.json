@@ -1334,6 +1334,9 @@
     "save_time": "Save time on creating menus, posters, table tents, stickers, coasters, A-frames, and more."
   },
   "public": {
+    "meta": {
+      "description": "Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments."
+    },
     "nav": {
       "features": "Features",
       "pricing": "Pricing",

@@ -1321,6 +1321,9 @@
     "save_time": "Gagnez du temps sur la création de menus, affiches, chevalets de table, autocollants, dessous de verre, cadres en A, et plus encore."
   },
   "public": {
+    "meta": {
+      "description": "Imboni Serve est une plateforme moderne pour les entreprises d'hôtellerie : commande par QR, opérations en temps réel, analyses IA et paiements mobiles."
+    },
     "nav": {
       "features": "Fonctionnalités",
       "pricing": "Tarifs",

@@ -1334,6 +1334,9 @@
     "save_time": "Zigama igihe ukoresheje Templates zacu za Menu, Poster, Table Tent, Sticker, Coaster, A-Frame, Business Card, Gift Card n'izindi."
   },
   "public": {
+    "meta": {
+      "description": "Imboni Serve ni urubuga rushya rw'ubucuruzi bwo kwakira abakiriya: gutoza kuri QR, ibikorwa bya buri munsi, ibyifuzo bya AI, n'amafaranga yo kwishyurwa kuri telefoni."
+    },
     "nav": {
       "features": "Ibiranga",
       "pricing": "Ibiciro",

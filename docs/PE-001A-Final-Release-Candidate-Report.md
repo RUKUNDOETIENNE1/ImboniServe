@@ -11,8 +11,8 @@
 |---|---|
 | Branch | main |
 | Base commit | 1b7f324cf01a57ca47bf2c8e5d12b29f19742354 |
-| Release commit | (to be recorded after commit) |
-| Push status | (to be recorded after push) |
+| Release commit | 585a3874d5f2dd085d668e29af0b9340301904ca |
+| Push status | PUSHED — Local HEAD = Remote HEAD |
 | Remote | origin → https://github.com/RUKUNDOETIENNE1/ImboniServe.git |
 
 ## What This Release Candidate Contains

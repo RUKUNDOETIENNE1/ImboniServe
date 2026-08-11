@@ -5,6 +5,8 @@ import rwTranslations from '@/locales/rw.json'
 
 export type Locale = 'en' | 'rw' | 'fr'
 
+export const defaultLocale: Locale = 'en'
+
 const translations: Record<Locale, any> = {
   en: enTranslations as any,
   rw: rwTranslations as any,
