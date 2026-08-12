@@ -16,6 +16,7 @@ import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalizati
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
 import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 import { ReservationService } from '@/lib/services/reservation.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -128,7 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ message: 'Already processed' })
     }
 
-    // Update transaction with webhook data
+    // Map provider status to internal status
     const mappedStatus: PaymentTransactionStatus =
       webhookPayload.status === TransactionStatus.SUCCESS
         ? PaymentTransactionStatus.SUCCESS
@@ -143,40 +144,147 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Use the validated signature captured earlier (if present)
     const signatureToStore = intouchSignature
 
-    await prisma.paymentTransaction.update({
-      where: { id: transaction.id },
-      data: {
-        status: mappedStatus,
-        paidAt: mappedStatus === PaymentTransactionStatus.SUCCESS ? webhookPayload.timestamp : null,
-        webhookSignature: signatureToStore,
-        webhookTimestamp: BigInt(webhookPayload.timestamp.getTime()),
-        webhookVerified: true,
-        rawCallback: webhookPayload.rawPayload,
-      },
-    })
+    // MPCA-001A (BLK-004): For SUCCESS status with a linked Sale, route through
+    // the canonical PaymentCompletionService to ensure atomic financial truth:
+    //   Sale → COMPLETED + PaymentTransaction → SUCCESS + FinancialLedgerEntry
+    // This prevents the inconsistency where PaymentTransaction is SUCCESS but
+    // Sale remains ACTIVE and no FinancialLedgerEntry is created.
+    // For non-Sale transactions (subscriptions, marketplace, reservations, tap-and-leave),
+    // the existing direct update path is retained as those have their own completion logic.
+    let saleCompletedViaCanonicalPath = false
+
+    if (mappedStatus === PaymentTransactionStatus.SUCCESS) {
+      // Find Sale linked to this PaymentTransaction
+      const sale = await prisma.sale.findFirst({
+        where: { paymentTransactionId: transaction.id },
+        select: {
+          id: true,
+          businessId: true,
+          totalAmountCents: true,
+          paymentStatus: true,
+          status: true,
+        },
+      })
+
+      if (sale) {
+        // Business isolation: Sale must belong to the same business as the PaymentTransaction
+        if (sale.businessId !== transaction.businessId) {
+          console.error('[InTouch Webhook] Business isolation violation:', {
+            transactionId: transaction.id,
+            transactionBusinessId: transaction.businessId,
+            saleBusinessId: sale.businessId,
+          })
+          await AlertDeliveryService.deliver({
+            severity: 'error',
+            title: 'InTouch webhook business isolation violation',
+            details: {
+              transactionId: transaction.id,
+              transactionBusinessId: transaction.businessId,
+              saleBusinessId: sale.businessId,
+            },
+          })
+          return res.status(403).json({ error: 'Business isolation violation' })
+        }
+
+        // Amount validation: PaymentTransaction amount must match Sale total
+        // Note: InTouch webhook does not include the provider amount, so we validate
+        // internal consistency between PaymentTransaction and Sale.
+        if (sale.totalAmountCents !== transaction.amountCents) {
+          console.error('[InTouch Webhook] Amount mismatch:', {
+            transactionId: transaction.id,
+            transactionAmountCents: transaction.amountCents,
+            saleTotalAmountCents: sale.totalAmountCents,
+          })
+          await AlertDeliveryService.deliver({
+            severity: 'error',
+            title: 'InTouch webhook amount mismatch',
+            details: {
+              transactionId: transaction.id,
+              transactionAmountCents: transaction.amountCents,
+              saleTotalAmountCents: sale.totalAmountCents,
+            },
+          })
+          // Do NOT complete the sale — financial truth cannot be established
+          return res.status(422).json({ error: 'Amount mismatch — payment cannot be completed' })
+        }
+
+        // Delegate to canonical PaymentCompletionService for atomic financial truth.
+        // This atomically: Sale → COMPLETED, PaymentTransaction → SUCCESS, FinancialLedgerEntry → created.
+        // Idempotent: if Sale is already COMPLETED, the updateMany guard skips and no duplicate ledger entry is created.
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            transaction.id,
+            sale.id,
+            { source: 'intouch-webhook' }
+          )
+          saleCompletedViaCanonicalPath = true
+          console.log('[InTouch Webhook] Sale completed via canonical PaymentCompletionService:', {
+            transactionId: transaction.id,
+            saleId: sale.id,
+          })
+        } catch (completionError) {
+          console.error('[InTouch Webhook] PaymentCompletionService failed — sale NOT completed:', {
+            transactionId: transaction.id,
+            saleId: sale.id,
+            error: String(completionError),
+          })
+          // The transaction rolled back — Sale is NOT COMPLETED, PaymentTransaction is NOT SUCCESS.
+          // Return 500 so InTouch retries the webhook.
+          return res.status(500).json({ error: 'Payment completion failed — will retry' })
+        }
+
+        // Store webhook metadata (separate from financial state — audit data only)
+        await prisma.paymentTransaction.update({
+          where: { id: transaction.id },
+          data: {
+            webhookSignature: signatureToStore,
+            webhookTimestamp: BigInt(webhookPayload.timestamp.getTime()),
+            webhookVerified: true,
+            rawCallback: webhookPayload.rawPayload,
+          },
+        })
+      }
+    }
+
+    // For non-SUCCESS status, or SUCCESS without a linked Sale (subscription, marketplace,
+    // reservation, tap-and-leave), update PaymentTransaction status directly.
+    // This preserves the existing behavior for non-sale payment flows.
+    if (!saleCompletedViaCanonicalPath) {
+      await prisma.paymentTransaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: mappedStatus,
+          paidAt: mappedStatus === PaymentTransactionStatus.SUCCESS ? webhookPayload.timestamp : null,
+          webhookSignature: signatureToStore,
+          webhookTimestamp: BigInt(webhookPayload.timestamp.getTime()),
+          webhookVerified: true,
+          rawCallback: webhookPayload.rawPayload,
+        },
+      })
+
+      // Log billing event for transaction result
+      const eventType: BillingEventType =
+        mappedStatus === PaymentTransactionStatus.SUCCESS
+          ? BillingEventType.PAYMENT_SUCCESS
+          : mappedStatus === PaymentTransactionStatus.CANCELLED
+          ? BillingEventType.PAYMENT_CANCELLED
+          : mappedStatus === PaymentTransactionStatus.REFUNDED
+          ? BillingEventType.PAYMENT_REFUNDED
+          : mappedStatus === PaymentTransactionStatus.PROCESSING
+          ? BillingEventType.PAYMENT_PROCESSING
+          : BillingEventType.PAYMENT_FAILED
+
+      await logBillingEvent({
+        businessId: transaction.businessId,
+        paymentTransactionId: transaction.id,
+        eventType,
+        metadata: webhookPayload.rawPayload as any,
+      })
+    }
 
     counter('webhook_processed_total', 'Webhooks processed').inc({ provider: 'intouch', status: mappedStatus })
     const domain = (transaction as any).marketplaceOrderId ? 'marketplace' : (transaction.subscriptionId ? 'subscription' : 'general')
     counter('payments_status_total', 'Payments by status').inc({ provider: 'intouch', status: mappedStatus, domain })
-
-    // Log billing event for transaction result
-    const eventType: BillingEventType =
-      mappedStatus === PaymentTransactionStatus.SUCCESS
-        ? BillingEventType.PAYMENT_SUCCESS
-        : mappedStatus === PaymentTransactionStatus.CANCELLED
-        ? BillingEventType.PAYMENT_CANCELLED
-        : mappedStatus === PaymentTransactionStatus.REFUNDED
-        ? BillingEventType.PAYMENT_REFUNDED
-        : mappedStatus === PaymentTransactionStatus.PROCESSING
-        ? BillingEventType.PAYMENT_PROCESSING
-        : BillingEventType.PAYMENT_FAILED
-
-    await logBillingEvent({
-      businessId: transaction.businessId,
-      paymentTransactionId: transaction.id,
-      eventType,
-      metadata: webhookPayload.rawPayload as any,
-    })
 
     const rawRequest = (transaction.rawRequest as any) || {}
 
