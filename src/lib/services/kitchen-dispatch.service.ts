@@ -11,6 +11,7 @@ import { triggerEvent } from '@/lib/pusher-server'
 import { RoutingService } from './routing.service'
 import { TicketEventService } from './ticket-event.service'
 import { ingestKDSShadowEvent } from '@/lib/die/business-as-plugin/kds/kds.shadow'
+import { PromiseEngine } from '@/lib/promise-engine'
 
 export interface KitchenOrderItem {
   menuItemName: string
@@ -184,6 +185,13 @@ export class KitchenDispatchService {
         businessId: input.businessId,
         itemCount: input.items.length,
       })
+
+      // 4. Create service promise for SLA monitoring
+      await PromiseEngine.createOrUpdatePromise({
+        businessId: input.businessId,
+        saleId: input.saleId,
+        orderNumber: input.orderNumber,
+      }).catch((err) => console.warn('[Kitchen Dispatch] Promise creation failed:', err))
 
       return { success: true }
     } catch (error: any) {

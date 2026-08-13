@@ -16,6 +16,7 @@ import { logger } from './logger'
 import { PaymentTransactionStatus } from '@prisma/client'
 import { ReservationService } from './services/reservation.service'
 import { TrialPolicyService } from './services/trial-policy.service'
+import { PromiseEngine } from './promise-engine'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -64,6 +65,7 @@ export class CronService {
     this.scheduleWhatsappReorderFunnel()
     this.scheduleReservationNoShowForfeit()
     this.scheduleGenericPaymentWatchdog()
+    this.schedulePromiseEvaluation()
 
     logger.info('All cron jobs started')
   }
@@ -738,7 +740,7 @@ export class CronService {
           for (const p of [...stuckPending, ...stuckProcessing]) {
             if (p.amountCents >= 5000000) { // 50,000 RWF or more
               await AlertDeliveryService.deliver({
-                severity: 'warning',
+                severity: 'warn',
                 title: `High-value stuck payment: ${p.amountCents / 100} RWF`,
                 details: {
                   paymentId: p.id,
@@ -766,6 +768,23 @@ export class CronService {
     const report = await ReportService.generateDailyReport(businessId, today)
     await NotificationService.sendDailyReport(businessId, report)
     return report
+  }
+
+  private static schedulePromiseEvaluation() {
+    const tick = async () => {
+      try {
+        const result = await PromiseEngine.evaluateActivePromises()
+        if (result.transitions > 0) {
+          logger.info('[PromiseEngine] Cron tick', { ...result })
+        }
+      } catch (err) {
+        logger.error('[PromiseEngine] Cron tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 2 minutes
+    const interval = setInterval(tick, 2 * 60 * 1000)
+    this.intervals.set('promise-evaluation', interval)
   }
 }
 
