@@ -21,6 +21,7 @@ import { logBillingEvent } from './billing-ledger.service'
 import { KitchenDispatchService } from './kitchen-dispatch.service'
 import { broadcast } from '@/lib/realtime'
 import { BillingEventType, PaymentTransactionStatus } from '@prisma/client'
+import { SettlementIntelligenceService } from '@/lib/settlement'
 
 const log = logger.child({ service: 'payment-completion' })
 
@@ -329,6 +330,51 @@ export class PaymentCompletionService {
       })
     } catch (error) {
       log.error('Failed to write audit log', { error: String(error), saleId })
+    }
+
+    // 8b. MPCA-001B: Settlement Intelligence — non-blocking, additive
+    // Records that a payment succeeded and creates a SettlementRecord with
+    // status=SETTLEMENT_UNKNOWN (if provider doesn't expose settlement) or
+    // SETTLEMENT_PENDING (if provider does). This does NOT modify the payment
+    // truth chain — it sits alongside it. Any errors are non-blocking.
+    try {
+      const txnForSettlement = effectiveTxnId
+        ? await prisma.paymentTransaction.findUnique({
+            where: { id: effectiveTxnId },
+            select: { id: true, businessId: true, gateway: true, amountCents: true, currency: true, platformFeeCents: true, gatewayFeeActualCents: true, gatewayFeeEstimatedCents: true, netToBusinessCents: true },
+          })
+        : null
+
+      if (txnForSettlement) {
+        await SettlementIntelligenceService.onPaymentSuccess(
+          txnForSettlement.id,
+          txnForSettlement.businessId,
+          txnForSettlement.gateway,
+          txnForSettlement.amountCents,
+          txnForSettlement.currency,
+          {
+            providerFeeCents: txnForSettlement.gatewayFeeActualCents ?? txnForSettlement.gatewayFeeEstimatedCents ?? 0,
+            platformFeeCents: txnForSettlement.platformFeeCents,
+            netAmountCents: txnForSettlement.netToBusinessCents,
+            source: 'payment-completion-service',
+          }
+        )
+      } else if (sale) {
+        // CASH sale with no PaymentTransaction — still record settlement intelligence
+        await SettlementIntelligenceService.onPaymentSuccess(
+          '',
+          sale.businessId,
+          'CASH' as any,
+          sale.totalAmountCents,
+          sale.business?.currency || 'RWF',
+          {
+            netAmountCents: sale.totalAmountCents,
+            source: 'payment-completion-service-cash',
+          }
+        )
+      }
+    } catch (settlementError) {
+      log.error('Settlement intelligence failed (non-blocking)', { error: String(settlementError), saleId })
     }
 
     // 9. Mark order token as used (if applicable)

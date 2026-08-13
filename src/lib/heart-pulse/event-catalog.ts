@@ -90,10 +90,29 @@ export const HeartPulseEventType = {
   // SLA Events
   SLA_WARNING: 'sla.warning',
   SLA_BREACH: 'sla.breach',
-  
+
+  // Promise Engine Events
+  PROMISE_CREATED: 'promise.created',
+  PROMISE_WARNING: 'promise.warning',
+  PROMISE_CRITICAL: 'promise.critical',
+  PROMISE_FULFILLED: 'promise.fulfilled',
+  PROMISE_RECOVERED: 'promise.recovered',
+  PROMISE_FAILED: 'promise.failed',
+
   // Payment Events
   PAYMENT_CONFIRMED: 'payment.confirmed',
   PAYMENT_FAILED: 'payment.failed',
+
+  // MPCA-001B: Settlement Intelligence Events
+  SETTLEMENT_CREATED: 'settlement.created',
+  SETTLEMENT_PROCESSING: 'settlement.processing',
+  SETTLEMENT_COMPLETED: 'settlement.completed',
+  SETTLEMENT_FAILED: 'settlement.failed',
+  WITHDRAWAL_REQUESTED: 'withdrawal.requested',
+  WITHDRAWAL_PROCESSING: 'withdrawal.processing',
+  WITHDRAWAL_COMPLETED: 'withdrawal.completed',
+  WITHDRAWAL_FAILED: 'withdrawal.failed',
+  FUNDS_AVAILABLE: 'funds.available',
 } as const
 
 export type HeartPulseEventTypeValue = typeof HeartPulseEventType[keyof typeof HeartPulseEventType]
@@ -172,6 +191,65 @@ export interface PaymentConfirmedPayload {
   orderNumber: string
   paymentMethod: string
   amountCents: number
+}
+
+// MPCA-001B: Settlement Intelligence Event Payloads
+
+export interface SettlementCreatedPayload {
+  settlementRecordId: string
+  internalSettlementId: string
+  provider: string
+  businessId: string
+  grossAmountCents: number
+  netAmountCents: number
+  currency: string
+  status: string
+  fundsAvailabilityStatus: string
+  settlementDataAvailable: boolean
+}
+
+export interface SettlementStatusChangedPayload {
+  settlementRecordId: string
+  internalSettlementId: string
+  provider: string
+  businessId: string
+  previousStatus: string
+  newStatus: string
+  completedAt?: string
+}
+
+export interface WithdrawalEventPayload {
+  withdrawalRecordId: string
+  internalWithdrawalId: string
+  provider: string
+  businessId: string
+  amountCents: number
+  netAmountCents: number
+  currency: string
+  status: string
+  destinationType?: string
+  failureReason?: string
+}
+
+export interface FundsAvailablePayload {
+  settlementRecordId: string
+  businessId: string
+  provider: string
+  availableCents: number
+  currency: string
+}
+
+export interface PromiseEventPayload {
+  promiseId: string
+  saleId: string
+  orderNumber: string
+  promiseType: string
+  state: string
+  startedAt: string
+  expectedAt: string
+  actualMinutes?: number
+  warningAfterMinutes: number
+  breachAfterMinutes: number
 }
 
 export interface OrderReadyForPickupPayload {
@@ -259,11 +337,29 @@ export const EventOwnership = {
   [HeartPulseEventType.INGREDIENTS_CONSUMED]: 'ConsumptionEngineService',
   [HeartPulseEventType.CONSUMPTION_REVERSED]: 'ConsumptionEngineService',
   
-  [HeartPulseEventType.SLA_WARNING]: 'SLAMonitorService',
-  [HeartPulseEventType.SLA_BREACH]: 'SLAMonitorService',
-  
+  [HeartPulseEventType.SLA_WARNING]: 'PromiseEngine',
+  [HeartPulseEventType.SLA_BREACH]: 'PromiseEngine',
+
+  [HeartPulseEventType.PROMISE_CREATED]: 'PromiseEngine',
+  [HeartPulseEventType.PROMISE_WARNING]: 'PromiseEngine',
+  [HeartPulseEventType.PROMISE_CRITICAL]: 'PromiseEngine',
+  [HeartPulseEventType.PROMISE_FULFILLED]: 'PromiseEngine',
+  [HeartPulseEventType.PROMISE_RECOVERED]: 'PromiseEngine',
+  [HeartPulseEventType.PROMISE_FAILED]: 'PromiseEngine',
+
   [HeartPulseEventType.PAYMENT_CONFIRMED]: '/api/orders/[id]/confirm-payment',
   [HeartPulseEventType.PAYMENT_FAILED]: 'PaymentService',
+
+  // MPCA-001B: Settlement Intelligence Events
+  [HeartPulseEventType.SETTLEMENT_CREATED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.SETTLEMENT_PROCESSING]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.SETTLEMENT_COMPLETED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.SETTLEMENT_FAILED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.WITHDRAWAL_REQUESTED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.WITHDRAWAL_PROCESSING]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.WITHDRAWAL_COMPLETED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.WITHDRAWAL_FAILED]: 'SettlementIntelligenceService',
+  [HeartPulseEventType.FUNDS_AVAILABLE]: 'SettlementIntelligenceService',
 } as const
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -317,5 +413,27 @@ export const EventSubscribers = {
     'Waiter Dashboard (/dashboard/waiter)',
     'Kitchen Board (/dashboard/kitchen)',
     'Customer Order View',
+  ],
+
+  [HeartPulseEventType.PROMISE_WARNING]: [
+    'Service Risks Dashboard (/dashboard/service-risks)',
+    'Kitchen Board (/dashboard/kitchen)',
+  ],
+
+  [HeartPulseEventType.PROMISE_CRITICAL]: [
+    'Service Risks Dashboard (/dashboard/service-risks)',
+    'Kitchen Board (/dashboard/kitchen)',
+  ],
+
+  [HeartPulseEventType.PROMISE_FULFILLED]: [
+    'Service Risks Dashboard (/dashboard/service-risks)',
+  ],
+
+  [HeartPulseEventType.PROMISE_RECOVERED]: [
+    'Service Risks Dashboard (/dashboard/service-risks)',
+  ],
+
+  [HeartPulseEventType.PROMISE_FAILED]: [
+    'Service Risks Dashboard (/dashboard/service-risks)',
   ],
 } as const

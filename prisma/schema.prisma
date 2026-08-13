@@ -195,6 +195,8 @@ model Business {
   purchaseOrders                    PurchaseOrder[]
   procurementReconciliations        ProcurementReconciliation[]
   reconciliationLogs                ReconciliationLog[]
+  settlementRecords                 SettlementRecord[]
+  withdrawalRecords                 WithdrawalRecord[]
   reservations                      Reservation[]
   owner                             User                      @relation("BusinessOwner", fields: [ownerId], references: [id])
   plan                              Plan?                     @relation(fields: [planId], references: [id])
@@ -265,6 +267,7 @@ model Business {
   stations    Station[]
   routeRules  RouteRule[]
   slaProfiles SLAProfile[]
+  servicePromises ServicePromise[]
 
   // Operational Hardening (Phase 3)
   idempotencyKeys IdempotencyKey[]
@@ -426,6 +429,7 @@ model Sale {
   diningSlipItems             DiningSessionSlipItem[]      @relation("SaleDiningSlipItems")
   waiterCalls                 WaiterCall[]
   ticketEvents                TicketEvent[]
+  servicePromises             ServicePromise[]
 
   @@index([orderSource])
   @@index([scheduledAt])
@@ -1430,6 +1434,7 @@ model PaymentTransaction {
   salePayment              SalePayment?
   staffTip                 StaffTip?
   reservation              Reservation?
+  settlementLinks          SettlementTransactionLink[]
 
   @@index([businessId])
   @@index([invoiceNumber])
@@ -1973,6 +1978,106 @@ model ReconciliationLog {
   @@index([status])
 }
 
+/// MPCA-001B: Provider-neutral settlement record — when the provider makes funds available/settled to the merchant
+model SettlementRecord {
+  id                     String                         @id @default(cuid())
+  businessId             String
+  provider               PaymentGateway
+  providerSettlementId   String?
+  internalSettlementId   String                         @unique
+  currency               String
+  grossAmountCents       Int
+  providerFeeCents       Int                            @default(0)
+  platformFeeCents       Int                            @default(0)
+  otherDeductionsCents   Int                            @default(0)
+  netAmountCents         Int
+  status                 SettlementStatus
+  fundsAvailabilityStatus FundsAvailabilityStatus
+  requestedAt            DateTime?
+  processingAt           DateTime?
+  completedAt            DateTime?
+  expectedAvailabilityAt DateTime?
+  destinationReference   String?
+  providerMetadata       Json?
+  reconciliationStatus   SettlementReconciliationStatus @default(RECONCILIATION_PENDING)
+  reconciledAt           DateTime?
+  reconciliationVarianceCents Int?
+  idempotencyKey         String?                        @unique
+  createdAt              DateTime                       @default(now())
+  updatedAt              DateTime                       @updatedAt
+
+  business               Business                       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  transactionLinks       SettlementTransactionLink[]
+
+  @@index([businessId, createdAt])
+  @@index([provider, status])
+  @@index([reconciliationStatus])
+  @@index([fundsAvailabilityStatus])
+}
+
+/// MPCA-001B: Links a SettlementRecord to the PaymentTransactions it covers
+model SettlementTransactionLink {
+  id                   String           @id @default(cuid())
+  settlementRecordId   String
+  paymentTransactionId String
+  allocatedAmountCents Int
+  createdAt            DateTime         @default(now())
+
+  settlementRecord    SettlementRecord   @relation(fields: [settlementRecordId], references: [id], onDelete: Cascade)
+  paymentTransaction  PaymentTransaction @relation(fields: [paymentTransactionId], references: [id])
+
+  @@unique([settlementRecordId, paymentTransactionId])
+  @@index([settlementRecordId])
+  @@index([paymentTransactionId])
+}
+
+/// MPCA-001B: Merchant-initiated withdrawal of available funds
+model WithdrawalRecord {
+  id                    String           @id @default(cuid())
+  businessId            String
+  provider              PaymentGateway
+  providerWithdrawalId  String?
+  internalWithdrawalId  String           @unique
+  currency              String
+  amountCents           Int
+  feeCents              Int              @default(0)
+  netAmountCents        Int
+  status                WithdrawalStatus
+  destinationType       String?
+  destinationReference  String?
+  requestedAt           DateTime         @default(now())
+  processingAt          DateTime?
+  completedAt           DateTime?
+  failedAt              DateTime?
+  failureReason         String?
+  providerMetadata      Json?
+  idempotencyKey        String?          @unique
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  business              Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, status])
+  @@index([provider, status])
+}
+
+/// MPCA-001B: Provider capability record — what each provider supports, with verification status
+model ProviderCapabilityRecord {
+  id                 String                          @id @default(cuid())
+  provider           PaymentGateway
+  capability         String
+  verificationStatus ProviderCapabilityVerification
+  evidence           String?
+  lastVerifiedAt     DateTime?
+  notes              String?
+  createdAt          DateTime                        @default(now())
+  updatedAt          DateTime                        @updatedAt
+
+  @@unique([provider, capability])
+  @@index([provider])
+  @@index([verificationStatus])
+}
+
 model WhatsAppTemplate {
   id         String   @id @default(cuid())
   businessId String?
@@ -2308,6 +2413,53 @@ model BillingEvent {
 enum PaymentProvider {
   MTN
   AIRTEL
+}
+
+/// MPCA-001B: Funds availability status for settlement intelligence
+enum FundsAvailabilityStatus {
+  FUNDS_PENDING
+  FUNDS_AVAILABLE
+  FUNDS_UNKNOWN
+}
+
+/// MPCA-001B: Settlement lifecycle status
+enum SettlementStatus {
+  SETTLEMENT_PENDING
+  SETTLEMENT_PROCESSING
+  SETTLEMENT_COMPLETED
+  SETTLEMENT_FAILED
+  SETTLEMENT_NOT_REQUIRED
+  SETTLEMENT_UNKNOWN
+}
+
+/// MPCA-001B: Withdrawal lifecycle status
+enum WithdrawalStatus {
+  WITHDRAWAL_REQUESTED
+  WITHDRAWAL_PROCESSING
+  WITHDRAWAL_COMPLETED
+  WITHDRAWAL_FAILED
+  WITHDRAWAL_NOT_SUPPORTED
+  WITHDRAWAL_UNKNOWN
+}
+
+/// MPCA-001B: Settlement reconciliation status
+enum SettlementReconciliationStatus {
+  RECONCILED
+  RECONCILIATION_VARIANCE
+  RECONCILIATION_PENDING
+  RECONCILIATION_NOT_APPLICABLE
+}
+
+/// MPCA-001B: Provider capability verification status
+enum ProviderCapabilityVerification {
+  UNKNOWN
+  NOT_VERIFIED
+  NOT_SUPPORTED
+  SUPPORTED
+  SUPPORTED_BUT_UNTESTED
+  VERIFIED
+  DOCUMENTED
+  SUPPORT_CONFIRMED
 }
 
 enum CommissionType {
@@ -4067,6 +4219,58 @@ model SLAProfile {
   @@index([category])
 }
 
+// ServicePromise - Promise Engine tracking entity
+model ServicePromise {
+  id          String       @id @default(cuid())
+  businessId  String
+  saleId      String
+  promiseType String       @default("ORDER_PREPARATION")
+  state       PromiseState @default(ON_TRACK)
+
+  // Timing context
+  startedAt        DateTime  // When the promise clock started (dispatch or prep start)
+  expectedAt       DateTime  // When the promise should be fulfilled
+  warningAt        DateTime  // When warning threshold is reached
+  criticalAt       DateTime  // When critical threshold is reached
+
+  // State transitions
+  warningTriggeredAt  DateTime?
+  criticalTriggeredAt DateTime?
+  fulfilledAt         DateTime?
+  failedAt            DateTime?
+  recoveredAt         DateTime?
+
+  // Evaluation context
+  warningAfterMinutes Int
+  breachAfterMinutes  Int
+  actualMinutes       Int?
+
+  // Idempotency: one active promise per sale+type
+  idempotencyKey String @unique
+
+  // Metadata
+  lastEvaluatedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sale     Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, state])
+  @@index([saleId])
+  @@index([businessId, saleId])
+  @@index([state, expectedAt])
+}
+
+enum PromiseState {
+  ON_TRACK
+  WARNING
+  CRITICAL
+  FULFILLED
+  FAILED
+  RECOVERED
+}
+
 // ====================================================
 // ENUMS FOR OPERATIONAL COORDINATION
 // ====================================================
@@ -4124,6 +4328,13 @@ enum TicketEventType {
   // Kitchen Consumption Engine (Phase 0)
   INGREDIENTS_CONSUMED
   CONSUMPTION_REVERSED
+  // Promise Engine
+  PROMISE_CREATED
+  PROMISE_WARNING
+  PROMISE_CRITICAL
+  PROMISE_FULFILLED
+  PROMISE_RECOVERED
+  PROMISE_FAILED
 }
 
 // Phase 3: Idempotency tracking for request deduplication

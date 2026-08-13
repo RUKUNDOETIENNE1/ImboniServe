@@ -65,6 +65,16 @@ export type ReplayEventType =
   | 'PAYMENT_STARTED'
   | 'PAYMENT_COMPLETED'
   | 'PAYMENT_FAILED'
+  // MPCA-001B: Settlement Intelligence Events
+  | 'SETTLEMENT_CREATED'
+  | 'SETTLEMENT_PROCESSING'
+  | 'SETTLEMENT_COMPLETED'
+  | 'SETTLEMENT_FAILED'
+  | 'WITHDRAWAL_REQUESTED'
+  | 'WITHDRAWAL_PROCESSING'
+  | 'WITHDRAWAL_COMPLETED'
+  | 'WITHDRAWAL_FAILED'
+  | 'FUNDS_AVAILABLE'
   // Table Events
   | 'TABLE_OCCUPIED'
   | 'TABLE_CLEARED'
@@ -78,6 +88,13 @@ export type ReplayEventType =
   // SLA Events
   | 'SLA_WARNING'
   | 'SLA_BREACH'
+  // Promise Engine Events
+  | 'PROMISE_CREATED'
+  | 'PROMISE_WARNING'
+  | 'PROMISE_CRITICAL'
+  | 'PROMISE_FULFILLED'
+  | 'PROMISE_RECOVERED'
+  | 'PROMISE_FAILED'
   // System Events
   | 'RECONCILIATION'
   | 'MANUAL_OVERRIDE'
@@ -315,7 +332,18 @@ export const EVENT_TYPE_METADATA: Record<ReplayEventType, EventTypeMetadata> = {
   PAYMENT_STARTED: { type: 'PAYMENT_STARTED', category: 'payment', label: 'Payment Started', description: 'Payment initiated', icon: 'credit-card' },
   PAYMENT_COMPLETED: { type: 'PAYMENT_COMPLETED', category: 'completed', label: 'Payment Completed', description: 'Payment successful', icon: 'check-circle' },
   PAYMENT_FAILED: { type: 'PAYMENT_FAILED', category: 'failure', label: 'Payment Failed', description: 'Payment failed', icon: 'x-circle' },
-  
+
+  // MPCA-001B: Settlement Intelligence Events
+  SETTLEMENT_CREATED: { type: 'SETTLEMENT_CREATED', category: 'payment', label: 'Settlement Created', description: 'Settlement record created', icon: 'file-text' },
+  SETTLEMENT_PROCESSING: { type: 'SETTLEMENT_PROCESSING', category: 'payment', label: 'Settlement Processing', description: 'Settlement in progress', icon: 'loader' },
+  SETTLEMENT_COMPLETED: { type: 'SETTLEMENT_COMPLETED', category: 'completed', label: 'Settlement Completed', description: 'Settlement completed', icon: 'check-circle' },
+  SETTLEMENT_FAILED: { type: 'SETTLEMENT_FAILED', category: 'failure', label: 'Settlement Failed', description: 'Settlement failed', icon: 'x-circle' },
+  WITHDRAWAL_REQUESTED: { type: 'WITHDRAWAL_REQUESTED', category: 'payment', label: 'Withdrawal Requested', description: 'Withdrawal requested', icon: 'arrow-up-right' },
+  WITHDRAWAL_PROCESSING: { type: 'WITHDRAWAL_PROCESSING', category: 'payment', label: 'Withdrawal Processing', description: 'Withdrawal in progress', icon: 'loader' },
+  WITHDRAWAL_COMPLETED: { type: 'WITHDRAWAL_COMPLETED', category: 'completed', label: 'Withdrawal Completed', description: 'Withdrawal completed', icon: 'check-circle' },
+  WITHDRAWAL_FAILED: { type: 'WITHDRAWAL_FAILED', category: 'failure', label: 'Withdrawal Failed', description: 'Withdrawal failed', icon: 'x-circle' },
+  FUNDS_AVAILABLE: { type: 'FUNDS_AVAILABLE', category: 'completed', label: 'Funds Available', description: 'Funds now available', icon: 'dollar-sign' },
+
   // Table Events
   TABLE_OCCUPIED: { type: 'TABLE_OCCUPIED', category: 'table', label: 'Table Occupied', description: 'Table now occupied', icon: 'users' },
   TABLE_CLEARED: { type: 'TABLE_CLEARED', category: 'table', label: 'Table Cleared', description: 'Table cleared', icon: 'check' },
@@ -331,7 +359,15 @@ export const EVENT_TYPE_METADATA: Record<ReplayEventType, EventTypeMetadata> = {
   // SLA Events
   SLA_WARNING: { type: 'SLA_WARNING', category: 'system', label: 'SLA Warning', description: 'SLA threshold approaching', icon: 'alert-triangle' },
   SLA_BREACH: { type: 'SLA_BREACH', category: 'failure', label: 'SLA Breach', description: 'SLA threshold exceeded', icon: 'alert-octagon' },
-  
+
+  // Promise Engine Events
+  PROMISE_CREATED: { type: 'PROMISE_CREATED', category: 'system', label: 'Promise Created', description: 'Service promise tracking started', icon: 'clock' },
+  PROMISE_WARNING: { type: 'PROMISE_WARNING', category: 'system', label: 'Promise Warning', description: 'Service promise approaching deadline', icon: 'alert-triangle' },
+  PROMISE_CRITICAL: { type: 'PROMISE_CRITICAL', category: 'failure', label: 'Promise Critical', description: 'Service promise breached', icon: 'alert-octagon' },
+  PROMISE_FULFILLED: { type: 'PROMISE_FULFILLED', category: 'completed', label: 'Promise Fulfilled', description: 'Service promise fulfilled on time', icon: 'check-circle' },
+  PROMISE_RECOVERED: { type: 'PROMISE_RECOVERED', category: 'completed', label: 'Promise Recovered', description: 'Service promise recovered after warning', icon: 'rotate-ccw' },
+  PROMISE_FAILED: { type: 'PROMISE_FAILED', category: 'failure', label: 'Promise Failed', description: 'Service promise failed', icon: 'x-circle' },
+
   // System Events
   RECONCILIATION: { type: 'RECONCILIATION', category: 'system', label: 'Reconciliation', description: 'State reconciliation', icon: 'refresh-cw' },
   MANUAL_OVERRIDE: { type: 'MANUAL_OVERRIDE', category: 'system', label: 'Manual Override', description: 'Manual state change', icon: 'edit-3' },
