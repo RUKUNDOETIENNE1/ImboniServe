@@ -1,0 +1,13 @@
+docs(gpv): add FOUNDER-GPV-001 founder-led guided verification roadmap
+
+Produces the 20-document master journey enabling a real founder to
+manually operate ImboniServe end-to-end (login -> order -> kitchen ->
+payment -> close day -> executive review). Includes the 50-step
+master sequence (FGPV-001..050), session plan, feature readiness
+matrix, defect/stop register, environment prerequisites, and per-role
+journey maps. Also bundles MPCA-001 status reports and the GPV
+verification scripts used during forensic discovery.
+
+Generated with [Devin](https://devin.ai)
+
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>
