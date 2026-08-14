@@ -59,7 +59,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json(errorResponse('Invalid payment record'))
     }
 
-    const statusResponse = await InTouchService.getPaymentStatus(payment.transactionId)
+    // PAY-002: GetTransactionStatus requires both requesttransactionid and
+    // transactionid (doc Section 4.5). The provider's own transactionid is
+    // captured in rawCallback from the initial RequestPayment response.
+    const providerTransactionId = (payment.rawCallback as any)?.transactionid
+      ? String((payment.rawCallback as any).transactionid)
+      : undefined
+    const statusResponse = await InTouchService.getPaymentStatus(payment.transactionId, providerTransactionId)
 
     // Determine new status
     const newStatus = InTouchService.isSuccess(statusResponse.responsecode)

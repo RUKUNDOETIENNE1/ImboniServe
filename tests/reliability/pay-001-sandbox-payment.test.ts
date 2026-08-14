@@ -979,9 +979,23 @@ describe('PAY-001: Sandbox Payment & Provider Verification', () => {
       expect(InTouchService.isSuccess('01')).toBe(true)
     })
 
-    it('should recognize code 1110 as success', () => {
+    // PAY-002 forensic finding (http_intouchpay_api_v1.2.pdf, Section 3.7):
+    // Response code 1110 is documented as "Duplicate Remit ID" — a RequestDeposit
+    // FAILURE code. It does not appear in the RequestPayment (2.9) or
+    // GetTransactionStatus (4.7) response-code tables at all. Treating it as a
+    // payment success was a defect; corrected per PAY-002-Response-Code-Mapping.md.
+    it('should NOT recognize code 1110 as success (PAY-002: it is RequestDeposit "Duplicate Remit ID")', () => {
       const { InTouchService } = require('@/lib/services/intouch.service')
-      expect(InTouchService.isSuccess('1110')).toBe(true)
+      expect(InTouchService.isSuccess('1110')).toBe(false)
+    })
+
+    // PAY-002 forensic finding: 01 = successful PAYMENT, 2001 = successful DEPOSIT
+    // (http_intouchpay_api_v1.2.pdf, Section 4.7). These must never be conflated —
+    // isSuccess() is used exclusively in customer-payment contexts, so it must not
+    // report a deposit-success code as a payment success.
+    it('should NOT recognize code 2001 (deposit success) as a payment success', () => {
+      const { InTouchService } = require('@/lib/services/intouch.service')
+      expect(InTouchService.isSuccess('2001')).toBe(false)
     })
 
     it('should recognize code 1000 as pending', () => {

@@ -1,12 +1,44 @@
-docs(gpv): add FOUNDER-GPV-001 founder-led guided verification roadmap
+fix(payments): PAY-002 InTouch document-to-code forensic conformance
 
-Produces the 20-document master journey enabling a real founder to
-manually operate ImboniServe end-to-end (login -> order -> kitchen ->
-payment -> close day -> executive review). Includes the 50-step
-master sequence (FGPV-001..050), session plan, feature readiness
-matrix, defect/stop register, environment prerequisites, and per-role
-journey maps. Also bundles MPCA-001 status reports and the GPV
-verification scripts used during forensic discovery.
+Forensically compared the actual InTouch API specification
+(http_intouchpay_api_v1.2.pdf) against the live payment implementation
+before founder-led sandbox testing. Key finding: the Tap & Leave
+checkout flow runs through the "deprecated" legacy InTouchService, not
+the modern InTouchProvider abstraction that was previously audited.
+
+Fixes to InTouchService (legacy, actually used by Tap & Leave):
+- RequestPayment/RequestDeposit/GetBalance: switched from JSON to the
+  documented application/x-www-form-urlencoded encoding.
+- GetTransactionStatus: corrected endpoint from the nonexistent
+  /paymentstatus/ to the documented /gettransactionstatus/, and added
+  the mandatory transactionid parameter (sourced from the existing
+  rawCallback data, no schema change needed) across all 4 call sites
+  (status polling API, tap-and-leave status polling, cron reconciler,
+  finalization sweeper).
+- isSuccess(): no longer conflates payment success (01) with deposit
+  success (2001) or the unrelated RequestDeposit "Duplicate Remit ID"
+  failure code (1110), per the document's explicit distinction.
+- Tap & Leave callback URL now prefers INTOUCH_CALLBACK_URL (matching
+  InTouchProvider's existing fallback order) instead of being hardcoded
+  from NEXTAUTH_URL, which silently ignored the founder-configured
+  webhook tunnel URL entirely.
+
+Corrected a proven-wrong existing test assertion (isSuccess('1110')
+was asserted true) and added dedicated PAY-002 conformance tests.
+605/605 reliability tests pass; zero new TypeScript errors (182
+pre-existing unrelated errors confirmed identical before/after).
+
+Twelve PAY-002 forensic documents added under docs/, including the
+response-code mapping, webhook compatibility audit, sandbox readiness
+report (which withdraws a prior inaccurate recommendation to change
+PAYMENTS_PROVIDER, traced to have zero effect on this flow), and the
+founder-facing sandbox test contract.
+
+One confirmed defect (refunds.ts compares InTouch's RequestDeposit
+response code to '200' instead of the documented '2001') is
+intentionally NOT fixed here — refunds are outside the forward Tap &
+Leave sandbox test contract — and is tracked in
+PAY-002-Final-Forensic-Certification.md for separate remediation.
 
 Generated with [Devin](https://devin.ai)
 

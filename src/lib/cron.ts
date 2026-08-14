@@ -488,7 +488,12 @@ export class CronService {
           if (!slipId || !sessionId) continue
 
           try {
-            const status = await InTouchService.getPaymentStatus(p.transactionId)
+            // PAY-002: GetTransactionStatus requires both requesttransactionid
+            // and transactionid (doc Section 4.5).
+            const providerTransactionId = (p.rawCallback as any)?.transactionid
+              ? String((p.rawCallback as any).transactionid)
+              : undefined
+            const status = await InTouchService.getPaymentStatus(p.transactionId, providerTransactionId)
             const isSuccess = InTouchService.isSuccess(status.responsecode)
             const isPending = InTouchService.isPending(status.responsecode)
 

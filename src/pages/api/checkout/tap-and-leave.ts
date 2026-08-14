@@ -158,7 +158,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await DiningSessionSlipService.markPaymentTriggered(slip.id, payment.id)
 
     // Prepare callback URL
-    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
+    // PAY-002: prefer the explicit INTOUCH_CALLBACK_URL (e.g. an ngrok tunnel
+    // during sandbox testing) over NEXTAUTH_URL. Previously this always
+    // derived the callback from NEXTAUTH_URL, silently ignoring
+    // INTOUCH_CALLBACK_URL even when configured — meaning the founder-facing
+    // instruction to set INTOUCH_CALLBACK_URL (FOUNDER-GPV-001 environment
+    // prerequisites) had no effect on the Tap & Leave flow. This mirrors the
+    // fallback order already used by InTouchProvider (the marketplace/
+    // subscription payment path).
+    const callbackUrl = process.env.INTOUCH_CALLBACK_URL || `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Development-only: simulation mode to bypass external gateway
     const simulate = (req.query?.simulate === '1') || (req.body && req.body.simulate === true)
