@@ -17,6 +17,7 @@ type AppUser = User & {
   subscriptionStatus?: string
   trialEndDate?: Date | null
   debugRequestId?: string | null
+  editorialRoles?: string[]
 }
 
 type AppJWT = JWT & {
@@ -27,6 +28,7 @@ type AppJWT = JWT & {
   subscriptionStatus?: string
   trialEndDate?: Date | null
   debugRequestId?: string | null
+  editorialRoles?: string[]
 }
 
 type AppSession = Session & {
@@ -37,6 +39,7 @@ type AppSession = Session & {
     planCode?: string
     subscriptionStatus?: string
     trialEndDate?: Date | null
+    editorialRoles?: string[]
   }
 }
 
@@ -127,6 +130,7 @@ export const authOptions: NextAuthOptions = {
         } | null
 
         const roles = (user.roles as string[]) || []
+        const editorialRoles = ((user as any).editorialRoles as string[]) || []
         const latestSub = businessMeta?.subscriptions?.[0]
         const authUser: AppUser = {
           id: user.id,
@@ -139,6 +143,7 @@ export const authOptions: NextAuthOptions = {
           subscriptionStatus: (latestSub?.status as string) ?? undefined,
           trialEndDate: businessMeta?.trialEndDate ?? null,
           debugRequestId: requestId,
+          editorialRoles,
         }
         logAuthDebug(requestId, 'nextauth_authorize_complete', 'success', { userId: user.id })
         return authUser
@@ -185,6 +190,7 @@ export const authOptions: NextAuthOptions = {
             if (!ok) return null
 
             const roles = (user as any).roles || []
+            const editorialRoles = (user as any).editorialRoles || []
             const primaryRole = roles && roles.length > 0 ? roles[0] : undefined
             const latestSub = user.business?.subscriptions?.[0]
             const authUser: AppUser = {
@@ -198,6 +204,7 @@ export const authOptions: NextAuthOptions = {
               subscriptionStatus: latestSub?.status ?? undefined,
               trialEndDate: user.business?.trialEndDate ?? null,
               debugRequestId: null,
+              editorialRoles,
             }
 
             return authUser
@@ -220,6 +227,7 @@ export const authOptions: NextAuthOptions = {
         t.subscriptionStatus = u.subscriptionStatus ?? t.subscriptionStatus
         t.trialEndDate = u.trialEndDate ?? t.trialEndDate
         t.debugRequestId = u.debugRequestId ?? t.debugRequestId ?? null
+        t.editorialRoles = u.editorialRoles ?? []
         logAuthDebug(t.debugRequestId, 'nextauth_jwt_callback', 'success', { userId: u.id })
       }
       return t
@@ -235,6 +243,7 @@ export const authOptions: NextAuthOptions = {
         s.user.planCode = t.planCode
         s.user.subscriptionStatus = t.subscriptionStatus
         s.user.trialEndDate = t.trialEndDate ?? null
+        s.user.editorialRoles = t.editorialRoles ?? []
         logAuthDebug(t.debugRequestId, 'nextauth_session_callback', 'success', { userId: t.sub })
       }
       return s

@@ -102,6 +102,12 @@ model User {
   supportMessagesSent          SupportMessage[]            @relation("SupportMessagesSentBy")
   ticketEvents                 TicketEvent[]
   ScanJob                      ScanJob[]
+
+  // Editorial platform roles (Phase A — CONTENT-002)
+  editorialRoles               String[]                    @default([])
+  authoredArticles             EditorialArticle[]          @relation("AuthoredArticles")
+  reviewedArticles             EditorialArticle[]          @relation("ReviewedArticles")
+  publishedArticles            EditorialArticle[]          @relation("PublishedArticles")
 }
 
 model Business {
@@ -4106,6 +4112,17 @@ model NewsletterSubscriber {
   isActive       Boolean   @default(true)
   unsubscribedAt DateTime?
 
+  // Phase A extensions (CONTENT-002)
+  name           String?
+  email          String?
+  phone          String?
+  consentAt      DateTime?
+  consentSource  String?
+  preferences    Json?
+  lastEngagedAt  DateTime?
+  bounceCount    Int       @default(0)
+  suppressedAt   DateTime?
+
   @@index([isActive, createdAt])
   @@index([createdAt])
 }
@@ -6145,4 +6162,160 @@ model PartnershipAuditRecord {
 
   @@index([partnershipId, createdAt])
   @@index([action, createdAt])
+}
+
+// ============================================================
+// EDITORIAL CONTENT MODELS (Phase A — CONTENT-002)
+// Platform-level editorial system — separate from business CMS
+// ============================================================
+
+model EditorialArticle {
+  id            String   @id @default(cuid())
+  type          String
+  title         String
+  subtitle      String?
+  slug          String   @unique
+  excerpt       String?
+  body          String
+  bodyFormat    String   @default("MARKDOWN")
+  status        String   @default("DRAFT")
+  authorId      String?
+  reviewerId    String?
+  publisherId   String?
+  publishedAt   DateTime?
+  scheduledAt   DateTime?
+  archivedAt    DateTime?
+  coverImageId  String?
+  topicId       String?
+  tags          String[]
+  seoMeta       Json?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  author        User?              @relation("AuthoredArticles", fields: [authorId], references: [id])
+  reviewer      User?              @relation("ReviewedArticles", fields: [reviewerId], references: [id])
+  publisher     User?              @relation("PublishedArticles", fields: [publisherId], references: [id])
+  topic         Topic?             @relation(fields: [topicId], references: [id])
+  transitions   ContentTransition[]
+  articleTags   ArticleTag[]
+  productLinks  ArticleProductLink[]
+
+  @@index([status, publishedAt])
+  @@index([type, status])
+  @@index([topicId, status])
+  @@index([publishedAt])
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  parentId    String?
+  color       String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent      Topic?   @relation("TopicHierarchy", fields: [parentId], references: [id])
+  children    Topic[]  @relation("TopicHierarchy")
+  articles    EditorialArticle[]
+
+  @@index([parentId, sortOrder])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  articleTags ArticleTag[]
+}
+
+model ArticleTag {
+  id        String   @id @default(cuid())
+  articleId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  article   EditorialArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, tagId])
+  @@index([tagId])
+}
+
+model ContentTransition {
+  id         String   @id @default(cuid())
+  articleId  String
+  fromStatus String
+  toStatus   String
+  actorId    String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  article    EditorialArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, createdAt])
+  @@index([toStatus, createdAt])
+}
+
+model PlatformMediaAsset {
+  id            String   @id @default(cuid())
+  type          String
+  storageKey    String
+  filename      String
+  altText       String?
+  caption       String?
+  attribution   String?
+  width         Int?
+  height        Int?
+  durationSec   Int?
+  thumbnailKey  String?
+  sizeBytes     Int
+  mimeType      String
+  tags          String[]
+  usageCount    Int      @default(0)
+  uploadedById  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([type, createdAt])
+}
+
+model ArticleProductLink {
+  id           String   @id @default(cuid())
+  articleId    String
+  productKey   String
+  productLabel String?
+  linkType     String   @default("MENTIONED")
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  article      EditorialArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, productKey])
+  @@index([productKey])
+}
+
+model ContentEvent {
+  id          String   @id @default(cuid())
+  articleId   String?
+  eventType   String
+  metadata    Json?
+  sessionId   String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  refCode     String?
+  createdAt   DateTime @default(now())
+
+  @@index([articleId, eventType, createdAt])
+  @@index([eventType, createdAt])
+  @@index([sessionId, createdAt])
 }

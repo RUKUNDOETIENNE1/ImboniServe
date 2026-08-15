@@ -51,6 +51,28 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  // UTM parameter capture (CONTENT-002 — additive to referral logic)
+  const UTM_PARAMS = [
+    { param: 'utm_source', cookie: 'im_utm_source' },
+    { param: 'utm_medium', cookie: 'im_utm_medium' },
+    { param: 'utm_campaign', cookie: 'im_utm_campaign' },
+    { param: 'utm_content', cookie: 'im_utm_content' },
+    { param: 'utm_term', cookie: 'im_utm_term' },
+  ] as const
+
+  for (const { param, cookie } of UTM_PARAMS) {
+    const value = url.searchParams.get(param)
+    if (value) {
+      res.cookies.set(cookie, value, {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+      })
+    }
+  }
+
   return res
 }
 

@@ -55,6 +55,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Reports', href: '/admin/reports', icon: FileText },
     { name: 'Reconciliation', href: '/admin/reconciliation', icon: RefreshCw },
     { name: 'Feature Flags', href: '/admin/feature-flags', icon: Flag },
+    { name: 'Editorial Dashboard', href: '/admin/content', icon: FileText },
+    { name: 'Editorial New Article', href: '/admin/content/new', icon: FileText },
+    { name: 'Editorial Topics', href: '/admin/content/topics', icon: Tag },
+    { name: 'Editorial Tags', href: '/admin/content/tags', icon: Tag },
+    { name: 'Editorial Media', href: '/admin/content/media', icon: FileText },
   ]
 
   const isActive = (href: string) => {
