@@ -74,7 +74,7 @@ The following are NOT read by any InTouch code path. Do not set them expecting I
 - `INTOUCH_MERCHANT_ID` — does not exist
 - `INTOUCH_SETTLEMENT_URL` — does not exist
 
-## 3. Webhook Path and Tunnel Configuration
+## 3. Webhook Path and Public URL Configuration
 
 ### 3.1 Exact webhook endpoint
 
@@ -83,53 +83,66 @@ The following are NOT read by any InTouch code path. Do not set them expecting I
 **Method:** `POST` only (GET returns `405`)
 **Body limit:** `1mb` (configured in `config.api.bodyParser.sizeLimit`)
 
-### 3.2 Tunnel configuration (ngrok example)
+### 3.2 IMPORTANT: Real public URL required (not localhost/ngrok)
 
-```bash
-# 1. Start the dev server
-npm run dev  # listens on port 3000 by default
+**Founder clarification (2026-08-15):** InTouch does NOT accept localhost or ngrok-to-localhost tunneling for certification testing. They require a **real, publicly reachable URL** with HTTPS, and they verify end-to-end that the payment passes through their system. This means ImboniServe must be deployed to a real server with a real domain before the certification test.
 
-# 2. In a separate terminal, start ngrok
-ngrok http 3000
+The ngrok approach documented in earlier drafts of this document is **not acceptable to InTouch**. See `PAY-003-Founder-InTouch-Sandbox-Certification-Runbook.md` Phase 2 for deployment instructions.
 
-# 3. Note the forwarding URL, e.g. https://abc123.ngrok.io
+### 3.3 Callback URL configuration
 
-# 4. Set the callback URL in .env
-INTOUCH_CALLBACK_URL="https://abc123.ngrok.io/api/webhooks/intouch"
+Once ImboniServe is deployed to a public URL (e.g., `https://staging.imboniserve.com`), set:
+
+```env
+INTOUCH_CALLBACK_URL="https://<your-domain>/api/webhooks/intouch"
 ```
 
-### 3.3 Verification: webhook is reachable and enforcing auth
+The full callback URL InTouch will call is:
+```
+https://<your-domain>/api/webhooks/intouch
+```
+
+### 3.4 Verification: webhook is reachable and enforcing auth
+
+After deployment, verify the webhook is live:
 
 ```bash
+# GET — must return 405 (method not allowed — proves route exists)
+curl -i https://<your-domain>/api/webhooks/intouch
+
 # Unauthenticated POST — must return 401 (proves reachability + auth enforcement)
-curl -X POST https://abc123.ngrok.io/api/webhooks/intouch \
+curl -X POST https://<your-domain>/api/webhooks/intouch \
   -H "Content-Type: application/json" \
   -d '{"test": true}'
 
 # Authenticated POST with wrong credentials — must return 401
-curl -X POST https://abc123.ngrok.io/api/webhooks/intouch \
+curl -X POST https://<your-domain>/api/webhooks/intouch \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic $(echo -n 'wrong:wrong' | base64)" \
   -d '{"test": true}'
 
 # Authenticated POST with correct credentials — must return 200 (transaction not found)
-curl -X POST https://abc123.ngrok.io/api/webhooks/intouch \
+curl -X POST https://<your-domain>/api/webhooks/intouch \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic $(echo -n 'YOUR_WEBHOOK_USER:YOUR_WEBHOOK_PASS' | base64)" \
-  -d '{"transactionid": 'nonexistent', 'status': 'SUCCESS'}'
+  -d '{"transactionid":"nonexistent","status":"SUCCESS"}'
 ```
 
-Expected: the first two return `401`, the third returns `200` with `{"message": "Transaction not found"}`. This proves the tunnel is working, the webhook is reachable, and Basic Auth is enforced.
+Expected: GET returns `405`, the first two POSTs return `401`, the third returns `200` with `{"message": "Transaction not found"}`. This proves the webhook is reachable and Basic Auth is enforced.
 
-### 3.4 InTouch-side callback configuration
+### 3.5 InTouch-side callback configuration
 
-The founder must configure InTouch to call back to:
+The founder must **send InTouch the webhook URL** and the Basic Auth credentials so InTouch can configure the callback on their side:
+
 ```
-https://<tunnel>.ngrok.io/api/webhooks/intouch
+Webhook URL: https://<your-domain>/api/webhooks/intouch
+Basic Auth Username: <INTOUCH_WEBHOOK_USERNAME>
+Basic Auth Password: <INTOUCH_WEBHOOK_PASSWORD>
 ```
-with HTTP Basic Auth using the `INTOUCH_WEBHOOK_USERNAME` and `INTOUCH_WEBHOOK_PASSWORD` values.
 
-If InTouch does not support Basic Auth on callbacks, see `PAY-003-Webhook-Verification.md` Section 4 (the document's other callback variant) and `PAY-003-Provider-Questions-Register.md` Question W-1.
+InTouch will configure this on their side and confirm when ready. Do not proceed with the test payment until InTouch confirms the callback is configured.
+
+If InTouch does not support Basic Auth on callbacks (see `PAY-003-Provider-Questions-Register.md` Question W1 — the document shows two callback variants, one without Basic Auth), a code change will be required to make Basic Auth optional.
 
 ## 4. Callback URL Conformance by Payment Path
 
@@ -145,32 +158,47 @@ If InTouch does not support Basic Auth on callbacks, see `PAY-003-Webhook-Verifi
 
 This is a **P1 defect for sandbox** (limits which flows can be end-to-end tested) and a **P0 defect for production** (webhooks will never arrive for those flows in production if `NEXTAUTH_URL` is not publicly reachable). It is tracked by `pay-003-callback-url-consistency.test.ts` and documented in `PAY-003-Production-Handover-Requirements.md`.
 
-## 5. Minimal `.env` for Sandbox (Tap & Leave only)
+## 5. Minimal `.env` for Certification (Tap & Leave only)
+
+**Note:** These must be set on the **deployed instance** (not localhost), because InTouch requires a real public URL.
 
 ```env
 # Database (existing)
 DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 
-# Auth (existing)
-NEXTAUTH_URL="http://localhost:3000"
+# Auth — MUST be the real public URL of the deployed instance
+NEXTAUTH_URL="https://<your-domain>"
 NEXTAUTH_SECRET="<32+ chars>"
 
-# App URL (existing)
-APP_URL="http://localhost:3000"
+# App URL — MUST be the real public URL of the deployed instance
+APP_URL="https://<your-domain>"
 
-# InTouch API (founder-provided by InTouch)
+# InTouch API (test credentials already provided by InTouch)
 INTOUCH_API_URL="https://www.intouchpay.co.rw/api"
-INTOUCH_USERNAME="<from InTouch>"
-INTOUCH_ACCOUNT_NO="<from InTouch>"
-INTOUCH_PARTNER_PASSWORD="<from InTouch>"
+INTOUCH_USERNAME="<test username from InTouch>"
+INTOUCH_ACCOUNT_NO="<test account number from InTouch>"
+INTOUCH_PARTNER_PASSWORD="<test partner password from InTouch>"
 
-# InTouch webhook auth (founder-chosen — configure same in InTouch callback settings)
+# InTouch webhook auth (founder-chosen — send these to InTouch for callback configuration)
 INTOUCH_WEBHOOK_USERNAME="<founder-chosen>"
 INTOUCH_WEBHOOK_PASSWORD="<founder-chosen>"
 
-# InTouch callback URL (tunnel — set AFTER starting ngrok)
-INTOUCH_CALLBACK_URL="https://<tunnel>.ngrok.io/api/webhooks/intouch"
+# InTouch callback URL — the REAL public URL of the deployed instance
+INTOUCH_CALLBACK_URL="https://<your-domain>/api/webhooks/intouch"
 ```
 
 No other InTouch variables are read by the Tap & Leave flow. Setting additional `INTOUCH_*` variables will have no effect.
+
+### 5.1 Credential status (founder-confirmed 2026-08-15)
+
+| Credential | Status |
+|---|---|
+| `INTOUCH_USERNAME` | ✅ Already provided by InTouch (test credentials) |
+| `INTOUCH_PARTNER_PASSWORD` | ✅ Already provided by InTouch (test credentials) |
+| `INTOUCH_ACCOUNT_NO` | ⚠️ Confirm this was included in the test credentials (the API requires it as mandatory) |
+| `INTOUCH_API_URL` | ⚠️ Likely `https://www.intouchpay.co.rw/api` — confirm if InTouch provided a different URL |
+| `INTOUCH_WEBHOOK_USERNAME` | Founder-chosen (not from InTouch) |
+| `INTOUCH_WEBHOOK_PASSWORD` | Founder-chosen (not from InTouch) |
+| `INTOUCH_CALLBACK_URL` | Set to the deployed instance's public URL |
+| Production credentials | Will be provided by InTouch after successful certification |

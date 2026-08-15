@@ -60,15 +60,41 @@ During PAY-003 forensic re-checks, a **callback URL inconsistency** was identifi
 
 **Impact for sandbox testing:** The founder's primary test target (Tap & Leave) is unaffected — it correctly respects `INTOUCH_CALLBACK_URL`. The reservation deposit/cancel flows and the generic `payments/intouch/initiate` flow will silently send InTouch a `localhost` callback URL during sandbox testing, meaning webhooks for those flows will never arrive. This is a P1 defect for any sandbox test that exercises those flows, and a P0 for production. It is documented in `PAY-003-Sandbox-Integration-Contract.md` and `PAY-003-Provider-Questions-Register.md`, and tracked by the new regression test.
 
+## 4a. Founder-Provided Information (2026-08-15) and Document Cross-Reference
+
+The founder clarified InTouch's actual certification process, which differs from the original runbook assumptions:
+
+1. **InTouch requires a real public URL** (not localhost/ngrok) — they verify end-to-end payment pass-through.
+2. **InTouch requires a real payment with real money** — not a simulated test.
+3. **Test credentials already provided** — InTouch has given the founder test username and password; production credentials come after certification.
+4. **We must send InTouch our webhook URL** — they configure the callback on their side.
+
+A cross-reference of the 15 original provider questions against the InTouch API document (v1.2) found:
+
+| Status | Count | Questions |
+|---|---|---|
+| ✅ Answered by document | 2 | R1 (success code is `2001`), R2 (optional params documented) |
+| ⚠️ Partially answered | 5 | W1, W2, P3, G1, G3 |
+| ❌ Not answered (document silent or self-contradictory) | 8 | W3, P1, P2, S1, S2, S3, F1, F2 |
+| 🔶 Answered by founder | 3 | G4 (real URL), G5 (real payment), G6 (credentials provided) |
+
+See `PAY-003-Provider-Questions-Register.md` Section 4 for the full cross-reference table.
+
 ## 5. What the Founder Must Do Next
+
+**Revised based on founder-provided information (2026-08-15):** InTouch's certification process requires a real public URL (not localhost/ngrok), a real payment with real money, and they verify on their side that the payment passes through. Test credentials have already been provided by InTouch.
 
 **One precise sequence, fully specified in `PAY-003-Founder-InTouch-Sandbox-Certification-Runbook.md`:**
 
-1. Set the 7 environment variables listed in `PAY-003-Sandbox-Integration-Contract.md` Section 2 (no others — these are the exact names the code reads).
-2. Start an ngrok tunnel and set `INTOUCH_CALLBACK_URL` to `https://<tunnel>.ngrok.io/api/webhooks/intouch` (the exact path the webhook handler serves).
-3. Run `npm run dev` and confirm the webhook endpoint returns 401 on unauthenticated POST (proves it is reachable and enforcing auth).
-4. Execute the Tap & Leave sandbox payment per the runbook, capturing: the InTouch RequestPayment response, the USSD prompt outcome, the inbound webhook payload (headers + body), and the resulting `PaymentTransaction` / `Sale` / `FinancialLedgerEntry` database state.
-5. Answer the provider-confirmation questions in `PAY-003-Provider-Questions-Register.md` using the captured evidence.
+1. Confirm the test credentials already provided by InTouch (username, password, account number).
+2. **Deploy ImboniServe to a real public URL** with HTTPS (not localhost, not ngrok) — InTouch requires this.
+3. Set the environment variables listed in `PAY-003-Sandbox-Integration-Contract.md` Section 5 on the deployed instance.
+4. Verify the webhook endpoint is reachable and enforcing auth via curl.
+5. **Send InTouch the webhook URL and Basic Auth credentials** so they can configure the callback on their side. Include the questions from `PAY-003-Provider-Questions-Register.md` Section 6.
+6. Wait for InTouch to confirm the callback is configured.
+7. Execute a **real Tap & Leave payment** with real money, capturing: the InTouch RequestPayment response, the USSD prompt outcome, the inbound webhook payload (headers + body), and the resulting `PaymentTransaction` / `Sale` / `FinancialLedgerEntry` database state.
+8. Confirm with InTouch that they see the payment on their side (certification check).
+9. Answer the provider-confirmation questions in `PAY-003-Provider-Questions-Register.md` using the captured evidence.
 
 ## 6. Certification Status
 
