@@ -53,7 +53,7 @@ export default function TagsPage() {
       <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-4xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Tags</h1>
         {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
-        <form onSubmit={handleCreate} className="bg-white p-6 rounded-lg shadow-sm mb-6 flex gap-3 items-end">
+        <form onSubmit={handleCreate} className="bg-white p-4 sm:p-6 rounded-lg shadow-sm mb-6 flex flex-col sm:flex-row gap-3 items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
             <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" required />

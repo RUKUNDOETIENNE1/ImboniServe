@@ -90,8 +90,8 @@ export default function TopicsPage() {
         ) : (
           <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-200">
             {topics.map(t => (
-              <div key={t.id} className="px-6 py-4 flex items-center justify-between">
-                <div>
+              <div key={t.id} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+                <div className="min-w-0">
                   <p className="font-medium text-gray-900">{t.name}</p>
                   <p className="text-sm text-gray-500">/{t.slug} {t.description ? `— ${t.description}` : ''}</p>
                 </div>

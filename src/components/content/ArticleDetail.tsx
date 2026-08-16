@@ -73,12 +73,12 @@ export default function ArticleDetail({
       noIndex={article.seoMeta.noIndex}
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400">
-          <Link href="/" className="hover:text-gray-700 dark:hover:text-gray-300">Home</Link>
-          <span className="mx-2">/</span>
-          <Link href={sectionPath} className="hover:text-gray-700 dark:hover:text-gray-300">{sectionName}</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-700 dark:text-gray-300">{article.title}</span>
+        <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 overflow-hidden">
+          <Link href="/" className="hover:text-gray-700 dark:hover:text-gray-300 shrink-0">Home</Link>
+          <span className="shrink-0">/</span>
+          <Link href={sectionPath} className="hover:text-gray-700 dark:hover:text-gray-300 shrink-0">{sectionName}</Link>
+          <span className="shrink-0">/</span>
+          <span className="text-gray-700 dark:text-gray-300 truncate min-w-0">{article.title}</span>
         </nav>
 
         <header className="mb-8">

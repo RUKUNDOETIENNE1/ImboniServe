@@ -81,7 +81,7 @@ export default function EditorialDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Articles', value: stats?.total || 0, color: 'bg-blue-50 text-blue-700' },
             { label: 'Published', value: articles.filter(a => a.status === 'PUBLISHED').length, color: 'bg-green-50 text-green-700' },
@@ -96,7 +96,7 @@ export default function EditorialDashboard() {
         </div>
 
         {/* Filter */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4">
           {['', 'DRAFT', 'REVIEW', 'APPROVED', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'].map((s) => (
             <button
               key={s}
@@ -113,7 +113,7 @@ export default function EditorialDashboard() {
         </div>
 
         {/* Articles table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
