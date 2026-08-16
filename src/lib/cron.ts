@@ -17,6 +17,7 @@ import { PaymentTransactionStatus } from '@prisma/client'
 import { ReservationService } from './services/reservation.service'
 import { TrialPolicyService } from './services/trial-policy.service'
 import { PromiseEngine } from './promise-engine'
+import { GuardianService } from './guardian'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -66,6 +67,7 @@ export class CronService {
     this.scheduleReservationNoShowForfeit()
     this.scheduleGenericPaymentWatchdog()
     this.schedulePromiseEvaluation()
+    this.scheduleGuardianEvaluation()
 
     logger.info('All cron jobs started')
   }
@@ -790,6 +792,27 @@ export class CronService {
     // Run every 2 minutes
     const interval = setInterval(tick, 2 * 60 * 1000)
     this.intervals.set('promise-evaluation', interval)
+  }
+
+  private static scheduleGuardianEvaluation() {
+    const tick = async () => {
+      try {
+        const signalsProcessed = await GuardianService.evaluateActiveSignals()
+        const casesVerified = await GuardianService.verifyActiveCases()
+        if (signalsProcessed > 0 || casesVerified > 0) {
+          logger.info('[Guardian] Cron tick', { signalsProcessed, casesVerified })
+        }
+      } catch (err) {
+        logger.error('[Guardian] Cron tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 2 minutes, offset by 30 seconds from Promise Engine tick
+    setTimeout(() => {
+      tick()
+      const interval = setInterval(tick, 2 * 60 * 1000)
+      this.intervals.set('guardian-evaluation', interval)
+    }, 30 * 1000)
   }
 }
 

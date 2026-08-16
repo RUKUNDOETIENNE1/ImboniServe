@@ -102,6 +102,7 @@ model User {
   supportMessagesSent          SupportMessage[]            @relation("SupportMessagesSentBy")
   ticketEvents                 TicketEvent[]
   ScanJob                      ScanJob[]
+  guardianCasesAssigned        GuardianCase[]       @relation("GuardianAssignedUser")
 
   // Editorial platform roles (Phase A — CONTENT-002)
   editorialRoles               String[]                    @default([])
@@ -274,6 +275,8 @@ model Business {
   routeRules  RouteRule[]
   slaProfiles SLAProfile[]
   servicePromises ServicePromise[]
+  guardianCases  GuardianCase[]
+  guardianLearningSignals GuardianLearningSignal[]
 
   // Operational Hardening (Phase 3)
   idempotencyKeys IdempotencyKey[]
@@ -436,6 +439,7 @@ model Sale {
   waiterCalls                 WaiterCall[]
   ticketEvents                TicketEvent[]
   servicePromises             ServicePromise[]
+  guardianCases               GuardianCase[]
 
   @@index([orderSource])
   @@index([scheduledAt])
@@ -4277,6 +4281,8 @@ model ServicePromise {
   @@index([saleId])
   @@index([businessId, saleId])
   @@index([state, expectedAt])
+
+  guardianCases GuardianCase[]
 }
 
 enum PromiseState {
@@ -4352,6 +4358,17 @@ enum TicketEventType {
   PROMISE_FULFILLED
   PROMISE_RECOVERED
   PROMISE_FAILED
+  // Guardian
+  GUARDIAN_CASE_OPENED
+  GUARDIAN_CASE_SUPPRESSED
+  GUARDIAN_RECOMMENDATION_CREATED
+  GUARDIAN_NOTIFICATION_SENT
+  GUARDIAN_ACKNOWLEDGED
+  GUARDIAN_ESCALATED
+  GUARDIAN_INTERVENTION_RECORDED
+  GUARDIAN_RECOVERY_DETECTED
+  GUARDIAN_BREACH_DETECTED
+  GUARDIAN_CASE_RESOLVED
 }
 
 // Phase 3: Idempotency tracking for request deduplication
@@ -6318,4 +6335,150 @@ model ContentEvent {
   @@index([articleId, eventType, createdAt])
   @@index([eventType, createdAt])
   @@index([sessionId, createdAt])
+}
+
+// ====================================================
+// GUARDIAN V1 — SERVICE PROMISE PROTECTION
+// ====================================================
+
+// GuardianCase — Core case entity for service promise protection
+model GuardianCase {
+  id              String           @id @default(cuid())
+  businessId      String
+  promiseId       String
+  saleId          String
+  caseType        GuardianCaseType @default(SERVICE_PROMISE_RISK)
+  state           GuardianCaseState @default(DETECTED)
+  outcome         GuardianOutcome?
+
+  // Signal that triggered this case
+  triggerSignal   String   // e.g. 'PROMISE_WARNING', 'PROMISE_CRITICAL'
+  triggerState    String   // Promise state at detection time
+  triggerElapsedMinutes Int
+
+  // Context snapshot (JSON — order state, kitchen workload, etc.)
+  contextSnapshot Json?
+
+  // Decision
+  decisionLevel       GuardianDecisionLevel?
+  decisionReasoning   String?
+  decisionAt          DateTime?
+
+  // Responsibility
+  assignedUserId      String?
+  assignedRole        String?
+
+  // Intervention tracking
+  interventionCount   Int      @default(0)
+  lastNotifiedAt      DateTime?
+  lastNotificationChannel String?
+
+  // Verification
+  verifiedAt          DateTime?
+  verificationNotes   String?
+
+  // Learning
+
+  // Idempotency: one case per promise+signal
+  idempotencyKey      String   @unique
+
+  // Metadata
+  detectedAt      DateTime @default(now())
+  resolvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  business        Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  promise         ServicePromise @relation(fields: [promiseId], references: [id], onDelete: Cascade)
+  sale            Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  assignedUser    User?          @relation("GuardianAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  interventions   GuardianIntervention[]
+  learningSignal  GuardianLearningSignal?
+
+  @@index([businessId, state])
+  @@index([promiseId])
+  @@index([saleId])
+  @@index([state, detectedAt])
+  @@index([outcome])
+}
+
+// GuardianIntervention — Auditable record of each intervention action
+model GuardianIntervention {
+  id              String   @id @default(cuid())
+  caseId          String
+  interventionType String  // 'NOTIFY_STAFF', 'ESCALATE', 'RECOMMEND'
+  channel         String   // 'WHATSAPP', 'EMAIL', 'SLACK', 'IN_APP'
+  recipient       String?  // phone, email, userId
+  messageContent  String
+  dispatchedAt    DateTime @default(now())
+  acknowledgedAt  DateTime?
+  acknowledgedBy  String?
+  result          String?  // 'DELIVERED', 'FAILED', 'PENDING'
+  metadata        Json?
+
+  case            GuardianCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId, dispatchedAt])
+  @@index([dispatchedAt])
+}
+
+// GuardianLearningSignal — Preserved outcome for future improvement
+model GuardianLearningSignal {
+  id              String   @id @default(cuid())
+  caseId          String   @unique
+  businessId      String
+  outcome         GuardianOutcome
+  caseType        GuardianCaseType
+  triggerSignal   String
+  decisionLevel   GuardianDecisionLevel?
+  interventionCount Int
+  elapsedMinutesFromSignal Int?
+  contextSummary  Json?
+  lessonsLearned  String?
+  createdAt       DateTime @default(now())
+
+  case            GuardianCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  business        Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, outcome])
+  @@index([outcome, createdAt])
+}
+
+enum GuardianCaseState {
+  DETECTED
+  UNDERSTANDING
+  DECISION
+  INTERVENTION_PENDING
+  INTERVENED
+  VERIFYING
+  RESOLVED
+  BREACHED
+  CLEARED
+  CANCELLED
+}
+
+enum GuardianOutcome {
+  PROTECTED_BY_GUARDIAN
+  RECOVERED_NATURALLY
+  INTERVENTION_FAILED
+  BREACHED
+  FALSE_POSITIVE
+  UNKNOWN
+}
+
+enum GuardianCaseType {
+  SERVICE_PROMISE_RISK
+}
+
+enum GuardianDecisionLevel {
+  OBSERVE
+  RECOMMEND
+  ALERT
+  ESCALATE
+}
+
+enum GuardianMode {
+  OFF
+  SHADOW
+  ASSIST
 }

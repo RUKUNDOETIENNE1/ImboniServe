@@ -22,6 +22,7 @@ export const FEATURE_FLAGS = {
   FEED_V1: 'feed_v1',
   FEED_ENGAGEMENT_V1: 'feed_engagement_v1',
   FEED_RECOMMENDATIONS_V1: 'feed_recommendations_v1',
+  GUARDIAN_V1: 'guardian_v1',
 } as const
 
 export type FeatureFlagKey = (typeof FEATURE_FLAGS)[keyof typeof FEATURE_FLAGS]
@@ -186,6 +187,15 @@ const INITIAL_FLAGS = [
     key: FEATURE_FLAGS.FEED_RECOMMENDATIONS_V1,
     name: 'Feed Recommendations v1',
     description: 'Personalized ranking; Phase 1: location + popularity only',
+    enabled: false,
+    autoEnableThreshold: null,
+    planGated: false,
+    minimumPlan: null,
+  },
+  {
+    key: FEATURE_FLAGS.GUARDIAN_V1,
+    name: 'Guardian v1',
+    description: 'Service promise protection intelligence layer (SHADOW mode by default)',
     enabled: false,
     autoEnableThreshold: null,
     planGated: false,

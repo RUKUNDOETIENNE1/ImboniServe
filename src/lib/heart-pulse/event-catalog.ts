@@ -113,6 +113,18 @@ export const HeartPulseEventType = {
   WITHDRAWAL_COMPLETED: 'withdrawal.completed',
   WITHDRAWAL_FAILED: 'withdrawal.failed',
   FUNDS_AVAILABLE: 'funds.available',
+
+  // Guardian Events
+  GUARDIAN_CASE_OPENED: 'guardian.case.opened',
+  GUARDIAN_CASE_SUPPRESSED: 'guardian.case.suppressed',
+  GUARDIAN_RECOMMENDATION_CREATED: 'guardian.recommendation.created',
+  GUARDIAN_NOTIFICATION_SENT: 'guardian.notification.sent',
+  GUARDIAN_ACKNOWLEDGED: 'guardian.acknowledged',
+  GUARDIAN_ESCALATED: 'guardian.escalated',
+  GUARDIAN_INTERVENTION_RECORDED: 'guardian.intervention.recorded',
+  GUARDIAN_RECOVERY_DETECTED: 'guardian.recovery.detected',
+  GUARDIAN_BREACH_DETECTED: 'guardian.breach.detected',
+  GUARDIAN_CASE_RESOLVED: 'guardian.case.resolved',
 } as const
 
 export type HeartPulseEventTypeValue = typeof HeartPulseEventType[keyof typeof HeartPulseEventType]
@@ -360,6 +372,18 @@ export const EventOwnership = {
   [HeartPulseEventType.WITHDRAWAL_COMPLETED]: 'SettlementIntelligenceService',
   [HeartPulseEventType.WITHDRAWAL_FAILED]: 'SettlementIntelligenceService',
   [HeartPulseEventType.FUNDS_AVAILABLE]: 'SettlementIntelligenceService',
+
+  // Guardian Events
+  [HeartPulseEventType.GUARDIAN_CASE_OPENED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_CASE_SUPPRESSED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_RECOMMENDATION_CREATED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_NOTIFICATION_SENT]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_ACKNOWLEDGED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_ESCALATED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_INTERVENTION_RECORDED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_RECOVERY_DETECTED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_BREACH_DETECTED]: 'GuardianService',
+  [HeartPulseEventType.GUARDIAN_CASE_RESOLVED]: 'GuardianService',
 } as const
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -435,5 +459,23 @@ export const EventSubscribers = {
 
   [HeartPulseEventType.PROMISE_FAILED]: [
     'Service Risks Dashboard (/dashboard/service-risks)',
+  ],
+
+  // Guardian Events
+  [HeartPulseEventType.GUARDIAN_CASE_OPENED]: [
+    'Guardian Dashboard (/dashboard/operations/guardian)',
+  ],
+  [HeartPulseEventType.GUARDIAN_NOTIFICATION_SENT]: [
+    'Guardian Dashboard (/dashboard/operations/guardian)',
+  ],
+  [HeartPulseEventType.GUARDIAN_ESCALATED]: [
+    'Guardian Dashboard (/dashboard/operations/guardian)',
+  ],
+  [HeartPulseEventType.GUARDIAN_BREACH_DETECTED]: [
+    'Guardian Dashboard (/dashboard/operations/guardian)',
+    'Service Risks Dashboard (/dashboard/service-risks)',
+  ],
+  [HeartPulseEventType.GUARDIAN_CASE_RESOLVED]: [
+    'Guardian Dashboard (/dashboard/operations/guardian)',
   ],
 } as const

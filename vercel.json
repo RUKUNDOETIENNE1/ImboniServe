@@ -35,6 +35,10 @@
     {
       "path": "/api/cron/summary-daily",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/guardian",
+      "schedule": "*/2 * * * *"
     }
   ],
   "buildCommand": "npx prisma generate && next build",

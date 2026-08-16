@@ -107,6 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Reservations', href: '/dashboard/reservations', icon: Calendar, i18nKey: 'dashboard.nav.reservations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'FRONT_DESK', 'SUPERVISOR'] },
     { name: 'Waiter', href: '/dashboard/waiter', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.waiter', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 6, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK'] },
     { name: 'Service Replay', href: '/dashboard/operations/service-replay', icon: RotateCcw, i18nKey: 'dashboard.nav.serviceReplay', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 7, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'] },
+    { name: 'Guardian', href: '/dashboard/operations/guardian', icon: ShieldCheck, i18nKey: 'dashboard.nav.guardian', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 8, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'], featureFlag: 'guardian_v1' },
 
     // === MENU & INVENTORY (5 items) ===
     { name: 'Menu', href: '/dashboard/menu', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.menu', v1Visible: true, v1Section: 'MENU_INVENTORY', v1Order: 1 },
