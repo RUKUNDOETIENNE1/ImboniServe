@@ -115,7 +115,20 @@ const nextConfig = {
     if (!dev) {
       config.optimization.minimize = true
     }
-    
+
+    // Native binary installer packages must not be bundled by webpack.
+    // They use dynamic require.context to locate platform-specific binaries,
+    // which causes webpack to scan their directories and fail on tsconfig.json
+    // files that contain comments/trailing commas (invalid JSON for webpack's parser).
+    const nativeBinaryPackages = {
+      '@ffprobe-installer/ffprobe': 'commonjs @ffprobe-installer/ffprobe',
+      '@ffmpeg-installer/ffmpeg': 'commonjs @ffmpeg-installer/ffmpeg',
+    }
+    config.externals = config.externals || []
+    if (Array.isArray(config.externals)) {
+      config.externals.push(nativeBinaryPackages)
+    }
+
     // Exclude Node.js modules from client bundle
     if (!isServer) {
       config.resolve.fallback = {
@@ -127,7 +140,7 @@ const nextConfig = {
         child_process: false,
       }
     }
-    
+
     return config
   },
   // Performance budgets
