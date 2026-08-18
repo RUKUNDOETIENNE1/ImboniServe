@@ -48,16 +48,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sales: {
           where: {
             createdAt: { gte: startDate },
-            status: { in: ['COMPLETED', 'PAID'] }
+            isPaid: true,
           },
           select: {
             id: true,
-            totalCents: true,
-            tipCents: true,
+            totalAmountCents: true,
             createdAt: true,
-            completedAt: true
-          }
-        }
+            servedAt: true,
+          },
+        },
+        staffTipsReceived: {
+          where: {
+            createdAt: { gte: startDate },
+            status: 'PAID',
+          },
+          select: {
+            amountCents: true,
+            createdAt: true,
+          },
+        },
       }
     })
 
@@ -65,20 +74,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const staffWithMetrics = staffMembers.map(staff => {
       const sales = staff.sales
       const totalOrders = sales.length
-      const totalSales = sales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
-      const totalTips = sales.reduce((sum, s) => sum + (s.tipCents || 0), 0) / 100
+      const totalSales = sales.reduce((sum: number, s: { totalAmountCents: number }) => sum + (s.totalAmountCents || 0), 0) / 100
+
+      const tips = staff.staffTipsReceived
+      const totalTips = tips.reduce((sum: number, t: { amountCents: number }) => sum + (t.amountCents || 0), 0) / 100
+
       const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0
 
-      // Calculate average service time (order to completion)
+      // Calculate average service time (order to served)
       const serviceTimes = sales
-        .filter(s => s.completedAt)
-        .map(s => {
+        .filter((s: { servedAt: Date | null }) => Boolean(s.servedAt))
+        .map((s: { createdAt: Date; servedAt: Date | null }) => {
           const orderTime = new Date(s.createdAt).getTime()
-          const completeTime = new Date(s.completedAt!).getTime()
+          const completeTime = new Date(s.servedAt as Date).getTime()
           return (completeTime - orderTime) / (1000 * 60) // minutes
         })
       const avgServiceTime = serviceTimes.length > 0
-        ? serviceTimes.reduce((sum, t) => sum + t, 0) / serviceTimes.length
+        ? serviceTimes.reduce((sum: number, t: number) => sum + t, 0) / serviceTimes.length
         : 0
 
       // Mock customer rating (would come from feedback system)

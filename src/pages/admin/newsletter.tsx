@@ -1,10 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { useTranslation } from '@/lib/i18n'
 import { useToast } from '@/components/Toast'
 import { Mail, Download, TrendingUp } from 'lucide-react'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
+}
 
 export default function NewsletterPage() {
   const { data: session, status } = useSession()

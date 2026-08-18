@@ -7,12 +7,15 @@ import PreferencesSettings from '@/components/PreferencesSettings';
 import CallWaiterButton from '@/components/CallWaiterButton';
 import OTPVerification from '@/components/order/OTPVerification';
 import UpsellRecommendations from '@/components/order/UpsellRecommendations';
+import WelcomeBackBanner from '@/components/order/WelcomeBackBanner';
 import SeatSelectionModal from '@/components/SeatSelectionModal';
 import { getUserPreferences, isMenuItemSafe, detectUserLanguage } from '@/lib/userPreferences';
 import { abServeForMenuItem, abTrackEvent } from '@/lib/ab-testing/client';
 import type { MenuItemDetail } from '@/components/MenuItemDetailModal';
 import type { SessionInfo } from '@/lib/sessionManager';
 import { getSessionInfo, joinTableSession, getGroupOrderSummary, validateSession, setParticipantName } from '@/lib/sessionManager';
+import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/contexts/LocaleContext';
 
 type MenuItem = MenuItemDetail & {
   translations?: Array<{
@@ -31,6 +34,8 @@ type CartItem = {
 
 export default function OrderPage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { currency } = useCurrency();
   const { branchId, tableId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
 
   const [loading, setLoading] = useState(true);
@@ -423,6 +428,7 @@ export default function OrderPage() {
             allergies: preferences.allergies,
             dietaryPreferences: preferences.dietaryPreferences,
           },
+          customerPhone: phone || undefined,
           limit: 3,
         }),
       });
@@ -568,7 +574,7 @@ export default function OrderPage() {
         return;
       }
 
-      alert('Order confirmed and sent to kitchen!');
+      showToast('success', 'Order confirmed and sent to kitchen!');
       setShowConfirmation(false);
       setCart({});
     } catch (e: any) {
@@ -600,7 +606,7 @@ export default function OrderPage() {
 
   function formatRwf(cents: number) {
     // Deprecated: kept for compatibility; use <CurrencyDisplay inCents /> instead
-    return `${Math.round(cents).toLocaleString()}`;
+    return `${Math.round(cents).toLocaleString()} ${currency}`;
   }
 
   if (showConfirmation) {
@@ -719,7 +725,7 @@ export default function OrderPage() {
                 } catch {}
               } else {
                 navigator.clipboard.writeText(window.location.href);
-                alert('Link copied! Share it to earn 500 RWF when friends order.');
+                showToast('success', 'Link copied! Share it to earn 500 RWF when friends order.');
               }
             }}
             style={{
@@ -1015,6 +1021,10 @@ export default function OrderPage() {
                       <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: 8, fontSize: 13, color: '#166534' }}>
                         ✓ Phone verified: {phone}
                       </div>
+                      <WelcomeBackBanner
+                        phone={phone}
+                        businessId={branchId || ''}
+                      />
                       <input
                         type="text"
                         placeholder="Your name"

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { ingestLoyaltyShadowEvent } from '@/lib/die/business-as-plugin/loyalty/loyalty.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -50,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             businessId,
             phone: customerPhone,
             name: `Customer ${customerPhone}`,
-            pointsBalance: 0
+            loyaltyPoints: 0
           }
         })
       }
@@ -75,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await prisma.customer.update({
       where: { id: customer.id },
       data: {
-        pointsBalance: {
+        loyaltyPoints: {
           increment: parseInt(amount)
         }
       }
@@ -88,9 +89,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id: true,
         name: true,
         phone: true,
-        pointsBalance: true
+        loyaltyPoints: true
       }
     })
+
+    // Shadow taps (feature-flagged, non-blocking)
+    try {
+      const isDebit = parseInt(amount) < 0 || ['MANUAL_DEBIT'].includes(type)
+      const absPoints = Math.abs(parseInt(amount))
+      ingestLoyaltyShadowEvent({
+        type: isDebit ? 'POINTS_REDEEMED' : 'POINTS_EARNED',
+        businessId,
+        customerId: customer.id,
+        points: absPoints,
+      }).catch(() => {})
+    } catch {}
 
     return res.status(200).json({
       success: true,

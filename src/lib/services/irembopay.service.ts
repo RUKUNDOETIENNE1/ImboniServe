@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 export interface CreateInvoiceParams {
   businessId: string
-  subscriptionId: string
+  subscriptionId?: string
   amountCents: number
   description: string
   customer: {
@@ -52,18 +52,42 @@ export interface MomoPushResponse {
   referenceId: string
 }
 
+/**
+ * Security: Fail-closed payment API base resolution.
+ *
+ * In production, IREMBOPAY_API_BASE MUST be explicitly set.  Silently
+ * falling back to the sandbox URL would cause real customer payments to
+ * be processed against the test environment, which could lose money and
+ * corrupt financial state.
+ *
+ * In development / test, the sandbox URL is retained as a convenience
+ * default so local workflows keep working.
+ */
+const isProductionEnv = process.env.NODE_ENV === 'production'
+const IREMBOPAY_API_BASE_RESOLVED = (() => {
+  const v = process.env.IREMBOPAY_API_BASE
+  if (v) return v
+  if (isProductionEnv) {
+    throw new Error(
+      'SECURITY FATAL: IREMBOPAY_API_BASE is not set in production. ' +
+      'Refusing to default to the sandbox API. Set IREMBOPAY_API_BASE to the production IremboPay API URL.'
+    )
+  }
+  return 'https://api.sandbox.irembopay.com'
+})()
+
 export class IremboPayService {
-  private static readonly API_BASE = process.env.IREMBO_API_BASE || 'https://api.sandbox.irembopay.com'
-  private static readonly SECRET_KEY = process.env.IREMBO_SECRET_KEY!
-  private static readonly PUBLIC_KEY = process.env.IREMBO_PUBLIC_KEY!
-  private static readonly PAYMENT_ACCOUNT = process.env.IREMBO_PAYMENT_ACCOUNT!
-  private static readonly PAYMENT_ITEM_CODE = process.env.IREMBO_PAYMENT_ITEM_CODE!
-  private static readonly API_VERSION = process.env.IREMBO_API_VERSION || '2'
-  private static readonly WEBHOOK_TOLERANCE_SECONDS = parseInt(process.env.IREMBO_WEBHOOK_TOLERANCE_SECONDS || '300')
+  private static readonly API_BASE = IREMBOPAY_API_BASE_RESOLVED
+  private static readonly SECRET_KEY = process.env.IREMBOPAY_SECRET_KEY!
+  private static readonly PUBLIC_KEY = process.env.IREMBOPAY_PUBLIC_KEY!
+  private static readonly PAYMENT_ACCOUNT = process.env.IREMBOPAY_PAYMENT_ACCOUNT!
+  private static readonly PAYMENT_ITEM_CODE = process.env.IREMBOPAY_PAYMENT_ITEM_CODE!
+  private static readonly API_VERSION = process.env.IREMBOPAY_API_VERSION || '2'
+  private static readonly WEBHOOK_TOLERANCE_SECONDS = parseInt(process.env.IREMBOPAY_WEBHOOK_TOLERANCE_SECONDS || '300')
 
   static async createInvoice(params: CreateInvoiceParams): Promise<InvoiceResponse> {
     const transactionId = `IMBONI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    const expiryAt = new Date(Date.now() + 15 * 60 * 1000).toISOString()
+    const expiryAt = new Date(Date.now() + 20 * 60 * 1000).toISOString()
 
     const payload = {
       transactionId,
@@ -192,14 +216,15 @@ export class IremboPayService {
     return this.PUBLIC_KEY
   }
 
-  static calculateVATAmounts(grossAmountCents: number): {
+  static calculateVATAmounts(grossAmountCents: number, taxRate: number = 0): {
     vatAmountCents: number
     exVatAmountCents: number
   } {
-    // VAT = gross * 18 / 118 (for 18% VAT inclusive)
-    const vatAmountCents = Math.round(grossAmountCents * 18 / 118)
+    // VAT = gross * taxRate / (100 + taxRate) (for tax-inclusive pricing)
+    // taxRate defaults to 0 — no tax unless configured by the business
+    const vatAmountCents = Math.round(grossAmountCents * taxRate / (100 + taxRate))
     const exVatAmountCents = grossAmountCents - vatAmountCents
-    
+
     return {
       vatAmountCents,
       exVatAmountCents

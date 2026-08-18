@@ -1,0 +1,53 @@
+﻿-        totalCents: Math.round(suggestion.estimatedCost * 100),
++        totalAmountCents: Math.round(suggestion.estimatedCost * 100),
+-            totalCents: true,
++            totalAmountCents: true,
+-      const totalSpent = sales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
++      const totalSpent = sales.reduce((sum: number, s: { totalAmountCents: number }) => sum + (s.totalAmountCents || 0), 0) / 100
+-            totalCents,
++            totalAmountCents: totalCents,
+-                subtotalCents: item.unitPriceCents * item.quantity
++                totalPriceCents: item.unitPriceCents * item.quantity,
++                unitPriceCents: item.unitPriceCents,
++                subtotalCents: item.unitPriceCents * item.quantity,
++              totalCents,
++        return { order, supplierName, totalCents, orderReq }
+-              unitPriceCents: item.unitPriceCents,
+-            totalCents: order.totalCents,
++        totalCents: o.totalCents,
+-    let totalCents = 0
++    let totalAmountCents = 0
++    const saleItems: Array<{ menuItemId: string; quantity: number; unitPriceCents: number; totalPriceCents: number }> = []
+-      totalCents += itemTotal
++      totalAmountCents += itemTotal
+-        totalCents: itemTotal,
++        unitPriceCents: menuItem.priceCents,
++        totalPriceCents: itemTotal,
+-        totalCents,
++        totalAmountCents: totalAmountCents,
+-            totalCents: item.totalCents,
++            unitPriceCents: item.unitPriceCents,
++            totalPriceCents: item.totalPriceCents,
+-        totalCents,
++        totalCents: totalAmountCents,
+-            totalCents,
++            totalCents: totalAmountCents,
+-        totalCents: addonOrder.totalCents,
++        totalCents: addonOrder.totalAmountCents,
+-      amountCents: order.totalCents,
++      amountCents: order.totalAmountCents,
+-        amountCents: order.totalCents,
++        amountCents: order.totalAmountCents,
+-          amountCents: sale.totalCents,
++          amountCents: sale.totalAmountCents,
+-            totalCents: true,
++            totalAmountCents: true,
+-      const totalSales = sales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
++      const totalSales = sales.reduce((sum: number, s: { totalAmountCents: number }) => sum + (s.totalAmountCents || 0), 0) / 100
+-        totalCents: total,
++        totalAmountCents: total,
++            const unitPriceCents = menuItem?.priceCents || 0
++              unitPriceCents,
++              totalPriceCents: unitPriceCents * item.quantity,
+-  const total = sale.totalCents / 100
++  const total = sale.totalAmountCents / 100

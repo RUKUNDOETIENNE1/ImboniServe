@@ -3,8 +3,9 @@ import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { getTableSeats } from '@/lib/services/seat-detection.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 
@@ -35,5 +36,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(405).json({ error: 'Method not allowed' })
 }
+
+// Apply commercial enforcement: Tables require Starter plan or higher
+const handler = requiresFeature('hasTables')(baseHandler)
 
 export default requirePermission('tables.read')(handler)

@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const session = await getServerSession(req, res, authOptions)
@@ -30,3 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     whatsappShare: `https://wa.me/?text=${whatsappText}`,
   })
 }
+
+// Apply commercial enforcement: Business invites require active subscription
+export default requiresActiveSubscription(baseHandler)

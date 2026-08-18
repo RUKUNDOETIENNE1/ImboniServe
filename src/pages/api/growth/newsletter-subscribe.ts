@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { emailOrPhone, sourcePage } = req.body
+    const { emailOrPhone, sourcePage, name, email, phone, consentSource } = req.body
 
     // Validation
     if (!emailOrPhone) {
@@ -21,7 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const subscriber = await NewsletterService.subscribe({
       emailOrPhone,
-      sourcePage
+      sourcePage,
+      name,
+      email,
+      phone,
+      consentSource,
     })
 
     return res.status(201).json({ success: true, subscriber })

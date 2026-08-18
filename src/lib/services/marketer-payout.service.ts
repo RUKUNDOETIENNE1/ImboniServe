@@ -62,12 +62,20 @@ export class MarketerPayoutService {
       throw new Error('Marketer not found');
     }
 
+    // Determine payout currency from the marketer's most recent commission
+    const latestCommission = await prisma.marketerCommission.findFirst({
+      where: { marketerId: params.marketerId },
+      orderBy: { createdAt: 'desc' },
+      select: { currency: true }
+    });
+    const payoutCurrency = latestCommission?.currency || 'RWF';
+
     // Create payout request
     const payout = await prisma.marketerPayout.create({
       data: {
         marketerId: params.marketerId,
         amountCents: params.amountCents,
-        currency: 'RWF',
+        currency: payoutCurrency,
         method: params.method,
         status: 'PENDING',
         recipientPhone: params.recipientPhone,
@@ -119,10 +127,10 @@ export class MarketerPayoutService {
       if (approve) {
         await this.approvePayout(payout.id, 'system:auto-approval');
         await RevenueEventService.emit({
-          type: 'PAYOUT_AUTO_APPROVED',
+          type: 'PAYOUT_APPROVED',
           entityType: 'payout',
           entityId: payout.id,
-          payload: { marketerId: params.marketerId, amountCents: params.amountCents, reasons }
+          payload: { marketerId: params.marketerId, amountCents: params.amountCents, reasons, autoApproved: true }
         });
         // Notify marketer
         RevenueNotificationService.sendPayoutApproved({

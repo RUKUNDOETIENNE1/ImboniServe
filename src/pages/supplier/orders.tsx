@@ -1,8 +1,12 @@
 ﻿import { Search, Filter, Clock, CheckCircle, XCircle, Truck } from 'lucide-react'
 import { useState } from 'react'
+import { useToast } from '@/components/Toast'
+import { useCurrency } from '@/contexts/LocaleContext'
 
 export default function SupplierOrders() {
   const [statusFilter, setStatusFilter] = useState('all')
+  const { showToast } = useToast()
+  const { currency } = useCurrency()
   
   const [orders, setOrders] = useState([
     { 
@@ -104,9 +108,9 @@ export default function SupplierOrders() {
       throw new Error(data?.error || 'Failed to update')
     }
     setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)))
-    alert(`Order ${orderId} status updated to ${newStatus}`)
+    showToast('success', `Order ${orderId} status updated to ${newStatus}`)
   } catch (e) {
-    alert('Failed to update status')
+    showToast('error', 'Failed to update status')
   }
 }
 
@@ -125,9 +129,9 @@ export default function SupplierOrders() {
         throw new Error(data?.error || 'Failed to confirm delivery')
       }
       setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: 'DELIVERED' } : o)))
-      alert(`Order ${orderId} delivered successfully!`)
+      showToast('success', `Order ${orderId} delivered successfully!`)
     } catch (e) {
-      alert('Failed to confirm delivery')
+      showToast('error', 'Failed to confirm delivery')
     }
   }
 
@@ -161,7 +165,7 @@ export default function SupplierOrders() {
           <div className="bg-white p-6 rounded-lg shadow">
             <p className="text-sm text-gray-600">Today's Revenue</p>
             <p className="text-2xl font-bold text-green-600">
-              RWF {orders.reduce((sum, o) => sum + o.amount, 0).toLocaleString()}
+              {currency} {orders.reduce((sum, o) => sum + o.amount, 0).toLocaleString()}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
@@ -222,7 +226,7 @@ export default function SupplierOrders() {
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Order #</th>
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Business</th>
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Items</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount (RWF)</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount ({currency})</th>
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Delivery Time</th>
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
@@ -245,7 +249,7 @@ export default function SupplierOrders() {
                         <span className="text-sm">{order.items}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="font-bold">RWF {order.amount.toLocaleString()}</span>
+                        <span className="font-bold">{currency} {order.amount.toLocaleString()}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${getStatusColor(order.status)}`}>

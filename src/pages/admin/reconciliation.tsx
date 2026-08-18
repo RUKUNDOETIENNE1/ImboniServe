@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { AlertTriangle, CheckCircle, RefreshCw, Play } from 'lucide-react'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
+import { useCurrency } from '@/contexts/LocaleContext'
 import type { GetServerSideProps } from 'next'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -13,10 +15,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 export default function ReconciliationPage() {
+  const { currency } = useCurrency()
   const [mismatches, setMismatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
   const [message, setMessage] = useState('')
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   async function fetchMismatches() {
     setLoading(true)
@@ -24,6 +28,7 @@ export default function ReconciliationPage() {
       const res = await fetch('/api/admin/reconciliation')
       const data = await res.json()
       setMismatches(data.mismatches || [])
+      setLastUpdated(new Date())
     } catch { } finally { setLoading(false) }
   }
 
@@ -67,6 +72,7 @@ export default function ReconciliationPage() {
             <AlertTriangle className="w-6 h-6 text-amber-500" /> Payment Reconciliation
           </h1>
           <p className="text-sm text-slate-500 mt-1">Review and resolve payment mismatches</p>
+          <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
         </div>
         <div className="flex gap-2">
           <button onClick={fetchMismatches} className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50">
@@ -114,7 +120,7 @@ export default function ReconciliationPage() {
                       {m.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{m.expectedAmountCents ? `${(m.expectedAmountCents / 100).toLocaleString()} RWF` : '—'}</td>
+                  <td className="px-4 py-3">{m.expectedAmountCents ? `${(m.expectedAmountCents / 100).toLocaleString()} ${currency}` : '—'}</td>
                   <td className="px-4 py-3 text-slate-500 max-w-xs truncate">{m.notes}</td>
                   <td className="px-4 py-3 text-slate-400">{new Date(m.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3">

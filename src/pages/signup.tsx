@@ -1,13 +1,14 @@
-import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react'
+import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/router'
-import { Mail, Lock, Phone, Building, MapPin, Globe } from 'lucide-react'
+import { Mail, Lock, Phone, Building, MapPin, Globe, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
-import { PRICING_PLANS } from '@/config/pricing'
+import { PRICING_PLANS, PRICING_CONFIG } from '@/config/pricing'
 import { formatCurrency } from '@/lib/utils/currency'
 import LocationAutocomplete from '@/components/LocationAutocomplete'
+import { TrialLengthLabel } from '@/components/TrialLengthLabel'
 
 export default function Signup() {
   const { t, changeLocale } = useTranslation()
@@ -30,25 +31,74 @@ export default function Signup() {
     phone: '',
     businessName: '',
     city: 'Kigali',
-    planCode: 'ESSENTIALS', // Default entry plan for trial (overridden by ?plan=)
+    country: 'RW', // EGR-016: Country is configurable, defaults to Rwanda
+    planCode: 'STARTER', // Default entry plan for trial (overridden by ?plan=)
     businessType: 'RESTAURANT', // RESTAURANT, HOTEL, CAFE, BAR, SUPPLIER
     latitude: null as number | null,
     longitude: null as number | null,
+    referralCode: '', // Optional referral/affiliate code
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
 
+  // Live referral code validation state
+  const [refValidation, setRefValidation] = useState<
+    | { state: 'idle' | 'checking' | 'valid' | 'invalid'; source?: string; trialDays?: number }
+  >({ state: 'idle' })
+  const [refAutoDetected, setRefAutoDetected] = useState(false)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const validateReferralCode = useCallback((code: string) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    if (!code.trim()) {
+      setRefValidation({ state: 'idle' })
+      return
+    }
+    setRefValidation({ state: 'checking' })
+    debounceTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/codes/resolve?code=${encodeURIComponent(code.trim())}`)
+        const data = await res.json()
+        if (data.valid) {
+          setRefValidation({ state: 'valid', source: data.source, trialDays: data.trialDays })
+        } else {
+          setRefValidation({ state: 'invalid' })
+        }
+      } catch {
+        setRefValidation({ state: 'invalid' })
+      }
+    }, 500)
+  }, [])
+
   useEffect(() => {
     const qp = (router.query.plan as string | undefined)?.toUpperCase()
-    const allowed = ['ESSENTIALS', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE', 'GROWTH', 'STARTER']
+    const allowed = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
     if (qp && allowed.includes(qp)) {
       setFormData(prev => ({ ...prev, planCode: qp as any }))
     }
-  }, [router.query.plan])
+    // Hydrate referral code from all URL param aliases
+    const refFromUrl =
+      (router.query.ref as string | undefined) ||
+      (router.query.aff as string | undefined) ||
+      (router.query.partner as string | undefined) ||
+      (router.query.m as string | undefined) ||
+      (router.query.invite as string | undefined) ||
+      (router.query.inv as string | undefined) ||
+      undefined
+    if (refFromUrl) {
+      setFormData(prev => ({ ...prev, referralCode: refFromUrl }))
+      setRefAutoDetected(true)
+      validateReferralCode(refFromUrl)
+    }
+  }, [router.query.plan, router.query.ref, router.query.aff, router.query.partner, router.query.m, router.query.invite, router.query.inv, validateReferralCode])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    if (e.target.name === 'referralCode') {
+      setRefAutoDetected(false)
+      validateReferralCode(e.target.value)
+    }
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -69,7 +119,7 @@ export default function Signup() {
         throw new Error(data.error || t('auth.signup_failed', 'Signup failed'))
       }
 
-      await router.push('/login?signup=success')
+      await router.push('/welcome')
     } catch (err) {
       setError(err instanceof Error ? err.message : t('auth.signup_failed', 'Signup failed'))
     } finally {
@@ -116,7 +166,7 @@ export default function Signup() {
         {/* Trial banner - only for hospitality businesses */}
         {(['RESTAURANT','HOTEL','CAFE','BAR'] as const).includes(formData.businessType as any) && (
           <div className="bg-gradient-imboni text-white text-center text-sm font-medium px-4 py-2.5 rounded-xl mb-4">
-            🎉 {t('auth.trial_banner', '14-day free trial — no credit card required. 50% OFF launch pricing.')}
+            🎉 <TrialLengthLabel />. 50% OFF launch pricing.
           </div>
         )}
         <div className="text-center mb-8">
@@ -242,11 +292,52 @@ export default function Signup() {
                   placeholder="e.g. Kigali, Nairobi, London"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('auth.country', 'Country')}
+                </label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
+                  suppressHydrationWarning
+                >
+                  <option value="RW">Rwanda</option>
+                  <option value="KE">Kenya</option>
+                  <option value="UG">Uganda</option>
+                  <option value="TZ">Tanzania</option>
+                  <option value="ZA">South Africa</option>
+                  <option value="NG">Nigeria</option>
+                  <option value="GH">Ghana</option>
+                  <option value="EG">Egypt</option>
+                  <option value="MA">Morocco</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="FR">France</option>
+                  <option value="DE">Germany</option>
+                  <option value="IT">Italy</option>
+                  <option value="ES">Spain</option>
+                  <option value="BE">Belgium</option>
+                  <option value="NL">Netherlands</option>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="AE">United Arab Emirates</option>
+                  <option value="SA">Saudi Arabia</option>
+                  <option value="QA">Qatar</option>
+                  <option value="IN">India</option>
+                  <option value="CN">China</option>
+                  <option value="JP">Japan</option>
+                  <option value="AU">Australia</option>
+                  <option value="BR">Brazil</option>
+                  <option value="MX">Mexico</option>
+                </select>
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('auth.account_type', 'Account Type (Business or Affiliate)')}
+                {t('auth.account_type', 'Account Type')}
               </label>
               <select
                 name="businessType"
@@ -259,12 +350,63 @@ export default function Signup() {
                 <option value="HOTEL">{t('auth.business_type_hotel', 'Hotel')}</option>
                 <option value="CAFE">{t('auth.business_type_cafe', 'Café / Coffee Shop')}</option>
                 <option value="BAR">{t('auth.business_type_bar', 'Bar / Pub')}</option>
-                <option value="AFFILIATE">{t('auth.business_type_affiliate', 'Affiliate Marketer')}</option>
                 <option value="SUPPLIER">{t('auth.business_type_supplier', 'Supplier (No free trial)')}</option>
               </select>
               {formData.businessType === 'SUPPLIER' && (
                 <p className="mt-2 text-sm text-amber-600">
-                  ⚠️ {t('auth.supplier_no_trial', 'Suppliers are not eligible for the 14-day free trial. Paid plan required.')}
+                  ⚠️ {t('auth.supplier_no_trial', `Suppliers are not eligible for the ${PRICING_CONFIG.trialDays ?? 14}-day free trial. Paid plan required.`)}
+                </p>
+              )}
+            </div>
+
+            {/* Referral Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('auth.referral_code', 'Referral / Invitation Code (optional)')}
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="referralCode"
+                  value={formData.referralCode}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
+                  placeholder={t('auth.referral_code_placeholder', 'Enter referral or invitation code')}
+                  aria-describedby="referral-code-hint"
+                />
+                {refValidation.state === 'checking' && (
+                  <Loader2 className="absolute right-3 top-3 w-4 h-4 text-gray-400 animate-spin" />
+                )}
+                {refValidation.state === 'valid' && (
+                  <CheckCircle2 className="absolute right-3 top-3 w-4 h-4 text-green-500" />
+                )}
+                {refValidation.state === 'invalid' && (
+                  <AlertCircle className="absolute right-3 top-3 w-4 h-4 text-red-400" />
+                )}
+              </div>
+              {refAutoDetected && refValidation.state === 'valid' && (
+                <p className="mt-1.5 text-xs text-green-600 font-medium">
+                  ✓ {t('auth.referral_auto_detected', 'Invitation detected! Your extended trial will be applied automatically. You can change or remove the code if needed.')}
+                </p>
+              )}
+              {refValidation.state === 'valid' && !refAutoDetected && refValidation.trialDays && refValidation.trialDays > (PRICING_CONFIG.trialDays ?? 14) && (
+                <p className="mt-1.5 text-xs text-green-600">
+                  ✓ {t('auth.referral_extended_trial', `Code valid — ${refValidation.trialDays}-day trial applied!`)}
+                </p>
+              )}
+              {refValidation.state === 'valid' && !refAutoDetected && (!refValidation.trialDays || refValidation.trialDays <= (PRICING_CONFIG.trialDays ?? 14)) && (
+                <p className="mt-1.5 text-xs text-green-600">
+                  ✓ {t('auth.referral_valid', 'Code valid!')}
+                </p>
+              )}
+              {refValidation.state === 'invalid' && (
+                <p className="mt-1.5 text-xs text-red-500">
+                  {t('auth.referral_invalid', 'This code doesn\'t match any active referral or invitation. Check the spelling or leave blank.')}
+                </p>
+              )}
+              {refValidation.state === 'idle' && (
+                <p id="referral-code-hint" className="mt-1 text-xs text-gray-500">
+                  {t('auth.referral_code_hint', 'Enter a referral or invitation code if you were referred by a partner or friend.')}
                 </p>
               )}
             </div>
@@ -288,7 +430,7 @@ export default function Signup() {
                 <Link href="/privacy" target="_blank" className="text-imboni-blue hover:text-imboni-orange underline font-medium">
                   {t('auth.privacy_policy', 'Privacy Policy')}
                 </Link>
-                {', and '}
+                {t('auth.and_service_terms', ', and ')}
                 <Link href="/service-terms" target="_blank" className="text-imboni-blue hover:text-imboni-orange underline font-medium">
                   {t('auth.service_terms', 'Service Terms')}
                 </Link>
@@ -304,7 +446,7 @@ export default function Signup() {
                 ? t('auth.creating_account', 'Creating Account...') 
                 : formData.businessType === 'SUPPLIER'
                   ? t('auth.create_account', 'Create Account')
-                  : t('auth.start_free_trial', 'Start Your 14-Day Free Trial')
+                  : t('auth.start_free_trial', `Start Your ${PRICING_CONFIG.trialDays ?? 14}-Day Free Trial`)
               }
             </button>
             {formData.businessType !== 'SUPPLIER' && (
@@ -327,7 +469,7 @@ export default function Signup() {
 
       <div className="mt-6 text-center text-xs text-gray-400">
         <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-gray-600">
-          Powered by ICTHubs
+          {t('auth.powered_by', 'Powered by ICTHubs')}
         </a>
       </div>
     </div>

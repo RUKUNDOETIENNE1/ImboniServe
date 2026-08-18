@@ -54,7 +54,7 @@ export class RevenueNotificationService {
         
         <div style="background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0;">
           <p style="color:#1e293b;margin:0 0 16px;">Hello <strong>${params.name}</strong>,</p>
-          <p style="color:#475569;margin:0 0 24px;">Your marketer account has been created! You can now start referring restaurants and earning commissions.</p>
+          <p style="color:#475569;margin:0 0 24px;">Your marketer account has been created! You can now start referring hospitality businesses and earning commissions.</p>
           
           <div style="background:#dbeafe;border-radius:8px;padding:20px;margin-bottom:24px;border-left:4px solid #1e40af;">
             <p style="color:#1e40af;margin:0 0 8px;font-weight:bold;">Your Referral Code</p>
@@ -68,14 +68,14 @@ export class RevenueNotificationService {
 
           <h3 style="color:#1e3a5f;margin:0 0 16px;font-size:16px;">💰 Commission Structure</h3>
           <ul style="color:#475569;line-height:1.8;padding-left:20px;">
-            <li><strong>Signup Bonus:</strong> 50,000 RWF when a restaurant signs up</li>
+            <li><strong>Signup Bonus:</strong> 50,000 RWF when a hospitality business signs up</li>
             <li><strong>Recurring Commission:</strong> 15% of their subscription for 12 months</li>
             <li><strong>Validation Period:</strong> 7 days before funds become available</li>
           </ul>
 
           <h3 style="color:#1e3a5f;margin:24px 0 16px;font-size:16px;">🚀 Getting Started</h3>
           <ol style="color:#475569;line-height:1.8;padding-left:20px;">
-            <li>Share your referral link with restaurant owners</li>
+            <li>Share your referral link with hospitality business owners</li>
             <li>When they sign up, you earn a 50,000 RWF bonus</li>
             <li>Track your earnings in the marketer dashboard</li>
             <li>Request payouts when your balance reaches 10,000 RWF</li>
@@ -524,7 +524,7 @@ export class RevenueNotificationService {
             ` : ''}
           </div>
 
-          <p style="color:#475569;margin:0 0 16px;">Keep up the great work! Continue referring restaurants to earn more commissions.</p>
+          <p style="color:#475569;margin:0 0 16px;">Keep up the great work! Continue referring hospitality businesses to earn more commissions.</p>
 
           <div style="text-align:center;margin-top:32px;">
             <a href="${process.env.NEXTAUTH_URL}/dashboard/marketer" style="display:inline-block;background:#10b981;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;">View Dashboard</a>

@@ -4,7 +4,9 @@ import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package, AlertCircle } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
+import { useCurrency } from '@/contexts/LocaleContext'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
+import { useToast } from '@/components/Toast'
 
 interface CartItem {
   productId: string
@@ -29,6 +31,8 @@ export default function CartPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const { cart, updateQuantity: updateQty, removeFromCart: removeItem, clearCart: clear } = useCart()
+  const { currency } = useCurrency()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -59,7 +63,7 @@ export default function CartPage() {
     }, {} as GroupedCart)
   }
 
-  const MINIMUM_ORDER_CENTS = 5000 // 5,000 RWF minimum order
+  const MINIMUM_ORDER_CENTS = 5000 // 5,000 minimum order
 
   const getTotalCents = () => {
     return cart.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0)
@@ -69,7 +73,7 @@ export default function CartPage() {
     if (cart.length === 0) return
     const total = getTotalCents()
     if (total < MINIMUM_ORDER_CENTS) {
-      alert(`Minimum order value is ${(MINIMUM_ORDER_CENTS / 100).toLocaleString()} RWF. Please add ${((MINIMUM_ORDER_CENTS - total) / 100).toLocaleString()} RWF more to proceed.`)
+      showToast('warning', `Minimum order value is ${(MINIMUM_ORDER_CENTS / 100).toLocaleString()} ${currency}. Please add ${((MINIMUM_ORDER_CENTS - total) / 100).toLocaleString()} ${currency} more to proceed.`)
       return
     }
     router.push('/store/checkout')
@@ -120,7 +124,7 @@ export default function CartPage() {
                   <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4 border-b border-gray-200">
                     <h3 className="font-bold text-lg text-gray-900">{group.supplierName}</h3>
                     <p className="text-sm text-gray-600">
-                      {group.items.length} item{group.items.length > 1 ? 's' : ''} · Subtotal: {(group.subtotal / 100).toLocaleString()} RWF
+                      {group.items.length} item{group.items.length > 1 ? 's' : ''} · Subtotal: {(group.subtotal / 100).toLocaleString()} {currency}
                     </p>
                   </div>
 
@@ -134,7 +138,7 @@ export default function CartPage() {
                             <p className="text-sm text-gray-600 mb-2">{item.category}</p>
                             <div className="flex items-center gap-4">
                               <span className="text-lg font-bold text-imboni-orange">
-                                {(item.unitPriceCents / 100).toLocaleString()} RWF
+                                {(item.unitPriceCents / 100).toLocaleString()} {currency}
                               </span>
                               <span className="text-sm text-gray-500">per {item.unit}</span>
                             </div>
@@ -163,7 +167,7 @@ export default function CartPage() {
                             <div className="w-32 text-right">
                               <p className="text-sm text-gray-500">Total</p>
                               <p className="text-lg font-bold text-gray-900">
-                                {((item.unitPriceCents * item.quantity) / 100).toLocaleString()} RWF
+                                {((item.unitPriceCents * item.quantity) / 100).toLocaleString()} {currency}
                               </p>
                             </div>
 
@@ -223,7 +227,7 @@ export default function CartPage() {
                       <div className="text-sm text-yellow-900">
                         <p className="font-semibold mb-1">Minimum order not met</p>
                         <p className="text-yellow-700">
-                          Add {((MINIMUM_ORDER_CENTS - totalCents) / 100).toLocaleString()} RWF more to reach the minimum order of {(MINIMUM_ORDER_CENTS / 100).toLocaleString()} RWF
+                          Add {((MINIMUM_ORDER_CENTS - totalCents) / 100).toLocaleString()} {currency} more to reach the minimum order of {(MINIMUM_ORDER_CENTS / 100).toLocaleString()} {currency}
                         </p>
                       </div>
                     </div>

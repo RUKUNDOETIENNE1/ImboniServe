@@ -1,17 +1,37 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { UserCog, Plus, DollarSign, Users, TrendingUp, Download } from 'lucide-react'
+import { useToast } from '@/components/Toast'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
+import { useCurrency } from '@/contexts/LocaleContext'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
+}
 
 export default function AdminAffiliates() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showToast } = useToast()
+  const { currency } = useCurrency()
   const [affiliates, setAffiliates] = useState<any[]>([])
   const [payouts, setPayouts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newAffiliate, setNewAffiliate] = useState({ code: '', name: '', commissionRate: 20 })
+  const [approveCode, setApproveCode] = useState<string>('')
+  const [approvingId, setApprovingId] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -32,6 +52,7 @@ export default function AdminAffiliates() {
     } catch (error) {
       console.error('Failed to load affiliates:', error)
     } finally {
+      setLastUpdated(new Date())
       setLoading(false)
     }
   }
@@ -44,16 +65,16 @@ export default function AdminAffiliates() {
         body: JSON.stringify(newAffiliate),
       })
       if (res.ok) {
-        alert('Affiliate created successfully!')
+        showToast('success', 'Affiliate created successfully!')
         setShowCreateForm(false)
         setNewAffiliate({ code: '', name: '', commissionRate: 20 })
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to create affiliate')
+        showToast('error', error.error || 'Failed to create affiliate')
       }
     } catch (error) {
-      alert('Failed to create affiliate')
+      showToast('error', 'Failed to create affiliate')
     }
   }
 
@@ -71,14 +92,40 @@ export default function AdminAffiliates() {
         body: JSON.stringify({ method, reference }),
       })
       if (res.ok) {
-        alert('Payout marked as paid!')
+        showToast('success', 'Payout marked as paid!')
         loadData()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to mark payout as paid')
+        showToast('error', error.error || 'Failed to mark payout as paid')
       }
     } catch (error) {
-      alert('Failed to mark payout as paid')
+      showToast('error', 'Failed to mark payout as paid')
+    }
+  }
+
+  const approveAffiliate = async (affiliateId: string) => {
+    if (!approveCode) {
+      showToast('warning', 'Please enter an affiliate code for this application')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/admin/affiliates/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ affiliateId, code: approveCode }),
+      })
+      if (res.ok) {
+        showToast('success', 'Affiliate application approved!')
+        setApprovingId(null)
+        setApproveCode('')
+        loadData()
+      } else {
+        const error = await res.json()
+        showToast('error', error.error || 'Failed to approve affiliate')
+      }
+    } catch {
+      showToast('error', 'Failed to approve affiliate')
     }
   }
 
@@ -90,11 +137,11 @@ export default function AdminAffiliates() {
         method: 'POST',
       })
       if (res.ok) {
-        alert('Affiliate suspended!')
+        showToast('success', 'Affiliate suspended!')
         loadData()
       }
     } catch (error) {
-      alert('Failed to suspend affiliate')
+      showToast('error', 'Failed to suspend affiliate')
     }
   }
 
@@ -115,6 +162,7 @@ export default function AdminAffiliates() {
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Affiliate Management</h1>
             <p className="text-sm text-slate-500 mt-1">Manage affiliate partners and track commissions</p>
+            <DataFreshnessIndicator lastUpdated={lastUpdated} loading={loading} className="mt-1" />
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
@@ -184,7 +232,9 @@ export default function AdminAffiliates() {
                     <td className="py-2">{aff.commissionRatePercent || 20}%</td>
                     <td className="py-2">
                       <span className={`px-2 py-1 rounded text-xs ${
-                        aff.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        aff.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                        aff.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
                       }`}>
                         {aff.status}
                       </span>
@@ -197,6 +247,40 @@ export default function AdminAffiliates() {
                         >
                           Suspend
                         </button>
+                      )}
+                      {aff.status === 'PENDING' && (
+                        <div className="flex items-center gap-2">
+                          {approvingId === aff.id ? (
+                            <>
+                              <input
+                                type="text"
+                                placeholder="Affiliate Code"
+                                value={approveCode}
+                                onChange={(e) => setApproveCode(e.target.value.toUpperCase())}
+                                className="px-2 py-1 border border-slate-300 rounded text-sm w-32"
+                              />
+                              <button
+                                onClick={() => approveAffiliate(aff.id)}
+                                className="text-green-600 hover:underline text-sm font-medium"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => { setApprovingId(null); setApproveCode('') }}
+                                className="text-slate-500 hover:underline text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => { setApprovingId(aff.id); setApproveCode('') }}
+                              className="text-green-600 hover:underline text-sm font-medium"
+                            >
+                              Approve
+                            </button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -227,7 +311,7 @@ export default function AdminAffiliates() {
                   <tr key={payout.id} className="border-b">
                     <td className="py-2">{new Date(payout.createdAt).toLocaleDateString()}</td>
                     <td className="py-2">{payout.affiliate?.name || 'N/A'}</td>
-                    <td className="py-2 font-bold">{(payout.totalAmountCents / 100).toLocaleString()} RWF</td>
+                    <td className="py-2 font-bold">{(payout.totalAmountCents / 100).toLocaleString()} {currency}</td>
                     <td className="py-2">
                       <span className={`px-2 py-1 rounded text-xs ${
                         payout.status === 'approved' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'

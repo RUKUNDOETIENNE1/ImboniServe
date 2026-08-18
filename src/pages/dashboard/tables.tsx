@@ -3,6 +3,7 @@ import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { Users, Trash2, Edit2, RefreshCw, Plus } from 'lucide-react'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import { useToast } from '@/components/Toast'
 import { useTranslation } from '@/lib/i18n'
 
@@ -26,6 +27,7 @@ export default function TablesPage() {
   const [capacity, setCapacity] = useState<number | ''>('')
   const [editNumber, setEditNumber] = useState('')
   const [editCapacity, setEditCapacity] = useState<number | ''>('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<{ id: string; number: string } | null>(null)
 
   const loadTables = async () => {
     setLoading(true)
@@ -57,7 +59,8 @@ export default function TablesPage() {
       if (!r.ok) throw new Error(data.error || r.statusText)
       setNumber('')
       setCapacity('')
-      showToast('success', t('tables.table_created_success', { number }))
+      // t returns string; ensure payload interpolation handled by translation layer externally
+      showToast('success', String(t('tables.table_created_success')))
       await loadTables()
     } catch (e: any) {
       showToast('error', e.message || t('tables.failed_to_create'))
@@ -66,18 +69,18 @@ export default function TablesPage() {
     }
   }
 
-  const onDelete = async (id: string, tableNumber: string) => {
-    if (!confirm(t('tables.delete_confirm', { number: tableNumber }))) return
+  const onDelete = async (id: string) => {
     setDeleting(id)
     try {
       const r = await fetch(`/api/tables/${id}`, { method: 'DELETE' })
       if (!r.ok) throw new Error('Failed to delete table')
-      showToast('success', t('tables.table_deleted_success', { number: tableNumber }))
+      showToast('success', String(t('tables.table_deleted_success')))
       await loadTables()
     } catch (e: any) {
       showToast('error', e.message || t('tables.failed_to_delete'))
     } finally {
       setDeleting(null)
+      setShowDeleteConfirm(null)
     }
   }
 
@@ -192,7 +195,7 @@ export default function TablesPage() {
                           <span className="text-sm" suppressHydrationWarning>{t('common.cancel')}</span>
                         </button>
                       </div>
-                      <form onSubmit={onEdit} className="space-y-3">
+                      <form onSubmit={(e) => { e.preventDefault(); onEdit(table.id) }} className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1" suppressHydrationWarning>{t('tables.table_number')}</label>
@@ -256,7 +259,7 @@ export default function TablesPage() {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button 
-                          onClick={() => onDelete(table.id, table.number)} 
+                          onClick={() => setShowDeleteConfirm({ id: table.id, number: table.number })} 
                           disabled={deleting === table.id}
                           className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                           title={t('tables.delete_table')}
@@ -272,6 +275,18 @@ export default function TablesPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={() => showDeleteConfirm && onDelete(showDeleteConfirm.id)}
+        title={t('tables.delete_table')}
+        message={t('tables.delete_confirm')}
+        confirmText={t('common.delete', 'Delete')}
+        cancelText={t('common.cancel', 'Cancel')}
+        variant="danger"
+      />
     </DashboardLayout>
   )
 }

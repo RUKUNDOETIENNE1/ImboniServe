@@ -6,6 +6,7 @@ import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 /**
  * POST /api/payments/intouch/initiate
@@ -31,6 +32,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    // Fetch business currency for the transaction record
+    // Note: InTouch may only support RWF — this is a provider constraint.
+    // We still read from business.currency for the transaction record.
+    const business = await prisma.business.findUnique({
+      where: { id: ctx.businessId },
+      select: { currency: true }
+    })
+
     // Generate unique transaction ID
     const requestTransactionId = InTouchService.generateRequestTransactionId()
 
@@ -54,7 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: requestTransactionId,
         referenceId: orderId,
         amountCents: totalAmount * 100,
-        currency: 'RWF',
+        currency: business?.currency || 'RWF',
         vatAmountCents: 0,
         exVatAmountCents: totalAmount * 100,
         gatewayFeeEstimatedCents: gatewayFee * 100, // 3% InTouch fee (internal)
@@ -79,7 +88,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     // Prepare callback URL
-    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`
+    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Request payment from InTouch
     const response = await InTouchService.requestPayment({
@@ -95,12 +104,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: response as any,
         status: InTouchService.isSuccess(response.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(response.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(response.responsecode) ? new Date() : null,
       },
+    })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'payments/intouch/initiate',
+      responsecode: response.responsecode,
+      requestTransactionId,
     })
 
     // Check if payment failed immediately

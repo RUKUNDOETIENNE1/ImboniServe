@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Top issues aggregation
     const issueCounts: Record<string, number> = {}
     feedback.forEach(f => {
-      f.issues.forEach(i => {
+      f.issues.forEach((i: string) => {
         issueCounts[i] = (issueCounts[i] || 0) + 1
       })
     })

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { OutletType } from '@prisma/client'
 import { QRGeneratorService } from './qr-generator.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export interface CreateOutletInput {
   businessId: string
@@ -58,6 +59,12 @@ export class OutletService {
   }
 
   static async getOutlets(businessId: string, branchId?: string): Promise<OutletWithStats[]> {
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: dayStart } = getBusinessDayBoundary(new Date(), business?.timezone)
+
     const outlets = await prisma.outlet.findMany({
       where: {
         businessId,
@@ -72,7 +79,7 @@ export class OutletService {
           where: {
             status: 'ACTIVE',
             createdAt: {
-              gte: new Date(new Date().setHours(0, 0, 0, 0))
+              gte: dayStart
             }
           },
           select: {

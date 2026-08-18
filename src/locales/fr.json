@@ -21,6 +21,156 @@
     "close": "Fermer",
     "all": "Tout"
   },
+  "features_finance": {
+    "title_page": "Fonctionnalités Finance — Imboni Serve",
+    "badge": "Finance",
+    "h1": "Chaque franc suivi",
+    "subheading": "De l'argent mobile à l'intelligence CFO — votre argent, pleinement visible.",
+    "meta_description": "Suivez paiements, versements et santé financière avec tableaux CFO/CEO, moniteurs temps réel et réconciliation claire.",
+    "hero": {
+      "title": "Tableau de bord CFO",
+      "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s."
+    },
+    "featured": {
+      "title": "Tableau de bord CEO",
+      "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min."
+    },
+    "standard_section_title": "Finance standard",
+    "standard": {
+      "payout_summary": {
+        "title": "Récapitulatif des versements",
+        "desc": "Montants brut, commission et net par vente. Période sélectionnable."
+      },
+      "payment_monitor": {
+        "title": "Suivi des paiements",
+        "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Historique complet avec filtres d'état et export."
+      }
+    }
+  },
+  "features_growth": {
+    "title_page": "Fonctionnalités Croissance — Imboni Serve",
+    "badge": "Croissance",
+    "h1": "Basculez une fois. Grandissez durablement.",
+    "subheading": "Les opérations ne sont que le début. ImboniServe vous aide à trouver et fidéliser vos clients.",
+    "meta_description": "Acquérir et fidéliser via Fiche Découverte, campagnes WhatsApp, créateur de site et outils contenus.",
+    "hero": {
+      "title": "Fiche Découverte",
+      "desc": "Soyez trouvé par les clients à la recherche d'établissements près d'eux. Votre entreprise listée avec type de cuisine, gamme de prix et filtres par localisation.",
+      "cta": "Parcourir le marketplace"
+    },
+    "featured": {
+      "whatsapp_campaigns": {
+        "title": "Campagnes WhatsApp",
+        "desc": "Campagnes ciblées vers des segments CRM — Champions, À risque, Nouveaux — directement sur WhatsApp. Messages personnalisés et suivi de livraison."
+      },
+      "site_builder": {
+        "title": "Créateur de site",
+        "desc": "Créez votre site avec génération de contenu IA. Modèles, personnalisation de marque et publication en un clic."
+      },
+      "marketer_dashboard": {
+        "title": "Tableau marketer",
+        "desc": "Parrainage & affiliation avec portefeuille, commissions, paiements et QR. Suivez et récompensez vos ambassadeurs."
+      },
+      "content_management_cms": {
+        "title": "Gestion de contenu (CMS)",
+        "desc": "Publiez articles et vidéos dans votre flux Découverte. Cycle complet avec médias."
+      },
+      "video_analytics": {
+        "title": "Analyses vidéo",
+        "desc": "Vues, temps de visionnage et engagement."
+      }
+    }
+  },
+  "features_infrastructure": {
+    "title_page": "Fonctionnalités Infrastructure — Imboni Serve",
+    "badge": "Infrastructure",
+    "h1": "Conçu pour les équipes",
+    "subheading": "La base qui rend tout le reste possible.",
+    "meta_description": "Rôles, stocks, contacts, sécurité et notifications — l'ossature de vos opérations.",
+    "also_included": "Également inclus",
+    "standard": {
+      "staff_management": {
+        "title": "Gestion du personnel",
+        "desc": "CRUD complet avec rôles système, rôles personnalisés, permissions et affectation par succursale. Contrôle d'accès fin: serveur, caissier, superviseur, manager, etc."
+      },
+      "inventory_management": {
+        "title": "Gestion des stocks",
+        "desc": "Suivi des stocks avec seuils min/réappro, coûts unitaires et filtres par catégorie. Traçabilité complète."
+      },
+      "contacts": {
+        "title": "Contacts",
+        "desc": "Gestion centralisée des contacts avec lien organisations. Suivez fournisseurs, clients et partenaires."
+      }
+    },
+    "operational": {
+      "security_sessions": {
+        "title": "Sécurité & sessions",
+        "desc": "Surveillance des sessions actives, état MFA, événements de sécurité et révocation."
+      },
+      "notifications_settings": {
+        "title": "Paramètres de notifications",
+        "desc": "Planification des rapports quotidiens, alertes WhatsApp, fuseau horaire."
+      }
+    }
+  },
+  "features_analytics": {
+    "title_page": "Fonctionnalités Analyses — Imboni Serve",
+    "badge": "Analyses",
+    "h1": "Connaissez votre activité de l'intérieur",
+    "subheading": "Des données actionnables, pas seulement admirables.",
+    "meta_description": "Analyses IA pour l'activité, le menu et les revenus avec tableaux sous-seconde et auto-rafraîchissement.",
+    "hero": {
+      "cfo_dashboard": {
+        "title": "Tableau de bord CFO",
+        "desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations. Mise en cache <1s."
+      },
+      "ceo_dashboard": {
+        "title": "Tableau de bord CEO",
+        "desc": "Santé globale, revenus, clients, opérations — agrégé de plusieurs services d'intelligence. Auto-rafraîchi toutes les 5 min."
+      }
+    },
+    "featured": {
+      "crm_with_rfm_segmentation": {
+        "title": "CRM avec segmentation RFM",
+        "desc": "Segmentation automatique : Champions, Fidèles, À risque, Perdus, Nouveaux, Prometteurs. VLV, fréquence, dépenses."
+      },
+      "qr_analytics": {
+        "title": "Analyses QR",
+        "desc": "Conversion scan→revenu. Identifiez les QR les plus performants par heure, appareil, lieu."
+      },
+      "menu_performance_analytics": {
+        "title": "Performance du menu",
+        "desc": "Revenus, quantités et tendances par article. Identifiez les meilleurs et moins performants."
+      },
+      "peak_hours_analytics": {
+        "title": "Heures de pointe",
+        "desc": "Demandes horaires et quotidiennes. Planifiez les équipes avec des données."
+      },
+      "instruction_insights": {
+        "title": "Insights sur instructions",
+        "desc": "Motifs des instructions de commande. Comprenez les préférences et demandes spéciales."
+      },
+      "video_analytics": {
+        "title": "Analyses vidéo",
+        "desc": "Performances vidéo : vues, temps de visionnage, engagement."
+      }
+    },
+    "standard_section_title": "Analyses standards",
+    "standard": {
+      "payment_monitor": {
+        "title": "Suivi des paiements",
+        "desc": "Suivi en temps réel avec répartition par méthode et auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Historique complet avec filtres d'état et export."
+      }
+    }
+  },
   "cookies": {
     "banner": {
       "text": "Nous utilisons des cookies pour améliorer votre expérience, analyser l'utilisation et afficher du contenu pertinent.",
@@ -142,7 +292,9 @@
       "rt_os": "OS en temps réel : voyez chaque vente, chaque table, chaque action client — et augmentez les revenus automatiquement.",
       "cta_primary": "Commencer l'essai gratuit de 14 jours",
       "cta_secondary": "Voir les tarifs",
+      "cta_talk_to_team": "Parler à notre équipe",
       "cta_explore": "Découvrir les Entreprises Près de Vous",
+      "aria_go_to_slide": "Aller à la diapositive {{n}}",
       "slides": {
         "0": {
           "title": "Transformez Chaque Table en",
@@ -167,12 +319,43 @@
           "highlight": "Contrôle Complet",
           "subtitle": "POS, QR, Inventaire, Analyses",
           "description": "Cessez de jongler entre plusieurs systèmes. Gérez commandes, inventaire, personnel et rapports depuis un tableau de bord unique."
+        },
+        "os": {
+          "title": "Le Système d'Exploitation",
+          "highlight": "pour l'Hôtellerie.",
+          "subtitle": "Gérez votre café, hôtel, bar ou entreprise d'hospitalité depuis une plateforme intelligente.",
+          "description": "Tout ce dont vous avez besoin — des commandes et de l'inventaire aux paiements et aux insights — sur une seule plateforme."
+        },
+        "replay": {
+          "title": "Service Replay™",
+          "highlight": "Voyez ce qui s'est vraiment passé",
+          "subtitle": "Revivez n'importe quel service",
+          "description": "Rejouez les événements comme un match — chaque commande, table, poste et transfert. Diagnostiquez vite, coachez les équipes, évitez les pertes."
+        },
+        "qr": {
+          "title": "Commande QR intelligente",
+          "highlight": "Zéro temps d'attente",
+          "subtitle": "Les clients commandent depuis leur téléphone",
+          "description": "Scannez, parcourez le menu et commandez instantanément. Aucune application. Aucune interruption du personnel. Efficacité pure."
+        },
+        "analytics": {
+          "title": "Analyses intelligentes",
+          "highlight": "Croissance guidée par les données",
+          "subtitle": "Maîtrisez votre activité",
+          "description": "Suivez les ventes, optimisez l'inventaire et prenez de meilleures décisions avec des recommandations actionnables."
+        },
+        "platform": {
+          "title": "Plateforme Tout-en-Un",
+          "highlight": "Contrôle Complet",
+          "subtitle": "POS, QR, Inventaire, Analyses",
+          "description": "Cessez de jongler entre plusieurs systèmes. Gérez tout depuis un tableau de bord unique."
         }
       }
     },
     "features": {
-      "title": "Tout ce dont vous avez besoin pour une gestion efficace",
-      "subtitle": "Des commandes à l'approvisionnement, des analyses à la gestion multi-établissements — Imboni Serve couvre tous les aspects de votre entreprise.",
+      "title": "Une seule plateforme. Des opérations complètes.",
+      "subtitle": "Gérez toute votre activité d’hôtellerie-restauration depuis une plateforme intelligente — commandes, inventaire, paiements, insights et croissance.",
+      "tagline": "Unifié. Intelligent. Fiable.",
       "qr_ordering": "Commande par QR Code",
       "qr_ordering_desc": "Les clients scannent, consultent votre menu et commandent directement depuis leur téléphone — aucune application nécessaire.",
       "inventory": "Inventaire & Approvisionnement",
@@ -192,48 +375,68 @@
       "whatsapp": "Intégration WhatsApp",
       "whatsapp_desc": "Recevez des alertes de commande, des résumés quotidiens et des notifications de stock bas directement sur WhatsApp.",
       "mobile_money": "Paiements Mobile Money",
-      "mobile_money_desc": "Acceptez MTN MoMo et Airtel Money nativement — aucun terminal de paiement requis.",
+      "mobile_money_desc": "Acceptez les paiements mobile money nativement — aucun terminal de paiement requis.",
       "multi_branch": "Contrôle Multi-Établissements",
       "multi_branch_desc": "Gérez plusieurs emplacements depuis un tableau de bord unique avec des rapports consolidés et par établissement.",
       "roles": "Accès Basé sur les Rôles",
       "roles_desc": "Caissier, serveur, superviseur, gérant — chaque rôle ne voit que ce dont il a besoin."
     },
     "advanced": {
-      "title": "Encore plus de fonctionnalités",
-      "subtitle": "Capacités avancées disponibles sur les plans supérieurs — toutes intégrées, aucun outil tiers requis.",
-      "hotel_mode": "Mode Hôtel",
-      "hotel_mode_desc": "Gestion des chambres, zones de service et opérations de réception intégrées.",
+      "title": "Conçu pour la croissance",
+      "subtitle": "Tout ce qu’il vous faut pour passer d’un seul établissement à une activité d’hospitalité moderne—depuis une plateforme intelligente unique.",
+      "hotel_mode": "Opérations Hôtelières",
+      "hotel_mode_desc": "Gestion des chambres, zones de service et opérations de réception pour les activités d’hospitalité.",
       "site_builder": "Créateur de Site",
       "site_builder_desc": "Lancez votre propre site web avec des modèles personnalisables — aucun code nécessaire.",
       "ai_menu": "Créateur de Menu IA",
-      "ai_menu_desc": "Téléchargez une photo ou un document et laissez l'IA créer votre menu pour vous.",
-      "marketplace": "Marché de Découverte",
-      "marketplace_desc": "Soyez répertorié dans un annuaire public où les clients recherchent des endroits où manger.",
+      "ai_menu_desc": "Transformez vos menus en expériences digitales en quelques minutes. Téléchargez une photo ou un document et laissez l’IA créer un menu digital professionnel prêt à la commande.",
+      "marketplace": "Découverte de l’établissement",
+      "marketplace_desc": "Aidez davantage de clients à découvrir votre établissement via l’écosystème Imboni grâce à des profils d’établissement recherchables, des promotions et une visibilité digitale.",
+      "procurement": "Approvisionnement & Inventaire",
+      "procurement_desc": "Gérez les achats, les fournisseurs, les niveaux de stock et les coûts alimentaires avec une visibilité opérationnelle complète, de la livraison à la consommation.",
       "referral": "Programme de Parrainage",
       "referral_desc": "Partagez et gagnez — les clients parrainent des amis et gagnent automatiquement des crédits repas.",
       "staff": "Personnel & Rôles",
-      "staff_desc": "Permissions de rôle granulaires : serveur, caissier, superviseur, gérant, et plus."
+      "staff_desc": "Contrôlez qui peut accéder à quoi grâce à des rôles et permissions flexibles pour chaque membre de votre équipe.",
+      "multi_branch": "Opérations Multi-Établissements",
+      "multi_branch_desc": "Pilotez plusieurs établissements depuis une seule plateforme avec des rapports centralisés, une visibilité des stocks et une cohérence opérationnelle.",
+      "business_intelligence": "Business Intelligence",
+      "business_intelligence_desc": "Suivez les ventes, les tendances clients, l’inventaire et la performance financière avec des insights en temps réel pour prendre de meilleures décisions.",
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Revivez chaque période de service événement par événement afin de comprendre exactement ce qui s'est passé.",
+      "inventory_alerts": "Alertes de Stock & Réapprovisionnement Automatique",
+      "inventory_alerts_desc": "Recevez automatiquement des alertes de stock ainsi que des propositions de commandes d'achat générées par l'IA pour vos fournisseurs.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Générez automatiquement des reçus numériques avec des liens partageables pour offrir une meilleure expérience client."
     },
     "discovery": {
-      "badge": "NOUVEAU — Flux de Découverte",
-      "title": "Soyez découvert par les clients à la recherche d'expériences exceptionnelles",
-      "subtitle": "Répertoriez votre entreprise sur le marché de découverte Imboni Serve. Publiez du contenu, des promotions et des spéciaux du jour — les clients vous trouvent et commandent directement.",
-      "cta_browse": "Parcourir le Marché",
-      "cta_claim": "Réclamer Votre Inscription Gratuite",
-      "feature_posts": "Publications Achetables",
-      "feature_media": "Photo & Vidéo",
-      "feature_promos": "Promos & Combos",
-      "feature_attribution": "Attribution des Commandes"
+      "badge": "Découverte de l’établissement",
+      "title": "Aidez les clients à découvrir votre établissement",
+      "subtitle": "Soyez découvert via l’écosystème Imboni. Les clients qui recherchent des établissements d’hospitalité peuvent vous trouver, voir vos offres et commander directement.",
+      "cta_browse": "Explorer la découverte",
+      "cta_claim": "Commencer",
+      "feature_visibility": "Visibilité",
+      "feature_orders": "Commandes directes",
+      "feature_growth": "Croissance",
+      "feature_customers": "Nouveaux clients",
+      "feature_posts": "Publications Commerciales",
+      "feature_media": "Photos & Vidéos",
+      "feature_promos": "Promotions & Offres Combinées",
+      "feature_attribution": "Origine des Commandes"
     },
     "payments": {
-      "title": " Paiements Prêts pour le Rwanda",
-      "subtitle": "Acceptez tous les principaux modes de paiement utilisés quotidiennement par vos clients."
+      "title": "Acceptez les paiements que vos clients utilisent déjà",
+      "subtitle": "Des options de paiement flexibles configurées pour votre marché — mobile money, cartes, espèces et portefeuilles numériques.",
+      "mobile_money": "Mobile Money",
+      "cards": "Cartes & TPE",
+      "cash": "Espèces",
+      "digital_wallets": "Portefeuilles numériques"
     },
     "final_cta": {
-      "title": "Prêt à développer votre entreprise ?",
-      "subtitle": "Rejoignez plus de 500 entreprises d'hôtellerie au Rwanda utilisant Imboni Serve. Commencez votre essai gratuit de 14 jours aujourd'hui — aucune carte de crédit requise.",
+      "title": "Prêt à transformer votre activité d’hospitalité ?",
+      "subtitle": "Commencez votre essai gratuit de 14 jours dès aujourd’hui — aucune carte de crédit requise. Découvrez l’Operating System for Hospitality.",
       "cta_start": "Commencer Gratuitement",
-      "cta_whatsapp": "Discuter sur WhatsApp"
+      "cta_whatsapp": "Parler à notre équipe"
     },
     "footer": {
       "copyright": "Imboni Serve. Conçu pour l'industrie de l'hôtellerie.",
@@ -260,7 +463,7 @@
       "step3_title": "Configurez les Tables et Codes QR",
       "step3_desc": "Créez vos tables (Table 1, Section VIP, Terrasse, etc.) et générez des codes QR uniques pour chacune — tout depuis votre tableau de bord. Imprimez et placez-les sur les tables.",
       "step4_title": "Connectez WhatsApp et Paiements",
-      "step4_desc": "Liez votre numéro WhatsApp pour recevoir des alertes de commande instantanées et des rapports quotidiens. Activez MTN MoMo et Airtel Money pour des paiements mobiles fluides.",
+      "step4_desc": "Liez votre numéro WhatsApp pour recevoir des alertes de commande instantanées et des rapports quotidiens. Activez vos moyens de paiement préférés pour des paiements numériques fluides.",
       "step5_title": "Suivez l'Inventaire et les Coûts",
       "step5_desc": "Ajoutez vos articles en stock, définissez des points de réapprovisionnement et suivez chaque achat. Recevez des alertes IA lorsque les coûts augmentent ou le stock diminue.",
       "step6_title": "Lancez et Développez!",
@@ -273,7 +476,8 @@
       "title": "Voir Imboni Serve en Action",
       "subtitle": "Regardez comment les restaurants rationalisent leurs opérations avec notre plateforme tout-en-un.",
       "cta": "Cliquez pour regarder sur YouTube",
-      "description": "Voyez comment Imboni Serve transforme les opérations des restaurants"
+      "description": "Voyez comment Imboni Serve transforme les opérations des restaurants",
+      "alt": "Vidéo de démonstration d'Imboni Serve"
     },
     "store": {
       "badge": "Boutique d'Approvisionnement",
@@ -286,7 +490,58 @@
       "businesses": "Entreprises servies",
       "orders": "Commandes traitées",
       "trial": "Essai gratuit, sans carte",
-      "features": "Fonctionnalités incluses"
+      "trial_days": "14 jours",
+      "no_card": "Sans carte",
+      "plans_count": "5 plans",
+      "features": "Fonctionnalités vérifiées",
+      "plans": "Du Starter à l'Enterprise"
+    },
+    "why_switch": {
+      "badge": "Pourquoi changer ?",
+      "title": "Vous n'obtenez pas seulement un POS. Vous obtenez de l'intelligence.",
+      "subtitle": "Des capacités qui résolvent des problèmes ignorés par les concurrents.",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Revivez un service comme un match. Chaque commande, chaque poste, chaque table — événement par événement.",
+      "crm_title": "CRM Client (RFM)",
+      "crm_desc": "Segmentez en Champions, Fidèles et À Risque.",
+      "ab_title": "Tests A/B du menu",
+      "ab_desc": "Testez prix, textes et visuels. Choisissez les gagnants avec des données.",
+      "replay_cta": "Voir en Action",
+      "crm_cta": "Découvrir le CRM",
+      "ab_cta": "Lancer un Test"
+    },
+    "why_ai": {
+      "badge": "Pourquoi l'IA ?",
+      "title": "L'IA n'est pas un mot à la mode. Elle fonctionne déjà dans votre tableau de bord.",
+      "subtitle": "Une IA qui travaille — pas seulement des graphiques.",
+      "menu_builder_title": "Créateur de menu IA",
+      "menu_builder_desc": "Téléchargez une photo ou un PDF. L'IA extrait articles, prix et descriptions.",
+      "auto_reorder_title": "Réapprovisionnement automatique (IA)",
+      "auto_reorder_desc": "Analyse la demande, les délais et le stock de sécurité pour suggérer des réapprovisionnements.",
+      "insight_reports_title": "Rapports d'insights IA",
+      "insight_reports_desc": "Rapports hebdo/mensuels avec KPI, narratifs et priorités.",
+      "cost_anomaly_title": "Alertes d'anomalies de coûts",
+      "cost_anomaly_desc": "Détection automatique des hausses fournisseurs avec analyse statistique."
+    },
+    "why_trust": {
+      "badge": "Pourquoi nous faire confiance ?",
+      "title": "Ce n'est pas un POS basique avec de jolis graphiques. C'est de l'intelligence de niveau entreprise.",
+      "subtitle": "Conçu pour les décideurs.",
+      "cfo_title": "Tableau de bord CFO",
+      "cfo_desc": "Santé financière, intelligence des revenus, abonnements — avec narratifs IA et corrélations.",
+      "cfo_cta": "Voir le tableau CFO",
+      "ceo_title": "Tableau de bord CEO",
+      "ceo_desc": "Santé business, revenus, clients, opérations, hôtellerie — données agrégées.",
+      "ceo_cta": "Voir le tableau CEO"
+    },
+    "why_now": {
+      "badge": "Pourquoi maintenant ?",
+      "title": "Chaque jour sans intelligence est un jour de revenus perdus.",
+      "stockouts": "Les ruptures de stock vous coûtent des clients. L'IA les prévient.",
+      "pricing": "Vous fixez vos prix à l'aveugle. Testez avec des données réelles.",
+      "churn": "Vous ignorez qui va partir. Le RFM le révèle.",
+      "supplier": "Les prix fournisseurs grimpent discrètement. Les alertes d'anomalies les détectent.",
+      "replay": "Vous ne pouvez pas reconstituer le dernier service. Service Replay™ rejoue chaque événement."
     },
     "pricing": {
       "title": "Tarification simple pour le Rwanda",
@@ -341,7 +596,46 @@
       "alerts_cta": "Configurer les Alertes",
       "resv_title": "Dépôts & Réservations",
       "resv_desc": "Réduisez les absences avec des dépôts et confirmations intelligents.",
-      "resv_cta": "Gérer les Réservations"
+      "resv_cta": "Gérer les Réservations",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Revivez chaque période de service événement par événement, comme si vous regardiez le replay d'un match de football.",
+      "replay_cta": "Découvrir Service Replay"
+    },
+    "pricing_preview": {
+      "heading": "Des Tarifs Transparents pour Toutes les Tailles d'Entreprise",
+      "subtitle": "ImboniServe propose des offres flexibles adaptées aux établissements d'hôtellerie-restauration de toutes tailles.",
+      "starting_at": "À partir de",
+      "per_month": "/ mois",
+      "starter_desc": "Idéal pour les établissements disposant d'un seul site qui souhaitent moderniser leurs opérations.",
+      "annual_savings": "La facturation annuelle vous permet d'économiser 25 % (l'équivalent de 3 mois gratuits).",
+      "scale": "Des offres qui évoluent avec votre entreprise, d'un seul établissement jusqu'aux entreprises multi-sites.",
+      "all_plans_include": "Tous les Plans Incluent",
+      "feature_1": "Commandes par QR, POS et gestion de cuisine",
+      "feature_2": "Gestion des stocks et des approvisionnements",
+      "feature_3": "Intégration WhatsApp et paiements Mobile Money",
+      "feature_4": "Rapports et analyses",
+      "enterprise_note": "Des offres Enterprise avec une tarification personnalisée sont disponibles pour les entreprises multi-sites et les besoins avancés.",
+      "founding_note": "🎉 Les membres du Founding Hospitality Business Program bénéficient d'une réduction de 50 % à vie sur tous les plans.",
+      "founding_link": "En savoir plus ci-dessous ↓",
+      "view_full_pricing": "Voir Tous les Tarifs",
+      "help": "Besoin d'aide pour choisir ?",
+      "chat": "Discutez avec nous sur WhatsApp"
+    },
+    "founding_program": {
+      "badge": "Programme Limité des Premiers Utilisateurs",
+      "title": "Programme Fondateur des Entreprises d'Hôtellerie",
+      "subtitle": "Rejoignez les 100 premiers établissements qui contribueront à construire l'avenir de l'hôtellerie.",
+      "benefit_1_title": "50 % de Réduction à Vie",
+      "benefit_1_desc": "Conservez une réduction de 50 % aussi longtemps que vous restez client. Sans expiration.",
+      "benefit_2_title": "Support Direct des Fondateurs",
+      "benefit_2_desc": "Profitez d'un accompagnement prioritaire et d'un accès direct à l'équipe fondatrice.",
+      "benefit_3_title": "Accès Anticipé aux Nouvelles Fonctionnalités",
+      "benefit_3_desc": "Soyez parmi les premiers à découvrir et utiliser les nouvelles fonctionnalités.",
+      "benefit_4_title": "Contribuez à l'Évolution de la Plateforme",
+      "benefit_4_desc": "Vos besoins opérationnels influencent directement les priorités de développement de la plateforme.",
+      "limited": "Limité aux 100 premiers établissements",
+      "cta": "Rejoindre le Programme",
+      "learn_more": "En Savoir Plus"
     }
   },
   "dashboard": {
@@ -630,8 +924,12 @@
     "last_90_days": "90 derniers jours",
     "last_365_days": "365 derniers jours",
     "lifetime": "Durée de vie",
-    "brand": { "tagline": "Gestion hôtelière" },
-    "user": { "anon": "Utilisateur" },
+    "brand": {
+      "tagline": "Gestion hôtelière"
+    },
+    "user": {
+      "anon": "Utilisateur"
+    },
     "actions": {
       "logout": "Se déconnecter",
       "searchPlaceholder": "Rechercher..."
@@ -760,7 +1058,59 @@
     "plan_professional": "Professionnel - 25 000 RWF/mois ou 20 000 avec annuel (⭐ Le plus populaire)",
     "plan_business": "Entreprise - 62 500 RWF/mois ou 50 000 avec annuel (🏢 Multi‑succursales)",
     "plan_premium": "Premium - 208 334 RWF/mois ou 166 667 avec annuel (🏢 Toutes les fonctionnalités)",
-    "plan_enterprise": "Enterprise - Tarification Personnalisée"
+    "plan_enterprise": "Enterprise - Tarification Personnalisée",
+    "verify_identity": "Vérifiez votre identité",
+    "enter_6_digit_code": "Entrez le code complet à 6 chiffres.",
+    "too_many_attempts": "Trop de tentatives. Veuillez patienter quelques minutes, puis demander un nouveau code.",
+    "code_expired": "Votre code a expiré. Cliquez sur « Renvoyer le code » ci-dessous pour en obtenir un nouveau.",
+    "invalid_or_expired_code": "Code invalide ou expiré.",
+    "login_incomplete": "La connexion n'a pas pu être terminée. Le code a peut-être expiré — demandez-en un nouveau.",
+    "verification_failed": "Échec de la vérification. Veuillez réessayer.",
+    "too_many_resends": "Trop de demandes de renvoi. Veuillez patienter quelques minutes et réessayer.",
+    "could_not_resend": "Impossible de renvoyer le code.",
+    "could_not_resend_retry": "Impossible de renvoyer le code. Réessayez.",
+    "code_sent_to": "Un code à 6 chiffres a été envoyé à",
+    "via_whatsapp": "via WhatsApp",
+    "email_and_whatsapp": "(email + WhatsApp)",
+    "verifying": "Vérification...",
+    "verify_and_signin": "Vérifier et Se Connecter",
+    "sending": "Envoi...",
+    "resend_code": "Vous ne l'avez pas reçu ? Renvoyer le code",
+    "never_share_code": "🔒 Ne partagez jamais ce code. Il expire dans 10 minutes.",
+    "back": "Retour",
+    "login_error": "Service de connexion indisponible. Veuillez réessayer.",
+    "powered_by": "Propulsé par ICTHubs",
+    "and_service_terms": ", et ",
+    "forgot_failed": "Échec de l'envoi de l'e-mail de réinitialisation",
+    "network_error": "Erreur réseau. Veuillez réessayer.",
+    "check_email": "Vérifiez votre e-mail",
+    "reset_link_sent": "Si un compte existe avec",
+    "reset_link_will_arrive": "vous recevrez un lien de réinitialisation de mot de passe sous peu.",
+    "reset_link_expires": "Le lien expirera dans 1 heure. Vérifiez vos spams si vous ne le voyez pas.",
+    "back_to_login": "Retour à la connexion",
+    "forgot_password_title": "Mot de passe oublié ?",
+    "forgot_password_desc": "Pas d'inquiétude ! Entrez votre e-mail et nous vous enverrons un lien de réinitialisation.",
+    "send_reset_link": "Envoyer le lien de réinitialisation",
+    "invalid_reset_link": "Lien de réinitialisation invalide. Veuillez demander une nouvelle réinitialisation de mot de passe.",
+    "password_min_length": "Le mot de passe doit contenir au moins 8 caractères",
+    "password_uppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+    "password_lowercase": "Le mot de passe doit contenir au moins une lettre minuscule",
+    "password_number": "Le mot de passe doit contenir au moins un chiffre",
+    "passwords_no_match": "Les mots de passe ne correspondent pas",
+    "fix_password_requirements": "Veuillez corriger les exigences du mot de passe",
+    "reset_failed": "Échec de la réinitialisation du mot de passe",
+    "reset_success_title": "Mot de passe réinitialisé avec succès !",
+    "reset_success_desc": "Votre mot de passe a été modifié. Toutes vos sessions actives ont été déconnectées pour des raisons de sécurité.",
+    "redirecting_to_login": "Redirection vers la page de connexion...",
+    "go_to_login": "Aller à la connexion",
+    "reset_password_title": "Réinitialisez votre mot de passe",
+    "enter_new_password_for": "Entrez un nouveau mot de passe pour",
+    "new_password": "Nouveau mot de passe",
+    "enter_new_password": "Entrez le nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "confirm_new_password": "Confirmer le nouveau mot de passe",
+    "resetting_password": "Réinitialisation du mot de passe...",
+    "reset_password": "Réinitialiser le mot de passe"
   },
   "navigation": {
     "home": "Accueil",
@@ -779,7 +1129,13 @@
     "network": "Erreur réseau. Veuillez vérifier votre connexion.",
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
     "not_found": "La ressource demandée n'a pas été trouvée.",
-    "validation": "Veuillez vérifier votre saisie et réessayer."
+    "validation": "Veuillez vérifier votre saisie et réessayer.",
+    "server_error": "Erreur serveur",
+    "server_error_desc": "Un problème est survenu de notre côté. Veuillez réessayer plus tard.",
+    "go_home": "Retour à l'accueil",
+    "server_error_code": "Une erreur est survenue sur le serveur",
+    "client_error": "Une erreur est survenue sur le client",
+    "go_home_link": "Retour à l'accueil"
   },
   "qr": {
     "title": "Code QR",
@@ -965,6 +1321,9 @@
     "save_time": "Gagnez du temps sur la création de menus, affiches, chevalets de table, autocollants, dessous de verre, cadres en A, et plus encore."
   },
   "public": {
+    "meta": {
+      "description": "Imboni Serve est une plateforme moderne pour les entreprises d'hôtellerie : commande par QR, opérations en temps réel, analyses IA et paiements mobiles."
+    },
     "nav": {
       "features": "Fonctionnalités",
       "pricing": "Tarifs",
@@ -979,12 +1338,18 @@
       "get_discovered": "Soyez découvert par des clients",
       "referral": "Programme de parrainage",
       "share_earn": "Parrainez et gagnez",
+      "share_earn_short": "Parrainez & gagnez",
       "discover": "Découvrir",
-      "contact": "Contact"
+      "contact": "Contact",
+      "close_menu": "Fermer le menu",
+      "open_menu": "Ouvrir le menu"
     },
     "cta": {
       "sign_in": "Se connecter",
-      "start_trial": "Commencer l'essai gratuit"
+      "start_trial": "Commencer l'essai gratuit",
+      "installed": "Installée",
+      "install": "Installer l'application",
+      "trial": "Essai"
     },
     "footer": {
       "tagline": "Conçu pour l'industrie de l'hôtellerie.",
@@ -994,10 +1359,158 @@
       "privacy": "Politique de Confidentialité",
       "cookies": "Politique des Cookies",
       "service_terms": "Conditions de Service",
-      "cookie_prefs": "Préférences des cookies"
+      "cookie_prefs": "Préférences des cookies",
+      "powered_by": "Propulsé par ICTHubs",
+      "share_text": "Découvrez ImboniServe – Restauration Intelligente pour les Entreprises d'Hôtellerie au Rwanda"
+    },
+    "errors": {
+      "404": {
+        "title": "Page introuvable",
+        "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+        "cta_home": "Retour à l'accueil"
+      }
+    }
+  },
+  "features_page": {
+    "title_page": "Fonctionnalités — Imboni Serve",
+    "meta_description": "Explorez toutes les fonctionnalités d'ImboniServe — opérations, IA, analyses, finance, croissance et infrastructure dans une seule plateforme.",
+    "title": "Tout ce dont vous avez besoin pour gérer votre activité d'hôtellerie",
+    "subtitle": "38 fonctionnalités vérifiées et prêtes pour la production. Organisées par résultat métier, pas par modules internes.",
+    "explore": "Explorer",
+    "back": "Toutes les fonctionnalités",
+    "ready_title": "Prêt à le voir en action ?",
+    "ready_desc": "Démarrez votre essai gratuit de 14 jours. Aucune carte bancaire requise.",
+    "cta": "Commencer l'essai gratuit",
+    "categories": {
+      "operations": {
+        "title": "Opérations",
+        "desc": "De la commande à la livraison, chaque étape est visible et maîtrisée."
+      },
+      "ai": {
+        "title": "IA",
+        "desc": "Une IA utile au quotidien — pas seulement des tableaux de bord."
+      },
+      "analytics": {
+        "title": "Analyses",
+        "desc": "Des données actionnables, pas seulement admirables."
+      },
+      "finance": {
+        "title": "Finance",
+        "desc": "Chaque franc suivi — de l'argent mobile à l'intelligence CFO."
+      },
+      "growth": {
+        "title": "Croissance",
+        "desc": "Basculez une fois. Grandissez durablement."
+      },
+      "infrastructure": {
+        "title": "Infrastructure",
+        "desc": "La base qui rend tout le reste possible."
+      }
+    }
+  },
+  "features_ai": {
+    "title_page": "Fonctionnalités IA — Imboni Serve",
+    "badge": "IA",
+    "h1": "Une IA qui travaille pendant que vous travaillez",
+    "subheading": "L'IA n'est pas un gadget. C'est le socle. Chaque capacité fait un vrai travail — pas seulement afficher des chiffres.",
+    "meta_description": "Créateur de menu IA, réapprovisionnement, rapports, alertes de coûts, tests A/B et hub d'optimisation.",
+    "hero": {
+      "title": "Créateur de Menu par IA",
+      "desc": "Importez une photo ou un PDF de votre menu. L'IA extrait automatiquement les articles, prix et descriptions. Plus de saisie manuelle — des heures réduites à des minutes."
+    },
+    "capabilities": {
+      "auto_reorder_ai": {
+        "title": "IA de réapprovisionnement",
+        "desc": "Analyse de la demande, délais et stock de sécurité pour proposer des réapprovisionnements avec scores de confiance. Validation en un clic."
+      },
+      "ai_insight_reports": {
+        "title": "Rapports d'Insights IA",
+        "desc": "Rapports hebdomadaires et mensuels avec KPIs, analyse narrative et recommandations prioritaires. Votre analyste IA."
+      },
+      "cost_anomaly_alerts": {
+        "title": "Alertes d'anomalie de coûts",
+        "desc": "Détection automatique des hausses fournisseurs (analyse z-score) avec niveau de sévérité. Stoppez l'érosion de marge."
+      },
+      "a_b_testing_for_menus": {
+        "title": "Tests A/B pour menus",
+        "desc": "Testez prix, textes, visuels. Répartissez le trafic. Mesurez. Choisissez sur données, pas à l'instinct."
+      },
+      "optimization_hub": {
+        "title": "Hub d'optimisation",
+        "desc": "Recommandations IA issues du Scanner Business, Insights IA et Autopilote — avec impact mesuré."
+      }
+    },
+    "analytics_section_title": "Analyses pilotées par l'IA",
+    "analytics": {
+      "menu_performance_analytics": {
+        "title": "Performance du menu",
+        "desc": "Revenus, quantités et tendances par article."
+      },
+      "peak_hours_analytics": {
+        "title": "Heures de pointe",
+        "desc": "Courbes horaires/quotidiennes de demande. Planifiez les équipes."
+      },
+      "instruction_insights": {
+        "title": "Insights sur instructions",
+        "desc": "Analyse des préférences via les instructions de commande."
+      }
+    }
+  },
+  "features_operations": {
+    "title_page": "Fonctionnalités Opérations — Imboni Serve",
+    "badge": "Opérations",
+    "h1": "Pilotez votre salle",
+    "subheading": "De la commande à la livraison, chaque étape est visible et maîtrisée.",
+    "meta_description": "Pilotez votre salle avec commandes QR, Service Replay™, Smart Dining Slips™, affichage cuisine, réservations et plus.",
+    "hero": {
+      "title": "Commandes par QR Code",
+      "desc": "Les clients scannent, parcourent votre menu et commandent directement depuis leur téléphone — sans application. Sessions de groupe, vérification OTP, recommandations d'upsell, préférences alimentaires, choix des places et appel-serveur.",
+      "cta": "Essayer les commandes QR"
+    },
+    "featured": {
+      "service_replay": {
+        "title": "Service Replay™",
+        "desc": "Rejouez tout un service, événement par événement — comme un match. Chaque commande, chaque poste, chaque table. Contrôles de lecture, vitesse ajustable et filtres par table, poste, serveur ou type d'événement."
+      },
+      "smart_dining_slips": {
+        "title": "Smart Dining Slips™",
+        "desc": "Reçus numériques générés automatiquement avec liens partageables pour une expérience fluide. Sans papier, professionnel et traçable."
+      },
+      "qr_analytics": {
+        "title": "Analyses QR",
+        "desc": "Suivez les scans, les taux de conversion et le chiffre d'affaires par QR. Identifiez les tables et QR qui génèrent le plus de commandes et de revenus."
+      }
+    },
+    "standard_section_title": "Opérations standard",
+    "standard": {
+      "kds": {
+        "title": "Kitchen Display System (KDS)",
+        "desc": "Affichage des commandes en temps réel avec urgences et statut de paiement."
+      },
+      "waiter_dashboard": {
+        "title": "Tableau de bord serveur",
+        "desc": "File d'attente en 5 étapes : en attente → en préparation → prêt → récupéré → livré."
+      },
+      "reservations": {
+        "title": "Réservations",
+        "desc": "Gestion des réservations avec suivi des acomptes et états."
+      },
+      "close_day": {
+        "title": "Clôture (Z-Report)",
+        "desc": "Rapprochement de fin de journée avec ventilation par mode de paiement et source de commande."
+      },
+      "promotions": {
+        "title": "Promotions",
+        "desc": "Remises en pourcentage, montants fixes et happy hours avec activation programmée."
+      },
+      "qr_builder": {
+        "title": "Créateur de QR",
+        "desc": "Créez des QR de marque avec logo, modèles et URLs courtes."
+      }
     }
   },
   "home": {
+    "title_page": "Imboni Serve — Système d'Exploitation pour l'Hôtellerie",
     "launch_badge": "Offre de lancement — 50% de réduction sur tous les plans",
     "hero": {
       "title1": "Transformez chaque table en",
@@ -1137,7 +1650,20 @@
     "feature_sso_custom_roles": "SSO & rôles personnalisés",
     "feature_regional_data_residency": "Résidence des données régionale",
     "feature_custom_workflows": "Flux de travail personnalisés",
-    "feature_audit_exports": "Exports d'audit"
+    "feature_audit_exports": "Exports d'audit",
+    "feature_qr_code_ordering": "Commandes par QR Code",
+    "feature_smart_dining_slips": "Smart Dining Slips™",
+    "feature_ai_menu_builder": "Créateur de Menu par IA",
+    "feature_auto_reorder_ai": "IA de réapprovisionnement",
+    "feature_a_b_testing": "Tests A/B",
+    "feature_crm_with_rfm": "CRM avec RFM",
+    "feature_payout_summary": "Récapitulatif des versements",
+    "feature_payment_monitor": "Suivi des paiements",
+    "feature_transactions": "Transactions",
+    "feature_discovery_listing": "Fiche Découverte",
+    "feature_site_builder": "Créateur de site",
+    "feature_inventory": "Stock",
+    "feature_contacts": "Contacts"
   },
   "faq": {
     "title_page": "FAQ — Imboni Serve",
@@ -2105,5 +2631,75 @@
     "request_domain": "Demander une Connexion de Domaine",
     "note": "Remarque :",
     "note_text": "Les domaines .tk et .ml ne sont pas pris en charge. Après la demande, vous recevrez des instructions de configuration DNS."
+  },
+  "refer": {
+    "title_page": "Programme de Parrainage — Imboni Serve",
+    "meta_description": "Partagez votre lien de parrainage avec vos amis. Quand ils commandent, vous recevez chacun 1 000 RWF. Sans limites, sans frais récurrents.",
+    "h1": "Parrainez et Gagnez 1 000 RWF par Ami",
+    "subtitle": "Partagez votre lien de parrainage avec vos amis. Quand ils commandent, vous recevez chacun 1 000 RWF. Sans limites, sans frais récurrents — juste des récompenses instantanées !",
+    "how_it_works_title": "Comment ça Marche — Simple et Rapide",
+    "steps": {
+      "1_title": "Obtenez votre Code",
+      "1_desc": "Entrez votre téléphone pour générer un code de parrainage unique",
+      "2_title": "Ils Commandent",
+      "2_desc": "Votre ami clique sur votre lien et passe une commande",
+      "3_title": "Commande Confirmée",
+      "3_desc": "Valeur minimum de commande : 5 000 RWF",
+      "4_title": "Vous Gagnez Tous les Deux",
+      "4_desc": "1 000 RWF chacun — instantanément !"
+    },
+    "requirements_title": "Conditions Simples",
+    "requirements_desc": "Votre ami doit compléter sa première commande (minimum 5 000 RWF). C'est tout ! Aucun processus de qualification compliqué.",
+    "phone_label": "Votre Numéro de Téléphone *",
+    "name_label": "Votre Nom (Optionnel)",
+    "error_phone_required": "Le numéro de téléphone est requis",
+    "error_generate_failed": "Échec de la génération du code de parrainage",
+    "generating": "Génération...",
+    "get_code_btn": "Obtenir Mon Code de Parrainage",
+    "your_code": "Votre Code de Parrainage",
+    "share_code_desc": "Partagez ce code avec des propriétaires d'entreprises d'hôtellerie",
+    "share_link_btn": "Partager le Lien de Parrainage",
+    "referral_link_label": "Lien de parrainage :",
+    "copied_alert": "Lien de parrainage copié dans le presse-papiers !",
+    "share_message": "Rejoignez Imboni Serve et transformez votre entreprise d'hôtellerie ! Utilisez mon code de parrainage : {{code}}\n\n{{link}}\n\nCommencez avec les commandes QR intelligentes, la gestion des stocks et plus encore.",
+    "share_title": "Rejoignez Imboni Serve",
+    "rewards_title": "Ce que Vous Obtenez",
+    "welcome_bonus_title": "Bonus de Bienvenue de 1 000 RWF",
+    "welcome_bonus_desc": "Récompense unique quand votre ami complète sa première commande. Sans frais récurrents, sans conditions compliquées.",
+    "your_reward": "Votre récompense :",
+    "friend_reward": "Récompense de l'ami :",
+    "total_per_referral": "Total par parrainage :",
+    "unlimited_title": "Parrainages Illimités",
+    "unlimited_desc": "Pas de plafonds, pas de limites. Parrainez 10 amis, gagnez 10 000 RWF. Parrainez 100 amis, gagnez 100 000 RWF. C'est aussi simple que ça !",
+    "unlimited_note": "Partagez autant que vous voulez — chaque parrainage compte !",
+    "fast_payout_title": "Paiement Rapide",
+    "fast_payout_desc": "Les récompenses se débloquent après une période de validation de 7 jours. Retirez sur Mobile Money ou utilisez dans toute entreprise d'hôtellerie sur Imboni Serve.",
+    "fast_payout_note": "Retrait minimum : 10 000 RWF (10 parrainages)",
+    "process_title": "Processus Simple en 3 Étapes",
+    "step1_title": "Étape 1 : Partagez votre lien",
+    "step1_desc": "Envoyez votre lien de parrainage unique à vos amis via WhatsApp, SMS ou réseaux sociaux",
+    "step2_title": "Étape 2 : Ils commandent",
+    "step2_desc": "Votre ami clique sur votre lien et passe sa première commande (minimum 5 000 RWF)",
+    "step3_title": "Étape 3 : Vous êtes tous les deux récompensés !",
+    "step3_desc": "1 000 RWF crédités sur chaque compte après la période de validation de 7 jours",
+    "redeem_title": "Comment Utiliser Vos Crédits",
+    "redeem_dine_title": "Dîner chez les Partenaires",
+    "redeem_dine_desc": "Utilisez vos crédits pour payer des repas dans toute entreprise d'hôtellerie utilisant Imboni Serve. Indiquez simplement votre numéro de téléphone au paiement.",
+    "redeem_dine_list_1": "Sans dépense minimum",
+    "redeem_dine_list_2": "Valable chez les partenaires",
+    "redeem_dine_list_3": "Utilisation instantanée",
+    "redeem_cash_title": "Retrait via Mobile Money",
+    "redeem_cash_desc": "Retirez vos crédits sur MTN MoMo ou Airtel Money après avoir rempli les conditions de confiance.",
+    "redeem_cash_list_1": "Nécessite 1 parrainage qualifié minimum",
+    "redeem_cash_list_2": "Le compte doit avoir 30+ jours",
+    "redeem_cash_list_3": "100% de paiement (sans frais)",
+    "terms_title": "Conditions Importantes",
+    "terms_validation": "Validation de 7 jours : Les récompenses se débloquent 7 jours après la confirmation de la commande",
+    "terms_min_order": "Commande minimum : La première commande de l'ami doit être d'au moins 5 000 RWF",
+    "terms_one_time": "Récompense unique : 1 000 RWF par ami (non récurrente)",
+    "terms_withdrawal": "Retrait : Minimum 10 000 RWF pour retirer via Mobile Money",
+    "affiliate_title": "Vous cherchez le Programme d'Affiliation B2B ?",
+    "affiliate_desc": "Si vous êtes un marketeur professionnel cherchant à amener des entreprises d'hôtellerie sur Imboni Serve et à gagner 15% de commissions récurrentes, vous pouvez accéder à votre portail d'affiliation ici.",
+    "affiliate_btn": "Ouvrir le Portail d'Affiliation"
   }
 }

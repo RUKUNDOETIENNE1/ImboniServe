@@ -13,7 +13,18 @@ interface UpgradePromptProps {
   message?: string;
 }
 
-const FEATURE_CONFIG = {
+type FeatureConfig = {
+  icon: any;
+  color: 'purple' | 'blue' | 'green' | 'orange';
+  title: string;
+  description: string;
+  benefits: string[];
+  cta: string;
+  plans: string[];
+  price?: string;
+};
+
+const FEATURE_CONFIG: Record<UpgradePromptProps['feature'], FeatureConfig> = {
   ai_credits: {
     icon: Sparkles,
     color: 'purple',

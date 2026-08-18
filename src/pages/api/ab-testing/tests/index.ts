@@ -28,12 +28,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let events: any[] = []
       if (testIds.length) {
         try {
-          events = await prisma.aBEvent.groupBy({
+          events = (await prisma.aBEvent.groupBy({
             by: ['testId', 'variantId', 'type'],
             where: { testId: { in: testIds } },
             _count: { _all: true },
             _sum: { valueCents: true },
-          }) as any[]
+          } as any)) as any[]
         } catch (e: any) {
           console.error('AB groupBy failed, returning zeroed metrics. Details:', e?.message || e)
           events = []

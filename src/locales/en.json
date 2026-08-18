@@ -22,6 +22,156 @@
     "all": "All",
     "minutes": "minutes"
   },
+  "features_finance": {
+    "title_page": "Finance Features — Imboni Serve",
+    "badge": "Finance",
+    "h1": "Every Franc Tracked",
+    "subheading": "From mobile money to CFO intelligence — your money, fully visible.",
+    "meta_description": "Track payments, payouts, and financial health with CFO/CEO dashboards, real-time monitors, and clear reconciliation.",
+    "hero": {
+      "title": "CFO Dashboard",
+      "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times."
+    },
+    "featured": {
+      "title": "CEO Dashboard",
+      "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes."
+    },
+    "standard_section_title": "Standard Finance",
+    "standard": {
+      "payout_summary": {
+        "title": "Payout Summary",
+        "desc": "Gross, commission, and net payout per sale. Date-range selectable."
+      },
+      "payment_monitor": {
+        "title": "Payment Monitor",
+        "desc": "Real-time payment tracking with method breakdown and auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Full transaction history with status filters and export."
+      }
+    }
+  },
+  "features_growth": {
+    "title_page": "Growth Features — Imboni Serve",
+    "badge": "Growth",
+    "h1": "Switch Once. Grow Forever.",
+    "subheading": "Operations are just the beginning. ImboniServe helps you find and keep customers.",
+    "meta_description": "Acquire and retain customers with Discovery listings, WhatsApp campaigns, site builder, and content tools.",
+    "hero": {
+      "title": "Discovery Listing",
+      "desc": "Get found by customers searching for hospitality businesses near them. Your business listed on our public directory with cuisine type, price range, and location filters.",
+      "cta": "Browse the Marketplace"
+    },
+    "featured": {
+      "whatsapp_campaigns": {
+        "title": "WhatsApp Campaigns",
+        "desc": "Targeted campaigns to CRM segments — Champions, At Risk, New — directly on WhatsApp. Personalized messages with delivery tracking."
+      },
+      "site_builder": {
+        "title": "Site Builder",
+        "desc": "Create your own website with AI content generation. Template selection, branding customization, and one-click publishing."
+      },
+      "marketer_dashboard": {
+        "title": "Marketer Dashboard",
+        "desc": "Referral and affiliate system with wallet, commissions, payouts, and QR code generation. Track referrals and reward advocates."
+      },
+      "content_management_cms": {
+        "title": "Content Management (CMS)",
+        "desc": "Publish posts and videos to your discovery feed. Full content lifecycle management with media uploads."
+      },
+      "video_analytics": {
+        "title": "Video Analytics",
+        "desc": "Track views, watch time, and engagement on your video content. Know what resonates with your audience."
+      }
+    }
+  },
+  "features_infrastructure": {
+    "title_page": "Infrastructure Features — Imboni Serve",
+    "badge": "Infrastructure",
+    "h1": "Built for Teams",
+    "subheading": "The foundation that makes everything else possible.",
+    "meta_description": "Team-ready roles, inventory, contacts, security, and notifications — the backbone of your operations.",
+    "also_included": "Also Included",
+    "standard": {
+      "staff_management": {
+        "title": "Staff Management",
+        "desc": "Full CRUD with system roles, custom roles, permissions, and branch assignment. Granular access control: waiter, cashier, supervisor, manager, and more."
+      },
+      "inventory_management": {
+        "title": "Inventory Management",
+        "desc": "Stock tracking with min/reorder levels, unit costs, and category filtering. Full audit trail of every movement."
+      },
+      "contacts": {
+        "title": "Contacts",
+        "desc": "Centralized contact management with organization linking. Keep track of suppliers, customers, and partners."
+      }
+    },
+    "operational": {
+      "security_sessions": {
+        "title": "Security & Sessions",
+        "desc": "Active session monitoring, MFA status, security events, and session revocation."
+      },
+      "notifications_settings": {
+        "title": "Notifications Settings",
+        "desc": "Daily report scheduling, WhatsApp alert configuration, and timezone management."
+      }
+    }
+  },
+  "features_analytics": {
+    "title_page": "Analytics Features — Imboni Serve",
+    "badge": "Analytics",
+    "h1": "Know Your Business Inside Out",
+    "subheading": "Data you can act on, not just admire.",
+    "meta_description": "AI-powered business, menu, and revenue analytics with sub-second dashboards and auto-refresh.",
+    "hero": {
+      "cfo_dashboard": {
+        "title": "CFO Dashboard",
+        "desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times."
+      },
+      "ceo_dashboard": {
+        "title": "CEO Dashboard",
+        "desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes."
+      }
+    },
+    "featured": {
+      "crm_with_rfm_segmentation": {
+        "title": "CRM with RFM Segmentation",
+        "desc": "Automatic customer segmentation: Champions, Loyal, At Risk, Lost, New, Promising. Lifetime value, visit frequency, and spend analysis."
+      },
+      "qr_analytics": {
+        "title": "QR Analytics",
+        "desc": "Scan-to-revenue conversion tracking. Know which QRs perform best by hour, device, and location."
+      },
+      "menu_performance_analytics": {
+        "title": "Menu Performance Analytics",
+        "desc": "Item-level revenue, quantity, and trend analysis. Know your best and worst performers."
+      },
+      "peak_hours_analytics": {
+        "title": "Peak Hours Analytics",
+        "desc": "Hourly and daily demand patterns. Plan staffing with data, not guesswork."
+      },
+      "instruction_insights": {
+        "title": "Instruction Insights",
+        "desc": "Customer order instruction patterns. Understand preferences and special requests."
+      },
+      "video_analytics": {
+        "title": "Video Analytics",
+        "desc": "Video content performance: views, watch time, and engagement tracking."
+      }
+    },
+    "standard_section_title": "Standard Analytics",
+    "standard": {
+      "payment_monitor": {
+        "title": "Payment Monitor",
+        "desc": "Real-time payment tracking with method breakdown and auto-refresh."
+      },
+      "transactions": {
+        "title": "Transactions",
+        "desc": "Full transaction history with status filters and export."
+      }
+    }
+  },
   "marketplace": {
     "browse_products": "Browse Products",
     "ai_recommendations": "AI Recommendations",
@@ -62,8 +212,8 @@
   },
   "discovery": {
     "title": "Discover Local Businesses",
-    "subtitle": "Find the best restaurants, cafes, and bars near you",
-    "searchPlaceholder": "Search restaurants, cafes, bars...",
+    "subtitle": "Find the best hospitality businesses, cafes, and bars near you",
+    "searchPlaceholder": "Search businesses, cafes, bars...",
     "filters": "Filters",
     "category": "Category",
     "location": "Location",
@@ -118,11 +268,13 @@
       "title": "Turn Every Table Into",
       "title_highlight": "Faster Revenue",
       "subtitle": "Reduce wait times, serve more customers, and streamline your operations—QR ordering, POS, and AI insights in one platform.",
-      "description": "Built for restaurants, hotels, bars, and cafés.",
+      "description": "Built for cafés, hotels, bars, and hospitality businesses.",
       "rt_os": "Real-time OS: see every sale, every table, every customer action — and grow revenue automatically.",
       "cta_primary": "Start 14-Day Free Trial",
       "cta_secondary": "View Pricing",
+      "cta_talk_to_team": "Talk to Our Team",
       "cta_explore": "Explore Businesses Near You",
+      "aria_go_to_slide": "Go to slide {{n}}",
       "slides": {
         "0": {
           "title": "Turn Every Table Into",
@@ -147,13 +299,44 @@
           "highlight": "Complete Control",
           "subtitle": "POS, QR, Inventory, Analytics",
           "description": "Stop juggling multiple systems. Manage orders, inventory, staff, and reports from one powerful dashboard."
+        },
+        "os": {
+          "title": "The Operating System",
+          "highlight": "for Hospitality.",
+          "subtitle": "Run your café, hotel, bar, or hospitality business from one intelligent platform.",
+          "description": "Everything you need to run your business — from orders and inventory to payments and insights — in one platform built for hospitality."
+        },
+        "replay": {
+          "title": "Service Replay™",
+          "highlight": "See What Really Happened",
+          "subtitle": "Rewind Any Service Period",
+          "description": "Replay events like a match—every order, table, station, and hand-off. Diagnose issues fast, coach teams, and prevent loss."
+        },
+        "qr": {
+          "title": "Smart QR Ordering",
+          "highlight": "Zero Wait Time",
+          "subtitle": "Customers Order from Their Phones",
+          "description": "Scan, browse menu, and place orders instantly. No app downloads. No staff interruptions. Pure efficiency."
+        },
+        "analytics": {
+          "title": "Smart Analytics",
+          "highlight": "Data-Driven Growth",
+          "subtitle": "Know Your Business Inside Out",
+          "description": "Track sales, optimize inventory, and make smarter decisions with actionable recommendations based on your real data."
+        },
+        "platform": {
+          "title": "All-in-One Platform",
+          "highlight": "Complete Control",
+          "subtitle": "POS, QR, Inventory, Analytics",
+          "description": "Stop juggling multiple systems. Manage orders, inventory, staff, and reports from one powerful dashboard."
         }
       }
     },
     "nav_tagline": "Run Smarter. Serve Better.",
     "features": {
-      "title": "Everything you need to run a tight operation",
-      "subtitle": "From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your business.",
+      "title": "One Platform. Complete Operations.",
+      "subtitle": "Run your entire hospitality business from one intelligent platform — orders, inventory, payments, insights, and growth.",
+      "tagline": "Unified. Intelligent. Reliable.",
       "qr_ordering": "QR Code Ordering",
       "qr_ordering_desc": "Customers scan, browse your menu, and order directly from their phones — no app needed.",
       "inventory": "Inventory & Procurement",
@@ -173,48 +356,68 @@
       "whatsapp": "WhatsApp Integration",
       "whatsapp_desc": "Receive order alerts, daily summaries, and low-stock notifications directly on WhatsApp.",
       "mobile_money": "Mobile Money Payments",
-      "mobile_money_desc": "Accept MTN MoMo and Airtel Money natively — no POS terminal required.",
+      "mobile_money_desc": "Accept mobile money payments natively — no POS terminal required.",
       "multi_branch": "Multi-Branch Control",
       "multi_branch_desc": "Manage multiple locations from one dashboard with consolidated and per-branch reporting.",
       "roles": "Role-Based Access",
       "roles_desc": "Cashier, waiter, supervisor, manager — each role sees only what they need."
     },
     "advanced": {
-      "title": "Even more in the box",
-      "subtitle": "Advanced capabilities available on higher plans — all built-in, no third-party tools required.",
-      "hotel_mode": "Hotel Mode",
-      "hotel_mode_desc": "Room management, service areas, and front desk operations built-in.",
+      "title": "Built for Growth",
+      "subtitle": "Everything you need to grow from a single location to a modern hospitality business—all from one intelligent platform.",
+      "hotel_mode": "Hotel Operations",
+      "hotel_mode_desc": "Room management, service areas, and front desk operations for hospitality businesses.",
       "site_builder": "Site Builder",
       "site_builder_desc": "Launch your own website with customizable templates — no code needed.",
       "ai_menu": "AI Menu Builder",
-      "ai_menu_desc": "Upload a photo or document and let AI build your menu for you.",
-      "marketplace": "Discovery Marketplace",
-      "marketplace_desc": "Get listed on a public directory where customers search for places to eat.",
+      "ai_menu_desc": "Turn menus into digital experiences in minutes. Upload a photo or document and let AI create a professional digital menu ready for ordering.",
+      "marketplace": "Business Discovery",
+      "marketplace_desc": "Help more customers discover your business through the Imboni ecosystem with searchable business profiles, promotions, and digital visibility.",
+      "procurement": "Procurement & Inventory",
+      "procurement_desc": "Manage purchasing, suppliers, stock levels, and food costs with complete operational visibility from delivery to consumption.",
       "referral": "Referral Program",
       "referral_desc": "Share & earn — customers refer friends and earn dining credits automatically.",
       "staff": "Staff & Roles",
-      "staff_desc": "Granular role permissions: waiter, cashier, supervisor, manager, and more."
+      "staff_desc": "Control who can access what with flexible roles and permissions for every member of your team.",
+      "multi_branch": "Multi-Branch Operations",
+      "multi_branch_desc": "Run multiple branches from one platform with centralized reporting, inventory visibility, and operational consistency.",
+      "business_intelligence": "Business Intelligence",
+      "business_intelligence_desc": "Monitor sales, customer trends, inventory, and financial performance with real-time insights that support better business decisions.",
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Replay every service period event-by-event and understand exactly what happened.",
+      "inventory_alerts": "Inventory Alerts & Auto-Reorder",
+      "inventory_alerts_desc": "Receive automatic stock alerts and AI-generated draft purchase orders for your suppliers.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Automatically generate digital receipts with shareable links for a seamless customer experience."
     },
     "discovery": {
-      "badge": "NEW — Discovery Feed",
-      "title": "Get discovered by customers looking for great experiences",
-      "subtitle": "List your business on the Imboni Serve discovery marketplace. Publish content, promotions, and daily specials — customers find you and order directly.",
-      "cta_browse": "Browse the Marketplace",
-      "cta_claim": "Claim Your Free Listing",
+      "badge": "Business Discovery",
+      "title": "Help customers discover your business",
+      "subtitle": "Get discovered through the Imboni ecosystem. Customers searching for hospitality businesses can find you, view your offerings, and place orders directly.",
+      "cta_browse": "Explore Discovery",
+      "cta_claim": "Get Started",
+      "feature_visibility": "Customer Visibility",
+      "feature_orders": "Direct Orders",
+      "feature_growth": "Business Growth",
+      "feature_customers": "New Customers",
       "feature_posts": "Shoppable Posts",
       "feature_media": "Photo & Video",
-      "feature_promos": "Promos & Combos",
+      "feature_promos": "Promotions & Combos",
       "feature_attribution": "Order Attribution"
     },
     "payments": {
-      "title": "🇷🇼 Rwanda-Ready Payments",
-      "subtitle": "Accept all major payment methods your customers use every day."
+      "title": "Accept Payments Your Customers Already Use",
+      "subtitle": "Flexible payment options configured for your market — mobile money, cards, cash, and digital wallets.",
+      "mobile_money": "Mobile Money",
+      "cards": "Cards & POS",
+      "cash": "Cash",
+      "digital_wallets": "Digital Wallets"
     },
     "final_cta": {
-      "title": "Ready to grow your business?",
-      "subtitle": "Join 500+ hospitality businesses across Rwanda using Imboni Serve. Start your free 14-day trial today — no credit card needed.",
+      "title": "Ready to transform your hospitality business?",
+      "subtitle": "Start your free 14-day trial today — no credit card needed. Experience the Operating System for Hospitality.",
       "cta_start": "Get Started Free",
-      "cta_whatsapp": "Chat on WhatsApp"
+      "cta_whatsapp": "Talk to Our Team"
     },
     "footer": {
       "copyright": "Imboni Serve. Built for the hospitality industry.",
@@ -241,7 +444,7 @@
       "step3_title": "Set Up Tables & QR Codes",
       "step3_desc": "Create your tables (Table 1, VIP Section, Terrace, etc.) and generate unique QR codes for each — all from your dashboard. Print and place them on tables.",
       "step4_title": "Connect WhatsApp & Payments",
-      "step4_desc": "Link your WhatsApp number to receive instant order alerts and daily reports. Enable MTN MoMo and Airtel Money for seamless mobile payments.",
+      "step4_desc": "Link your WhatsApp number to receive instant order alerts and daily reports. Enable your preferred payment methods for seamless digital payments.",
       "step5_title": "Track Inventory & Costs",
       "step5_desc": "Add your stock items, set reorder points, and track every purchase. Get AI-powered alerts when costs spike or stock runs low.",
       "step6_title": "Go Live & Grow!",
@@ -252,9 +455,10 @@
     },
     "video": {
       "title": "See Imboni Serve in Action",
-      "subtitle": "Watch how restaurants streamline operations with our all-in-one platform.",
+      "subtitle": "Watch how hospitality businesses streamline operations with our all-in-one platform.",
       "cta": "Click to watch on YouTube",
-      "description": "See how Imboni Serve transforms restaurant operations"
+      "description": "See how Imboni Serve transforms hospitality operations",
+      "alt": "Imboni Serve demonstration video"
     },
     "store": {
       "badge": "Procurement Store",
@@ -267,7 +471,11 @@
       "businesses": "Businesses served",
       "orders": "Orders processed",
       "trial": "Free trial, no card needed",
-      "features": "Features included"
+      "trial_days": "14 days",
+      "no_card": "No card",
+      "plans_count": "5 plans",
+      "features": "Verified capabilities",
+      "plans": "From Starter to Enterprise"
     },
     "pricing": {
       "title": "Simple Pricing for Rwanda",
@@ -322,7 +530,93 @@
       "alerts_cta": "Configure Alerts",
       "resv_title": "Deposits & Reservations",
       "resv_desc": "Cut no‑shows with smart deposits & confirmations.",
-      "resv_cta": "Manage Reservations"
+      "resv_cta": "Manage Reservations",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Replay every service period event-by-event—just like reviewing a football match.",
+      "replay_cta": "Explore Service Replay"
+    },
+    "why_switch": {
+      "badge": "Why Switch?",
+      "title": "You're not just getting a POS. You're getting intelligence.",
+      "subtitle": "Capabilities that solve problems competitors ignore.",
+      "replay_title": "Service Replay™",
+      "replay_desc": "Replay any service period like a football match. Every order, every station, every table — event by event. Understand exactly what happened and why.",
+      "crm_title": "Customer CRM (RFM)",
+      "crm_desc": "Segment customers into Champions, Loyal, and At-Risk.",
+      "ab_title": "Menu A/B Testing",
+      "ab_desc": "Test price, copy, and visuals. Pick winners with data.",
+      "ab_cta": "Start a Test",
+      "crm_cta": "Explore CRM",
+      "replay_cta": "See It in Action"
+    },
+    "why_ai": {
+      "badge": "Why AI?",
+      "title": "AI isn't a buzzword. It's working right now in your dashboard.",
+      "subtitle": "AI that does real work — not just displays data.",
+      "menu_builder_title": "AI Menu Builder",
+      "menu_builder_desc": "Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions. No manual entry — from hours to minutes.",
+      "auto_reorder_title": "Auto-Reorder AI",
+      "auto_reorder_desc": "AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again.",
+      "insight_reports_title": "AI Insight Reports",
+      "insight_reports_desc": "Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst.",
+      "cost_anomaly_title": "Cost Anomaly Alerts",
+      "cost_anomaly_desc": "Automatic detection of supplier price increases with statistical analysis and severity scoring. Catch price creep before it hurts your margins."
+    },
+    "why_trust": {
+      "badge": "Why Trust Us?",
+      "title": "This isn't a basic POS with pretty charts. This is enterprise-grade intelligence.",
+      "subtitle": "Built for decision-makers, not just order-takers.",
+      "cfo_title": "CFO Dashboard",
+      "cfo_desc": "Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times.",
+      "cfo_cta": "View CFO Dashboard",
+      "ceo_title": "CEO Dashboard",
+      "ceo_desc": "Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes.",
+      "ceo_cta": "View CEO Dashboard"
+    },
+    "why_now": {
+      "badge": "Why Now?",
+      "title": "Every day without intelligence is a day of lost revenue.",
+      "stockouts": "Stockouts cost you customers today. AI prevents them before they happen.",
+      "pricing": "You're pricing your menu blind. Test prices with real conversion data.",
+      "churn": "You don't know who's about to churn. RFM segmentation reveals it automatically.",
+      "supplier": "Supplier prices are creeping up unnoticed. Cost anomaly alerts catch them early.",
+      "replay": "You can't reconstruct what went wrong last Friday. Service Replay™ lets you replay any service period event-by-event."
+    },
+    "founding_program": {
+      "badge": "Limited Early-Adopter Program",
+      "title": "Founding Hospitality Business Program",
+      "subtitle": "Join the first 100 hospitality businesses to shape the future of hospitality operations.",
+      "benefit_1_title": "50% Lifetime Discount",
+      "benefit_1_desc": "Lock in 50% off your subscription for as long as you remain a customer. No expiration.",
+      "benefit_2_title": "Direct Founder Support",
+      "benefit_2_desc": "Get priority onboarding and direct access to the founding team for support and guidance.",
+      "benefit_3_title": "Early Access to New Capabilities",
+      "benefit_3_desc": "Be the first to access selected new features and capabilities as they launch.",
+      "benefit_4_title": "Shape Platform Development",
+      "benefit_4_desc": "Direct input on roadmap priorities — your operational needs help guide what we build next.",
+      "limited": "Limited to first 100 hospitality businesses",
+      "cta": "Join Founding Program",
+      "learn_more": "Learn More"
+    },
+    "pricing_preview": {
+      "heading": "Transparent Pricing for Every Business Size",
+      "subtitle": "ImboniServe offers flexible plans designed for hospitality businesses of all sizes.",
+      "starting_at": "Starting at",
+      "per_month": "/ month",
+      "starter_desc": "Perfect for single-location hospitality businesses getting started with modern operations.",
+      "annual_savings": "Annual billing saves 25% (equivalent to 3 free months)",
+      "scale": "Plans scale from single locations to multi-branch enterprises.",
+      "all_plans_include": "All Plans Include",
+      "feature_1": "QR ordering, POS, and kitchen operations",
+      "feature_2": "Inventory and procurement management",
+      "feature_3": "WhatsApp integration and mobile money payments",
+      "feature_4": "Reporting and analytics",
+      "enterprise_note": "Enterprise plans available with custom pricing for multi-branch operations and advanced requirements.",
+      "founding_note": "🎉 Founding Hospitality Business Program members receive 50% lifetime discount on all plans.",
+      "founding_link": "Learn more below ↓",
+      "view_full_pricing": "View Full Pricing",
+      "help": "Need help choosing?",
+      "chat": "Chat with us on WhatsApp"
     }
   },
   "cookies": {
@@ -514,7 +808,7 @@
       "branding": "Branding",
       "content": "Content",
       "templates_hero_title": "Professional Website Templates",
-      "templates_hero_subtitle": "Launch your restaurant website in minutes with pre-designed templates",
+      "templates_hero_subtitle": "Launch your hospitality business website in minutes with pre-designed templates",
       "benefit_beautiful_designs": "Beautiful Designs",
       "benefit_beautiful_desc": "Professionally crafted templates for every cuisine type",
       "benefit_quick_setup": "Quick Setup",
@@ -522,7 +816,7 @@
       "benefit_mobile_ready": "Mobile Ready",
       "benefit_mobile_desc": "All templates look perfect on any device",
       "choose_template": "Choose Your Template",
-      "choose_template_desc": "Browse professionally designed templates tailored for restaurants, cafés, and food businesses",
+      "choose_template_desc": "Browse professionally designed templates tailored for hospitality businesses, cafés, and food businesses",
       "popular": "Popular",
       "selected": "Selected",
       "use_template_cta": "Use This Template",
@@ -631,8 +925,12 @@
     "last_90_days": "Last 90 days",
     "last_365_days": "Last 365 days",
     "lifetime": "Lifetime",
-    "brand": { "tagline": "Hospitality Management" },
-    "user": { "anon": "User" },
+    "brand": {
+      "tagline": "Hospitality Management"
+    },
+    "user": {
+      "anon": "User"
+    },
     "actions": {
       "logout": "Logout",
       "searchPlaceholder": "Search..."
@@ -761,7 +1059,59 @@
     "plan_professional": "Professional - RWF 25,000/month or 20,000 with annual (⭐ Most Popular)",
     "plan_business": "Business - RWF 62,500/month or 50,000 with annual (🏢 Multi-Branch)",
     "plan_premium": "Premium - RWF 208,334/month or 166,667 with annual (🏢 All Features)",
-    "plan_enterprise": "Enterprise - Custom Pricing"
+    "plan_enterprise": "Enterprise - Custom Pricing",
+    "verify_identity": "Verify your identity",
+    "enter_6_digit_code": "Enter the complete 6-digit code.",
+    "too_many_attempts": "Too many attempts. Please wait a few minutes, then request a new code.",
+    "code_expired": "Your code has expired. Click \"Resend code\" below to get a new one.",
+    "invalid_or_expired_code": "Invalid or expired code.",
+    "login_incomplete": "Login could not be completed. The code may have expired — request a new one.",
+    "verification_failed": "Verification failed. Please try again.",
+    "too_many_resends": "Too many resend requests. Please wait a few minutes and try again.",
+    "could_not_resend": "Could not resend code.",
+    "could_not_resend_retry": "Could not resend code. Try again.",
+    "code_sent_to": "A 6-digit code was sent to",
+    "via_whatsapp": "via WhatsApp",
+    "email_and_whatsapp": "(email + WhatsApp)",
+    "verifying": "Verifying...",
+    "verify_and_signin": "Verify & Sign In",
+    "sending": "Sending...",
+    "resend_code": "Didn't receive it? Resend code",
+    "never_share_code": "🔒 Never share this code. It expires in 10 minutes.",
+    "back": "Back",
+    "login_error": "Login service unavailable. Please try again.",
+    "powered_by": "Powered by ICTHubs",
+    "and_service_terms": ", and ",
+    "forgot_failed": "Failed to send reset email",
+    "network_error": "Network error. Please try again.",
+    "check_email": "Check Your Email",
+    "reset_link_sent": "If an account exists with",
+    "reset_link_will_arrive": "you will receive a password reset link shortly.",
+    "reset_link_expires": "The link will expire in 1 hour. Check your spam folder if you don't see it.",
+    "back_to_login": "Back to Login",
+    "forgot_password_title": "Forgot Password?",
+    "forgot_password_desc": "No worries! Enter your email and we'll send you a reset link.",
+    "send_reset_link": "Send Reset Link",
+    "invalid_reset_link": "Invalid reset link. Please request a new password reset.",
+    "password_min_length": "Password must be at least 8 characters long",
+    "password_uppercase": "Password must contain at least one uppercase letter",
+    "password_lowercase": "Password must contain at least one lowercase letter",
+    "password_number": "Password must contain at least one number",
+    "passwords_no_match": "Passwords do not match",
+    "fix_password_requirements": "Please fix the password requirements",
+    "reset_failed": "Failed to reset password",
+    "reset_success_title": "Password Reset Successful!",
+    "reset_success_desc": "Your password has been changed. All your active sessions have been logged out for security.",
+    "redirecting_to_login": "Redirecting to login page...",
+    "go_to_login": "Go to Login",
+    "reset_password_title": "Reset Your Password",
+    "enter_new_password_for": "Enter a new password for",
+    "new_password": "New Password",
+    "enter_new_password": "Enter new password",
+    "confirm_password": "Confirm Password",
+    "confirm_new_password": "Confirm new password",
+    "resetting_password": "Resetting Password...",
+    "reset_password": "Reset Password"
   },
   "navigation": {
     "home": "Home",
@@ -780,7 +1130,13 @@
     "network": "Network error. Please check your connection.",
     "unauthorized": "You are not authorized to perform this action.",
     "not_found": "The requested resource was not found.",
-    "validation": "Please check your input and try again."
+    "validation": "Please check your input and try again.",
+    "server_error": "Server Error",
+    "server_error_desc": "Something went wrong on our end. Please try again later.",
+    "go_home": "Go Back Home",
+    "server_error_code": "An error occurred on server",
+    "client_error": "An error occurred on client",
+    "go_home_link": "Go back home"
   },
   "qr": {
     "title": "QR Code",
@@ -978,6 +1334,9 @@
     "save_time": "Save time on creating menus, posters, table tents, stickers, coasters, A-frames, and more."
   },
   "public": {
+    "meta": {
+      "description": "Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments."
+    },
     "nav": {
       "features": "Features",
       "pricing": "Pricing",
@@ -992,12 +1351,16 @@
       "get_discovered": "Get discovered by customers",
       "referral": "Referral Program",
       "share_earn": "Share & earn rewards",
+      "share_earn_short": "Share & earn",
       "discover": "Discover",
       "contact": "Contact"
     },
     "cta": {
       "sign_in": "Sign in",
-      "start_trial": "Start Free Trial"
+      "start_trial": "Start Free Trial",
+      "installed": "Installed",
+      "install": "Install App",
+      "trial": "Trial"
     },
     "footer": {
       "tagline": "Built for the hospitality industry.",
@@ -1007,7 +1370,154 @@
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy",
       "service_terms": "Service Terms",
-      "cookie_prefs": "Cookie Preferences"
+      "cookie_prefs": "Cookie Preferences",
+      "powered_by": "Powered by ICTHubs",
+      "share_text": "Discover ImboniServe – Smart Dining for Hospitality Businesses in Rwanda"
+    },
+    "errors": {
+      "404": {
+        "title": "Page Not Found",
+        "description": "The page you're looking for doesn't exist or has been moved.",
+        "cta_home": "Go Back Home"
+      }
+    }
+  },
+  "features_page": {
+    "title_page": "Features — Imboni Serve",
+    "meta_description": "Explore all features of ImboniServe — operations, AI, analytics, finance, growth, and infrastructure in one hospitality platform.",
+    "title": "Everything You Need to Run Your Hospitality Business",
+    "subtitle": "38 verified, production-ready capabilities. Organized by what they do for your business — not by internal modules.",
+    "explore": "Explore",
+    "back": "All Features",
+    "ready_title": "Ready to see it in action?",
+    "ready_desc": "Start your free 14-day trial. No credit card needed. Full access to all capabilities.",
+    "cta": "Start Free Trial",
+    "categories": {
+      "operations": {
+        "title": "Operations",
+        "desc": "From order to delivery, every step visible and controlled."
+      },
+      "ai": {
+        "title": "AI",
+        "desc": "AI that works while you work — not just dashboards."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "desc": "Data you can act on, not just admire."
+      },
+      "finance": {
+        "title": "Finance",
+        "desc": "Every franc tracked — from mobile money to CFO intelligence."
+      },
+      "growth": {
+        "title": "Growth",
+        "desc": "Switch once. Grow forever."
+      },
+      "infrastructure": {
+        "title": "Infrastructure",
+        "desc": "The foundation that makes everything else possible."
+      }
+    }
+  },
+  "features_ai": {
+    "title_page": "AI Features — Imboni Serve",
+    "badge": "AI",
+    "h1": "AI That Works While You Work",
+    "subheading": "AI isn't a feature. It's the foundation. Every AI capability does real work — not just displays data.",
+    "meta_description": "AI Menu Builder, auto-reorder, insight reports, cost anomaly alerts, A/B testing, and optimization hub — AI that does real work.",
+    "hero": {
+      "title": "AI Menu Builder",
+      "desc": "Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions automatically. No manual entry — from hours to minutes."
+    },
+    "capabilities": {
+      "auto_reorder_ai": {
+        "title": "Auto-Reorder AI",
+        "desc": "AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again."
+      },
+      "ai_insight_reports": {
+        "title": "AI Insight Reports",
+        "desc": "Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst."
+      },
+      "cost_anomaly_alerts": {
+        "title": "Cost Anomaly Alerts",
+        "desc": "Automatic detection of supplier price increases with z-score analysis and severity scoring. Catch price creep before it hurts."
+      },
+      "a_b_testing_for_menus": {
+        "title": "A/B Testing for Menus",
+        "desc": "Test price, copy, and visuals. Split traffic. Measure conversion. Pick winners with real data, not gut feeling."
+      },
+      "optimization_hub": {
+        "title": "Optimization Hub",
+        "desc": "AI-driven recommendations from Business Scanner, AI Insights, and Autopilot — with measured impact tracking."
+      }
+    },
+    "analytics_section_title": "AI-Powered Analytics",
+    "analytics": {
+      "menu_performance_analytics": {
+        "title": "Menu Performance Analytics",
+        "desc": "Item-level revenue, quantity, and trend analysis."
+      },
+      "peak_hours_analytics": {
+        "title": "Peak Hours Analytics",
+        "desc": "Hourly and daily demand patterns. Plan staffing with data."
+      },
+      "instruction_insights": {
+        "title": "Instruction Insights",
+        "desc": "Customer order instruction patterns and preference analysis."
+      }
+    }
+  },
+  "features_operations": {
+    "title_page": "Operations Features — Imboni Serve",
+    "badge": "Operations",
+    "h1": "Run Your Floor",
+    "subheading": "From order to delivery, every step visible and controlled.",
+    "meta_description": "Run your floor with QR ordering, Service Replay™, Smart Dining Slips™, kitchen display, reservations, and more.",
+    "hero": {
+      "title": "QR Code Ordering",
+      "desc": "Customers scan, browse your menu, and order directly from their phones — no app needed. Group sessions, OTP verification, upsell recommendations, dietary preferences, seat selection, and call-waiter functionality.",
+      "cta": "Try QR Ordering"
+    },
+    "featured": {
+      "service_replay": {
+        "title": "Service Replay™",
+        "desc": "Replay any service period event-by-event — like a football match. Every order, every station, every table. Playback controls with speed adjustment and filtering by table, station, waiter, or event type."
+      },
+      "smart_dining_slips": {
+        "title": "Smart Dining Slips™",
+        "desc": "Auto-generated digital receipts with shareable links for seamless customer experience. Paperless, professional, and trackable."
+      },
+      "qr_analytics": {
+        "title": "QR Analytics",
+        "desc": "Track scans, conversion rates, and revenue per QR. Know which tables and QR codes drive the most orders and revenue."
+      }
+    },
+    "standard_section_title": "Standard Operations",
+    "standard": {
+      "kds": {
+        "title": "Kitchen Display System (KDS)",
+        "desc": "Real-time order display with urgency timers and payment status."
+      },
+      "waiter_dashboard": {
+        "title": "Waiter Dashboard",
+        "desc": "5-stage order queue: waiting → preparing → ready → picked up → delivered."
+      },
+      "reservations": {
+        "title": "Reservations",
+        "desc": "Reservation management with deposit tracking and status workflow."
+      },
+      "close_day": {
+        "title": "Close Day (Z-Report)",
+        "desc": "End-of-day reconciliation with revenue breakdown by payment method and order source."
+      },
+      "promotions": {
+        "title": "Promotions",
+        "desc": "Percentage discounts, fixed amount off, and happy hour promotions with time-based activation."
+      },
+      "qr_builder": {
+        "title": "QR Builder",
+        "desc": "Create branded QR codes with logo embedding, template selection, and short URLs."
+      }
     }
   },
   "home": {
@@ -1016,18 +1526,19 @@
       "title1": "Turn Every Table Into",
       "title2": "Faster Revenue",
       "subtitle1": "Reduce wait times, serve more customers, and streamline your operations—QR ordering, POS, and AI insights in one platform.",
-      "subtitle2": "Built for restaurants, hotels, bars, and cafés."
+      "subtitle2": "Built for cafés, hotels, bars, and hospitality businesses."
     },
     "cta": {
       "start_trial_14": "Start 14-Day Free Trial",
       "explore_near": "Explore Businesses Near You",
       "view_pricing": "View Pricing"
-    }
+    },
+    "title_page": "Imboni Serve — Hospitality Operating System"
   },
   "pricing": {
     "title_page": "Pricing — Imboni Serve",
     "heading": "Simple Pricing for All Hospitality Businesses",
-    "subheading": "Choose the perfect plan for your restaurant, hotel, bar, or café. All plans include WhatsApp integration and mobile money support.",
+    "subheading": "Choose the perfect plan for your hospitality business, hotel, bar, or café. All plans include WhatsApp integration and mobile money support.",
     "tagline": "Unified. Intelligent. Reliable.",
     "launch_badge": "🎉 Launch Special - 50% OFF All Plans!",
     "monthly": "Monthly",
@@ -1049,9 +1560,9 @@
     "plan_starter": "Essentials",
     "plan_starter_desc": "Perfect for small cafés and food stalls",
     "plan_professional": "Professional",
-    "plan_professional_desc": "For established restaurants and cafés",
+    "plan_professional_desc": "For established hospitality businesses and cafés",
     "plan_business": "Business",
-    "plan_business_desc": "For hotels, chains, and high-volume restaurants",
+    "plan_business_desc": "For hotels, chains, and high-volume hospitality businesses",
     "plan_premium": "Premium",
     "plan_premium_desc": "Complete solution with all features included",
     "plan_enterprise": "Enterprise",
@@ -1059,9 +1570,9 @@
     "plan_essentials_name": "Essentials",
     "plan_essentials_desc": "Perfect for small cafés and food stalls getting started",
     "plan_professional_name": "Professional",
-    "plan_professional_desc_full": "For established restaurants and cafés",
+    "plan_professional_desc_full": "For established hospitality businesses and cafés",
     "plan_business_name": "Business",
-    "plan_business_desc_full": "For hotels, chains, and high-volume restaurants",
+    "plan_business_desc_full": "For hotels, chains, and high-volume hospitality businesses",
     "plan_premium_name": "Premium",
     "plan_premium_desc_full": "Complete solution with all features included",
     "plan_enterprise_name": "Enterprise",
@@ -1150,7 +1661,44 @@
     "feature_sso_custom_roles": "SSO & custom roles",
     "feature_regional_data_residency": "Regional data residency",
     "feature_custom_workflows": "Custom workflows",
-    "feature_audit_exports": "Audit exports"
+    "feature_audit_exports": "Audit exports",
+    "feature_referrals": "Referrals",
+    "feature_smart_dining_slips": "Smart Dining Slips",
+    "feature_standard_support": "Standard support",
+    "feature_everything_in_starter": "Everything in Starter",
+    "feature_inventory_alerts": "Inventory alerts",
+    "feature_role_based_access_control": "Role-based access control",
+    "feature_payment_monitor": "Payment monitor",
+    "feature_menu_performance_analytics": "Menu performance analytics",
+    "feature_peak_hours_analytics": "Peak hours analytics",
+    "feature_crm_with_rfm_segmentation": "CRM with RFM segmentation",
+    "feature_qr_builder_20_codes": "QR Builder (20 codes)",
+    "feature_1_branch_unlimited_outlets": "1 branch, unlimited outlets",
+    "feature_multi_branch_dashboard": "Multi-branch dashboard",
+    "feature_supplier_orders_enhanced": "Supplier orders (enhanced)",
+    "feature_delivery_confirmation": "Delivery confirmation",
+    "feature_qr_analytics": "QR analytics",
+    "feature_qr_builder_unlimited_codes": "QR Builder (unlimited codes)",
+    "feature_discovery_featured_listing": "Discovery (featured listing)",
+    "feature_whatsapp_campaigns": "WhatsApp Campaigns",
+    "feature_ai_draft_purchase_orders": "AI draft purchase orders",
+    "feature_service_replay": "Service Replay™",
+    "feature_a_b_testing_for_menus": "A/B Testing for menus",
+    "feature_cfo_dashboard": "CFO Dashboard",
+    "feature_ceo_dashboard": "CEO Dashboard",
+    "feature_custom_roles_and_permissions": "Custom roles and permissions",
+    "feature_training_and_onboarding": "Training and onboarding",
+    "feature_qr_code_ordering": "QR Code Ordering",
+    "feature_ai_menu_builder": "AI Menu Builder",
+    "feature_auto_reorder_ai": "Auto-Reorder AI",
+    "feature_a_b_testing": "A/B Testing",
+    "feature_crm_with_rfm": "CRM with RFM",
+    "feature_payout_summary": "Payout Summary",
+    "feature_transactions": "Transactions",
+    "feature_discovery_listing": "Discovery Listing",
+    "feature_site_builder": "Site Builder",
+    "feature_inventory": "Inventory",
+    "feature_contacts": "Contacts"
   },
   "faq": {
     "title_page": "FAQ — Imboni Serve",
@@ -1265,8 +1813,7 @@
       "insufficient_credits": "Insufficient AI Credits",
       "upgrade_prompt": "Upgrade your plan or purchase additional AI credits to continue scanning."
     }
-  }
-  ,
+  },
   "achievements": {
     "title": "Achievements",
     "show_less": "Show Less",
@@ -2033,5 +2580,75 @@
     "require_business_plan": "Hotel Mode requires Business plan+",
     "features_description": "Room service, service areas, and bill-to-room functionality",
     "no_rooms": "No rooms added yet"
+  },
+  "refer": {
+    "title_page": "Referral Program — Imboni Serve",
+    "meta_description": "Share your referral link with friends. When they order, you both get 1,000 RWF. No limits, no recurring fees.",
+    "h1": "Share & Earn 1,000 RWF Per Friend",
+    "subtitle": "Share your referral link with friends. When they order, you both get 1,000 RWF. No limits, no recurring fees — just instant rewards!",
+    "how_it_works_title": "How It Works — Simple & Fast",
+    "steps": {
+      "1_title": "Get Your Code",
+      "1_desc": "Enter your phone to generate a unique referral code",
+      "2_title": "They Order",
+      "2_desc": "Friend clicks your link and places an order",
+      "3_title": "Order Confirmed",
+      "3_desc": "Minimum 5,000 RWF order value",
+      "4_title": "You Both Earn",
+      "4_desc": "1,000 RWF each — instantly!"
+    },
+    "requirements_title": "Simple Requirements",
+    "requirements_desc": "Your friend must complete their first order (minimum 5,000 RWF). That's it! No complicated qualification process.",
+    "phone_label": "Your Phone Number *",
+    "name_label": "Your Name (Optional)",
+    "error_phone_required": "Phone number is required",
+    "error_generate_failed": "Failed to generate referral code",
+    "generating": "Generating...",
+    "get_code_btn": "Get My Referral Code",
+    "your_code": "Your Referral Code",
+    "share_code_desc": "Share this code with hospitality business owners",
+    "share_link_btn": "Share Referral Link",
+    "referral_link_label": "Referral link:",
+    "copied_alert": "Referral link copied to clipboard!",
+    "share_message": "Join Imboni Serve and transform your hospitality business! Use my referral code: {{code}}\n\n{{link}}\n\nGet started with smart QR ordering, inventory management, and more.",
+    "share_title": "Join Imboni Serve",
+    "rewards_title": "What You Get",
+    "welcome_bonus_title": "1,000 RWF Welcome Bonus",
+    "welcome_bonus_desc": "One-time reward when your friend completes their first order. No recurring fees, no complicated terms.",
+    "your_reward": "Your reward:",
+    "friend_reward": "Friend's reward:",
+    "total_per_referral": "Total per referral:",
+    "unlimited_title": "Unlimited Referrals",
+    "unlimited_desc": "No caps, no limits. Refer 10 friends, earn 10,000 RWF. Refer 100 friends, earn 100,000 RWF. It's that simple!",
+    "unlimited_note": "Share as much as you want — every referral counts!",
+    "fast_payout_title": "Fast Payout",
+    "fast_payout_desc": "Rewards unlock after 7-day validation period. Withdraw to Mobile Money or use at any hospitality business on Imboni Serve.",
+    "fast_payout_note": "Minimum withdrawal: 10,000 RWF (10 referrals)",
+    "process_title": "Simple 3-Step Process",
+    "step1_title": "Step 1: Share your link",
+    "step1_desc": "Send your unique referral link to friends via WhatsApp, SMS, or social media",
+    "step2_title": "Step 2: They order",
+    "step2_desc": "Friend clicks your link and places their first order (minimum 5,000 RWF)",
+    "step3_title": "Step 3: You both get rewarded!",
+    "step3_desc": "1,000 RWF credited to each account after 7-day validation period",
+    "redeem_title": "How to Redeem Your Credits",
+    "redeem_dine_title": "Dine at Partner Businesses",
+    "redeem_dine_desc": "Use your credits to pay for meals at any hospitality business using Imboni Serve. Just provide your phone number at checkout.",
+    "redeem_dine_list_1": "No minimum spend",
+    "redeem_dine_list_2": "Works at partner locations",
+    "redeem_dine_list_3": "Instant redemption",
+    "redeem_cash_title": "Cash Out via Mobile Money",
+    "redeem_cash_desc": "Withdraw credits to MTN MoMo or Airtel Money after meeting trust requirements.",
+    "redeem_cash_list_1": "Requires 1+ qualified referral",
+    "redeem_cash_list_2": "Account must be 30+ days old",
+    "redeem_cash_list_3": "100% payout (no fees)",
+    "terms_title": "Important Terms",
+    "terms_validation": "7-day validation: Rewards unlock 7 days after order confirmation",
+    "terms_min_order": "Minimum order: Friend's first order must be at least 5,000 RWF",
+    "terms_one_time": "One-time reward: 1,000 RWF per friend (not recurring)",
+    "terms_withdrawal": "Withdrawal: Minimum 10,000 RWF to cash out via Mobile Money",
+    "affiliate_title": "Looking for the B2B Affiliate Program?",
+    "affiliate_desc": "If you're a professional marketer looking to bring hospitality businesses to Imboni Serve and earn 15% recurring commissions, you can access your affiliate portal here.",
+    "affiliate_btn": "Open Affiliate Portal"
   }
 }

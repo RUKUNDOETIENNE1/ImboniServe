@@ -4,6 +4,7 @@
  */
 
 import { CheckCircle, Download, Share2 } from 'lucide-react';
+import { useCurrency } from '@/contexts/LocaleContext';
 
 interface PaymentConfirmationProps {
   orderNumber: string;
@@ -30,13 +31,14 @@ export default function PaymentConfirmation({
   businessName,
   onClose,
 }: PaymentConfirmationProps) {
-  const formatRwf = (cents: number) => `RWF ${Math.round(cents).toLocaleString('en-RW')}`;
+  const { currency } = useCurrency();
+  const formatRwf = (cents: number) => `${currency} ${Math.round(cents).toLocaleString('en-RW')}`;
 
   const handleDownloadReceipt = () => {
     // Generate a simple text receipt
     const receiptText = `
 IMBONI SERVE - DIGITAL RECEIPT
-${businessName || 'Restaurant'}
+${businessName || 'Business'}
 ================================
 
 Order #: ${orderNumber}

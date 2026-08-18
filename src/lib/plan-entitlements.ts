@@ -3,10 +3,11 @@
  * Centralized feature gating based on subscription tier
  */
 
-export type PlanCode = 'ESSENTIALS' | 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
+export type PlanCode = 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
 
 export interface PlanEntitlements {
   // Core Operations
+  hasMenu: boolean
   hasKitchenTickets: boolean
   hasKDS: boolean
   hasKDSAdvanced: boolean
@@ -93,6 +94,26 @@ export interface PlanEntitlements {
   
   // Concurrent limits
   maxConcurrentABTests: number | 'unlimited'
+
+  // Aggregate feature gates (convenience keys for broader feature areas)
+  hasOrders: boolean
+  hasPayments: boolean
+  hasInventory: boolean
+  hasCRM: boolean
+  hasMarketing: boolean
+  hasMarketplace: boolean
+  hasTables: boolean
+  hasQRCodes: boolean
+  hasSiteBuilder: boolean
+  hasSupplierOrders: boolean
+  hasSupplierMarketplace: boolean
+  hasPurchaseOrders: boolean
+  hasAIAssistant: boolean
+  hasAIMenuAssistant: boolean
+  hasAICostAnomalies: boolean
+  hasPeakHoursAnalytics: boolean
+  hasProcurementAnalytics: boolean
+  hasMultiLanguageMenus: boolean
 }
 
 /**
@@ -100,6 +121,7 @@ export interface PlanEntitlements {
  */
 export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
   const baseEntitlements: PlanEntitlements = {
+    hasMenu: true,
     hasKitchenTickets: false,
     hasKDS: false,
     hasKDSAdvanced: false,
@@ -158,10 +180,27 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
     hasBasicCRM: false,
     hasCustomerFeedback: false,
     maxConcurrentABTests: 0,
+    hasOrders: false,
+    hasPayments: false,
+    hasInventory: false,
+    hasCRM: false,
+    hasMarketing: false,
+    hasMarketplace: false,
+    hasTables: false,
+    hasQRCodes: false,
+    hasSiteBuilder: false,
+    hasSupplierOrders: false,
+    hasSupplierMarketplace: false,
+    hasPurchaseOrders: false,
+    hasAIAssistant: false,
+    hasAIMenuAssistant: false,
+    hasAICostAnomalies: false,
+    hasPeakHoursAnalytics: false,
+    hasProcurementAnalytics: false,
+    hasMultiLanguageMenus: false,
   }
 
   switch (planCode) {
-    case 'ESSENTIALS':
     case 'STARTER':
       return {
         ...baseEntitlements,
@@ -178,6 +217,15 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         maxOutlets: 1,
         storageGB: 2,
         supportLevel: 'standard',
+        // Aggregate gates
+        hasOrders: true,
+        hasPayments: true,
+        hasInventory: true,
+        hasCRM: true,
+        hasTables: true,
+        hasQRCodes: true,
+        hasSiteBuilder: true,
+        hasSupplierOrders: true,
       }
 
     case 'PROFESSIONAL':
@@ -205,6 +253,21 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         maxOutlets: 'unlimited',
         storageGB: 5,
         supportLevel: 'priority',
+        // Aggregate gates
+        hasOrders: true,
+        hasPayments: true,
+        hasInventory: true,
+        hasCRM: true,
+        hasMarketing: true,
+        hasTables: true,
+        hasQRCodes: true,
+        hasSiteBuilder: true,
+        hasSupplierOrders: true,
+        hasPurchaseOrders: true,
+        hasAIAssistant: true,
+        hasAIMenuAssistant: true,
+        hasPeakHoursAnalytics: true,
+        hasMultiLanguageMenus: true,
       }
 
     case 'BUSINESS':
@@ -244,6 +307,25 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         storageGB: 20,
         supportLevel: 'priority',
         maxConcurrentABTests: 1,
+        // Aggregate gates
+        hasOrders: true,
+        hasPayments: true,
+        hasInventory: true,
+        hasCRM: true,
+        hasMarketing: true,
+        hasMarketplace: true,
+        hasTables: true,
+        hasQRCodes: true,
+        hasSiteBuilder: true,
+        hasSupplierOrders: true,
+        hasSupplierMarketplace: true,
+        hasPurchaseOrders: true,
+        hasAIAssistant: true,
+        hasAIMenuAssistant: true,
+        hasAICostAnomalies: true,
+        hasPeakHoursAnalytics: true,
+        hasProcurementAnalytics: true,
+        hasMultiLanguageMenus: true,
       }
 
     case 'PREMIUM':
@@ -298,6 +380,25 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         storageGB: 100,
         supportLevel: 'premium',
         maxConcurrentABTests: 'unlimited',
+        // Aggregate gates
+        hasOrders: true,
+        hasPayments: true,
+        hasInventory: true,
+        hasCRM: true,
+        hasMarketing: true,
+        hasMarketplace: true,
+        hasTables: true,
+        hasQRCodes: true,
+        hasSiteBuilder: true,
+        hasSupplierOrders: true,
+        hasSupplierMarketplace: true,
+        hasPurchaseOrders: true,
+        hasAIAssistant: true,
+        hasAIMenuAssistant: true,
+        hasAICostAnomalies: true,
+        hasPeakHoursAnalytics: true,
+        hasProcurementAnalytics: true,
+        hasMultiLanguageMenus: true,
       }
 
     case 'ENTERPRISE':
@@ -359,6 +460,25 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         hasSLA: true,
         hasDedicatedManager: true,
         maxConcurrentABTests: 'unlimited',
+        // Aggregate gates
+        hasOrders: true,
+        hasPayments: true,
+        hasInventory: true,
+        hasCRM: true,
+        hasMarketing: true,
+        hasMarketplace: true,
+        hasTables: true,
+        hasQRCodes: true,
+        hasSiteBuilder: true,
+        hasSupplierOrders: true,
+        hasSupplierMarketplace: true,
+        hasPurchaseOrders: true,
+        hasAIAssistant: true,
+        hasAIMenuAssistant: true,
+        hasAICostAnomalies: true,
+        hasPeakHoursAnalytics: true,
+        hasProcurementAnalytics: true,
+        hasMultiLanguageMenus: true,
       }
 
     default:
@@ -391,7 +511,7 @@ export function hasFeatureAccess(
  * Get upgrade target plan for a feature
  */
 export function getUpgradePlanForFeature(featureKey: keyof PlanEntitlements): PlanCode | null {
-  const plans: PlanCode[] = ['ESSENTIALS', 'STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
+  const plans: PlanCode[] = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
   
   for (const plan of plans) {
     if (hasFeatureAccess(plan, featureKey)) {

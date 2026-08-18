@@ -1,7 +1,7 @@
 // Bluetooth thermal printer service for Android app
 // Supports ESC/POS protocol for common thermal printers
-import { Sale, SaleLineItem, MenuItem, Table, Business } from '@prisma/client'
 import { formatCurrency } from '@/lib/utils/currency'
+import { formatDateTimeRW } from '@/utils/datetimeRW'
 import { EscPosEncoder } from 'esc-pos-encoder'
 
 export interface PrinterDevice {

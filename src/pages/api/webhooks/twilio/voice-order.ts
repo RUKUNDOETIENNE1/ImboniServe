@@ -98,14 +98,14 @@ async function handleTextOrder(from: string, text: string, res: NextApiResponse)
       where: { id: customer.businessId },
       include: {
         menuItems: {
-          where: { available: true },
+          where: { isAvailable: true },
           select: {
             id: true,
             name: true,
             description: true,
             priceCents: true,
-            category: true
-          }
+            category: true,
+          },
         }
       }
     })
@@ -169,6 +169,19 @@ Provide a helpful, friendly response. Keep it brief (1-2 sentences).`
       return res.status(200).json({ message: 'Responded to customer' })
     }
 
+    const owner = await prisma.user.findFirst({
+      where: {
+        businessId: business.id,
+        roles: { has: 'OWNER' },
+      },
+      select: { id: true },
+    })
+
+    if (!owner) {
+      await sendWhatsAppMessage(from, 'Sorry, we could not route your order right now. Please try again.')
+      return res.status(500).json({ error: 'Business owner user not found' })
+    }
+
     // Step 5: Create order
     const orderItems = orderData.items.map((item: any) => ({
       menuItemId: item.menuItemId,
@@ -182,16 +195,25 @@ Provide a helpful, friendly response. Keep it brief (1-2 sentences).`
     const sale = await prisma.sale.create({
       data: {
         businessId: business.id,
+        userId: owner.id,
         customerId: customer.id,
-        totalCents: total,
+        totalAmountCents: total,
         status: 'PENDING',
-        orderType: 'WHATSAPP_VOICE',
+        orderNumber: `WA-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+        paymentMethod: 'CASH',
+        paymentStatus: 'PENDING',
         items: {
-          create: orderItems.map((item: any) => ({
-            menuItemId: item.menuItemId,
-            quantity: item.quantity,
-            specialInstructions: item.specialInstructions
-          }))
+          create: orderItems.map((item: any) => {
+            const menuItem = business.menuItems.find((m) => m.id === item.menuItemId)
+            const unitPriceCents = menuItem?.priceCents || 0
+            return {
+              menuItemId: item.menuItemId,
+              quantity: item.quantity,
+              unitPriceCents,
+              totalPriceCents: unitPriceCents * item.quantity,
+              instructions: item.specialInstructions
+            }
+          })
         }
       },
       include: {
@@ -234,7 +256,7 @@ async function generateConfirmation(sale: any, language: string): Promise<string
     `${item.quantity}x ${item.menuItem.name}`
   ).join('\n')
 
-  const total = sale.totalCents / 100
+  const total = sale.totalAmountCents / 100
 
   const templates: Record<string, string> = {
     en: `✅ Order Confirmed! #${sale.id.slice(-6)}

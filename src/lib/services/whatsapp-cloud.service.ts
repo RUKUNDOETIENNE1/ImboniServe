@@ -1,16 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
+import { normalizePhoneForWhatsApp } from '@/lib/utils/phone'
 
 const log = logger.child({ service: 'whatsapp-cloud' })
-
-function normalizePhone(phone: string): string {
-  const p = phone.trim().replace(/\s/g, '')
-  if (p.startsWith('+')) return p.slice(1)
-  if (p.startsWith('07')) return `250${p.slice(1)}`
-  if (p.startsWith('2507')) return p
-  if (p.startsWith('0')) return `250${p.slice(1)}`
-  return p
-}
 
 interface SendTextOptions {
   phone: string
@@ -44,7 +36,7 @@ export class WhatsAppCloudService {
       return result
     }
 
-    const to = normalizePhone(phone)
+    const to = normalizePhoneForWhatsApp(phone)
     try {
       const response = await fetch(
         `https://graph.facebook.com/${version}/${phoneNumberId}/messages`,
@@ -85,7 +77,7 @@ export class WhatsAppCloudService {
     const { token, phoneNumberId, version } = this.getCredentials()
     if (!token || !phoneNumberId) return { success: false, error: 'WhatsApp Cloud API not configured' }
 
-    const to = normalizePhone(phone)
+    const to = normalizePhoneForWhatsApp(phone)
     try {
       const response = await fetch(
         `https://graph.facebook.com/${version}/${phoneNumberId}/messages`,

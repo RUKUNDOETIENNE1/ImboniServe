@@ -5,6 +5,8 @@ import rwTranslations from '@/locales/rw.json'
 
 export type Locale = 'en' | 'rw' | 'fr'
 
+export const defaultLocale: Locale = 'en'
+
 const translations: Record<Locale, any> = {
   en: enTranslations as any,
   rw: rwTranslations as any,
@@ -85,6 +87,10 @@ function translateFor(locale: Locale, key: string, fallback?: string): string {
     try { console.warn(`[i18n] Missing translation key: ${key} for locale: ${locale}`) } catch {}
   }
   return fallback || key
+}
+
+export function getTranslation(locale: Locale, key: string, fallback?: string): string {
+  return translateFor(locale, key, fallback)
 }
 
 export function t(key: string, fallback?: string): string {

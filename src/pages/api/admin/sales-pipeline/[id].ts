@@ -4,6 +4,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { successResponse, unauthorizedResponse, forbiddenResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -75,7 +76,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Calculate analytics
     const today = new Date()
-    const todayStart = new Date(new Date().setHours(0, 0, 0, 0))
+    const { start: todayStart } = getBusinessDayBoundary(today)
     
     const ordersToday = (business.sales as any[]).filter((s) => s.createdAt >= todayStart).length
     const revenueToday = (business.sales as any[])

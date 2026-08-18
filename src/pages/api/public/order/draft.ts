@@ -9,15 +9,8 @@ import { Prisma } from '@prisma/client';
 import { formatDateTimeRW } from '@/utils/datetimeRW';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
-
-function normalizePhone(phone: string | undefined): string | undefined {
-  if (!phone) return undefined;
-  const p = phone.trim();
-  if (p.startsWith('+')) return p;
-  if (p.startsWith('07')) return `+250${p.slice(1)}`;
-  if (p.startsWith('2507')) return `+${p}`;
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`;
-}
+import { IdempotencyService } from '@/lib/services/idempotency.service';
+import { normalizePhone } from '@/lib/utils/phone';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -43,11 +36,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       participantId: z.string().cuid().optional(),
       branchId: z.string().cuid().optional(),
       paymentMethod: z.enum(['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'WEB', 'OTHER']).optional(),
-      sessionToken: z.string().optional()
+      sessionToken: z.string().optional(),
+      idempotencyKey: z.string().optional()
     });
 
     const validatedBody = draftOrderSchema.parse(req.body);
-    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken } = validatedBody;
+    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken, idempotencyKey } = validatedBody;
 
     // Validate access token
     const claims = await validateAccessToken(accessToken, req.body.branchId || '');
@@ -73,6 +67,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });
     }
+    
+    // Idempotency check
+    if (idempotencyKey) {
+      const idempotencyCheck = await IdempotencyService.checkAndLock(
+        idempotencyKey,
+        business.id,
+        '/api/public/order/draft',
+        req.body
+      )
+      
+      if (!idempotencyCheck.isNew && idempotencyCheck.existingResponse) {
+        return res
+          .status(idempotencyCheck.existingResponse.statusCode)
+          .json(idempotencyCheck.existingResponse.body)
+      }
+    }
 
     // Validate order source
     const isRemote = mode === 'preorder' || mode === 'pickup';
@@ -83,7 +93,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'In-venue QR ordering not enabled' });
     }
 
-    const phoneE164 = normalizePhone(phone);
+    const phoneE164 = phone ? normalizePhone(phone) : undefined;
     if (isRemote) {
       if (!phoneE164) {
         return res.status(400).json({ error: 'Phone is required for remote orders' });
@@ -198,7 +208,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             paymentMethod: selectedPaymentMethod as any,
             status: 'PENDING',
             amountCents: amountToCharge,
-            currency: 'RWF',
+            currency: business.currency,
             vatAmountCents: pricing.vatCents,
             exVatAmountCents: pricing.subtotalCents,
             gatewayFeeEstimatedCents: isManualPayment ? 0 : Math.round(amountToCharge * 0.0342),
@@ -352,7 +362,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ? formatDateTimeRW(scheduledAt, 'en')
       : '15-20 minutes';
 
-    return res.status(201).json({
+    const response = {
       orderId: saleId,
       orderNumber,
       paymentTransactionId,
@@ -379,7 +389,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       eta,
       scheduledAt: scheduledAt || null,
       slotAvailable: true
-    });
+    };
+    
+    // Store idempotency response
+    if (idempotencyKey) {
+      await IdempotencyService.storeResponse(idempotencyKey, 201, response)
+    }
+    
+    return res.status(201).json(response);
   } catch (error: any) {
     console.error('Error creating draft order:', error);
     

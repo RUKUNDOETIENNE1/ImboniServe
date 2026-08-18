@@ -11,6 +11,8 @@ class RealtimeService {
   private subscribers: Map<string, Set<RealtimeCallback>> = new Map()
   private pollingIntervals: Map<string, NodeJS.Timeout> = new Map()
   private pusherChannels: Map<string, any> = new Map()
+  private reconnectCallbacks: Set<() => void> = new Set()
+  private lastSnapshotTime: Map<string, string> = new Map()
 
   private async getPusherClient() {
     if (this.pusherClient) return this.pusherClient
@@ -21,7 +23,61 @@ class RealtimeService {
       cluster: PUSHER_CLUSTER,
       authEndpoint: '/api/realtime/auth',
     })
+
+    // Phase 3: Handle reconnection
+    this.pusherClient.connection.bind('connected', () => {
+      console.log('[Realtime] Connected to Pusher')
+    })
+
+    this.pusherClient.connection.bind('disconnected', () => {
+      console.log('[Realtime] Disconnected from Pusher')
+    })
+
+    this.pusherClient.connection.bind('reconnected', () => {
+      console.log('[Realtime] Reconnected to Pusher - triggering reconciliation')
+      this.reconnectCallbacks.forEach((cb) => cb())
+    })
+
+    this.pusherClient.connection.bind('error', (err: any) => {
+      console.error('[Realtime] Pusher error:', err)
+    })
+
     return this.pusherClient
+  }
+
+  /**
+   * Register callback to be called on reconnect
+   * Phase 3: Enables snapshot reconciliation
+   */
+  onReconnect(callback: () => void) {
+    this.reconnectCallbacks.add(callback)
+    return () => {
+      this.reconnectCallbacks.delete(callback)
+    }
+  }
+
+  /**
+   * Get snapshot for reconciliation
+   * Phase 3: Called after reconnect to sync state
+   */
+  async getSnapshot(stationId: string): Promise<any> {
+    try {
+      const since = this.lastSnapshotTime.get(stationId)
+      const url = since
+        ? `/api/station/snapshot?stationId=${stationId}&since=${since}`
+        : `/api/station/snapshot?stationId=${stationId}`
+
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Snapshot fetch failed')
+
+      const data = await res.json()
+      this.lastSnapshotTime.set(stationId, data.snapshotTime)
+
+      return data
+    } catch (error) {
+      console.error('[Realtime] Snapshot fetch failed:', error)
+      return null
+    }
   }
 
   async subscribe(channel: string, event: string, callback: RealtimeCallback) {

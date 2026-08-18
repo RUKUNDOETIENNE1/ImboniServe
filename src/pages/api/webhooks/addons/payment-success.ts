@@ -3,7 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { upgradeToPro } from '@/lib/services/site-builder-subscription.service';
 import { upgradeDiscoveryTier } from '@/lib/services/discovery-subscription.service';
 import { purchaseExtraCredits } from '@/lib/services/ai-credit.service';
+import { fulfillPurchase } from '@/lib/services/credits/credit-purchase.service';
 import { logger } from '@/lib/logger';
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service';
 
 const log = logger.child({ service: 'addon-webhook' });
 
@@ -38,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    const metadata = transaction.metadata as any;
+    const metadata = transaction.rawRequest as any;
     
     if (metadata?.type !== 'addon') {
       return res.status(200).json({ message: 'Not an addon transaction' });
@@ -60,9 +62,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break;
 
       case 'ai_credits':
-        const credits = metadata.credits;
-        await purchaseExtraCredits(businessId, credits);
-        log.info('AI credits purchased', { businessId, credits, transactionId });
+        // Use the new AI Credits Platform fulfillment
+        if (metadata.packageCode) {
+          await fulfillPurchase(businessId, metadata.packageCode, transaction.id);
+          log.info('AI credits purchased via platform', { businessId, packageCode: metadata.packageCode, transactionId });
+        } else {
+          // Fallback for legacy purchases without packageCode
+          const credits = metadata.credits;
+          await purchaseExtraCredits(businessId, credits);
+          log.info('AI credits purchased (legacy)', { businessId, credits, transactionId });
+        }
         break;
 
       default:
@@ -73,13 +82,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await prisma.paymentTransaction.update({
       where: { id: transactionId },
       data: {
-        status: 'COMPLETED',
-        metadata: {
-          ...metadata,
+        status: 'SUCCESS',
+        rawRequest: {
+          ...(transaction.rawRequest as any),
           activated: true,
           activatedAt: new Date().toISOString()
-        }
+        } as any
       }
+    });
+    await ensurePaymentLedgerEvent(transactionId, 'SUCCESS', {
+      source: 'webhooks/addons/payment-success',
+      addon: metadata.addon,
     });
 
     return res.status(200).json({

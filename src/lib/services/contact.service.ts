@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { ContactType, ContactStatus, Prisma } from '@prisma/client'
+import { ContactCustomerBridge } from './contact-customer-bridge.service'
+import { logger } from '@/lib/logger'
+
+const log = logger.child({ service: 'contact' })
 
 export interface CreateContactInput {
   name: string
@@ -74,6 +78,15 @@ export class ContactService {
       source: 'system',
       performedBy: input.createdBy,
     })
+
+    // Bridge: if this is a CUSTOMER type contact, ensure a Customer entity exists
+    if (contact.type === ContactType.CUSTOMER) {
+      try {
+        await ContactCustomerBridge.ensureCustomerForContact(contact.id)
+      } catch (error) {
+        log.error('Failed to bridge contact to customer', { error: String(error), contactId: contact.id })
+      }
+    }
 
     return contact
   }
@@ -193,27 +206,27 @@ export class ContactService {
     }
 
     if (filters.createdAfter) {
-      where.createdAt = { ...where.createdAt, gte: filters.createdAfter }
+      where.createdAt = { ...(where.createdAt as any), gte: filters.createdAfter }
     }
 
     if (filters.createdBefore) {
-      where.createdAt = { ...where.createdAt, lte: filters.createdBefore }
+      where.createdAt = { ...(where.createdAt as any), lte: filters.createdBefore }
     }
 
     if (filters.lastActivityAfter) {
-      where.lastActivityAt = { ...where.lastActivityAt, gte: filters.lastActivityAfter }
+      where.lastActivityAt = { ...(where.lastActivityAt as any), gte: filters.lastActivityAfter }
     }
 
     if (filters.lastActivityBefore) {
-      where.lastActivityAt = { ...where.lastActivityAt, lte: filters.lastActivityBefore }
+      where.lastActivityAt = { ...(where.lastActivityAt as any), lte: filters.lastActivityBefore }
     }
 
     if (filters.minActivityScore !== undefined) {
-      where.activityScore = { ...where.activityScore, gte: filters.minActivityScore }
+      where.activityScore = { ...(where.activityScore as any), gte: filters.minActivityScore }
     }
 
     if (filters.maxActivityScore !== undefined) {
-      where.activityScore = { ...where.activityScore, lte: filters.maxActivityScore }
+      where.activityScore = { ...(where.activityScore as any), lte: filters.maxActivityScore }
     }
 
     const [contacts, total] = await Promise.all([

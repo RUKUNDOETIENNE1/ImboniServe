@@ -1,8 +1,11 @@
 import { prisma } from '@/lib/prisma'
-import type { CreateSaleInput, UpdateSaleInput, SalesQueryInput } from '@/lib/validations/sales.schema'
+import type { CreateSaleInput, UpdateSaleInput, SalesQueryInput, CancelSaleInput } from '@/lib/validations/sales.schema'
 import { calculateConvenienceFee } from '@/lib/pricing/fee-calculator'
 import type { PaymentMethod } from '@/lib/pricing/fee-config'
-import { SmartDiningSlipService } from './smart-dining-slip.service'
+import { PaymentCompletionService } from './payment-completion.service'
+import { FinancialTruthService, CostSource } from './financial-truth.service'
+import { GuestRecognitionService } from './guest-recognition.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export class SalesService {
   static async createSale(userId: string, input: CreateSaleInput) {
@@ -21,17 +24,37 @@ export class SalesService {
     
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
+    // Upsert customer if phone provided
+    let customerId: string | undefined
+    if (input.clientPhone) {
+      try {
+        const result = await GuestRecognitionService.registerOrRecognize(
+          input.clientPhone,
+          input.businessId,
+        )
+        customerId = result.customerId
+      } catch (error) {
+        console.error('Failed to upsert customer for sale:', error)
+      }
+    }
+
     const sale = await prisma.sale.create({
       data: {
         orderNumber,
         businessId: input.businessId,
         userId,
+        customerId: customerId || null,
+        customerPhone: input.clientPhone || null,
         totalAmountCents,
         paymentMethod: input.paymentMethod,
-        paymentStatus: input.paymentMethod === 'CASH' ? 'COMPLETED' : 'PENDING',
+        // GPV-D010 FIX: Don't pre-set COMPLETED for CASH — let PaymentCompletionService
+        // handle the full atomic transition (status, paymentStatus, isPaid, ledger entry).
+        // Pre-setting paymentStatus='COMPLETED' causes the idempotent guard in
+        // PaymentCompletionService to skip, which means no ledger entry is created.
+        paymentStatus: 'PENDING',
         paymentReference: input.paymentReference,
         notes: input.notes,
-        isPaid: input.paymentMethod === 'CASH',
+        isPaid: false,
         items: {
           create: input.items.map(item => ({
             menuItemId: item.menuItemId,
@@ -59,16 +82,23 @@ export class SalesService {
     })
 
     if (input.paymentMethod === 'CASH') {
+      // Route through canonical PaymentCompletionService for all post-payment side effects
+      // GPV-D010 FIX: PaymentCompletionService now handles the full atomic transition
+      // including status='COMPLETED', ledger entry creation, and all side effects.
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: sale.id,
-          clientPhone: input.clientPhone,
-          clientEmail: input.clientEmail,
-          clientConsentedWhatsApp: input.clientConsentedWhatsApp,
-          consentCollectedBy: userId,
-        })
+        await PaymentCompletionService.onPaymentSuccess(
+          '', // CASH has no payment transaction — service will create ledger from sale data
+          sale.id,
+          {
+            clientPhone: input.clientPhone,
+            clientEmail: input.clientEmail,
+            clientConsentedWhatsApp: input.clientConsentedWhatsApp,
+            consentCollectedBy: userId,
+            source: 'cash-sale',
+          }
+        )
       } catch (error) {
-        console.error('Failed to generate Smart Dining Slip™:', error)
+        console.error('Failed to process payment completion for CASH sale:', error)
       }
     }
 
@@ -138,12 +168,37 @@ export class SalesService {
   }
 
   static async updateSale(id: string, input: UpdateSaleInput, businessId?: string) {
-    const where: any = { id }
-    if (businessId) where.businessId = businessId
+    // Validate business ownership if required
+    if (businessId) {
+      const existing = await prisma.sale.findUnique({
+        where: { id },
+        select: { businessId: true }
+      })
+      
+      if (!existing) {
+        throw new Error('Sale not found')
+      }
+      
+      if (existing.businessId !== businessId) {
+        throw new Error('Forbidden: Sale does not belong to this business')
+      }
+    }
+
+    // GPV-D010 FIX: If the update is marking the sale as COMPLETED, don't set
+    // paymentStatus/isPaid in the update — let PaymentCompletionService handle
+    // the full atomic transition (status, paymentStatus, isPaid, ledger entry).
+    // Otherwise the idempotent guard in PaymentCompletionService skips, and no
+    // ledger entry is created.
+    const isCompletingPayment = input.paymentStatus === 'COMPLETED' && input.isPaid
+    const updateData = { ...input }
+    if (isCompletingPayment) {
+      delete updateData.paymentStatus
+      delete updateData.isPaid
+    }
 
     const sale = await prisma.sale.update({
-      where,
-      data: input,
+      where: { id },
+      data: updateData,
       include: {
         items: {
           include: {
@@ -153,34 +208,115 @@ export class SalesService {
       },
     })
 
-    if (input.paymentStatus === 'COMPLETED' && input.isPaid) {
+    if (isCompletingPayment) {
+      // Route through canonical PaymentCompletionService
+      // GPV-D010 FIX: Pass the sale's paymentTransactionId so the ledger entry
+      // is created with the correct transaction reference.
       try {
-        await SmartDiningSlipService.generateSlip({
-          saleId: sale.id,
-          clientPhone: (input as any).clientPhone,
-          clientEmail: (input as any).clientEmail,
-          clientConsentedWhatsApp: (input as any).clientConsentedWhatsApp,
-          consentCollectedBy: (input as any).consentCollectedBy,
-        })
+        await PaymentCompletionService.onPaymentSuccess(
+          sale.paymentTransactionId || '',
+          sale.id,
+          { source: 'sale-update' }
+        )
       } catch (error) {
-        console.error('Failed to generate Smart Dining Slip™:', error)
+        console.error('Failed to process payment completion on sale update:', error)
       }
     }
 
     return sale
   }
 
-  static async deleteSale(id: string, businessId?: string) {
-    const where: any = { id }
-    if (businessId) where.businessId = businessId
-
-    return prisma.sale.delete({ where })
+  static async cancelSale(id: string, input: CancelSaleInput, businessId?: string) {
+    // Validate business ownership and payment status
+    const existing = await prisma.sale.findUnique({
+      where: { id },
+      select: { 
+        businessId: true, 
+        paymentStatus: true, 
+        isPaid: true,
+        status: true 
+      }
+    })
+    
+    if (!existing) {
+      throw new Error('Sale not found')
+    }
+    
+    if (businessId && existing.businessId !== businessId) {
+      throw new Error('Forbidden: Sale does not belong to this business')
+    }
+    
+    // Block cancellation of paid orders without refund
+    if (existing.isPaid || existing.paymentStatus === 'COMPLETED' || existing.paymentStatus === 'PAID') {
+      throw new Error('Cannot cancel paid orders. Process refund first.')
+    }
+    
+    // Prevent double-cancellation
+    if (existing.status === 'CANCELLED') {
+      throw new Error('Order is already cancelled')
+    }
+    
+    // Update sale to cancelled status
+    const cancelledSale = await prisma.sale.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
+        paymentStatus: 'CANCELLED',
+        notes: existing.status === 'ACTIVE' 
+          ? `CANCELLED: ${input.reason}` 
+          : `${existing.status} | CANCELLED: ${input.reason}`
+      },
+      include: {
+        items: {
+          include: {
+            menuItem: true,
+          },
+        },
+      },
+    })
+    
+    return cancelledSale
   }
 
+  static async deleteSale(id: string, businessId?: string) {
+    // Validate business ownership if required
+    if (businessId) {
+      const existing = await prisma.sale.findUnique({
+        where: { id },
+        select: { businessId: true, paymentStatus: true, isPaid: true }
+      })
+      
+      if (!existing) {
+        throw new Error('Sale not found')
+      }
+      
+      if (existing.businessId !== businessId) {
+        throw new Error('Forbidden: Sale does not belong to this business')
+      }
+      
+      // Block deletion of paid orders (safety guard)
+      if (existing.isPaid || existing.paymentStatus === 'COMPLETED' || existing.paymentStatus === 'PAID') {
+        throw new Error('Cannot delete paid orders. Use cancellation with refund instead.')
+      }
+    }
+
+    return prisma.sale.delete({ where: { id } })
+  }
+
+  /**
+   * Get daily sales with actual consumption costs where available.
+   * Falls back to estimated costs for historical data without consumption records.
+   */
   static async getDailySales(businessId: string, date?: Date) {
     const targetDate = date || new Date()
-    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0))
-    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999))
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(
+      targetDate,
+      business?.timezone
+    )
 
     const sales = await prisma.sale.findMany({
       where: {
@@ -200,14 +336,15 @@ export class SalesService {
     })
 
     const totalRevenue = sales.reduce((sum: number, sale: any) => sum + (sale.totalAmountCents as number), 0)
-    const totalCost = sales.reduce((sum: number, sale: any) => {
-      return (
-        sum + (sale.items as any[]).reduce(
-          (itemSum: number, item: any) => itemSum + ((item.menuItem.costCents as number) * (item.quantity as number)),
-          0,
-        )
-      )
-    }, 0)
+
+    // Get actual + estimated cost from FinancialTruthService
+    const costData = await FinancialTruthService.getCombinedPeriodCost(
+      businessId,
+      startOfDay,
+      endOfDay
+    )
+
+    const totalCost = costData.totalCostCents
 
     return {
       sales,
@@ -216,6 +353,11 @@ export class SalesService {
       totalCost,
       profit: totalRevenue - totalCost,
       profitMargin: totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0,
+      // Financial truth metadata
+      costSource: costData.source,
+      actualCostCents: costData.actualCostCents,
+      estimatedCostCents: costData.estimatedCostCents,
+      actualCostPercentage: costData.actualPercentage,
     }
   }
 }

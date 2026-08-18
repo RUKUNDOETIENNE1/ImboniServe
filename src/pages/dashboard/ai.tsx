@@ -60,14 +60,15 @@ type InsightReport = {
 }
 
 import { formatCurrency } from '@/lib/utils/currency'
+import { useCurrency } from '@/contexts/LocaleContext'
 
-function formatRwf(cents: number) {
-  return formatCurrency(Math.round(cents / 100), 'RWF')
+function formatRwf(cents: number, currency = 'RWF') {
+  return formatCurrency(Math.round(cents / 100), currency)
 }
 
-function formatRwfFromCents(value?: number | null) {
+function formatRwfFromCents(value?: number | null, currency = 'RWF') {
   if (value === undefined || value === null) return '-'
-  return formatCurrency(value / 100, 'RWF')
+  return formatCurrency(value / 100, currency)
 }
 
 function TrendIcon({ trend }: { trend: string }) {
@@ -91,6 +92,7 @@ function KpiCard({ label, value, sub, icon }: { label: string; value: string; su
 
 function BusinessSummaryTab({ businessId }: { businessId: string | undefined }) {
   const { showToast } = useToast()
+  const { currency } = useCurrency()
   const [period, setPeriod] = useState<'WEEKLY' | 'MONTHLY'>('WEEKLY')
   const [report, setReport] = useState<InsightReport | null>(null)
   const [history, setHistory] = useState<InsightReport[]>([])
@@ -208,19 +210,19 @@ function BusinessSummaryTab({ businessId }: { businessId: string | undefined }) 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <KpiCard
                 label="Revenue"
-                value={formatRwf(kpi.revenue?.total || 0)}
+                value={formatRwf(kpi.revenue?.total || 0, currency)}
                 sub={kpi.revenue?.growthPct != null ? `${kpi.revenue.growthPct > 0 ? '+' : ''}${kpi.revenue.growthPct}% vs prior` : undefined}
                 icon={<TrendIcon trend={kpi.signals?.trend || 'flat'} />}
               />
               <KpiCard
                 label="Transactions"
                 value={String(kpi.transactions?.count || 0)}
-                sub={`AOV ${formatRwf(kpi.transactions?.aov || 0)}`}
+                sub={`AOV ${formatRwf(kpi.transactions?.aov || 0, currency)}`}
                 icon={<CreditCard className="w-4 h-4" />}
               />
               <KpiCard
                 label="Avg Daily"
-                value={formatRwf(kpi.revenue?.avgDaily || 0)}
+                value={formatRwf(kpi.revenue?.avgDaily || 0, currency)}
                 sub={kpi.revenue?.bestDay ? `Best: ${kpi.revenue.bestDay}` : undefined}
                 icon={<Calendar className="w-4 h-4" />}
               />
@@ -308,6 +310,7 @@ export default function AIDashboard() {
   const { data: session } = useSession()
   const { showToast } = useToast()
   const { t } = useTranslation()
+  const { currency } = useCurrency()
 
   const [loading, setLoading] = useState(true)
   const [suggestions, setSuggestions] = useState<ReorderSuggestion[]>([])
@@ -699,7 +702,7 @@ export default function AIDashboard() {
                         Supplier: {a.supplierName || a.supplierId} | Severity: {a.severity}
                       </div>
                       <div className="text-xs text-slate-600 mt-2">
-                        Observed: {formatRwfFromCents(a.observedUnitPriceCents)} | Trailing avg: {formatRwfFromCents(a.trailingAvgUnitPriceCents)}
+                        Observed: {formatRwfFromCents(a.observedUnitPriceCents, currency)} | Trailing avg: {formatRwfFromCents(a.trailingAvgUnitPriceCents, currency)}
                       </div>
                       <div className="text-xs text-slate-600">
                         Delta: {Number(a.deltaPercent).toFixed(1)}% | Threshold: {Number(a.thresholdPercent).toFixed(0)}%

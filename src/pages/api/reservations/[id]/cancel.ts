@@ -5,8 +5,12 @@ import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { ReservationService } from '@/lib/services/reservation.service'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json(errorResponse('Method not allowed'))
   }
@@ -27,14 +31,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const reservation = await prisma.reservation.findUnique({ where: { id } })
     if (!reservation) return res.status(404).json(errorResponse('Reservation not found'))
 
-    // Cancel reservation
-    await prisma.reservation.update({
-      where: { id },
-      data: {
-        status: 'CANCELLED',
-        specialRequests: reason ? `CANCELLED: ${reason}` : 'CANCELLED',
-      },
-    })
+    // Cancel reservation via canonical ReservationService
+    await ReservationService.cancelReservation(id, reason)
+
+    // Shadow tap: BOOKING_CANCELLED (feature-flagged, non-blocking)
+    ingestReservationShadowEvent({
+      type: 'BOOKING_CANCELLED',
+      businessId: reservation.businessId,
+      reservationId: reservation.id,
+      reason,
+    }).catch(() => {})
 
     // Optional: charge cancellation fee
     let feeChargedCents = 0
@@ -45,13 +51,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const phone = reservation.customerPhone
 
       if (phone) {
+        const business = await prisma.business.findUnique({
+          where: { id: reservation.businessId },
+          select: { currency: true }
+        })
         const payment = await prisma.paymentTransaction.create({
           data: {
             invoiceNumber: `RES-CAN-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
             transactionId: requestTransactionId,
             referenceId: reservation.id,
             amountCents: feeChargedCents,
-            currency: 'RWF',
+            currency: business?.currency || 'RWF',
             vatAmountCents: 0,
             exVatAmountCents: feeChargedCents,
             gatewayFeeEstimatedCents: 0,
@@ -63,7 +73,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             paymentMethod: phone.startsWith('078') || phone.startsWith('079') ? 'MTN_MOBILE_MONEY' : 'AIRTEL_MONEY',
             paymentProvider: phone.startsWith('078') || phone.startsWith('079') ? 'MTN' : 'AIRTEL',
             businessId: reservation.businessId,
-            callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+            callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
             rawRequest: { reservationId: reservation.id, type: 'RESERVATION_CANCELLATION_FEE', percent: applyCancellationFeePercent },
           },
         })
@@ -72,7 +82,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           amount: amountRwf,
           mobilePhoneNo: phone,
           requestTransactionId,
-          callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+          callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
         })
 
         await prisma.paymentTransaction.update({
@@ -80,12 +90,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           data: {
             rawCallback: intouchResponse as any,
             status: InTouchService.isSuccess(intouchResponse.responsecode)
-              ? 'PAID'
+              ? 'SUCCESS'
               : InTouchService.isPending(intouchResponse.responsecode)
               ? 'PENDING'
               : 'FAILED',
             paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
           },
+        })
+        await ensurePaymentLedgerEvent(payment.id, undefined, {
+          source: 'reservations/cancel',
+          reservationId: reservation.id,
+          responsecode: intouchResponse.responsecode,
+          cancellationFeePercent: applyCancellationFeePercent,
         })
       }
     }
@@ -96,5 +112,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json(errorResponse(error.message || 'Failed to cancel reservation'))
   }
 }
+
+// Apply commercial enforcement: Reservations require Professional plan or higher
+const handler = requiresFeature('hasReservations')(baseHandler)
 
 export default withErrorHandler(handler)

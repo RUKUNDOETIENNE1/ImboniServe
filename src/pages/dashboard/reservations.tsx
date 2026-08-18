@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
-import { toast } from 'react-hot-toast'
+import { useToast } from '@/components/Toast'
 
 interface Reservation {
   id: string
@@ -27,6 +27,7 @@ interface Reservation {
 
 export default function Reservations() {
   const { t } = useTranslation()
+  const { showToast } = useToast()
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [showNewForm, setShowNewForm] = useState(false)
@@ -73,7 +74,7 @@ export default function Reservations() {
       })
 
       if (res.ok) {
-        toast.success(t('reservations.created', 'Reservation created successfully'))
+        showToast('success', t('reservations.created', 'Reservation created successfully'))
         setShowNewForm(false)
         setFormData({
           customerName: '',
@@ -88,10 +89,10 @@ export default function Reservations() {
         fetchReservations()
       } else {
         const error = await res.json()
-        toast.error(error.error || 'Failed to create reservation')
+        showToast('error', error.error || 'Failed to create reservation')
       }
     } catch (error) {
-      toast.error('Failed to create reservation')
+      showToast('error', 'Failed to create reservation')
     }
   }
 
@@ -104,11 +105,11 @@ export default function Reservations() {
       })
 
       if (res.ok) {
-        toast.success(t('reservations.updated', 'Reservation updated'))
+        showToast('success', t('reservations.updated', 'Reservation updated'))
         fetchReservations()
       }
     } catch (error) {
-      toast.error('Failed to update reservation')
+      showToast('error', 'Failed to update reservation')
     }
   }
 

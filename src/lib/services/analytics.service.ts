@@ -1,12 +1,12 @@
 import { prisma } from '@/lib/prisma'
 
 export class AnalyticsService {
-  static async getDashboardStats(businessId: string, days = 30) {
+  static async getDashboardStats(businessId: string, days = 30, timezone: string = 'Africa/Kigali') {
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
     const [totalSales, salesByDay, topItems, salesBySource, revenueByPayment] = await Promise.all([
       prisma.sale.aggregate({
-        where: { businessId, createdAt: { gte: since }, isPaid: true },
+        where: { businessId, createdAt: { gte: since }, isPaid: true }, // Sale.isPaid boolean field
         _sum: { totalAmountCents: true },
         _count: { id: true },
         _avg: { totalAmountCents: true },
@@ -14,13 +14,13 @@ export class AnalyticsService {
 
       prisma.$queryRaw<Array<{ day: string; revenue: number; orders: number }>>`
         SELECT
-          DATE_TRUNC('day', "createdAt" AT TIME ZONE 'Africa/Kigali')::date::text AS day,
+          DATE_TRUNC('day', "createdAt" AT TIME ZONE ${timezone})::date::text AS day,
           SUM("totalAmountCents") AS revenue,
           COUNT(id) AS orders
         FROM "Sale"
         WHERE "businessId" = ${businessId}
           AND "createdAt" >= ${since}
-          AND "isPaid" = true
+          AND "isPaid" = true -- Sale.isPaid boolean column
         GROUP BY 1
         ORDER BY 1 ASC
       `,
@@ -70,11 +70,11 @@ export class AnalyticsService {
     }
   }
 
-  static async getPeakHours(businessId: string, days = 30) {
+  static async getPeakHours(businessId: string, days = 30, timezone: string = 'Africa/Kigali') {
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     return prisma.$queryRaw<Array<{ hour: number; orders: number }>>`
       SELECT
-        EXTRACT(HOUR FROM "createdAt" AT TIME ZONE 'Africa/Kigali')::int AS hour,
+        EXTRACT(HOUR FROM "createdAt" AT TIME ZONE ${timezone})::int AS hour,
         COUNT(id) AS orders
       FROM "Sale"
       WHERE "businessId" = ${businessId}

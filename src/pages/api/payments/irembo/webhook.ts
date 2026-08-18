@@ -4,6 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { buffer } from 'micro'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { BusinessInviteService } from '@/lib/services/business-invite.service'
+import { logBillingEvent } from '@/lib/services/billing-ledger.service'
+import { BillingEventType } from '@prisma/client'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
+import { FounderCommissionService } from '@/lib/services/founder-commission.service'
+import { MarketerCommissionService } from '@/lib/services/marketer-commission.service'
 
 export const config = {
   api: {
@@ -34,6 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { invoiceNumber, paymentStatus, paidAt, paymentMethod, paymentReference } = payload.data
 
     console.log('[Webhook] Received IremboPay notification', { invoiceNumber, paymentStatus })
+    // PII redacted: phone/customer data not logged
 
     // Fetch invoice status from IremboPay API (server-to-server verification)
     const invoiceStatus = await IremboPayService.getInvoiceStatus(invoiceNumber)
@@ -60,10 +66,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Compute final status from verified invoice status
-    const finalStatus = invoiceStatus.paymentStatus === 'PAID' ? 'PAID' : 
-                        invoiceStatus.paymentStatus === 'EXPIRED' ? 'EXPIRED' : 'FAILED'
+    const finalStatus = invoiceStatus.paymentStatus === 'PAID' ? 'SUCCESS' : 
+                        invoiceStatus.paymentStatus === 'EXPIRED' ? 'CANCELLED' : 'FAILED'
 
-    // Idempotency + invariants: update transaction only if not already PAID
+    // Idempotency + invariants: update transaction only if not already SUCCESS
     const txUpdate: any = {
       status: finalStatus,
       webhookSignature: signature,
@@ -73,42 +79,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       rawStatus: invoiceStatus,
       updatedAt: new Date(),
     }
-    if (finalStatus === 'PAID') {
+    if (finalStatus === 'SUCCESS') {
       txUpdate.paidAt = new Date(paidAt || invoiceStatus.updatedAt)
     }
 
     const updatedTx = await prisma.paymentTransaction.updateMany({
-      where: { id: transaction.id, status: { not: 'PAID' } },
+      where: { id: transaction.id, status: { not: 'SUCCESS' } },
       data: txUpdate
     })
 
-    const firstProcess = updatedTx.count > 0 && finalStatus === 'PAID'
-    if (!firstProcess && transaction.status === 'PAID') {
+    const firstProcess = updatedTx.count > 0 && finalStatus === 'SUCCESS'
+    if (!firstProcess && transaction.status === 'SUCCESS') {
       // Already processed by a prior call
-      console.log('[Webhook] Idempotent replay; transaction already PAID', { invoiceNumber })
+      console.log('[Webhook] Idempotent replay; transaction already SUCCESS', { invoiceNumber })
       return res.status(200).json({ success: true, message: 'Already processed' })
     }
 
     // If became PAID in this call, cascade to Sale and downstream effects
     if (firstProcess) {
-      await AuditLogService.log({
-        action: 'PAYMENT_PAID',
-        entityType: 'PaymentTransaction',
-        entityId: transaction.id,
-        metadata: {
-          invoiceNumber,
-          paymentReference,
-          paymentMethod,
-          paidAt: txUpdate.paidAt || paidAt || invoiceStatus.updatedAt,
-          amountCents: transaction.amountCents,
-          businessId: transaction.businessId,
-        },
-      })
+      // Note: logBillingEvent and AuditLogService.log for PAYMENT_SUCCESS are handled
+      // by PaymentCompletionService.onPaymentSuccess below — do not duplicate here.
       // Update subscription if applicable
       if (transaction.subscriptionId) {
         await prisma.subscription.update({
           where: { id: transaction.subscriptionId },
-          data: { 
+          data: {
             status: 'ACTIVE',
             endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -128,57 +123,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
       if (sale) {
-        // Atomically set PAID if not already; derive isPaid to avoid drift
-        const saleUpdate = await prisma.sale.updateMany({
-          where: { id: sale.id, paymentStatus: { not: 'PAID' } },
-          data: { paymentStatus: 'PAID', isPaid: true }
-        })
-
-        if (saleUpdate.count > 0) {
-          // Release to kitchen if immediate order or scheduled time approaching
-          const shouldReleaseNow = sale.orderSource === 'QR_IN_VENUE' || 
-            (sale.scheduledAt && new Date(sale.scheduledAt).getTime() - Date.now() <= sale.business.prepBufferMinutes * 60000)
-
-          if (shouldReleaseNow) {
-            await prisma.sale.update({
-              where: { id: sale.id },
-              data: { kitchenReleasedAt: new Date() }
-            })
-          }
-
-          // Mark token as used
-          const orderToken = await prisma.orderToken.findFirst({
-            where: {
-              branchId: sale.businessId,
-              used: false
-            },
-            orderBy: { createdAt: 'desc' }
-          })
-
-          if (orderToken) {
-            await prisma.orderToken.update({
-              where: { id: orderToken.id },
-              data: { used: true, usedAt: new Date() }
-            })
-          }
-
-          // Notify business via WhatsApp about the paid order (kitchen alert)
-          try {
-            const { NotificationService } = await import('@/lib/services/notification.service')
-            await NotificationService.sendOrderNotification(sale.id)
-          } catch (error) {
-            console.error('Error sending order notification:', error)
-          }
+        // Delegate all post-payment side effects to canonical PaymentCompletionService
+        // This handles: sale status update, dining slip, guest recognition, notification,
+        // broadcast, ledger entry, audit log, order token
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            transaction.id,
+            sale.id,
+            { source: 'irembopay-webhook' }
+          )
+        } catch (error) {
+          console.error('Error in PaymentCompletionService:', error)
         }
       }
 
       // Create affiliate commissions if applicable
       await createAffiliateCommissions(transaction)
+
+      // Create Founder Partner commissions if applicable
+      await createFounderCommissions(transaction)
+
+      // Create Professional Marketer commissions if applicable
+      await createMarketerCommissions(transaction)
     }
 
-    // For non-PAID statuses or if already processed, we updated raw data above; finish
-    if (updatedTx.count > 0 && finalStatus !== 'PAID') {
-      const action = finalStatus === 'EXPIRED' ? 'PAYMENT_EXPIRED' : 'PAYMENT_FAILED'
+    // For non-SUCCESS statuses or if already processed, we updated raw data above; finish
+    if (updatedTx.count > 0 && finalStatus !== 'SUCCESS') {
+      await logBillingEvent({
+        businessId: transaction.businessId,
+        paymentTransactionId: transaction.id,
+        eventType: finalStatus === 'CANCELLED' ? BillingEventType.PAYMENT_CANCELLED : BillingEventType.PAYMENT_FAILED,
+        metadata: { source: 'payments/irembo/webhook', invoiceNumber, finalStatus },
+      })
+      const action = finalStatus === 'CANCELLED' ? 'PAYMENT_EXPIRED' : 'PAYMENT_FAILED'
       await AuditLogService.log({
         action,
         entityType: 'PaymentTransaction',
@@ -283,8 +260,8 @@ async function createAffiliateCommissions(transaction: any) {
       })
 
       if (plan) {
-        // Recruiter welcome bonus: 5,000 RWF for non-base, 2,000 RWF for base plan (ESSENTIALS/STARTER)
-        const isBasePlan = plan.code === 'ESSENTIALS' || plan.code === 'STARTER'
+        // Recruiter welcome bonus: 5,000 RWF for non-base, 2,000 RWF for base plan (STARTER)
+        const isBasePlan = plan.code === 'STARTER'
         const bonusAmountCents = isBasePlan ? 200000 : 500000
         
         await prisma.affiliateCommissionNew.create({
@@ -310,5 +287,87 @@ async function createAffiliateCommissions(transaction: any) {
   } catch (error) {
     console.error('Error creating affiliate commissions:', error)
     // Don't throw - we don't want to fail the webhook if commission creation fails
+  }
+}
+
+async function createFounderCommissions(transaction: any) {
+  try {
+    const businessId = transaction.businessId
+    if (!businessId) return
+
+    const amountCents = transaction.exVatAmountCents || transaction.amountCents || 0
+    if (amountCents <= 0) return
+
+    await FounderCommissionService.createCommissionForPayment({
+      businessId,
+      paymentTransactionId: transaction.id,
+      amountCents,
+    })
+
+    console.log('Founder commissions processed')
+  } catch (error) {
+    console.error('Error creating founder commissions:', error)
+  }
+}
+
+async function createMarketerCommissions(transaction: any) {
+  try {
+    const subscription = transaction.subscription
+    if (!subscription || !subscription.business) return
+
+    const businessId = subscription.business.id
+    const amountCents = transaction.exVatAmountCents || transaction.amountCents || 0
+    if (amountCents <= 0) return
+
+    // Check if business has a marketer attribution
+    const attribution = await prisma.acquisitionAttribution.findUnique({
+      where: { businessId },
+    })
+
+    if (!attribution || attribution.sourceType !== 'PROFESSIONAL_MARKETER') return
+
+    const marketerId = attribution.sourceId
+    if (!marketerId) return
+
+    const marketer = await prisma.professionalMarketer.findUnique({
+      where: { id: marketerId },
+    })
+
+    if (!marketer || marketer.status !== 'ACTIVE') return
+
+    // Anti-fraud: self-referral check
+    if (subscription.business.ownerId === marketer.userId) {
+      console.log('Marketer self-referral detected - no commission')
+      return
+    }
+
+    // Create signup bonus on first payment
+    const existingBonus = await prisma.marketerCommission.findFirst({
+      where: {
+        marketerId,
+        businessId,
+        type: 'SIGNUP_BONUS',
+      },
+    })
+
+    if (!existingBonus) {
+      await MarketerCommissionService.createSignupBonus({
+        marketerId,
+        businessId,
+        description: 'Signup bonus for first referred payment',
+      })
+    }
+
+    // Create recurring commission
+    await MarketerCommissionService.createRecurringCommission({
+      marketerId,
+      businessId,
+      invoiceId: transaction.id,
+      invoiceAmountCents: amountCents,
+    })
+
+    console.log('Marketer commissions processed')
+  } catch (error) {
+    console.error('Error creating marketer commissions:', error)
   }
 }

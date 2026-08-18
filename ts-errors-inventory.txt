@@ -1,0 +1,51 @@
+﻿src/lib/services/expo-finalization.service.ts(60,28): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/lib/services/fraud-detection.service.ts(319,11): error TS2322: Type 'RiskFactor[]' is not assignable to type 'JsonNull | InputJsonValue'.
+  Type 'RiskFactor[]' is not assignable to type 'InputJsonObject'.
+    Index signature for type 'string' is missing in type 'RiskFactor[]'.
+src/lib/services/insight.service.ts(118,32): error TS2367: This comparison appears to be unintentional because the types 'PaymentTransactionStatus' and '"COMPLETED"' have no overlap.
+src/lib/services/marketer-payout.service.ts(122,11): error TS2820: Type '"PAYOUT_AUTO_APPROVED"' is not assignable to type 'RevenueEventType'. Did you mean '"PAYOUT_APPROVED"'?
+src/lib/services/order-normalization.service.ts(155,9): error TS2353: Object literal may only specify known properties, and 'isActive' does not exist in type 'MenuItemWhereInput'.
+src/lib/services/security-event.service.ts(42,11): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly (InputJsonValue | null)[]': length, concat, join, slice, and 26 more.
+src/lib/services/ticket-event.service.ts(61,11): error TS2322: Type 'Record<string, any> | null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+src/pages/api/ab-testing/tests/index.ts(31,49): error TS2345: Argument of type '{ by: ("type" | "testId" | "variantId")[]; where: { testId: { in: any[]; }; }; _count: { _all: true; }; _sum: { valueCents: true; }; }' is not assignable to parameter of type '{ by: ("type" | "testId" | "variantId")[]; where: { testId: { in: any[]; }; }; _count: { _all: true; }; _sum: { valueCents: true; }; } & { orderBy?: ABEventOrderByWithAggregationInput | ABEventOrderByWithAggregationInput[] | undefined; } & any[]'.
+  Type '{ by: ("type" | "testId" | "variantId")[]; where: { testId: { in: any[]; }; }; _count: { _all: true; }; _sum: { valueCents: true; }; }' is missing the following properties from type 'any[]': length, pop, push, concat, and 35 more.
+src/pages/api/admin/ai-monitoring.ts(107,23): error TS2339: Property '$raw' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/pages/api/admin/growth/demo-requests.ts(44,9): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/pages/api/analytics/payments.ts(93,11): error TS2367: This comparison appears to be unintentional because the types 'PaymentTransactionStatus' and '"COMPLETED"' have no overlap.
+src/pages/api/analytics/qr.ts(63,69): error TS2339: Property 'totalCents' does not exist on type '{ table: { number: string; id: string; } | null; } & { id: string; createdAt: Date; updatedAt: Date; businessId: string; userId: string; status: string; totalAmountCents: number; notes: string | null; ... 36 more ...; servedConfirmedAt: Date | null; }'.
+src/pages/api/analytics/qr.ts(76,35): error TS2339: Property 'totalCents' does not exist on type '{ table: { number: string; id: string; } | null; } & { id: string; createdAt: Date; updatedAt: Date; businessId: string; userId: string; status: string; totalAmountCents: number; notes: string | null; ... 36 more ...; servedConfirmedAt: Date | null; }'.
+src/pages/api/auth/signup.ts(140,9): error TS2322: Type 'DuplicateMatch[] | undefined' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'DuplicateMatch[]' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+    Type 'DuplicateMatch[]' is not assignable to type 'InputJsonObject'.
+      Index signature for type 'string' is missing in type 'DuplicateMatch[]'.
+src/pages/api/cron/subscription-reminders.ts(77,50): error TS2339: Property 'sendSubscriptionReminder' does not exist on type 'typeof EmailService'.
+src/pages/api/feedback/payment/list.ts(71,24): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/pages/api/marketplace/orders/details.ts(41,13): error TS2353: Object literal may only specify known properties, and 'productName' does not exist in type 'SupplierOrderItemSelect<DefaultArgs>'.
+src/pages/api/marketplace/orders/list.ts(29,13): error TS2353: Object literal may only specify known properties, and 'productName' does not exist in type 'SupplierOrderItemSelect<DefaultArgs>'.
+src/pages/api/menu/[id].ts(54,11): error TS2353: Object literal may only specify known properties, and 'isSpecial' does not exist in type 'MenuItemSelect<DefaultArgs>'.
+src/pages/api/orders/[id]/confirm-payment.ts(97,29): error TS2339: Property 'totalCents' does not exist on type '{ business: { id: string; name: string; phone: string; whatsappNumber: string | null; isActive: boolean; createdAt: Date; updatedAt: Date; referredByAffiliateId: string | null; ... 57 more ...; storageUsedBytes: bigint; }; items: ({ ...; } & { ...; })[]; } & { ...; }'.
+src/pages/api/payments/irembo/initiate-momo.ts(49,9): error TS2367: This comparison appears to be unintentional because the types 'PaymentTransactionStatus' and '"PAID"' have no overlap.
+src/pages/api/payments/irembo/initiate-momo.ts(53,9): error TS2367: This comparison appears to be unintentional because the types 'PaymentTransactionStatus' and '"EXPIRED"' have no overlap.
+src/pages/api/payments/irembo/webhook.ts(81,46): error TS2322: Type '"PAID"' is not assignable to type 'PaymentTransactionStatus | NestedEnumPaymentTransactionStatusFilter<"PaymentTransaction"> | undefined'.
+src/pages/api/payments/irembo/webhook.ts(86,26): error TS2367: This comparison appears to be unintentional because the types 'PaymentTransactionStatus' and '"PAID"' have no overlap.
+src/pages/api/payments/mtn-momo/callback.ts(41,9): error TS2322: Type '"PENDING" | "PAID" | "FAILED"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+  Type '"PAID"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+src/pages/api/payments/refunds.ts(59,9): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "PROCESSING" | "FAILED" | "CANCELLED" | "SUCCESS"' and '"COMPLETED"' have no overlap.
+src/pages/api/reservations/[id]/cancel.ts(82,13): error TS2322: Type '"PENDING" | "PAID" | "FAILED"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+  Type '"PAID"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+src/pages/api/reservations/[id]/deposit/initiate.ts(83,9): error TS2322: Type '"PENDING" | "PAID" | "FAILED"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+  Type '"PAID"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
+src/pages/api/seats/lock.ts(97,37): error TS2339: Property 'seat' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; seatId: string; tableSessionId: string | null; participantId: string | null; state: string; sessionToken: string; lockedAt: Date; lockExpiresAt: Date; lockedByTempId: string; occupiedAt: Date | null; releasedAt: Date | null; }'.
+src/pages/api/seats/lock.ts(97,82): error TS2339: Property 'seat' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; seatId: string; tableSessionId: string | null; participantId: string | null; state: string; sessionToken: string; lockedAt: Date; lockExpiresAt: Date; lockedByTempId: string; occupiedAt: Date | null; releasedAt: Date | null; }'.
+src/pages/api/subscriptions/initiate-payment.ts(182,11): error TS2322: Type 'PaymentInitiationResponse' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'PaymentInitiationResponse' is not assignable to type 'InputJsonObject'.
+    Index signature for type 'string' is missing in type 'PaymentInitiationResponse'.
+src/pages/api/track/business-view.ts(38,29): error TS2339: Property 'substring' does not exist on type 'string | string[]'.
+  Property 'substring' does not exist on type 'string[]'.
+src/pages/api/waiter-calls/index.ts(55,16): error TS2339: Property 'isActive' does not exist on type '{ business: { id: string; name: string; }; } & { number: string; qrCode: string | null; id: string; createdAt: Date; updatedAt: Date; businessId: string; status: string; outletId: string | null; capacity: number; assignedWaiterId: string | null; }'.
+src/pages/api/webhooks/addons/payment-success.ts(41,34): error TS2339: Property 'metadata' does not exist on type '{ business: { id: string; name: string; }; } & { id: string; businessId: string; createdAt: Date; updatedAt: Date; currency: string; status: PaymentTransactionStatus; ... 27 more ...; paymentProvider: PaymentProvider | null; }'.
+src/pages/api/webhooks/addons/payment-success.ts(76,9): error TS2322: Type '"COMPLETED"' is not assignable to type 'PaymentTransactionStatus | EnumPaymentTransactionStatusFieldUpdateOperationsInput | undefined'.
