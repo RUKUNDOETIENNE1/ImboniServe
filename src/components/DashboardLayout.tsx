@@ -469,16 +469,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
         {/* Top Header */}
         <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-slate-200/60 dark:border-gray-700 sticky top-0 z-30 transition-colors">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+          <div className="px-4 sm:px-6 py-3 sm:py-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
                 >
                   <Menu className="w-6 h-6 text-slate-600 dark:text-gray-300" />
                 </button>
-                <div className="relative hidden md:block">
+                <div className="relative hidden md:block flex-shrink-0">
                   <Search className="w-5 h-5 text-slate-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input 
                     type="text" 
@@ -488,8 +488,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <LiveClock showDate={false} />
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
+                <div className="hidden sm:block"><LiveClock showDate={false} /></div>
                 <LanguageSwitcher />
                 {isInstalled && (
                   <span className="hidden md:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
@@ -519,7 +519,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-4 sm:p-6">
           {children}
         </main>
       </div>

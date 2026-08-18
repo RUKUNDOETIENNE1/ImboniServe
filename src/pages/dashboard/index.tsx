@@ -127,7 +127,7 @@ export default function Dashboard() {
         <div className="mb-6">
           <div className="h-16 bg-slate-100 animate-pulse rounded-xl" />
         </div>
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6">
           <div className="col-span-12 xl:col-span-8">
             <div className="h-96 bg-slate-100 animate-pulse rounded-xl" />
           </div>
@@ -142,15 +142,15 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">{t('dashboard.title', 'Dashboard')}</h1>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800">{t('dashboard.title', 'Dashboard')}</h1>
             <p className="text-sm text-slate-500 mt-1">{t('dashboard.welcome', "Welcome back! Here's what's happening today.")}</p>
             <div className="mt-2">
               <TrialPill />
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <button
               onClick={() => setShowScanner(true)}
               className="flex items-center gap-2 bg-gradient-to-r from-imboni-orange to-orange-600 text-white rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-all font-semibold"
@@ -219,14 +219,14 @@ export default function Dashboard() {
 
       <LiveMetricsTicker />
 
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-4 sm:gap-6">
         <div className="col-span-12 xl:col-span-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 sm:p-6 mb-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-sm text-slate-500 mb-1">{t('dashboard.daily_sales', 'Daily Sales')} - {mounted && currentTime ? currentTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : t('common.loading', 'Loading...')}</p>
                 <div className="flex items-baseline gap-3">
-                  <h2 className="text-4xl font-bold text-slate-800">
+                  <h2 className="text-2xl sm:text-4xl font-bold text-slate-800">
                     {loading ? '...' : <CurrencyDisplay amount={stats?.todaySales?.revenue || 0} />}
                   </h2>
                   <span className="flex items-center text-green-600 text-sm font-medium">
@@ -258,7 +258,7 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-semibold text-slate-800">{t('dashboard.inventory_alerts', 'Inventory Alerts')}</h3>
                 <a href="/dashboard/inventory" className="text-sm text-imboni-blue hover:text-imboni-blue/80 font-medium">
@@ -321,10 +321,10 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-semibold text-slate-800">{t('dashboard.table_management', 'Table Management')}</h3>
-                <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-2 sm:gap-4 text-xs flex-wrap">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span> {t('dashboard.available', 'Available')}
                   </span>
@@ -337,13 +337,13 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {loading ? (
                   [...Array(8)].map((_, i) => (
                     <div key={i} className="h-24 bg-slate-100 animate-pulse rounded-xl"></div>
                   ))
                 ) : tables.length === 0 ? (
-                  <div className="col-span-4 text-center py-8 text-slate-400">
+                  <div className="col-span-3 sm:col-span-4 text-center py-8 text-slate-400">
                     <p className="text-sm">{t('dashboard.no_tables', 'No tables configured')}</p>
                     <p className="text-xs mt-1">{t('dashboard.add_tables', 'Add tables to start managing them')}</p>
                   </div>
@@ -391,7 +391,7 @@ export default function Dashboard() {
         <div className="col-span-12 xl:col-span-4 space-y-6">
           <CurrencyRatesWidget />
           
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-slate-800">{t('dashboard.real_time_sales', 'Real-time Sales')}</h3>
               <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-slate-800 mb-4">{t('dashboard.quick_actions', 'Quick Actions')}</h3>
             <div className="grid grid-cols-2 gap-3">
               <a 
@@ -530,7 +530,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 sm:p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-yellow-400" />
