@@ -1,19 +1,51 @@
 'use strict'
 
+// NOTE: This file is the one actually loaded by next.config.js via require()
+// (Node resolves .js before .ts). It MUST be kept in sync with env-validator.ts.
+// VERCEL-002: previously this file hard-required IREMBOPAY_* unconditionally in
+// production, which broke builds after the IremboPay -> InTouch migration removed
+// those variables from Vercel. It is now provider-conditional, matching .ts.
+
 function validateEnv() {
   const isProd = process.env.NODE_ENV === 'production'
 
-  // In production, require critical variables. In development, warn only.
+  // Foundational variables — always required in production.
   const requiredProd = [
     'DATABASE_URL',
     'NEXTAUTH_SECRET',
-    'IREMBOPAY_PUBLIC_KEY',
-    'IREMBOPAY_SECRET_KEY',
-    'IREMBOPAY_PAYMENT_ACCOUNT',
-    'IREMBOPAY_PAYMENT_ITEM_CODE'
   ]
 
   const missing = isProd ? requiredProd.filter(k => !process.env[k]) : []
+
+  // Conditionally require payment provider variables (matches env-validator.ts).
+  const provider = (process.env.PAYMENTS_PROVIDER || 'intouch').toLowerCase()
+  if (provider === 'intouch') {
+    const intouchRequired = [
+      'INTOUCH_API_URL',
+      'INTOUCH_USERNAME',
+      'INTOUCH_ACCOUNT_NO',
+      'INTOUCH_WEBHOOK_USERNAME',
+      'INTOUCH_WEBHOOK_PASSWORD',
+    ]
+    for (const key of intouchRequired) {
+      if (isProd && !process.env[key]) missing.push(key)
+    }
+    // Require one of partner password aliases
+    if (isProd && !process.env['INTOUCH_PARTNER_PASSWORD'] && !process.env['INTOUCH_PASSWORD']) {
+      missing.push('INTOUCH_PARTNER_PASSWORD')
+    }
+  } else if (provider === 'irembo') {
+    const iremboPayRequired = [
+      'IREMBOPAY_PUBLIC_KEY',
+      'IREMBOPAY_SECRET_KEY',
+      'IREMBOPAY_PAYMENT_ACCOUNT',
+      'IREMBOPAY_PAYMENT_ITEM_CODE',
+    ]
+    for (const key of iremboPayRequired) {
+      if (isProd && !process.env[key]) missing.push(key)
+    }
+  }
+
   if (missing.length > 0) {
     const message = `Missing required environment variables (production):\n${missing.map(v => `  - ${v}`).join('\n')}`
     throw new Error(message)
@@ -24,10 +56,6 @@ function validateEnv() {
     const recommended = [
       'NEXTAUTH_SECRET',
       'DATABASE_URL',
-      'IREMBOPAY_PUBLIC_KEY',
-      'IREMBOPAY_SECRET_KEY',
-      'IREMBOPAY_PAYMENT_ACCOUNT',
-      'IREMBOPAY_PAYMENT_ITEM_CODE'
     ]
     const warnings = recommended.filter(k => !process.env[k])
     if (warnings.length > 0) {
