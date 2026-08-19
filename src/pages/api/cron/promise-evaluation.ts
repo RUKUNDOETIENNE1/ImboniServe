@@ -1,27 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { GuardianService } from '@/lib/guardian'
+import { PromiseEngine } from '@/lib/promise-engine'
 import { acquireCronLock } from '@/lib/scheduler/cron-lock'
 import { publishHeartPulseEvent, HeartPulseEventType, HeartPulseChannel } from '@/lib/heart-pulse'
 import { logger } from '@/lib/logger'
 
-const log = logger.child({ service: 'cron-guardian' })
+const log = logger.child({ service: 'cron-promise-evaluation' })
 
 /**
- * Guardian Cron Job
- * Evaluates active Promise Engine signals and verifies active Guardian cases.
+ * Promise Engine Cron Job
+ *
+ * Evaluates all active service promises (ON_TRACK, WARNING, CRITICAL)
+ * and transitions states based on elapsed time vs thresholds.
  *
  * Primary scheduler: Railway worker in-process (every 2 minutes)
- * Fallback scheduler: Vercel daily cron (0 1 * * *)
+ * Fallback scheduler: Vercel daily cron (0 0 * * *)
  *
  * Authentication: CRON_SECRET Bearer token (fail-closed)
- * Concurrency: Redis lock (120s TTL) prevents duplicate execution
+ * Concurrency: Redis lock (60s TTL) prevents duplicate execution
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const cronSecret = process.env.CRON_SECRET
   const authHeader = req.headers.authorization
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    log.warn('Unauthorized cron attempt on Guardian evaluation')
+    log.warn('Unauthorized cron attempt on Promise Engine evaluation')
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
@@ -30,22 +32,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const source = process.env.VERCEL === '1' ? 'vercel-cron' : 'railway'
-  const lock = await acquireCronLock('guardian-evaluation', 120)
+  const lock = await acquireCronLock('promise-evaluation', 60)
   if (!lock) {
-    log.info('Guardian cron skipped (lock held)')
+    log.info('Promise Engine cron skipped (lock held)')
     return res.status(200).json({ success: true, skipped: true, reason: 'lock_held' })
   }
 
   const startTime = Date.now()
   try {
-    log.info('Running Guardian evaluation tick', { source })
-    const signalsProcessed = await GuardianService.evaluateActiveSignals()
-    const casesVerified = await GuardianService.verifyActiveCases()
+    log.info('Running Promise Engine evaluation tick', { source })
+    const result = await PromiseEngine.evaluateActivePromises()
     const durationMs = Date.now() - startTime
 
-    log.info('Guardian evaluation complete', {
-      signalsProcessed,
-      casesVerified,
+    log.info('Promise Engine evaluation complete', {
+      ...result,
       durationMs,
       source,
     })
@@ -56,10 +56,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       HeartPulseEventType.SCHEDULER_TICK,
       'system',
       {
-        scheduler: 'guardian-evaluation',
+        scheduler: 'promise-evaluation',
         source,
-        signalsProcessed,
-        casesVerified,
+        evaluated: result.evaluated,
+        transitions: result.transitions,
         durationMs,
       }
     ).catch((e: any) => {
@@ -68,21 +68,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       success: true,
-      signalsProcessed,
-      casesVerified,
+      ...result,
       durationMs,
       source,
     })
   } catch (error: any) {
     const durationMs = Date.now() - startTime
-    log.error('Guardian cron failed', { error: error?.message || String(error), durationMs })
+    log.error('Promise Engine cron failed', { error: error?.message || String(error), durationMs })
 
     await publishHeartPulseEvent(
       HeartPulseChannel.system(),
       HeartPulseEventType.SCHEDULER_ERROR,
       'system',
       {
-        scheduler: 'guardian-evaluation',
+        scheduler: 'promise-evaluation',
         source,
         error: error?.message || String(error),
         durationMs,
@@ -91,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(500).json({
       success: false,
-      error: error?.message || 'Guardian cron execution failed',
+      error: error?.message || 'Promise Engine cron execution failed',
     })
   } finally {
     await lock.release()

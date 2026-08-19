@@ -37,8 +37,12 @@
       "schedule": "0 6 * * *"
     },
     {
+      "path": "/api/cron/promise-evaluation",
+      "schedule": "0 0 * * *"
+    },
+    {
       "path": "/api/cron/guardian",
-      "schedule": "*/2 * * * *"
+      "schedule": "0 1 * * *"
     }
   ],
   "buildCommand": "npx prisma generate && next build",

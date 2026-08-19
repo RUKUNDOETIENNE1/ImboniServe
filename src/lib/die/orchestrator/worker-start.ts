@@ -41,6 +41,11 @@ import { SystemRepairService } from '../services/system-repair.service'
 import { DIE_PLUGIN_EVENTS } from '@/lib/die/plugins/core/plugin-events'
 import { pluginRunner } from '@/lib/die/plugins/runtime/plugin-runner'
 
+// VERCEL-002C: Start in-process cron scheduler (Promise Engine + Guardian)
+// Runs every 2 minutes when CRON_WORKER=true and VERCEL is unset.
+// This is the PRIMARY scheduler for Guardian's frequent evaluation cadence.
+import '@/lib/cron'
+
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set. Please configure Upstash Redis URL in .env')
 }

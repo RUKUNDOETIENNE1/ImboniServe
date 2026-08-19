@@ -125,6 +125,11 @@ export const HeartPulseEventType = {
   GUARDIAN_RECOVERY_DETECTED: 'guardian.recovery.detected',
   GUARDIAN_BREACH_DETECTED: 'guardian.breach.detected',
   GUARDIAN_CASE_RESOLVED: 'guardian.case.resolved',
+
+  // Scheduler Events (VERCEL-002C)
+  SCHEDULER_TICK: 'scheduler.tick',
+  SCHEDULER_SKIP: 'scheduler.skip',
+  SCHEDULER_ERROR: 'scheduler.error',
 } as const
 
 export type HeartPulseEventTypeValue = typeof HeartPulseEventType[keyof typeof HeartPulseEventType]
@@ -312,6 +317,9 @@ export const HeartPulseChannel = {
   
   /** Business-wide operational channel */
   business: (businessId: string) => `private-business-${businessId}`,
+
+  /** System-wide channel for infrastructure/scheduler events */
+  system: () => `private-system`,
 } as const
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -384,6 +392,11 @@ export const EventOwnership = {
   [HeartPulseEventType.GUARDIAN_RECOVERY_DETECTED]: 'GuardianService',
   [HeartPulseEventType.GUARDIAN_BREACH_DETECTED]: 'GuardianService',
   [HeartPulseEventType.GUARDIAN_CASE_RESOLVED]: 'GuardianService',
+
+  // Scheduler Events (VERCEL-002C)
+  [HeartPulseEventType.SCHEDULER_TICK]: 'SchedulerService',
+  [HeartPulseEventType.SCHEDULER_SKIP]: 'SchedulerService',
+  [HeartPulseEventType.SCHEDULER_ERROR]: 'SchedulerService',
 } as const
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -477,5 +490,17 @@ export const EventSubscribers = {
   ],
   [HeartPulseEventType.GUARDIAN_CASE_RESOLVED]: [
     'Guardian Dashboard (/dashboard/operations/guardian)',
+  ],
+
+  // Scheduler Events (VERCEL-002C)
+  [HeartPulseEventType.SCHEDULER_TICK]: [
+    'Operations Dashboard',
+  ],
+  [HeartPulseEventType.SCHEDULER_SKIP]: [
+    'Operations Dashboard',
+  ],
+  [HeartPulseEventType.SCHEDULER_ERROR]: [
+    'Operations Dashboard',
+    'Alert Delivery Service',
   ],
 } as const
