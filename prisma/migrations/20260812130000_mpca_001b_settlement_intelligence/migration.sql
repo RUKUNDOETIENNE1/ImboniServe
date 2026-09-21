@@ -60,7 +60,7 @@ CREATE INDEX "SettlementRecord_reconciliationStatus_idx" ON "SettlementRecord"("
 CREATE INDEX "SettlementRecord_fundsAvailabilityStatus_idx" ON "SettlementRecord"("fundsAvailabilityStatus");
 
 -- Add foreign key from SettlementRecord to Business
-ALTER TABLE "SettlementRecord" ADD CONSTRAINT "SettlementRecord_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE;
+ALTER TABLE "SettlementRecord" ADD CONSTRAINT "SettlementRecord_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE;
 
 -- Table: SettlementTransactionLink
 CREATE TABLE "SettlementTransactionLink" (
@@ -122,7 +122,7 @@ CREATE INDEX "WithdrawalRecord_businessId_status_idx" ON "WithdrawalRecord"("bus
 CREATE INDEX "WithdrawalRecord_provider_status_idx" ON "WithdrawalRecord"("provider", "status");
 
 -- Add foreign key from WithdrawalRecord to Business
-ALTER TABLE "WithdrawalRecord" ADD CONSTRAINT "WithdrawalRecord_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE;
+ALTER TABLE "WithdrawalRecord" ADD CONSTRAINT "WithdrawalRecord_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Restaurant"("id") ON DELETE CASCADE;
 
 -- Table: ProviderCapabilityRecord
 CREATE TABLE "ProviderCapabilityRecord" (
