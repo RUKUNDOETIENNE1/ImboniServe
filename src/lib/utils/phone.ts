@@ -123,3 +123,20 @@ export function normalizePhoneForProvider(phone: string, countryCode?: string): 
   const normalized = normalizePhone(phone, countryCode);
   return normalized.replace(/\D/g, '');
 }
+
+/**
+ * Mask a phone number for logging (PII reduction).
+ * Shows the country prefix and last 4 digits only.
+ *
+ * @example maskPhone('+250788123456') → '+250****3456'
+ * @example maskPhone('whatsapp:+250788123456') → 'whatsapp:+250****3456'
+ */
+export function maskPhone(phone?: string | null): string {
+  if (!phone) return '';
+  const prefix = phone.startsWith('whatsapp:') ? 'whatsapp:' : '';
+  const p = prefix ? phone.slice('whatsapp:'.length) : phone;
+  if (p.length <= 7) return `${prefix}***`;
+  const visibleHead = p.startsWith('+') ? 4 : 0;
+  const tail = p.slice(-4);
+  return `${prefix}${p.slice(0, visibleHead)}****${tail}`;
+}

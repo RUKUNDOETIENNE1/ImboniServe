@@ -133,7 +133,10 @@ export class WhatsAppCloudService {
     const appSecret = process.env.WHATSAPP_APP_SECRET
     if (!appSecret) return false
     const crypto = require('crypto')
-    const expected = crypto.createHmac('sha256', appSecret).update(body).digest('hex')
-    return `sha256=${expected}` === signature
+    const expected = `sha256=${crypto.createHmac('sha256', appSecret).update(body).digest('hex')}`
+    const a = Buffer.from(expected)
+    const b = Buffer.from(signature || '')
+    if (a.length !== b.length) return false
+    return crypto.timingSafeEqual(a, b)
   }
 }

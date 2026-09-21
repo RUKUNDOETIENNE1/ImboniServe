@@ -5,8 +5,9 @@
 
 import { prisma } from '@/lib/prisma'
 import { formatCurrency } from '@/lib/utils/currency'
+import { normalizePhone, maskPhone } from '@/lib/utils/phone'
 import { logger } from '@/lib/logger'
-import { NotificationService } from './notification.service'
+import { KitchenDispatchService } from './kitchen-dispatch.service'
 import twilio from 'twilio'
 
 const log = logger.child({ service: 'whatsapp-order' })
@@ -20,18 +21,55 @@ if (accountSid && authToken) {
   twilioClient = twilio(accountSid, authToken)
 }
 
+export interface ProcessIncomingOptions {
+  /** Provider message id (Twilio MessageSid) for idempotent delivery */
+  messageSid?: string
+}
+
+export interface ProcessResult {
+  success: boolean
+  reply: string
+  orderId?: string
+  /** True when the message was already processed (idempotent replay) */
+  duplicate?: boolean
+}
+
+type ParsedItem = { quantity: number; name: string; note?: string; instructionTags?: string[] }
+
 export class WhatsAppOrderService {
   /**
-   * Process incoming WhatsApp message from staff
+   * Process incoming WhatsApp message from staff.
+   * Idempotent on opts.messageSid: a re-delivered webhook never creates a
+   * second Sale.
    */
-  static async processIncomingMessage(from: string, body: string, businessId?: string) {
-    log.info('Processing WhatsApp message', { from, body })
+  static async processIncomingMessage(from: string, body: string, opts: ProcessIncomingOptions = {}): Promise<ProcessResult> {
+    log.info('Processing WhatsApp message', {
+      from: maskPhone(from),
+      bodyLength: typeof body === 'string' ? body.length : 0,
+      messageSid: opts.messageSid,
+    })
+
+    // Idempotency: a previously processed provider message id short-circuits
+    // before any order work (Twilio may redeliver webhooks).
+    if (opts.messageSid) {
+      const existing = await prisma.whatsAppMessage.findFirst({
+        where: { messageSid: opts.messageSid },
+        select: { id: true },
+      })
+      if (existing) {
+        log.info('Duplicate WhatsApp message ignored', { messageSid: opts.messageSid })
+        return {
+          success: true,
+          duplicate: true,
+          reply: 'This message was already processed. Your order was received.',
+        }
+      }
+    }
 
     // Parse message format: "ORDER [table] [items]"
     // Example: "ORDER T5 2x Brochette, 1x Primus"
-    
     const orderMatch = body.match(/ORDER\s+([A-Z0-9]+)\s+([\s\S]+)/i)
-    
+
     if (!orderMatch) {
       return {
         success: false,
@@ -42,7 +80,6 @@ export class WhatsAppOrderService {
     const [, tableIdentifier, itemsText] = orderMatch
 
     // Extract optional post attribution from body
-    // Prefer explicit marker in message text, e.g. "[Post:abc123]", otherwise fall back to URL query param ref_post
     const bracketPostMatch = body.match(/\[Post:([a-zA-Z0-9_-]+)\]/i)
     const refPostMatch = body.match(/ref_post=([a-zA-Z0-9_-]+)/)
     const refPostId = bracketPostMatch ? bracketPostMatch[1] : (refPostMatch ? refPostMatch[1] : undefined)
@@ -52,14 +89,9 @@ export class WhatsAppOrderService {
     const itemsPart = split[0]
     const orderNotes = split[1]?.trim()
 
-    // Find staff member by phone
-    const staff = await prisma.user.findFirst({
-      where: {
-        phone: from.replace('whatsapp:', ''),
-        roles: { hasSome: ['WAITER', 'CASHIER', 'MANAGER', 'OWNER'] }
-      },
-      include: { business: true }
-    })
+    // Find staff member by phone (normalized — Twilio sends +E.164, staff
+    // records may store local 0-prefix format)
+    const staff = await this.findStaffByPhone(from)
 
     if (!staff) {
       return {
@@ -97,7 +129,7 @@ export class WhatsAppOrderService {
 
     // Parse items
     const items = this.parseOrderItems(itemsPart)
-    
+
     if (items.length === 0) {
       return {
         success: false,
@@ -105,18 +137,63 @@ export class WhatsAppOrderService {
       }
     }
 
-    // Match items to menu
-    const menuItems = await this.matchMenuItems(businessIdVal, items)
-    
-    if (menuItems.length === 0) {
+    // Resolve every item deterministically — never silently drop or pick
+    // an arbitrary first match.
+    const resolved: Array<{ menuItem: any; quantity: number; note?: string; instructionTags?: string[] }> = []
+    const problems: string[] = []
+    for (const item of items) {
+      const r = await this.resolveMenuItem(businessIdVal, item.name)
+      if (r.status === 'ok') {
+        resolved.push({ menuItem: r.menuItem, quantity: item.quantity, note: item.note, instructionTags: item.instructionTags })
+      } else if (r.status === 'ambiguous') {
+        problems.push(`"${item.name}" is ambiguous — matches ${r.matches.join(', ')}. Use the exact item name.`)
+      } else {
+        problems.push(`"${item.name}" not found on the menu.`)
+      }
+    }
+
+    if (problems.length > 0) {
       return {
         success: false,
-        reply: 'No menu items matched. Check item names and try again.'
+        reply: `Order not created — please fix and resend:\n${problems.join('\n')}`
       }
     }
 
     // Create order
-    const order = await this.createOrder(businessIdVal, table.id, staff.id, menuItems as any, orderNotes)
+    const order = await this.createOrder(businessIdVal, table.id, staff.id, resolved, orderNotes)
+
+    // Record the inbound message for deduplication (unique messageSid).
+    // A unique-violation here means a concurrent delivery already processed it.
+    if (opts.messageSid) {
+      try {
+        await prisma.whatsAppMessage.create({
+          data: {
+            businessId: businessIdVal,
+            userId: staff.id,
+            fromNumber: normalizePhone(from.replace('whatsapp:', '')),
+            toNumber: whatsappNumber || '',
+            message: `ORDER ${tableIdentifier} (${items.length} item(s))`,
+            type: 'ORDER',
+            status: 'PROCESSED',
+            direction: 'INBOUND',
+            command: 'ORDER',
+            processed: true,
+            messageSid: opts.messageSid,
+          },
+        })
+      } catch (dupErr: any) {
+        if (dupErr?.code === 'P2002') {
+          log.info('Concurrent duplicate WhatsApp message', { messageSid: opts.messageSid })
+          return {
+            success: true,
+            duplicate: true,
+            orderId: order.id,
+            reply: 'This message was already processed. Your order was received.',
+          }
+        }
+        log.warn('Failed to record inbound WhatsApp message', { error: String(dupErr) })
+      }
+    }
 
     // Post attribution — if order came from a feed CTA
     if (refPostId) {
@@ -126,7 +203,7 @@ export class WhatsAppOrderService {
             postId: refPostId,
             businessId: businessIdVal,
             orderId: order.id,
-            channel: 'WHATSAPP_AI',
+            channel: 'WHATSAPP',
             attributedAt: new Date()
           }
         })
@@ -135,8 +212,29 @@ export class WhatsAppOrderService {
       }
     }
 
+    // Dispatch to kitchen — same path as QR/public order confirm so WhatsApp
+    // orders reach stations and emit real-time events. Non-fatal: the kitchen
+    // list polls as a fallback.
+    try {
+      await KitchenDispatchService.dispatchToKitchen({
+        saleId: order.id,
+        businessId: order.businessId,
+        orderNumber: order.orderNumber || order.id,
+        orderSource: 'WHATSAPP',
+        tableId: order.tableId || undefined,
+        tableNumber: order.table?.number,
+        items: order.items.map((item: any) => ({
+          menuItemName: item.menuItem.name,
+          quantity: item.quantity,
+          unitPriceCents: item.unitPriceCents,
+        })),
+      })
+    } catch (dispatchError) {
+      log.error('Kitchen dispatch failed for WhatsApp order (kitchen will poll)', { orderId: order.id, error: String(dispatchError) })
+    }
+
     // Send confirmation
-    const reply = this.formatOrderConfirmation(order, table, menuItems)
+    const reply = this.formatOrderConfirmation(order, table, resolved)
 
     return {
       success: true,
@@ -146,10 +244,32 @@ export class WhatsAppOrderService {
   }
 
   /**
+   * Resolve a staff user by their WhatsApp phone number.
+   * Normalizes the incoming number to E.164 and matches against the common
+   * stored variants (E.164, bare digits, local 0-prefix).
+   */
+  private static async findStaffByPhone(from: string) {
+    const normalized = normalizePhone((from || '').replace('whatsapp:', ''))
+    const digits = normalized.replace(/\D/g, '')
+    const variants = new Set<string>([normalized, digits])
+    // Local format variant: 0 + national significant number (strip dial code)
+    const dialDigits = digits.replace(/^\d{3}(?=\d{9}$)/, '')
+    if (dialDigits !== digits) variants.add(`0${dialDigits}`)
+
+    return prisma.user.findFirst({
+      where: {
+        phone: { in: [...variants] },
+        roles: { hasSome: ['WAITER', 'CASHIER', 'MANAGER', 'OWNER'] }
+      },
+      include: { business: true }
+    })
+  }
+
+  /**
    * Parse order items from text
    */
-  private static parseOrderItems(text: string): Array<{ quantity: number; name: string; note?: string; instructionTags?: string[] }> {
-    const items: Array<{ quantity: number; name: string; note?: string; instructionTags?: string[] }> = []
+  private static parseOrderItems(text: string): ParsedItem[] {
+    const items: ParsedItem[] = []
 
     // Split by comma or newline
     const parts = text.split(/[\,\n]+/).map(p => p.trim()).filter(Boolean)
@@ -191,34 +311,61 @@ export class WhatsAppOrderService {
   }
 
   /**
-   * Match parsed items to menu items
+   * Resolve a requested item name to exactly one menu item for the business.
+   * Exact (case-insensitive) match wins; otherwise a unique partial match is
+   * accepted; multiple candidates are reported as ambiguous rather than
+   * silently choosing the first row.
    */
-  private static async matchMenuItems(businessId: string, items: Array<{ quantity: number; name: string; note?: string; instructionTags?: string[] }>) {
-    const matched: Array<{ menuItem: any; quantity: number; note?: string; instructionTags?: string[] }> = []
-    
-    for (const item of items) {
-      // Fuzzy match menu items
-      const menuItem = await prisma.menuItem.findFirst({
-        where: {
-          businessId,
-          isAvailable: true,
-          OR: [
-            { name: { contains: item.name, mode: 'insensitive' } },
-            { name: { startsWith: item.name, mode: 'insensitive' } }
-          ]
-        }
-      })
-      
-      if (menuItem) {
-        matched.push({ menuItem, quantity: item.quantity, note: item.note, instructionTags: item.instructionTags })
+  private static async resolveMenuItem(
+    businessId: string,
+    name: string
+  ): Promise<
+    | { status: 'ok'; menuItem: any }
+    | { status: 'ambiguous'; matches: string[] }
+    | { status: 'unmatched' }
+  > {
+    const trimmed = name.trim()
+    if (!trimmed) return { status: 'unmatched' }
+
+    // 1. Exact match first
+    const exact = await prisma.menuItem.findFirst({
+      where: {
+        businessId,
+        isAvailable: true,
+        name: { equals: trimmed, mode: 'insensitive' }
       }
+    })
+    if (exact) return { status: 'ok', menuItem: exact }
+
+    // 2. Partial matches — accept only if exactly one
+    const candidates = await prisma.menuItem.findMany({
+      where: {
+        businessId,
+        isAvailable: true,
+        OR: [
+          { name: { contains: trimmed, mode: 'insensitive' } },
+          { name: { startsWith: trimmed, mode: 'insensitive' } }
+        ]
+      },
+      select: { id: true, name: true, priceCents: true },
+      take: 10
+    })
+
+    if (candidates.length === 1) {
+      const full = await prisma.menuItem.findUnique({ where: { id: candidates[0].id } })
+      if (full) return { status: 'ok', menuItem: full }
     }
-    
-    return matched
+
+    if (candidates.length > 1) {
+      return { status: 'ambiguous', matches: candidates.map(c => c.name) }
+    }
+
+    return { status: 'unmatched' }
   }
 
   /**
-   * Create order in database
+   * Create order in database.
+   * Prices are always taken from the MenuItem rows — never from the message.
    */
   private static async createOrder(
     businessId: string,
@@ -227,7 +374,7 @@ export class WhatsAppOrderService {
     items: Array<{ menuItem: any; quantity: number; note?: string; instructionTags?: string[] }>,
     orderNotes?: string
   ) {
-    const totalCents = items.reduce((sum, item) => 
+    const totalCents = items.reduce((sum, item) =>
       sum + (item.menuItem.priceCents * item.quantity), 0
     )
 
@@ -258,12 +405,13 @@ export class WhatsAppOrderService {
       },
       include: {
         items: { include: { menuItem: true } },
-        table: true
+        table: true,
+        business: { select: { currency: true } }
       }
     })
 
     log.info('WhatsApp order created', { orderId: order.id, businessId, tableId })
-    
+
     return order
   }
 
@@ -272,7 +420,7 @@ export class WhatsAppOrderService {
    */
   private static formatOrderConfirmation(order: any, table: any, items: Array<{ menuItem: any; quantity: number }>) {
     const currency = order.business?.currency || 'RWF'
-    const itemsList = items.map(item => 
+    const itemsList = items.map(item =>
       `${item.quantity}x ${item.menuItem.name} - ${formatCurrency(item.menuItem.priceCents / 100, currency)}`
     ).join('\n')
 
@@ -302,10 +450,10 @@ export class WhatsAppOrderService {
         body: message
       })
 
-      log.info('WhatsApp message sent', { to, sid: result.sid })
+      log.info('WhatsApp message sent', { to: maskPhone(to), sid: result.sid })
       return { success: true, sid: result.sid }
     } catch (error) {
-      log.error('Failed to send WhatsApp message', { error: String(error), to })
+      log.error('Failed to send WhatsApp message', { error: String(error), to: maskPhone(to) })
       return { success: false, error: String(error) }
     }
   }

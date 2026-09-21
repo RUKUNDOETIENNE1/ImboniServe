@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger'
+import { maskPhone } from '@/lib/utils/phone'
 
 /**
  * WhatsApp Notification Service
@@ -13,17 +14,25 @@ interface WhatsAppMessage {
 }
 
 export class WhatsAppService {
-  private static apiUrl = process.env.WHATSAPP_API_URL || ''
-  private static apiKey = process.env.WHATSAPP_API_KEY || ''
-  private static fromNumber = process.env.WHATSAPP_FROM_NUMBER || ''
+  private static getCredentials() {
+    return {
+      apiUrl: process.env.WHATSAPP_API_URL || '',
+      apiKey: process.env.WHATSAPP_API_KEY || '',
+      fromNumber: process.env.WHATSAPP_FROM_NUMBER || '',
+    }
+  }
 
   /**
    * Send WhatsApp message
    */
   static async sendMessage(params: WhatsAppMessage): Promise<{ success: boolean; error?: string }> {
-    if (!this.apiUrl || !this.apiKey) {
-      logger.warn('WhatsApp not configured - message not sent', { to: params.to })
-      return { success: true } // Don't block operations
+    const { apiUrl, apiKey, fromNumber } = this.getCredentials()
+    if (!apiUrl || !apiKey) {
+      // Truthful failure: the message is NOT sent. Callers that treat WhatsApp
+      // as optional should not block on success:false — but they must not be
+      // told the message was delivered.
+      logger.warn('WhatsApp not configured - message not sent', { to: maskPhone(params.to) })
+      return { success: false, error: 'WHATSAPP_NOT_CONFIGURED' }
     }
 
     try {
@@ -31,7 +40,7 @@ export class WhatsAppService {
       const phone = params.to.startsWith('+') ? params.to : `+${params.to}`
 
       const payload = {
-        from: this.fromNumber,
+        from: fromNumber,
         to: phone,
         body: params.body,
         ...(params.templateName && {
@@ -51,25 +60,25 @@ export class WhatsAppService {
         })
       }
 
-      const response = await fetch(this.apiUrl, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify(payload)
       })
 
       if (response.ok) {
-        logger.info('WhatsApp message sent', { to: phone })
+        logger.info('WhatsApp message sent', { to: maskPhone(phone) })
         return { success: true }
       } else {
         const error = await response.text()
-        logger.error('WhatsApp send failed', { error, to: phone })
+        logger.error('WhatsApp send failed', { error, to: maskPhone(phone) })
         return { success: false, error }
       }
     } catch (error: any) {
-      logger.error('WhatsApp exception', { error: error.message, to: params.to })
+      logger.error('WhatsApp exception', { error: error.message, to: maskPhone(params.to) })
       return { success: false, error: error.message }
     }
   }
@@ -211,10 +220,10 @@ export class WhatsAppService {
         })
       }
 
-      logger.info('WhatsApp preferences updated', { phone, optIn })
+      logger.info('WhatsApp preferences updated', { phone: maskPhone(phone), optIn })
       return { success: true }
     } catch (error) {
-      logger.error('Failed to update WhatsApp preferences', { error, phone })
+      logger.error('Failed to update WhatsApp preferences', { error, phone: maskPhone(phone) })
       return { success: false }
     }
   }
@@ -230,11 +239,13 @@ export class WhatsAppService {
         orderBy: { createdAt: 'desc' },
       })
 
-      if (!pref) return true // Default: opted in
+      if (!pref) return true // Default: opted in (no explicit opt-out recorded)
       return pref.message === 'OPT_IN'
     } catch (error) {
-      logger.error('Failed to check WhatsApp opt-in status', { error, phone })
-      return true // Fail open: assume opted in
+      // Fail closed: on lookup error, do NOT treat the recipient as opted-in.
+      // An unsafe opt-out state must never appear opted-in.
+      logger.error('Failed to check WhatsApp opt-in status', { error, phone: maskPhone(phone) })
+      return false
     }
   }
 }

@@ -681,6 +681,9 @@ model WhatsAppMessage {
   direction  String
   command    String?
   processed  Boolean  @default(false)
+  // Provider-side message id (Twilio MessageSid / Meta wamid) for inbound
+  // webhook deduplication. Nullable: outbound log rows have no provider sid.
+  messageSid String?  @unique
   createdAt  DateTime @default(now())
   businessId String
   business   Business @relation(fields: [businessId], references: [id])

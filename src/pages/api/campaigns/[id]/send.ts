@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { prisma } from '@/lib/prisma'
 import { sendCampaignMessages } from '@/lib/whatsapp/campaign-scheduler'
 import { ingestCampaignShadowEvent } from '@/lib/die/business-as-plugin/campaigns/campaigns.shadow'
 import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
@@ -21,6 +22,23 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    // Tenant boundary: a business can only trigger its own campaigns.
+    // Campaigns are stored as Promotion rows scoped by businessId.
+    const sessionBusinessId = (session.user as any)?.businessId as string | null
+    if (!sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+    const campaign = await prisma.promotion.findUnique({
+      where: { id },
+      select: { businessId: true },
+    })
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' })
+    }
+    if (campaign.businessId !== sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+
     // Shadow: CAMPAIGN_STARTED
     try {
       const businessId = (session.user as any)?.businessId || ''
