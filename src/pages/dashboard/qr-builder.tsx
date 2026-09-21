@@ -438,7 +438,12 @@ export default function QrBuilderPage() {
                       if (!tables || tables.length === 0) { setErrors('No tables found to generate'); return }
                       setIsDownloading(true)
                       for (const t of tables) {
-                        const link = `/order?branchId=${business.id}&tableId=${t.id}&mode=invenue`
+                        // Use the canonical signed-link endpoint — unsigned
+                        // /order?... URLs fail HMAC verification at token issuance (401).
+                        const linkRes = await fetch(`/api/public/order/link?branchId=${encodeURIComponent(business.id)}&tableId=${encodeURIComponent(t.id)}&mode=invenue`)
+                        if (!linkRes.ok) throw new Error(`Failed to generate signed link for table ${t.number || t.id}`)
+                        const linkData = await linkRes.json()
+                        const link = linkData.url as string
                         const dataUrl = await QRCode.toDataURL(link, {
                           errorCorrectionLevel: 'M',
                           margin: 1,

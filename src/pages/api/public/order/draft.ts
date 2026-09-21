@@ -27,7 +27,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         notes: z.string().max(500).optional(),
         instructionTags: z.array(z.string()).max(10).optional()
       })).min(1).max(50),
-      mode: z.enum(['dine-in', 'preorder', 'pickup']).optional(),
+      // Canonical order-mode vocabulary is 'invenue' | 'preorder' | 'pickup'
+      // (qr-generator.service.ts, /api/public/order/link, token.ts, order page).
+      // 'dine-in' is kept as a backward-compatible alias for in-venue orders.
+      mode: z.enum(['invenue', 'dine-in', 'preorder', 'pickup']).optional(),
       scheduledAt: z.string().datetime().optional(),
       phone: z.string().optional(),
       customerName: z.string().max(100).optional(),
