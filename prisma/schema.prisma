@@ -1408,6 +1408,20 @@ model PaymentTransaction {
   referenceId              String?
   amountCents              Int
   currency                 String                   @default("RWF")
+  orderAmountCents         Int?
+  orderCurrency            String?
+  paymentAmountCents       Int?
+  paymentCurrency          String?
+  settlementAmountCents    Int?
+  settlementCurrency       String?
+  exchangeRateValue        Decimal?                 @db.Decimal(20, 10)
+  exchangeRateType         ExchangeRateType?
+  exchangeRateSource       String?
+  exchangeRateBaseCurrency String?
+  exchangeRateQuoteCurrency String?
+  exchangeRateEffectiveDate DateTime?
+  exchangeRateRecordId     String?
+  exchangeRateSnapshotId   String?
   vatAmountCents           Int
   exVatAmountCents         Int
   gatewayFeeEstimatedCents Int
@@ -1445,6 +1459,7 @@ model PaymentTransaction {
   staffTip                 StaffTip?
   reservation              Reservation?
   settlementLinks          SettlementTransactionLink[]
+  exchangeRateSnapshot     CurrencyExchangeRate?    @relation(fields: [exchangeRateSnapshotId], references: [id])
 
   @@index([businessId])
   @@index([invoiceNumber])
@@ -1454,6 +1469,9 @@ model PaymentTransaction {
   @@index([updatedAt])
   @@index([status, createdAt])
   @@index([businessId, status])
+  @@index([orderCurrency])
+  @@index([paymentCurrency])
+  @@index([exchangeRateSnapshotId])
 }
 
 model AffiliateCommissionNew {
@@ -2518,6 +2536,18 @@ enum TaxType {
   CITY_TAX
 }
 
+enum ExchangeRateType {
+  AVERAGE
+  BUYING
+  SELLING
+}
+
+enum ExchangeRateStatus {
+  ACTIVE
+  SUPERSEDED
+  INVALID
+}
+
 enum ReferralStatus {
   PENDING
   CONVERTED
@@ -2847,18 +2877,32 @@ model WaiterCall {
 
 // Global Currency System: Exchange Rates
 model CurrencyExchangeRate {
-  id           String    @id @default(cuid())
-  fromCurrency String // ISO 4217 currency code (e.g., RWF, USD)
-  toCurrency   String // ISO 4217 currency code
-  rate         Decimal   @db.Decimal(12, 6) // Exchange rate (6 decimal precision)
-  source       String    @default("manual") // 'manual', 'api', 'bank'
-  validFrom    DateTime  @default(now())
-  validUntil   DateTime? // Null means current/active
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                  String               @id @default(cuid())
+  fromCurrency        String // ISO 4217 base currency code
+  toCurrency          String // ISO 4217 quote currency code
+  rate                Decimal              @db.Decimal(20, 10) // Backward-compatible canonical rate value
+  averageRate         Decimal?             @db.Decimal(20, 10)
+  buyingRate          Decimal?             @db.Decimal(20, 10)
+  sellingRate         Decimal?             @db.Decimal(20, 10)
+  source              String               @default("manual") // e.g. 'BNR', 'manual'
+  sourceRecordId      String?
+  sourceCurrencyName  String?
+  sourceRecordCreatedAt DateTime?
+  effectiveDate       DateTime             @default(now()) // publication/effective date from source
+  fetchedAt           DateTime             @default(now())
+  validFrom           DateTime             @default(now())
+  validUntil          DateTime? // Null means current/active
+  status              ExchangeRateStatus   @default(ACTIVE)
+  revision            Int                  @default(0)
+  metadata            Json?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  paymentTransactions PaymentTransaction[]
 
   @@unique([fromCurrency, toCurrency, validFrom])
-  @@index([fromCurrency, toCurrency, validFrom])
+  @@unique([source, sourceRecordId, fromCurrency, toCurrency, effectiveDate, revision])
+  @@index([fromCurrency, toCurrency, effectiveDate])
+  @@index([fromCurrency, toCurrency, status, effectiveDate])
 }
 
 // Global Currency System: Supported Currencies
@@ -2868,6 +2912,10 @@ model SupportedCurrency {
   symbol        String // Currency symbol (FRw, $, €, etc.)
   decimalDigits Int      @default(2) // Number of decimal places
   isActive      Boolean  @default(true)
+  displayEnabled Boolean @default(true)
+  transactionEnabled Boolean @default(false)
+  paymentEnabled Boolean @default(false)
+  settlementEnabled Boolean @default(false)
   countries     String[] // Countries where this currency is used
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

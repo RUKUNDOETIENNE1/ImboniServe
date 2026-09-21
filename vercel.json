@@ -43,12 +43,17 @@
     {
       "path": "/api/cron/guardian",
       "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/bnr-sync",
+      "schedule": "30 6 * * *"
     }
   ],
   "buildCommand": "npx prisma generate && next build",
   "functions": {
     "src/pages/api/cron/reconciliation.ts": { "maxDuration": 300 },
     "src/pages/api/cron/tap-leave-sweep.ts": { "maxDuration": 120 },
-    "src/pages/api/cron/tap-leave-reconcile.ts": { "maxDuration": 120 }
+    "src/pages/api/cron/tap-leave-reconcile.ts": { "maxDuration": 120 },
+    "src/pages/api/cron/bnr-sync.ts": { "maxDuration": 120 }
   }
 }
