@@ -175,13 +175,29 @@ export default function QrBuilderPage() {
     loadTemplate()
   }, [selectedTemplateId])
 
-  const computedTargetUrl = useMemo(() => {
-    if (!business) return ''
-    const mode = qrType === 'table' || qrType === 'branch' ? 'invenue' : qrType
-    if (qrType === 'table' && selectedTableId) {
-      return `/order?branchId=${business.id}&tableId=${selectedTableId}&mode=${mode}`
+  // Signed target URL: the /order page requires a valid HMAC signature, so an
+  // unsigned /order?... link built here would 401 for every scanned customer.
+  // Fetch the signed URL from the existing public order-link endpoint.
+  const [computedTargetUrl, setComputedTargetUrl] = useState<string>('')
+  useEffect(() => {
+    const load = async () => {
+      if (!business) { setComputedTargetUrl(''); return }
+      const mode = qrType === 'table' || qrType === 'branch' ? 'invenue' : qrType
+      const params = new URLSearchParams({ branchId: business.id, mode })
+      if (qrType === 'table' && selectedTableId) params.set('tableId', selectedTableId)
+      try {
+        const r = await fetch(`/api/public/order/link?${params.toString()}`)
+        if (r.ok) {
+          const data = await r.json()
+          setComputedTargetUrl(data.url || '')
+        } else {
+          setComputedTargetUrl('')
+        }
+      } catch {
+        setComputedTargetUrl('')
+      }
     }
-    return `/order?branchId=${business.id}&mode=${mode}`
+    load()
   }, [business, qrType, selectedTableId])
 
   const [qrDataUrl, setQrDataUrl] = useState<string>('')

@@ -36,7 +36,7 @@ export default function OrderPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { currency } = useCurrency();
-  const { branchId, tableId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
+  const { branchId, tableId, seatId, outletId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
 
   const [loading, setLoading] = useState(true);
   const [tokenLoading, setTokenLoading] = useState(false);
@@ -179,9 +179,11 @@ export default function OrderPage() {
         body: JSON.stringify({
           branchId,
           tableId: tableId || null,
+          seatId: seatId || null,
+          outletId: outletId || null,
           version: version || '1',
           signature,
-          mode: mode || (tableId ? 'invenue' : 'preorder'),
+          mode: mode || (tableId || seatId || outletId ? 'invenue' : 'preorder'),
         }),
       });
 
@@ -710,7 +712,7 @@ export default function OrderPage() {
       )}
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
         <h1 style={{ margin: 0 }}>Order{branchName ? ` @ ${branchName}` : ''}</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
@@ -820,7 +822,7 @@ export default function OrderPage() {
       )}
 
       {!loading && !error && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+        <div className="order-layout">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <span style={{ padding: '4px 8px', background: '#f1f5f9', borderRadius: 999 }}>
@@ -833,7 +835,7 @@ export default function OrderPage() {
             {Object.entries(menuByCategory).map(([category, items]) => (
               <div key={category} style={{ marginBottom: 24 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#111827' }}>{category}</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="menu-grid">
                   {items.map(item => {
                     const safety = isMenuItemSafe(item, preferences);
                     const localizedName = getLocalizedName(item);
@@ -1142,6 +1144,26 @@ export default function OrderPage() {
       <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid #e5e7eb', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>
         Powered by <a href="https://imboniserve.com" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>ImboniServe</a>
       </div>
+      <style jsx>{`
+        .order-layout {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 16px;
+        }
+        .menu-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        @media (max-width: 768px) {
+          .order-layout {
+            grid-template-columns: 1fr;
+          }
+          .menu-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </div>
   );
 }

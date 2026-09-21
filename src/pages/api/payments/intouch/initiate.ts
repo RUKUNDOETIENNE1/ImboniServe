@@ -1,12 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
+import { IremboPayService } from '@/lib/services/irembopay.service'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { convertMinorUnits, getDefaultPaymentRateMaxAgeHours, getRateTypeForOperation } from '@/lib/services/currency-exchange.service'
 
 /**
  * POST /api/payments/intouch/initiate
@@ -37,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // We still read from business.currency for the transaction record.
     const business = await prisma.business.findUnique({
       where: { id: ctx.businessId },
-      select: { currency: true }
+      select: { currency: true, taxRate: true }
     })
 
     // Generate unique transaction ID
@@ -47,11 +49,49 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const paymentFee = Math.round(amount * 0.05)
     const totalAmount = amount + paymentFee
     
+    const orderCurrency = (business?.currency || 'RWF').toUpperCase()
+    const paymentCurrency = 'RWF'
+    const orderAmountCents = totalAmount * 100
+    let paymentAmountCents = orderAmountCents
+    let exchangeRateSnapshotId: string | null = null
+    let exchangeRateValue: string | null = null
+    let exchangeRateType: 'AVERAGE' | 'BUYING' | 'SELLING' | null = null
+    let exchangeRateSource: string | null = null
+    let exchangeRateBaseCurrency: string | null = null
+    let exchangeRateQuoteCurrency: string | null = null
+    let exchangeRateEffectiveDate: Date | null = null
+    let exchangeRateRecordId: string | null = null
+
+    if (orderCurrency !== paymentCurrency) {
+      const converted = await convertMinorUnits(orderAmountCents, orderCurrency, paymentCurrency, {
+        rateType: getRateTypeForOperation('payment'),
+        maxAgeHours: getDefaultPaymentRateMaxAgeHours(),
+        allowStale: false,
+      })
+      paymentAmountCents = converted.toAmountMinor
+      exchangeRateSnapshotId = converted.rateSnapshot.rateId !== 'IDENTITY' ? converted.rateSnapshot.rateId : null
+      exchangeRateValue = converted.rateSnapshot.rate.toString()
+      exchangeRateType = converted.rateSnapshot.rateType
+      exchangeRateSource = converted.rateSnapshot.source
+      exchangeRateBaseCurrency = converted.rateSnapshot.fromCurrency
+      exchangeRateQuoteCurrency = converted.rateSnapshot.toCurrency
+      exchangeRateEffectiveDate = converted.rateSnapshot.effectiveDate
+      exchangeRateRecordId = converted.rateSnapshot.sourceRecordId || null
+    }
+
     // Internal cost breakdown (not shown to customer)
-    // InTouch gateway fee: 3% of total
-    // Platform margin: 2% of original amount
-    const gatewayFee = Math.round(totalAmount * 0.03)
-    const platformMargin = paymentFee - gatewayFee
+    // InTouch gateway fee: 3% of payment amount (RWF)
+    // Platform margin: payment fee - gateway fee
+    const gatewayFeeCents = Math.round(paymentAmountCents * 0.03)
+    const platformMarginCents = Math.max(0, paymentFee * 100 - gatewayFeeCents)
+
+    // VAT: extract from the VAT-inclusive payment gross using the business's
+    // configured tax rate (RW default 18%). taxRate 0 = business not configured /
+    // legitimately non-VAT — the configured architecture is preserved.
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(
+      paymentAmountCents,
+      business?.taxRate ?? 0
+    )
 
     // Generate invoice number
     const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`
@@ -62,12 +102,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         invoiceNumber,
         transactionId: requestTransactionId,
         referenceId: orderId,
-        amountCents: totalAmount * 100,
-        currency: business?.currency || 'RWF',
-        vatAmountCents: 0,
-        exVatAmountCents: totalAmount * 100,
-        gatewayFeeEstimatedCents: gatewayFee * 100, // 3% InTouch fee (internal)
-        platformFeeCents: platformMargin * 100, // Net platform margin after gateway cost
+        amountCents: paymentAmountCents,
+        currency: paymentCurrency,
+        orderAmountCents,
+        orderCurrency,
+        paymentAmountCents,
+        paymentCurrency,
+        settlementAmountCents: paymentAmountCents,
+        settlementCurrency: paymentCurrency,
+        exchangeRateSnapshotId: exchangeRateSnapshotId || undefined,
+        exchangeRateValue: exchangeRateValue || undefined,
+        exchangeRateType: exchangeRateType || undefined,
+        exchangeRateSource: exchangeRateSource || undefined,
+        exchangeRateBaseCurrency: exchangeRateBaseCurrency || undefined,
+        exchangeRateQuoteCurrency: exchangeRateQuoteCurrency || undefined,
+        exchangeRateEffectiveDate: exchangeRateEffectiveDate || undefined,
+        exchangeRateRecordId: exchangeRateRecordId || undefined,
+        vatAmountCents,
+        exVatAmountCents,
+        gatewayFeeEstimatedCents: gatewayFeeCents, // 3% InTouch fee (internal)
+        platformFeeCents: platformMarginCents, // Net platform margin after gateway cost
         netToBusinessCents: amount * 100,
         payerPhone: phone,
         status: 'PENDING',
@@ -77,9 +131,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         businessId: ctx.businessId,
         rawRequest: {
           originalAmount: amount,
+          originalCurrency: orderCurrency,
+          paymentAmountCents,
+          paymentCurrency,
+          exchangeRateType,
+          exchangeRateSource,
+          exchangeRateDate: exchangeRateEffectiveDate?.toISOString() || null,
           paymentFee, // 5% all-inclusive (customer-facing)
-          gatewayFee, // 3% (internal)
-          platformMargin, // 2% (internal)
+          gatewayFeeCents, // 3% (internal)
+          platformMarginCents, // 2% (internal)
           phone,
           orderId,
           description,
@@ -91,8 +151,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const callbackUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Request payment from InTouch
+    const paymentAmountInRwfUnits = Math.round(paymentAmountCents / 100)
     const response = await InTouchService.requestPayment({
-      amount: totalAmount,
+      amount: paymentAmountInRwfUnits,
       mobilePhoneNo: phone,
       requestTransactionId,
       callbackUrl,
@@ -136,7 +197,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         message: InTouchService.isPending(response.responsecode)
           ? 'Payment request sent. Please approve via *182# on your phone.'
           : 'Payment successful',
-        amount: totalAmount,
+        amount: paymentAmountInRwfUnits,
+        amountCurrency: paymentCurrency,
+        orderAmount: totalAmount,
+        orderCurrency,
         paymentFee, // 5% all-inclusive (customer-facing)
         feePercentage: 5, // Always show 5% to customer
       })

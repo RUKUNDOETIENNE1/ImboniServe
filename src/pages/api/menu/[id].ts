@@ -27,7 +27,10 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (req.method === 'PATCH') {
-      const { name, description, priceCents, costCents, category, isAvailable, isSpecial } = req.body || {}
+      // NOTE: `isSpecial` is intentionally not accepted — MenuItem has no such
+      // column (writing it crashes Prisma). The dashboard "specials" toggle is
+      // a known non-functional UI feature pending a schema decision.
+      const { name, description, priceCents, costCents, category, isAvailable } = req.body || {}
 
       const data: any = {}
       if (typeof name === 'string') data.name = name
@@ -36,7 +39,6 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       if (priceCents != null) data.priceCents = Number(priceCents)
       if (costCents != null) data.costCents = Number(costCents)
       if (typeof isAvailable === 'boolean') data.isAvailable = isAvailable
-      if (typeof isSpecial === 'boolean') data.isSpecial = isSpecial
 
       if (Object.keys(data).length === 0) {
         return res.status(400).json({ error: 'No valid fields to update' })

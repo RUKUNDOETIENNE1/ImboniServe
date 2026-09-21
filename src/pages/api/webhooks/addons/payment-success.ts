@@ -6,16 +6,31 @@ import { purchaseExtraCredits } from '@/lib/services/ai-credit.service';
 import { fulfillPurchase } from '@/lib/services/credits/credit-purchase.service';
 import { logger } from '@/lib/logger';
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service';
+import { verifyCronAuth } from '@/lib/middleware/cronAuth';
 
 const log = logger.child({ service: 'addon-webhook' });
 
 /**
- * Webhook handler for add-on payment success
- * Called after Irembo Pay webhook confirms payment
+ * Internal webhook for add-on payment success.
+ * Called after the real provider webhook confirms payment.
+ *
+ * Security (P0 fix):
+ * - Requires Bearer CRON_SECRET (same internal auth as cron endpoints).
+ * - Only activates entitlements when the PaymentTransaction is ALREADY
+ *   marked SUCCESS by the canonical provider webhook — this endpoint can
+ *   never promote a PENDING transaction to SUCCESS.
+ * - Idempotent: already-activated transactions return 200 without re-fulfilling.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!verifyCronAuth(req)) {
+    log.warn('Unauthorized addon payment-success attempt', {
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+    });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   try {
@@ -40,7 +55,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
+    // Defense-in-depth: entitlement activation requires the canonical
+    // provider webhook to have already verified this payment.
+    if (transaction.status !== 'SUCCESS') {
+      log.warn('Addon activation refused — transaction not verified SUCCESS', {
+        transactionId,
+        status: transaction.status,
+      });
+      return res.status(200).json({ message: 'Payment not confirmed by provider webhook' });
+    }
+
     const metadata = transaction.rawRequest as any;
+
+    // Idempotency: never re-fulfill an already-activated add-on
+    if (metadata?.activated === true) {
+      return res.status(200).json({ success: true, message: 'Add-on already activated' });
+    }
     
     if (metadata?.type !== 'addon') {
       return res.status(200).json({ message: 'Not an addon transaction' });

@@ -24,7 +24,9 @@ export default function Settings() {
   const [businessSettings, setBusinessSettings] = useState({
     currency: 'RWF',
     taxMode: 'EXCLUSIVE' as 'INCLUSIVE' | 'EXCLUSIVE',
-    taxRate: 18.0
+    taxRate: 18.0,
+    enableQRInVenue: false,
+    enableQRRemote: false
   })
   const [savingBusiness, setSavingBusiness] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
@@ -159,7 +161,9 @@ export default function Settings() {
         setBusinessSettings({
           currency: data.currency || 'RWF',
           taxMode: data.taxMode || 'EXCLUSIVE',
-          taxRate: data.taxRate || 18.0
+          taxRate: data.taxRate || 18.0,
+          enableQRInVenue: data.enableQRInVenue === true,
+          enableQRRemote: data.enableQRRemote === true
         })
       }
     } catch (error) {
@@ -496,6 +500,38 @@ export default function Settings() {
                         onChange={(e) => setBusinessSettings({ ...businessSettings, taxRate: parseFloat(e.target.value) || 0 })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
                       />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-200">
+                    <h3 className="text-lg font-semibold text-slate-800 mb-4">{t('dashboard.settings.qr_ordering', 'QR Ordering')}</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-slate-800">{t('dashboard.settings.qr_in_venue', 'In-Venue QR Ordering')}</p>
+                          <p className="text-sm text-slate-500">{t('dashboard.settings.qr_in_venue_hint', 'Customers at your tables can scan a QR code to view the menu and order')}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setBusinessSettings({ ...businessSettings, enableQRInVenue: !businessSettings.enableQRInVenue })}
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${businessSettings.enableQRInVenue ? 'bg-imboni-blue' : 'bg-slate-300'}`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${businessSettings.enableQRInVenue ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-slate-800">{t('dashboard.settings.qr_remote', 'Remote / Pre-Order QR Ordering')}</p>
+                          <p className="text-sm text-slate-500">{t('dashboard.settings.qr_remote_hint', 'Customers can order ahead for pickup or delivery via a QR link')}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setBusinessSettings({ ...businessSettings, enableQRRemote: !businessSettings.enableQRRemote })}
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${businessSettings.enableQRRemote ? 'bg-imboni-blue' : 'bg-slate-300'}`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${businessSettings.enableQRRemote ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
                     </div>
                   </div>
 

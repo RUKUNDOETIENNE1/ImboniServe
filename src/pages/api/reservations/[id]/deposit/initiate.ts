@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
+import { IremboPayService } from '@/lib/services/irembopay.service'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
@@ -47,8 +48,15 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const business = await prisma.business.findUnique({
       where: { id: reservation.businessId },
-      select: { currency: true }
+      select: { currency: true, taxRate: true }
     })
+
+    // VAT: extract from the VAT-inclusive deposit gross using the business's
+    // configured tax rate (0 = not configured / legitimately non-VAT).
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(
+      amountCents,
+      business?.taxRate ?? 0
+    )
 
     const payment = await prisma.paymentTransaction.create({
       data: {
@@ -57,8 +65,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         referenceId: reservation.id,
         amountCents,
         currency: business?.currency || 'RWF',
-        vatAmountCents: 0,
-        exVatAmountCents: amountCents,
+        vatAmountCents,
+        exVatAmountCents,
         gatewayFeeEstimatedCents: 0,
         platformFeeCents: 0,
         netToBusinessCents: amountCents,
