@@ -98,7 +98,11 @@ describe('InTouch Initiate: Payment Currency Consistency', () => {
     const created = mockCreate.mock.calls[0][0].data
     expect(created.orderCurrency).toBe('RWF')
     expect(created.paymentCurrency).toBe('RWF')
-    expect(created.paymentAmountCents).toBe(created.orderAmountCents)
+    // J2 P1-1: orderAmountCents is the pre-fee order total (compared to
+    // Sale.totalAmountCents at webhook completion); paymentAmountCents is the
+    // fee-inclusive charge the customer actually pays.
+    expect(created.orderAmountCents).toBe(10000)
+    expect(created.paymentAmountCents).toBe(10500)
     expect(created.settlementCurrency).toBe('RWF')
     expect(created.exchangeRateValue).toBeUndefined()
   })
@@ -156,8 +160,9 @@ describe('InTouch Initiate: Payment Currency Consistency', () => {
     await handler(req, res)
 
     const created = mockCreate.mock.calls[0][0].data
-    // amount=500 RWF, fee=5%*500=25, total=525 -> orderAmountCents=52500
-    expect(created.orderAmountCents).toBe(52500)
+    // amount=500 RWF → orderAmountCents=50000 (pre-fee order total, matches
+    // Sale.totalAmountCents); fee=5%*500=25 → payment charge 52500.
+    expect(created.orderAmountCents).toBe(50000)
     expect(created.paymentAmountCents).toBe(52500)
     expect(created.amountCents).toBe(52500)
     expect(created.currency).toBe('RWF')

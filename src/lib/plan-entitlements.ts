@@ -3,7 +3,7 @@
  * Centralized feature gating based on subscription tier
  */
 
-export type PlanCode = 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
+export type PlanCode = 'STARTER' | 'ESSENTIALS' | 'PROFESSIONAL' | 'GROWTH' | 'BUSINESS' | 'PREMIUM' | 'ENTERPRISE'
 
 export interface PlanEntitlements {
   // Core Operations
@@ -228,6 +228,15 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         hasSupplierOrders: true,
       }
 
+    case 'ESSENTIALS':
+      // DB plan features: "Everything in Starter plan" + weekly/monthly reports,
+      // low stock alerts, improved inventory controls, priority support
+      return {
+        ...getPlanEntitlements('STARTER'),
+        hasInventoryAlerts: true,
+        supportLevel: 'priority',
+      }
+
     case 'PROFESSIONAL':
       return {
         ...baseEntitlements,
@@ -268,6 +277,16 @@ export function getPlanEntitlements(planCode: PlanCode): PlanEntitlements {
         hasAIMenuAssistant: true,
         hasPeakHoursAnalytics: true,
         hasMultiLanguageMenus: true,
+      }
+
+    case 'GROWTH':
+      // DB plan features: "Everything in Professional plan" + AI Smart Reorder
+      // Recommendations, AI Cost Anomaly Alerts, Insights dashboard, priority support
+      return {
+        ...getPlanEntitlements('PROFESSIONAL'),
+        hasInventoryAutoReorder: true,
+        hasAICostAnomalies: true,
+        hasOptimizationInsights: true,
       }
 
     case 'BUSINESS':
@@ -511,7 +530,7 @@ export function hasFeatureAccess(
  * Get upgrade target plan for a feature
  */
 export function getUpgradePlanForFeature(featureKey: keyof PlanEntitlements): PlanCode | null {
-  const plans: PlanCode[] = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
+  const plans: PlanCode[] = ['STARTER', 'ESSENTIALS', 'PROFESSIONAL', 'GROWTH', 'BUSINESS', 'PREMIUM', 'ENTERPRISE']
   
   for (const plan of plans) {
     if (hasFeatureAccess(plan, featureKey)) {

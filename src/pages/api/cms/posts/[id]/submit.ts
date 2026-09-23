@@ -18,6 +18,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method !== 'POST') return res.status(405).json(errorResponse('Method not allowed'))
 
+  // Tenant isolation: verify the post belongs to the caller's business.
+  const { prisma } = await import('@/lib/prisma')
+  const existing = await (prisma as any).contentPost.findFirst({ where: { id, businessId } })
+  if (!existing) return res.status(404).json(errorResponse('Post not found'))
+
   const post = await CmsService.submitForReview(businessId, id)
   return res.status(200).json(successResponse(post))
 }

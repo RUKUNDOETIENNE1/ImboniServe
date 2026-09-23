@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { generateExecutiveOverview } from '@/lib/die/ai-business-assistant.engine'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

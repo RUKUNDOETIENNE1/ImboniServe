@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { formatDateTimeRW } from '@/utils/datetimeRW';
+import { requireOrderAccess } from '@/lib/api/public-order-auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -13,6 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!orderId || typeof orderId !== 'string') {
       return res.status(400).json({ error: 'orderId is required' });
     }
+
+    const authz = await requireOrderAccess(req, res, orderId);
+    if (!authz) return;
 
     const sale = await prisma.sale.findUnique({
       where: { id: orderId },

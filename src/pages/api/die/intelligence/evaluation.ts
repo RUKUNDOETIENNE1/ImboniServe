@@ -3,8 +3,12 @@ import { evaluateDue } from '@/lib/die/evaluation/evaluation-engine'
 import { getEvaluatedRecords, getRecords, getEvaluatedCeoBatches } from '@/lib/die/evaluation/evaluation-engine'
 import { buildScorecard } from '@/lib/die/evaluation/intelligence-scorecard'
 import { computeCeoPriorityAccuracy } from '@/lib/die/evaluation/ceo-priority-validator'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   try {
     if (process.env.DIE_INTELLIGENCE_EVALUATION_ENABLED !== 'true') {

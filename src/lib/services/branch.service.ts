@@ -17,10 +17,17 @@ export class BranchService {
     })
   }
 
+  static async getBranchCount(businessId: string) {
+    return prisma.branch.count({ where: { businessId, isActive: true } })
+  }
+
   static async updateBranch(branchId: string, businessId: string, data: Partial<{
     name: string; address: string; phone: string; email: string
     latitude: number; longitude: number; isActive: boolean; settings: unknown
   }>) {
+    // Scope the update to the tenant: reject a branchId owned by another business.
+    const existing = await prisma.branch.findFirst({ where: { id: branchId, businessId } })
+    if (!existing) throw new Error('Branch not found')
     return prisma.branch.update({
       where: { id: branchId },
       data: data as any,

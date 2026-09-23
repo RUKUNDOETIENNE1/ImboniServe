@@ -392,6 +392,11 @@ model Sale {
   outletId             String?
   seatId               String?
 
+  // Customer order-token binding: jti of the QR access token that created this
+  // order via the public draft flow. Used by public order endpoints
+  // (confirm/status/messages) to authorize post-draft customer requests.
+  orderTokenJti        String?
+
   // Kitchen Execution & Group Ordering
   tableSessionId String?
   participantId  String?

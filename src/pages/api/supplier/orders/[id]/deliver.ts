@@ -24,6 +24,10 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!order) return res.status(404).json({ error: 'Order not found' })
+    const sessionBusinessId = (session.user as any).businessId
+    if (order.businessId !== sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
 
     const updated = await prisma.supplierOrder.update({
       where: { id },

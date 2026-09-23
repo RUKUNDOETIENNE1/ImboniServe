@@ -36,6 +36,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer = await prisma.customer.findUnique({
         where: { id: customerId }
       })
+      // Tenant isolation: a customerId belonging to another business must not
+      // be credited/debited from this session.
+      if (customer && customer.businessId !== businessId) {
+        return res.status(403).json({ error: 'Forbidden' })
+      }
     } else if (customerPhone) {
       customer = await prisma.customer.findFirst({
         where: {

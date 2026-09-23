@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { buildRealityAlignmentSnapshot } from '@/lib/die/reality/reality-alignment-engine'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   try {
     if (process.env.DIE_INTELLIGENCE_REALITY_ALIGNMENT_ENABLED !== 'true') {

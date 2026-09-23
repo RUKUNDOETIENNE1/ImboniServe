@@ -74,6 +74,7 @@ export default function OrderPage() {
   const [lastOrderId, setLastOrderId] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<any | null>(null);
   const [showAddMore, setShowAddMore] = useState(false);
+  const [addonParentId, setAddonParentId] = useState<string | null>(null);
   const [addingItems, setAddingItems] = useState(false);
   const [kitchenMessages, setKitchenMessages] = useState<Array<{ id: string; message: string | null; createdAt: string }>>([]);
 
@@ -385,7 +386,9 @@ export default function OrderPage() {
 
     const fetchStatus = async () => {
       try {
-        const r = await fetch(`/api/public/order/status?orderId=${lastOrderId}`);
+        const r = await fetch(`/api/public/order/status?orderId=${lastOrderId}`, {
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+        });
         if (!r.ok) return;
         const data = await r.json();
         if (!active) return;
@@ -398,7 +401,9 @@ export default function OrderPage() {
 
     const fetchMessages = async () => {
       try {
-        const r = await fetch(`/api/public/order/messages?orderId=${lastOrderId}`);
+        const r = await fetch(`/api/public/order/messages?orderId=${lastOrderId}`, {
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+        });
         if (!r.ok) return;
         const data = await r.json();
         if (!active) return;
@@ -493,6 +498,32 @@ export default function OrderPage() {
     setError(null);
     setLoading(true);
     try {
+      // Add-more flow: attach items to the existing order via the addon
+      // endpoint (the QR token is already consumed by the original draft and
+      // cannot mint a second order; the addon endpoint authorizes by the
+      // parent order's token binding).
+      if (addonParentId) {
+        const resp = await fetch(`/api/orders/${addonParentId}/add-items`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accessToken,
+            items: cartItems.map(ci => ({ menuItemId: ci.menuItemId, quantity: ci.quantity })),
+            sessionId: session?.sessionId,
+            participantId: session?.participantId,
+          }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data?.error || 'Failed to add items');
+
+        showToast('success', 'Items added to your order!');
+        setCart({});
+        setShowAddMore(false);
+        setLastOrderId(addonParentId); // resume tracking the parent order
+        setAddonParentId(null);
+        return;
+      }
+
       const payload: any = {
         accessToken,
         items: cartItems.map(ci => ({ menuItemId: ci.menuItemId, quantity: ci.quantity })),
@@ -533,7 +564,7 @@ export default function OrderPage() {
       const resp = await fetch('/api/public/order/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId: draftOrderId, confirmed: true })
+        body: JSON.stringify({ orderId: draftOrderId, confirmed: true, accessToken })
       });
 
       const data = await resp.json();
@@ -568,7 +599,9 @@ export default function OrderPage() {
       // Start tracking this order's status
       setLastOrderId(draftOrderId);
 
-      const paymentResp = await fetch(`/api/public/order/status?orderId=${draftOrderId}`);
+      const paymentResp = await fetch(`/api/public/order/status?orderId=${draftOrderId}`, {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+      });
       const paymentData = await paymentResp.json();
 
       if (paymentData.paymentLinkUrl) {
@@ -594,7 +627,7 @@ export default function OrderPage() {
       await fetch('/api/public/order/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId: draftOrderId, confirmed: false })
+        body: JSON.stringify({ orderId: draftOrderId, confirmed: false, accessToken })
       });
 
       setShowConfirmation(false);
@@ -1026,6 +1059,7 @@ export default function OrderPage() {
                       <WelcomeBackBanner
                         phone={phone}
                         businessId={branchId || ''}
+                        accessToken={accessToken}
                       />
                       <input
                         type="text"
@@ -1109,7 +1143,9 @@ export default function OrderPage() {
                     onClick={async () => {
                       if (!lastOrderId) return;
                       try {
-                        const r = await fetch(`/api/public/order/status?orderId=${lastOrderId}`);
+                        const r = await fetch(`/api/public/order/status?orderId=${lastOrderId}`, {
+                          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+                        });
                         if (r.ok) setOrderStatus(await r.json());
                       } catch {}
                     }}
@@ -1122,6 +1158,7 @@ export default function OrderPage() {
                   {!showAddMore && (
                     <button
                       onClick={() => {
+                        setAddonParentId(lastOrderId);
                         setShowAddMore(true);
                         setLastOrderId(null); // Allow adding to cart again
                       }}

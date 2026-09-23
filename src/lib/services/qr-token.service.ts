@@ -169,6 +169,73 @@ export async function validateAccessToken(
 }
 
 /**
+ * Verify a QR access token for post-draft customer actions on the order it
+ * created (confirm/status/messages). Unlike validateAccessToken(), this
+ * tolerates `used` and expiry: the single-use/TTL semantics protect order
+ * CREATION; after draft creation the token becomes a bearer credential whose
+ * authority is bound to exactly one Sale via Sale.orderTokenJti (the Sale's own
+ * lifecycle bounds the exposure window, so exp is not meaningful post-draft).
+ *
+ * Requirements enforced here:
+ * - valid JWT signature
+ * - jti exists in the orderToken table
+ * - the token was actually consumed by a draft (used === true)
+ *
+ * The caller MUST still enforce claims.jti === sale.orderTokenJti
+ * (or the parent order's jti for addon sales).
+ */
+export async function verifyOrderSessionToken(token: string): Promise<QRTokenClaims | null> {
+  let claims: QRTokenClaims;
+  try {
+    claims = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as QRTokenClaims;
+  } catch {
+    return null;
+  }
+
+  if (!claims?.jti || !claims?.branchId) {
+    return null;
+  }
+
+  const tokenRecord = await prisma.orderToken.findUnique({
+    where: { jti: claims.jti }
+  });
+
+  if (!tokenRecord || !tokenRecord.used) {
+    return null;
+  }
+
+  return claims;
+}
+
+/**
+ * Verify a QR session token for business-scoped customer actions that are not
+ * bound to a specific Sale (e.g., guest recognition on the order page).
+ * Tolerates both pre-draft (unused) and post-draft (used) tokens, but requires
+ * a valid signature, a known jti, and a matching branchId.
+ */
+export async function verifyQRSessionForBusiness(
+  token: string,
+  businessId: string
+): Promise<QRTokenClaims | null> {
+  let claims: QRTokenClaims;
+  try {
+    claims = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as QRTokenClaims;
+  } catch {
+    return null;
+  }
+
+  if (!claims?.jti || claims.branchId !== businessId) {
+    return null;
+  }
+
+  const tokenRecord = await prisma.orderToken.findUnique({
+    where: { jti: claims.jti }
+  });
+
+  return tokenRecord ? claims : null;
+}
+
+/**
  * Mark token as used (one-time use enforcement)
  */
 export async function markTokenUsed(jti: string): Promise<void> {

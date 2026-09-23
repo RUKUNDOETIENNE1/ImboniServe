@@ -35,6 +35,13 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(404).json(errorResponse('Reservation not found'))
     }
 
+    // Tenant isolation: only staff of the reservation's business may initiate
+    // a deposit charge against its customer.
+    const sessionBusinessId = (session.user as any).businessId
+    if (reservation.businessId !== sessionBusinessId) {
+      return res.status(403).json(errorResponse('Forbidden'))
+    }
+
     if (!reservation.depositCents || reservation.depositCents <= 0) {
       return res.status(400).json(errorResponse('No deposit configured for this reservation'))
     }

@@ -15,6 +15,7 @@
 
 import crypto from 'crypto'
 import { normalizePhoneForProvider } from '@/lib/utils/phone'
+import { fetchWithTimeout, FetchTimeoutError } from '@/lib/utils/fetch-with-timeout'
 
 interface RequestPaymentParams {
   amount: number
@@ -48,6 +49,11 @@ export class InTouchService {
   private static readonly USERNAME = process.env.INTOUCH_USERNAME || ''
   private static readonly ACCOUNT_NO = process.env.INTOUCH_ACCOUNT_NO || ''
   private static readonly PASSWORD = process.env.INTOUCH_PASSWORD || process.env.INTOUCH_PARTNER_PASSWORD || ''
+  // J2 P1-2: bounded timeouts matching the canonical provider (OEC-001C).
+  // 30s for initiation-type calls (RequestPayment/RequestDeposit),
+  // 15s for status/balance queries.
+  private static readonly INITIATION_TIMEOUT_MS = 30_000
+  private static readonly QUERY_TIMEOUT_MS = 15_000
 
   /**
    * Generate SHA256 password hash
@@ -107,11 +113,11 @@ export class InTouchService {
       // submitted to the intouchpay url as http-form post." The RequestPayment
       // example (2.3) confirms this via requests.post(url, data=data). JSON
       // encoding does not conform to the documented protocol.
-      const response = await fetch(`${this.API_URL}/requestpayment/`, {
+      const response = await fetchWithTimeout(`${this.API_URL}/requestpayment/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(payload as Record<string, string>).toString(),
-      })
+      }, this.INITIATION_TIMEOUT_MS)
 
       const data: InTouchResponse = await response.json()
 
@@ -124,6 +130,9 @@ export class InTouchService {
       return data
     } catch (error) {
       console.error('[InTouch] Request Payment failed:', error)
+      if (error instanceof FetchTimeoutError) {
+        throw new Error('InTouch API request timed out')
+      }
       throw new Error('Failed to initiate payment request')
     }
   }
@@ -162,11 +171,11 @@ export class InTouchService {
       // PAY-002 (http_intouchpay_api_v1.2.pdf, Section 1.2 + 3.3 example):
       // RequestDeposit is documented and exemplified as an http-form POST,
       // same as RequestPayment.
-      const response = await fetch(`${this.API_URL}/requestdeposit/`, {
+      const response = await fetchWithTimeout(`${this.API_URL}/requestdeposit/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(payload as Record<string, string>).toString(),
-      })
+      }, this.INITIATION_TIMEOUT_MS)
 
       const data: InTouchResponse = await response.json()
 
@@ -179,6 +188,9 @@ export class InTouchService {
       return data
     } catch (error) {
       console.error('[InTouch] Request Deposit failed:', error)
+      if (error instanceof FetchTimeoutError) {
+        throw new Error('InTouch API request timed out')
+      }
       throw new Error('Failed to initiate deposit request')
     }
   }
@@ -204,11 +216,11 @@ export class InTouchService {
     try {
       // PAY-002 (http_intouchpay_api_v1.2.pdf, Section 5.3 example): GetBalance
       // is exemplified as requests.post(url, data=data) — http-form POST.
-      const response = await fetch(`${this.API_URL}/getbalance/`, {
+      const response = await fetchWithTimeout(`${this.API_URL}/getbalance/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(payload as Record<string, string>).toString(),
-      })
+      }, this.QUERY_TIMEOUT_MS)
 
       const data: BalanceResponse = await response.json()
 
@@ -220,6 +232,9 @@ export class InTouchService {
       return data
     } catch (error) {
       console.error('[InTouch] Get Balance failed:', error)
+      if (error instanceof FetchTimeoutError) {
+        throw new Error('InTouch API request timed out')
+      }
       throw new Error('Failed to retrieve balance')
     }
   }
@@ -261,11 +276,11 @@ export class InTouchService {
     }
 
     try {
-      const response = await fetch(`${this.API_URL}/gettransactionstatus/`, {
+      const response = await fetchWithTimeout(`${this.API_URL}/gettransactionstatus/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      })
+      }, this.QUERY_TIMEOUT_MS)
 
       const data: InTouchResponse = await response.json()
 
@@ -279,6 +294,9 @@ export class InTouchService {
       return data
     } catch (error) {
       console.error('[InTouch] Get Payment Status failed:', error)
+      if (error instanceof FetchTimeoutError) {
+        throw new Error('InTouch API request timed out')
+      }
       throw new Error('Failed to retrieve payment status')
     }
   }

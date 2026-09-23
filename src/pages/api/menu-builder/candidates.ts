@@ -20,11 +20,11 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!candidateId) return res.status(400).json({ error: 'candidateId required' })
 
     if (action === 'publish') {
-      await SmartMenuBuilderService.publishCandidate(candidateId, userId)
+      await SmartMenuBuilderService.publishCandidate(candidateId, userId, businessId)
       return res.status(200).json({ ok: true })
     }
     if (action === 'reject') {
-      await SmartMenuBuilderService.rejectCandidate(candidateId, userId)
+      await SmartMenuBuilderService.rejectCandidate(candidateId, userId, businessId)
       return res.status(200).json({ ok: true })
     }
     return res.status(400).json({ error: 'Unknown action. Use publish or reject.' })

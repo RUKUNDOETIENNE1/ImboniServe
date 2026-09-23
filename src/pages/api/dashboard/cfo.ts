@@ -60,10 +60,10 @@ async function baseHandler(
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Check if user has CFO/executive access
-    // @ts-ignore
-    const userRole = session.user.role
-    if (!['OWNER', 'ADMIN', 'CFO'].includes(userRole)) {
+    // Platform-wide aggregates — executive/admin access only.
+    // Tenant OWNER must not receive cross-business data.
+    const userRoles = ((session.user as any).roles || [(session.user as any).role]) as string[]
+    if (!userRoles.some((r: string) => ['CFO', 'ADMIN', 'EXECUTIVE'].includes(r))) {
       return res.status(403).json({ error: 'Forbidden - CFO access required' })
     }
 

@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAggregate, getLatest, getRecent } from '@/lib/die/convergence/drift-logger'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+
   if (process.env.DIE_INTELLIGENCE_CONVERGENCE_ENABLED !== 'true') {
     return res.status(200).json({ enabled: false, latest: null, average: null, byModule: null, parity: 'DISABLED' })
   }

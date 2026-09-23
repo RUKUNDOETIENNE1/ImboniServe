@@ -9,6 +9,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -23,6 +24,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!businessId || typeof businessId !== 'string') {
     return res.status(400).json(errorResponse('Business ID is required'))
+  }
+
+  // Staff-facing guest intelligence is PII — requires an authenticated staff
+  // session bound to the same business as the requested context.
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+  if (ctx.businessId !== businessId) {
+    return res.status(403).json(errorResponse('Forbidden'))
   }
 
   try {

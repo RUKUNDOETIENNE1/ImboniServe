@@ -232,6 +232,25 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         kitchenStatus: newStatus,
         timestamp: now.toISOString(),
       })
+
+      // Ready events: kitchen dashboard listens for 'order.ready' and the
+      // waiter queue listens for 'order.ready_for_pickup' on the business
+      // channel. Previously neither was emitted, so ready orders never
+      // triggered realtime refreshes (dead events).
+      if (newStatus === 'ready') {
+        await triggerEvent(`private-kitchen-${businessId}`, 'order.ready', {
+          orderId: updatedOrder.id,
+          orderNumber: updatedOrder.orderNumber,
+          tableNumber: updatedOrder.table?.number,
+          timestamp: now.toISOString(),
+        })
+        await triggerEvent(`private-business-${businessId}`, 'order.ready_for_pickup', {
+          orderId: updatedOrder.id,
+          orderNumber: updatedOrder.orderNumber,
+          tableNumber: updatedOrder.table?.number,
+          timestamp: now.toISOString(),
+        })
+      }
     } catch (eventError) {
       console.error('Failed to emit status update event:', eventError)
     }

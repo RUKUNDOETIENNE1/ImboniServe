@@ -5,6 +5,7 @@ import { ingestDeliveryShadowEvent } from '@/lib/die/business-as-plugin/delivery
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { withCsrf } from '@/lib/middleware/csrf'
 import { KitchenDispatchService } from '@/lib/services/kitchen-dispatch.service'
+import { requireOrderAccess } from '@/lib/api/public-order-auth'
 
 const confirmOrderSchema = z.object({
   orderId: z.string().min(1).max(100),
@@ -23,6 +24,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const { orderId, confirmed } = parseResult.data
+
+    const authz = await requireOrderAccess(req, res, orderId)
+    if (!authz) return
 
     const sale = await prisma.sale.findUnique({
       where: { id: orderId },

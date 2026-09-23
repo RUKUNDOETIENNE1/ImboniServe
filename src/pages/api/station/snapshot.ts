@@ -160,4 +160,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('orders.view')(handler)
+export default requirePermission('orders.read')(handler)

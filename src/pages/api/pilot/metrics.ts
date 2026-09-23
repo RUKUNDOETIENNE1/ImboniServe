@@ -188,4 +188,4 @@ function isCanonicalTransition(from: string | null, to: string | null): boolean 
   return allowedNext ? allowedNext.includes(to) : false
 }
 
-export default requirePermission('orders.view')(handler)
+export default requirePermission('orders.read')(handler)

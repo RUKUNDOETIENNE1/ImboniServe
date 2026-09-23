@@ -42,17 +42,41 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       select: { currency: true, taxRate: true }
     })
 
+    // J2 P1-1: When an orderId is supplied it must resolve to a Sale owned by
+    // this business — never trust an arbitrary client-provided sale reference.
+    // The order amount is then derived from the Sale itself, not from the
+    // client-supplied `amount`, so the PaymentTransaction ↔ Sale financial
+    // relationship the webhook later validates is deterministic.
+    let saleOrderAmountCents: number | null = null
+    if (orderId) {
+      const sale = await prisma.sale.findFirst({
+        where: { id: orderId, businessId: ctx.businessId },
+        select: { id: true, totalAmountCents: true },
+      })
+      if (!sale) {
+        return res.status(404).json(errorResponse('Order not found for this business'))
+      }
+      saleOrderAmountCents = sale.totalAmountCents
+    }
+
+    // Order amount in major units: derived from the Sale when linked,
+    // otherwise the standalone amount supplied by the caller.
+    const baseAmount = saleOrderAmountCents !== null ? saleOrderAmountCents / 100 : amount
+
     // Generate unique transaction ID
     const requestTransactionId = InTouchService.generateRequestTransactionId()
 
     // Calculate total with 5% all-inclusive payment fee (customer-facing)
-    const paymentFee = Math.round(amount * 0.05)
-    const totalAmount = amount + paymentFee
-    
+    const paymentFee = Math.round(baseAmount * 0.05)
+    const totalAmount = baseAmount + paymentFee
+
     const orderCurrency = (business?.currency || 'RWF').toUpperCase()
     const paymentCurrency = 'RWF'
-    const orderAmountCents = totalAmount * 100
-    let paymentAmountCents = orderAmountCents
+    // orderAmountCents is the pre-fee order total — the value the webhook
+    // compares against Sale.totalAmountCents during completion.
+    const orderAmountCents = Math.round(baseAmount * 100)
+    // What the customer is actually charged — the fee-inclusive gross.
+    let paymentAmountCents = totalAmount * 100
     let exchangeRateSnapshotId: string | null = null
     let exchangeRateValue: string | null = null
     let exchangeRateType: 'AVERAGE' | 'BUYING' | 'SELLING' | null = null
@@ -63,7 +87,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let exchangeRateRecordId: string | null = null
 
     if (orderCurrency !== paymentCurrency) {
-      const converted = await convertMinorUnits(orderAmountCents, orderCurrency, paymentCurrency, {
+      // Convert the fee-inclusive gross — that is what the customer is charged.
+      const converted = await convertMinorUnits(totalAmount * 100, orderCurrency, paymentCurrency, {
         rateType: getRateTypeForOperation('payment'),
         maxAgeHours: getDefaultPaymentRateMaxAgeHours(),
         allowStale: false,
@@ -122,7 +147,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         exVatAmountCents,
         gatewayFeeEstimatedCents: gatewayFeeCents, // 3% InTouch fee (internal)
         platformFeeCents: platformMarginCents, // Net platform margin after gateway cost
-        netToBusinessCents: amount * 100,
+        netToBusinessCents: Math.round(baseAmount * 100),
         payerPhone: phone,
         status: 'PENDING',
         gateway: 'INTOUCH',
@@ -130,7 +155,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         paymentProvider: phone.startsWith('078') || phone.startsWith('079') ? 'MTN' : 'AIRTEL',
         businessId: ctx.businessId,
         rawRequest: {
-          originalAmount: amount,
+          originalAmount: baseAmount,
           originalCurrency: orderCurrency,
           paymentAmountCents,
           paymentCurrency,

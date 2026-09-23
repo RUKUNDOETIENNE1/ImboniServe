@@ -49,18 +49,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       where: { id: station.businessId },
       select: { timezone: true }
     })
-    const { start: startOfDay } = getBusinessDayBoundary(new Date(), business?.timezone)
+    const { start: startOfDay, end: endOfDay } = getBusinessDayBoundary(new Date(), business?.timezone)
 
     const sales = await prisma.sale.findMany({
       where: {
         businessId: station.businessId,
-        createdAt: { gte: startOfDay },
         kitchenStatus: { not: 'served' }, // Exclude completed orders
         items: {
           some: {
             stationId: stationId,
           },
         },
+        // Unscheduled orders: created today. Scheduled (preorder) orders:
+        // visible on their service day regardless of when they were placed,
+        // so preorders reach the station when they are actually due.
+        OR: [
+          { AND: [{ scheduledAt: null }, { createdAt: { gte: startOfDay } }] },
+          { scheduledAt: { gte: startOfDay, lt: endOfDay } },
+        ],
       },
       include: {
         items: {
@@ -164,4 +170,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('orders.view')(handler)
+export default requirePermission('orders.read')(handler)

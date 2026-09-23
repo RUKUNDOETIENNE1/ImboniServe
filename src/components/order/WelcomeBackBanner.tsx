@@ -42,6 +42,7 @@ interface GuestIntelligence {
 interface WelcomeBackBannerProps {
   phone: string
   businessId: string
+  accessToken?: string | null
   onRecognized?: (intelligence: GuestIntelligence) => void
   onDismiss?: () => void
   variant?: 'customer' | 'staff'
@@ -50,6 +51,7 @@ interface WelcomeBackBannerProps {
 export default function WelcomeBackBanner({
   phone,
   businessId,
+  accessToken,
   onRecognized,
   onDismiss,
   variant = 'customer',
@@ -71,7 +73,10 @@ export default function WelcomeBackBanner({
       try {
         const res = await fetch('/api/guest/recognize', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
           body: JSON.stringify({ phone, businessId }),
         })
 
@@ -97,7 +102,7 @@ export default function WelcomeBackBanner({
 
     recognize()
     return () => { cancelled = true }
-  }, [phone, businessId])
+  }, [phone, businessId, accessToken])
 
   const handleDismiss = () => {
     setDismissed(true)

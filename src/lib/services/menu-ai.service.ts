@@ -27,15 +27,15 @@ export class MenuAIService {
   /**
    * @deprecated Use SmartMenuBuilderService.publishCandidate()
    */
-  static async publishCandidate(candidateId: string, reviewedBy: string): Promise<void> {
-    return SmartMenuBuilderService.publishCandidate(candidateId, reviewedBy)
+  static async publishCandidate(candidateId: string, reviewedBy: string, businessId: string): Promise<void> {
+    return SmartMenuBuilderService.publishCandidate(candidateId, reviewedBy, businessId)
   }
 
   /**
    * @deprecated Use SmartMenuBuilderService.rejectCandidate()
    */
-  static async rejectCandidate(candidateId: string, reviewedBy: string): Promise<void> {
-    return SmartMenuBuilderService.rejectCandidate(candidateId, reviewedBy)
+  static async rejectCandidate(candidateId: string, reviewedBy: string, businessId: string): Promise<void> {
+    return SmartMenuBuilderService.rejectCandidate(candidateId, reviewedBy, businessId)
   }
 
   /**

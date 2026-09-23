@@ -22,6 +22,11 @@ import {
   HeartPulseChannel,
   type OrderDeliveredPayload,
 } from '@/lib/heart-pulse'
+import {
+  SaleItemStatusService,
+  InvalidTransitionError,
+  SaleItemStatusError,
+} from '@/lib/services/sale-item-status.service'
 
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -77,41 +82,58 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       })
     }
 
-    // Update order and items in transaction
+    // Reject delivery when items are still upstream of READY — the canonical
+    // item state machine only permits READY → DELIVERED. Previously this
+    // endpoint force-set every item to DELIVERED, bypassing the machine.
+    const unfinishedItems = order.items.filter(
+      (i) => i.itemStatus === 'NEW' || i.itemStatus === 'PREPARING'
+    )
+    if (unfinishedItems.length > 0) {
+      return res.status(409).json({
+        error: 'Order has items that are not ready for delivery',
+        unfinishedItemCount: unfinishedItems.length,
+      })
+    }
+
+    const deliverableItems = order.items.filter((i) => i.itemStatus === 'READY')
+
+    // Update order and items in transaction — per-item transitions go through
+    // SaleItemStatusService so the canonical state machine, audit trail
+    // (TicketEvent), and transition validation are applied.
     const now = new Date()
-    const updatedOrder = await prisma.$transaction(async (tx) => {
-      // Update order status
-      const orderResult = await tx.sale.update({
-        where: { id: orderId },
-        data: {
-          kitchenStatus: 'served',
-          servedAt: now,
-          expoStatus: 'SERVED_CONFIRMED',
-          servedConfirmedAt: now,
-        },
-        include: {
-          table: {
-            select: { number: true },
-          },
-        },
-      })
+    let updatedOrder
+    try {
+      updatedOrder = await prisma.$transaction(async (tx) => {
+        for (const item of deliverableItems) {
+          await SaleItemStatusService.transitionTx(tx, {
+            saleItemId: item.id,
+            newStatus: 'DELIVERED',
+            actorUserId: ctx.userId,
+            metadata: { source: 'waiter/deliver-order', orderId },
+          })
+        }
 
-      // Update all items to DELIVERED
-      await tx.saleItem.updateMany({
-        where: {
-          saleId: orderId,
-          itemStatus: {
-            not: 'DELIVERED',
+        return tx.sale.update({
+          where: { id: orderId },
+          data: {
+            kitchenStatus: 'served',
+            servedAt: now,
+            expoStatus: 'SERVED_CONFIRMED',
+            servedConfirmedAt: now,
           },
-        },
-        data: {
-          itemStatus: 'DELIVERED',
-          deliveredAt: now,
-        },
+          include: {
+            table: {
+              select: { number: true },
+            },
+          },
+        })
       })
-
-      return orderResult
-    })
+    } catch (err) {
+      if (err instanceof InvalidTransitionError || err instanceof SaleItemStatusError) {
+        return res.status(409).json({ error: err.message })
+      }
+      throw err
+    }
 
     // Generate correlation ID for this workflow
     const correlationId = generateCorrelationId()

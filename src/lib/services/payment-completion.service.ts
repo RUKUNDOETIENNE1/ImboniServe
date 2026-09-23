@@ -52,6 +52,9 @@ export class PaymentCompletionService {
     // must NOT be marked COMPLETED — otherwise we have revenue without a ledger
     // record (the exact scenario SIM-CRIT-002 was designed to prevent).
     let sale: any = null
+    // Hoisted so the settlement-intelligence step below can reference the
+    // transaction that was actually settled (fixes out-of-scope ReferenceError).
+    let effectiveTxnId: string | null = null
     try {
       sale = await prisma.$transaction(async (tx) => {
         // 1a. Update Sale → COMPLETED (idempotent via updateMany guard)
@@ -89,7 +92,7 @@ export class PaymentCompletionService {
         // passed an empty string (CASH/manual confirmation paths do this).
         // Without this, the PaymentTransaction is never updated to SUCCESS and
         // no FinancialLedgerEntry is created — breaking the financial truth chain.
-        const effectiveTxnId = paymentTransactionId || saleRow.paymentTransactionId || null
+        effectiveTxnId = paymentTransactionId || saleRow.paymentTransactionId || null
 
         // 1c. Update PaymentTransaction → SUCCESS (idempotent via updateMany guard)
         if (effectiveTxnId) {

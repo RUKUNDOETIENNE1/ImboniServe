@@ -11,9 +11,13 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { GuestRecognitionService } from '@/lib/services/guest-recognition.service'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { extractOrderAccessToken } from '@/lib/api/public-order-auth'
+import { verifyQRSessionForBusiness } from '@/lib/services/qr-token.service'
 import { logger } from '@/lib/logger'
 
 const log = logger.child({ api: 'guest-recognize' })
@@ -33,6 +37,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!businessId || typeof businessId !== 'string') {
     return res.status(400).json(errorResponse('Business ID is required'))
+  }
+
+  // Authorization: guest intelligence is PII (history, loyalty, allergies).
+  // Requires either a QR order token bound to this business (customer in an
+  // active QR session) or a staff session for the same business.
+  const token = extractOrderAccessToken(req)
+  let authorized = false
+
+  if (token) {
+    authorized = Boolean(await verifyQRSessionForBusiness(token, businessId))
+  }
+
+  if (!authorized) {
+    const session = await getServerSession(req, res, authOptions)
+    const sessionBusinessId = (session?.user as any)?.businessId
+    authorized = Boolean(session?.user && sessionBusinessId === businessId)
+  }
+
+  if (!authorized) {
+    return res.status(401).json(errorResponse('Unauthorized'))
   }
 
   try {

@@ -419,9 +419,9 @@ export class SmartMenuBuilderService {
   /**
    * Publish a candidate to a live MenuItem
    */
-  static async publishCandidate(candidateId: string, reviewedBy: string): Promise<void> {
-    const candidate = await prisma.menuItemCandidate.findUnique({
-      where: { id: candidateId },
+  static async publishCandidate(candidateId: string, reviewedBy: string, businessId: string): Promise<void> {
+    const candidate = await prisma.menuItemCandidate.findFirst({
+      where: { id: candidateId, businessId },
     })
     if (!candidate) throw new Error('Candidate not found')
     if (candidate.status !== 'PENDING') throw new Error('Candidate already processed')
@@ -454,11 +454,12 @@ export class SmartMenuBuilderService {
   /**
    * Reject a candidate
    */
-  static async rejectCandidate(candidateId: string, reviewedBy: string): Promise<void> {
-    await prisma.menuItemCandidate.update({
-      where: { id: candidateId },
+  static async rejectCandidate(candidateId: string, reviewedBy: string, businessId: string): Promise<void> {
+    const result = await prisma.menuItemCandidate.updateMany({
+      where: { id: candidateId, businessId, status: 'PENDING' },
       data: { status: 'REJECTED', reviewedBy, reviewedAt: new Date() },
     })
+    if (result.count === 0) throw new Error('Candidate not found')
 
     log.info('Candidate rejected', { candidateId })
   }

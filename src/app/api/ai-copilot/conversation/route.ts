@@ -28,6 +28,11 @@ export async function POST(request: NextRequest) {
       includeEvidence: includeEvidence ?? true,
       includeHistorical: includeHistorical ?? true,
       includeReplay: includeReplay ?? true,
+      // Bind tenant scope to the authenticated session — never trust a
+      // client-supplied restaurant/business id.
+      context: (session.user as any)?.businessId
+        ? { currentRestaurant: (session.user as any).businessId }
+        : undefined,
     })
 
     if (!response.success) {

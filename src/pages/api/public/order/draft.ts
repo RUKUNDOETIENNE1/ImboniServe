@@ -155,7 +155,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
             customerPhone: phoneE164,
             customerName,
-            paymentMethod: selectedPaymentMethod
+            paymentMethod: selectedPaymentMethod,
+            orderTokenJti: claims.jti
           },
           pricing,
           tx
@@ -198,8 +199,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const isManualPayment = ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod);
+        // PaymentGateway enum: MTN/Airtel MoMo methods both map to MOBILE_MONEY
         const gateway = isManualPayment 
-          ? (selectedPaymentMethod === 'CASH' ? 'CASH' : selectedPaymentMethod === 'MTN_MOBILE_MONEY' ? 'MTN_MONEY' : selectedPaymentMethod === 'AIRTEL_MONEY' ? 'AIRTEL_MONEY' : 'BANK_TRANSFER')
+          ? (selectedPaymentMethod === 'CASH' ? 'CASH' : selectedPaymentMethod === 'BANK_TRANSFER' ? 'BANK_TRANSFER' : selectedPaymentMethod === 'OTHER' ? 'CASH' : 'MOBILE_MONEY')
           : 'IREMBO_PAY';
         
         const pt = await tx.paymentTransaction.create({
@@ -371,7 +373,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       paymentTransactionId,
       paymentMethod: selectedPaymentMethod,
       paymentLinkUrl: invoice ? invoice.paymentLinkUrl : null,
-      requiresManualConfirmation: ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod),
+      // WEB payment requires an IremboPay payment link. While that provider is
+      // not configured the invoice step yields no link — flag manual staff
+      // confirmation so the customer is never shown a dead-end payment path.
+      requiresManualConfirmation:
+        ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod)
+        || (selectedPaymentMethod === 'WEB' && !invoice?.paymentLinkUrl),
       momoInitiationUrl: ['MTN_MOBILE_MONEY', 'AIRTEL_MONEY'].includes(selectedPaymentMethod) ? '/api/payments/momo/initiate' : null,
       summary: {
         subtotalCents: pricing.subtotalCents,

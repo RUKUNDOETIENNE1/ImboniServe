@@ -18,8 +18,16 @@ function validateEnv() {
   const missing = isProd ? requiredProd.filter(k => !process.env[k]) : []
 
   // Conditionally require payment provider variables (matches env-validator.ts).
-  const provider = (process.env.PAYMENTS_PROVIDER || 'intouch').toLowerCase()
-  if (provider === 'intouch') {
+  // Provider vars are only required when a provider is EXPLICITLY selected via
+  // PAYMENTS_PROVIDER. When unset, no provider credentials are demanded: payment
+  // operations already fail closed at runtime (PaymentProviderFactory raises
+  // CONFIG_ERROR on missing provider config), so an app not actively using a
+  // provider can build/deploy without its credentials. Set
+  // PAYMENTS_PROVIDER=intouch|irembo to re-enable strict validation.
+  const provider = (process.env.PAYMENTS_PROVIDER || '').toLowerCase()
+  if (!provider) {
+    console.warn('⚠️  PAYMENTS_PROVIDER is not set; provider operations will fail closed at runtime if invoked.')
+  } else if (provider === 'intouch') {
     const intouchRequired = [
       'INTOUCH_API_URL',
       'INTOUCH_USERNAME',

@@ -21,6 +21,11 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const existing = await prisma.supplierOrder.findUnique({ where: { id: id as string }, select: { id: true, orderNumber: true, status: true, createdAt: true, businessId: true, supplierId: true } })
+    if (!existing) return res.status(404).json({ error: 'Order not found' })
+    const sessionBusinessId = (session.user as any).businessId
+    if (existing.businessId !== sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
     const updated = await prisma.supplierOrder.update({
       where: { id },
       data: { status, notes: notes ?? undefined },

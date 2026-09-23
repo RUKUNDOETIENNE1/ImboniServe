@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { buildTruthAuditSnapshot } from '@/lib/die/audit/truth-audit-engine'
+import { resolveBusinessContext } from '@/lib/api/business-context'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ctx = await resolveBusinessContext(req, res)
+  if (!ctx) return
+
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
   try {
     if (process.env.DIE_INTELLIGENCE_TRUTH_AUDIT_ENABLED !== 'true') {

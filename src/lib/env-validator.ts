@@ -74,9 +74,18 @@ export function validateEnv(): void {
     }
   }
 
-  // Conditionally require payment provider variables
-  const provider = (process.env.PAYMENTS_PROVIDER || 'intouch').toLowerCase()
-  if (provider === 'intouch') {
+  // Conditionally require payment provider variables.
+  // Provider vars are only required when that provider is EXPLICITLY selected.
+  // When PAYMENTS_PROVIDER is unset, no provider credentials are demanded at
+  // build/boot time: payment operations already fail closed at runtime
+  // (PaymentProviderFactory raises CONFIG_ERROR on missing provider config),
+  // so an application that does not actively use a provider can deploy and
+  // operate without its credentials. Set PAYMENTS_PROVIDER=intouch|irembo to
+  // re-enable strict validation for that provider.
+  const provider = (process.env.PAYMENTS_PROVIDER || '').toLowerCase()
+  if (!provider) {
+    warnings.push('PAYMENTS_PROVIDER (no payment provider selected; provider operations will fail closed at runtime)')
+  } else if (provider === 'intouch') {
     const intouchRequired = [
       'INTOUCH_API_URL',
       'INTOUCH_USERNAME',

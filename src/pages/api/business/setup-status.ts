@@ -6,14 +6,16 @@ import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck'
 /**
  * Setup Status API
  * Returns progress for onboarding steps and first value detection for a business.
- * Steps considered (restaurants only):
+ * Steps considered:
  * - hasMenu: at least 1 MenuItem
  * - hasTables: at least 1 Table
+ * - hasStations: at least 1 active Station (required for item routing)
+ * - hasQR: in-venue QR ordering enabled
  * - hasPaymentConfig: business has tax/currency settings configured
  * - hasStaff: more than 1 User assigned to the business
  * - hasFirstSale: at least 1 Sale with paymentStatus COMPLETED
  *
- * Percent complete counts hasMenu + hasTables + hasPaymentConfig + hasStaff (0-4 steps) equally.
+ * Percent complete counts all setup steps equally.
  * First value is reported separately as `firstValueAchieved`.
  */
 async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,16 +29,21 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const { businessId, userId } = ctx
 
   try {
-    const [menuCount, tableCount, userCount, firstSale, business] = await Promise.all([
+    const [menuCount, tableCount, userCount, stationCount, firstSale, business] = await Promise.all([
       prisma.menuItem.count({ where: { businessId } }),
       prisma.table.count({ where: { businessId } }),
       prisma.user.count({ where: { businessId } }),
+      prisma.station.count({ where: { businessId, isActive: true } }),
       prisma.sale.findFirst({ where: { businessId, paymentStatus: 'COMPLETED' }, orderBy: { createdAt: 'asc' }, select: { id: true, createdAt: true } }),
-      prisma.business.findUnique({ where: { id: businessId }, select: { taxMode: true, taxRate: true, currency: true, splitPaymentConvenienceFeeEnabled: true } }),
+      prisma.business.findUnique({ where: { id: businessId }, select: { taxMode: true, taxRate: true, currency: true, splitPaymentConvenienceFeeEnabled: true, enableQRInVenue: true } }),
     ])
 
     const hasMenu = menuCount > 0
     const hasTables = tableCount > 0
+    // Without at least one active Station, dispatched order items resolve to
+    // NO_STATION and never appear on any workspace — a silent go-live failure.
+    const hasStations = stationCount > 0
+    const hasQR = business?.enableQRInVenue === true
     const hasStaff = userCount > 1 // owner + at least 1 staff
     // Payment config is considered done if the business has any tax settings configured.
     // The default 18% VAT (Rwanda standard) IS a valid configuration — owners who keep
@@ -45,11 +52,11 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       (business?.taxRate != null) ||
       (business?.splitPaymentConvenienceFeeEnabled === true)
 
-    const steps = [hasMenu, hasTables, hasPaymentConfig, hasStaff]
+    const steps = [hasMenu, hasTables, hasStations, hasQR, hasPaymentConfig, hasStaff]
     const completedSteps = steps.filter(Boolean).length
     const percentComplete = Math.round((completedSteps / steps.length) * 100)
 
-    const coreSetupComplete = hasMenu && hasTables && hasPaymentConfig
+    const coreSetupComplete = hasMenu && hasTables && hasStations && hasPaymentConfig
     const firstValueAchieved = Boolean(firstSale)
 
     // Pick next action
@@ -57,6 +64,10 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       ? { code: 'ADD_MENU', label: 'Add your first menu item', href: '/dashboard/menu-builder' }
       : !hasTables
       ? { code: 'ADD_TABLE', label: 'Add your first table', href: '/dashboard/tables' }
+      : !hasStations
+      ? { code: 'ADD_STATION', label: 'Create your first fulfillment station', href: '/dashboard/stations' }
+      : !hasQR
+      ? { code: 'ENABLE_QR', label: 'Enable in-venue QR ordering', href: '/dashboard/qr' }
       : !hasPaymentConfig
       ? { code: 'CONFIGURE_PAYMENTS', label: 'Configure your payment and tax settings', href: '/dashboard/payment-settings' }
       : !hasStaff
@@ -70,6 +81,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       progress: {
         hasMenu,
         hasTables,
+        hasStations,
+        hasQR,
         hasPaymentConfig,
         hasStaff,
         completedSteps,

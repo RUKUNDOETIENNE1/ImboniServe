@@ -154,8 +154,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let saleCompletedViaCanonicalPath = false
 
     if (mappedStatus === PaymentTransactionStatus.SUCCESS) {
-      // Find Sale linked to this PaymentTransaction
-      const sale = await prisma.sale.findFirst({
+      // Find Sale linked to this PaymentTransaction.
+      // Primary link: sale.paymentTransactionId (QR-order draft path).
+      // J2 P1-1 fallback: the InTouch initiate path stores the Sale id in
+      // transaction.referenceId — resolve it deterministically, scoped to the
+      // transaction's own businessId so a foreign/ambiguous reference cannot
+      // resolve. Reservation/subscription/marketplace transactions carry
+      // non-Sale ids in referenceId and simply won't match a Sale row.
+      let sale = await prisma.sale.findFirst({
         where: { paymentTransactionId: transaction.id },
         select: {
           id: true,
@@ -165,6 +171,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           status: true,
         },
       })
+
+      if (!sale && transaction.referenceId) {
+        sale = await prisma.sale.findFirst({
+          where: { id: transaction.referenceId, businessId: transaction.businessId },
+          select: {
+            id: true,
+            businessId: true,
+            totalAmountCents: true,
+            paymentStatus: true,
+            status: true,
+          },
+        })
+      }
 
       if (sale) {
         // Business isolation: Sale must belong to the same business as the PaymentTransaction
@@ -186,13 +205,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(403).json({ error: 'Business isolation violation' })
         }
 
-        // Amount validation: PaymentTransaction amount must match Sale total
-        // Note: InTouch webhook does not include the provider amount, so we validate
-        // internal consistency between PaymentTransaction and Sale.
-        if (sale.totalAmountCents !== transaction.amountCents) {
+        // Amount validation: the order-side amount recorded on the
+        // PaymentTransaction must match the Sale total.
+        // orderAmountCents holds the pre-fee order amount for initiate-path
+        // transactions (which also carry a customer-facing fee in
+        // amountCents/paymentAmountCents); draft-path transactions record the
+        // order total in amountCents. InTouch's webhook does not include the
+        // provider amount, so this validates internal consistency.
+        const orderSideAmountCents = transaction.orderAmountCents ?? transaction.amountCents
+        if (sale.totalAmountCents !== orderSideAmountCents) {
           console.error('[InTouch Webhook] Amount mismatch:', {
             transactionId: transaction.id,
-            transactionAmountCents: transaction.amountCents,
+            transactionOrderAmountCents: orderSideAmountCents,
             saleTotalAmountCents: sale.totalAmountCents,
           })
           await AlertDeliveryService.deliver({
@@ -200,7 +224,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             title: 'InTouch webhook amount mismatch',
             details: {
               transactionId: transaction.id,
-              transactionAmountCents: transaction.amountCents,
+              transactionOrderAmountCents: orderSideAmountCents,
               saleTotalAmountCents: sale.totalAmountCents,
             },
           })

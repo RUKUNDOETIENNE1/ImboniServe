@@ -69,20 +69,24 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
       where: { id: businessId },
       select: { timezone: true },
     })
-    const { start: dayStart } = getBusinessDayBoundary(new Date(), business?.timezone)
+    const { start: dayStart, end: dayEnd } = getBusinessDayBoundary(new Date(), business?.timezone)
 
     // Fetch active orders with their items and station assignments
     const orders = await prisma.sale.findMany({
       where: {
         businessId,
-        kitchenDispatchStatus: 'dispatched',
+        // 'failed' dispatch orders must remain visible to front-of-house —
+        // they need manual coordination, not silent disappearance.
+        kitchenDispatchStatus: { in: ['dispatched', 'failed'] },
         kitchenStatus: {
           in: ['pending', 'accepted', 'preparing', 'almost_ready', 'ready', 'served'],
         },
-        // Only show orders from today (operational view)
-        createdAt: {
-          gte: dayStart,
-        },
+        // Operational view: unscheduled orders created today, plus scheduled
+        // (preorder) orders due today regardless of when they were placed.
+        OR: [
+          { AND: [{ scheduledAt: null }, { createdAt: { gte: dayStart } }] },
+          { scheduledAt: { gte: dayStart, lt: dayEnd } },
+        ],
       },
       include: {
         items: {
@@ -226,4 +230,4 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('orders.view')(baseHandler)
+export default requirePermission('orders.read')(baseHandler)

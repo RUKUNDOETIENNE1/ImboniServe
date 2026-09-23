@@ -31,6 +31,12 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     const reservation = await prisma.reservation.findUnique({ where: { id } })
     if (!reservation) return res.status(404).json(errorResponse('Reservation not found'))
 
+    // Tenant isolation: only staff of the reservation's business may cancel it.
+    const sessionBusinessId = (session.user as any).businessId
+    if (reservation.businessId !== sessionBusinessId) {
+      return res.status(403).json(errorResponse('Forbidden'))
+    }
+
     // Cancel reservation via canonical ReservationService
     await ReservationService.cancelReservation(id, reason)
 
