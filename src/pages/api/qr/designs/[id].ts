@@ -3,12 +3,13 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { randomBytes, randomUUID } from 'crypto'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 function shortToken(length = 8) {
   return randomBytes(length).toString('base64url').slice(0, length)
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.email) return res.status(401).json({ error: 'Unauthorized' })
 
@@ -80,3 +81,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: QR Design Management requires Starter plan or higher
+export default requiresFeature('hasQRCodes')(baseHandler)

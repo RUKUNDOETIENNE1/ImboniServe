@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { Users, Search, Mail, Phone, Shield, Eye, Ban } from 'lucide-react'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
+}
 
 export default function AdminUsers() {
   const { data: session, status } = useSession()
@@ -120,7 +132,7 @@ export default function AdminUsers() {
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">User</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Contact</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Restaurant</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Business</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Role</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Status</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase">Actions</th>

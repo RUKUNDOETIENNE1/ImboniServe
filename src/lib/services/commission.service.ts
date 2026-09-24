@@ -16,6 +16,7 @@ export interface CommissionInvoice {
   commissionPercent: number;
   commissionAmount: number;
   commissionVAT: number;
+  vatRate: number;
   totalCommission: number;
   whtAmount: number;
   whtApplied: boolean;
@@ -145,6 +146,7 @@ export async function createCommissionInvoice(
     commissionPercent: invoice.commissionPercent,
     commissionAmount: invoice.commissionAmount,
     commissionVAT: invoice.commissionVAT,
+    vatRate: commission.vatRate,
     totalCommission: invoice.totalCommission,
     whtAmount: invoice.whtAmount,
     whtApplied: invoice.whtApplied,
@@ -179,7 +181,7 @@ export function generateCommissionInvoiceText(
   lines.push(`${language === 'en' ? 'Gross Order Amount' : 'Ikiguzi Rusange'}: ${formatRWF(invoice.grossAmount)}`);
   lines.push(`${language === 'en' ? 'Commission Rate' : 'Igipimo cya Komisiyo'}: ${invoice.commissionPercent}% (${invoice.tier})`);
   lines.push(`${language === 'en' ? 'Commission Amount' : 'Amafaranga ya Komisiyo'}: ${formatRWF(invoice.commissionAmount)}`);
-  lines.push(`${language === 'en' ? 'VAT on Commission' : 'TVA kuri Komisiyo'} (18%): ${formatRWF(invoice.commissionVAT)}`);
+  lines.push(`${language === 'en' ? 'VAT on Commission' : 'TVA kuri Komisiyo'} (${invoice.vatRate}%): ${formatRWF(invoice.commissionVAT)}`);
   lines.push(`${language === 'en' ? 'Total Commission' : 'Komisiyo Yose'}: ${formatRWF(invoice.totalCommission)}`);
 
   if (invoice.whtApplied && invoice.whtAmount > 0) {

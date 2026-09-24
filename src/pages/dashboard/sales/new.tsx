@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/i18n';
 import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import DashboardLayout from '@/components/DashboardLayout';
+import StaffGuestIntelligence from '@/components/staff/StaffGuestIntelligence';
 
 interface MenuItem {
   id: string;
@@ -225,6 +226,9 @@ export default function NewSalePage() {
                   onChange={(e) => setClientPhone(e.target.value)}
                   className="w-full border rounded p-2"
                 />
+                {clientPhone && clientPhone.length >= 8 && businessId && (
+                  <StaffGuestIntelligence phone={clientPhone} businessId={businessId} />
+                )}
                 <input
                   type="email"
                   placeholder="Client email (optional)"

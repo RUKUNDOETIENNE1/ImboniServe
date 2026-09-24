@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { PurchaseOrderService } from '@/lib/services/purchase-order.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user) {
@@ -103,3 +104,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Purchase Orders require Business plan or higher
+export default requiresFeature('hasPurchaseOrders')(baseHandler)

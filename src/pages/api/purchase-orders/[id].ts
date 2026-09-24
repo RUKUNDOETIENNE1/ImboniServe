@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { PurchaseOrderService } from '@/lib/services/purchase-order.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user) {
@@ -11,16 +12,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { id } = req.query
+  const sessionBusinessId = (session.user as any).businessId
 
   try {
-    if (req.method === 'GET') {
-      const po = await PurchaseOrderService.getPurchaseOrderById(id as string)
-      
-      if (!po) {
-        return res.status(404).json({ error: 'Purchase order not found' })
-      }
+    // Tenant isolation: load the PO once and require it belongs to the
+    // caller's business for both reads and mutations.
+    const existing = await PurchaseOrderService.getPurchaseOrderById(id as string)
+    if (!existing || existing.businessId !== sessionBusinessId) {
+      return res.status(404).json({ error: 'Purchase order not found' })
+    }
 
-      return res.status(200).json(po)
+    if (req.method === 'GET') {
+      return res.status(200).json(existing)
     }
 
     if (req.method === 'POST') {
@@ -71,3 +74,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Purchase Orders require Business plan or higher
+export default requiresFeature('hasPurchaseOrders')(baseHandler)

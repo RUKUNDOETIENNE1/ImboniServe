@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { InventoryService } from '@/lib/services/inventory.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 
@@ -23,5 +24,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 }
+
+// Apply commercial enforcement: Inventory Alerts require Professional plan or higher
+const handler = requiresFeature('hasInventoryAlerts')(baseHandler)
 
 export default requirePermission('inventory.read')(handler)

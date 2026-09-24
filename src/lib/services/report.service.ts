@@ -2,10 +2,17 @@ import { prisma } from '@/lib/prisma'
 import { SalesService } from './sales.service'
 import { ProfitService } from './profit.service'
 import { InventoryService } from './inventory.service'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export class ReportService {
   static async generateDailyReport(businessId: string, date?: Date) {
     const targetDate = date || new Date()
+
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true }
+    })
+    const { start: dayStart, end: dayEnd } = getBusinessDayBoundary(targetDate, business?.timezone)
 
     const [salesData, profitData, lowStock] = await Promise.all([
       SalesService.getDailySales(businessId, targetDate),
@@ -18,8 +25,8 @@ export class ReportService {
       where: {
         businessId: businessId,
         createdAt: {
-          gte: new Date(targetDate.setHours(0, 0, 0, 0)),
-          lte: new Date(targetDate.setHours(23, 59, 59, 999)),
+          gte: dayStart,
+          lte: dayEnd,
         },
       },
       _sum: {

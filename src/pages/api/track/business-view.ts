@@ -33,9 +33,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         profileId: profileId || null,
         sessionId: sessionId || null,
         userId: userId || null,
-        ipAddress: ipAddress?.substring(0, 45) || null, // Limit IP length
-        userAgent: userAgent?.substring(0, 255) || null, // Limit UA length
-        referrer: referrer?.substring(0, 255) || null, // Limit referrer length
+        ipAddress: (typeof ipAddress === 'string' ? ipAddress : ipAddress?.[0])?.substring(0, 45) || null, // Limit IP length
+        userAgent: (typeof userAgent === 'string' ? userAgent : userAgent?.[0])?.substring(0, 255) || null, // Limit UA length
+        referrer: (typeof referrer === 'string' ? referrer : referrer?.[0])?.substring(0, 255) || null, // Limit referrer length
       },
     })
 

@@ -1,16 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
+import { normalizePhoneForWhatsApp } from '@/lib/utils/phone'
 
 const log = logger.child({ service: 'whatsapp-cloud' })
-
-function normalizePhone(phone: string): string {
-  const p = phone.trim().replace(/\s/g, '')
-  if (p.startsWith('+')) return p.slice(1)
-  if (p.startsWith('07')) return `250${p.slice(1)}`
-  if (p.startsWith('2507')) return p
-  if (p.startsWith('0')) return `250${p.slice(1)}`
-  return p
-}
 
 interface SendTextOptions {
   phone: string
@@ -44,7 +36,7 @@ export class WhatsAppCloudService {
       return result
     }
 
-    const to = normalizePhone(phone)
+    const to = normalizePhoneForWhatsApp(phone)
     try {
       const response = await fetch(
         `https://graph.facebook.com/${version}/${phoneNumberId}/messages`,
@@ -85,7 +77,7 @@ export class WhatsAppCloudService {
     const { token, phoneNumberId, version } = this.getCredentials()
     if (!token || !phoneNumberId) return { success: false, error: 'WhatsApp Cloud API not configured' }
 
-    const to = normalizePhone(phone)
+    const to = normalizePhoneForWhatsApp(phone)
     try {
       const response = await fetch(
         `https://graph.facebook.com/${version}/${phoneNumberId}/messages`,
@@ -141,7 +133,10 @@ export class WhatsAppCloudService {
     const appSecret = process.env.WHATSAPP_APP_SECRET
     if (!appSecret) return false
     const crypto = require('crypto')
-    const expected = crypto.createHmac('sha256', appSecret).update(body).digest('hex')
-    return `sha256=${expected}` === signature
+    const expected = `sha256=${crypto.createHmac('sha256', appSecret).update(body).digest('hex')}`
+    const a = Buffer.from(expected)
+    const b = Buffer.from(signature || '')
+    if (a.length !== b.length) return false
+    return crypto.timingSafeEqual(a, b)
   }
 }

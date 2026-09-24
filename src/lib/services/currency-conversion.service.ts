@@ -1,113 +1,44 @@
 /**
- * Currency Conversion Service
- * Uses API Ninjas for real-time exchange rates
- * Caches rates to minimize API calls (3000/month limit)
+ * Compatibility wrapper around canonical currency exchange service.
+ *
+ * This file is kept for backward compatibility with existing imports.
+ * It no longer calls external FX APIs or hardcoded fallback rate tables.
  */
 
-const API_KEY = 'bzaajp79jpidQJ2A8CwY3k8ks7vVla49EP8ASE20'
-const API_BASE = 'https://api.api-ninjas.com/v1/convertcurrency'
-
-// Cache exchange rates for 6 hours (optimized for API limit)
-const rateCache = new Map<string, { rate: number; timestamp: number }>()
-const CACHE_DURATION = 6 * 60 * 60 * 1000 // 6 hours in milliseconds
-
-// Fallback rates (updated periodically, used if API fails)
-const FALLBACK_RATES: Record<string, number> = {
-  'RWF_USD': 0.00077, // 1 RWF = 0.00077 USD
-  'RWF_EUR': 0.00071, // 1 RWF = 0.00071 EUR
-  'RWF_GBP': 0.00061, // 1 RWF = 0.00061 GBP
-  'RWF_KES': 0.10,    // 1 RWF = 0.10 KES
-  'RWF_TZS': 1.93,    // 1 RWF = 1.93 TZS
-  'RWF_UGX': 2.84,    // 1 RWF = 2.84 UGX
-}
+import {
+  convertFromRWF as canonicalConvertFromRWF,
+  convertToRWF as canonicalConvertToRWF,
+  getExchangeRate as canonicalGetExchangeRate,
+} from '@/lib/services/currency-exchange.service';
 
 /**
- * Get exchange rate from RWF to target currency
+ * Backward-compatible helper:
+ * old signature was getExchangeRate(targetCurrency) with implicit RWF base.
  */
-export async function getExchangeRate(
-  targetCurrency: string
-): Promise<number> {
-  if (targetCurrency === 'RWF') return 1
-
-  const cacheKey = `RWF_${targetCurrency}`
-  
-  // Check cache first
-  const cached = rateCache.get(cacheKey)
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.rate
-  }
-
-  try {
-    // Call API Ninjas
-    const response = await fetch(
-      `${API_BASE}?have=RWF&want=${targetCurrency}&amount=1`,
-      {
-        headers: {
-          'X-Api-Key': API_KEY
-        }
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(`API returned ${response.status}`)
-    }
-
-    const data = await response.json()
-    const rate = data.new_amount
-
-    if (typeof rate !== 'number' || rate <= 0) {
-      throw new Error('Invalid rate received')
-    }
-
-    // Cache the rate
-    rateCache.set(cacheKey, { rate, timestamp: Date.now() })
-    
-    return rate
-  } catch (error) {
-    console.error(`Failed to fetch exchange rate for ${targetCurrency}:`, error)
-    
-    // Use fallback rate if available
-    const fallbackRate = FALLBACK_RATES[cacheKey]
-    if (fallbackRate) {
-      console.log(`Using fallback rate for ${targetCurrency}: ${fallbackRate}`)
-      return fallbackRate
-    }
-    
-    // Last resort: return 1 (no conversion)
-    console.warn(`No fallback rate available for ${targetCurrency}, using 1:1`)
-    return 1
-  }
+export async function getExchangeRate(targetCurrency: string): Promise<number> {
+  return canonicalGetExchangeRate('RWF', targetCurrency, {
+    rateType: 'AVERAGE',
+    maxAgeHours: parseInt(process.env.FX_MAX_RATE_AGE_HOURS || '168', 10),
+    allowStale: false,
+  });
 }
 
-/**
- * Convert amount from RWF to target currency
- */
-export async function convertFromRWF(
-  amountInRWF: number,
-  targetCurrency: string
-): Promise<number> {
-  if (targetCurrency === 'RWF') return amountInRWF
-  
-  const rate = await getExchangeRate(targetCurrency)
-  return amountInRWF * rate
+export async function convertFromRWF(amountInRWF: number, targetCurrency: string): Promise<number> {
+  return canonicalConvertFromRWF(amountInRWF, targetCurrency, {
+    rateType: 'AVERAGE',
+    maxAgeHours: parseInt(process.env.FX_MAX_RATE_AGE_HOURS || '168', 10),
+    allowStale: false,
+  });
 }
 
-/**
- * Convert amount from source currency to RWF
- */
-export async function convertToRWF(
-  amount: number,
-  sourceCurrency: string
-): Promise<number> {
-  if (sourceCurrency === 'RWF') return amount
-  
-  const rate = await getExchangeRate(sourceCurrency)
-  return amount / rate
+export async function convertToRWF(amount: number, sourceCurrency: string): Promise<number> {
+  return canonicalConvertToRWF(amount, sourceCurrency, {
+    rateType: 'AVERAGE',
+    maxAgeHours: parseInt(process.env.FX_MAX_RATE_AGE_HOURS || '168', 10),
+    allowStale: false,
+  });
 }
 
-/**
- * Format currency with proper symbol and conversion
- */
 export async function formatCurrencyConverted(
   amountInRWF: number,
   targetCurrency: string,
@@ -117,55 +48,35 @@ export async function formatCurrencyConverted(
     compact?: boolean
   } = {}
 ): Promise<string> {
-  const { showSymbol = true, showCode = false, compact = false } = options
+  const { showSymbol = true, showCode = false, compact = false } = options;
+  const convertedAmount = await convertFromRWF(amountInRWF, targetCurrency);
 
-  const convertedAmount = await convertFromRWF(amountInRWF, targetCurrency)
-  
-  const currencyConfig: Record<string, { symbol: string; decimals: number }> = {
-    RWF: { symbol: 'FRw', decimals: 0 },
-    USD: { symbol: '$', decimals: 2 },
-    EUR: { symbol: '€', decimals: 2 },
-    GBP: { symbol: '£', decimals: 2 },
-    KES: { symbol: 'KSh', decimals: 0 },
-    TZS: { symbol: 'TSh', decimals: 0 },
-    UGX: { symbol: 'USh', decimals: 0 }
+  const fractionDigits = targetCurrency === 'RWF' ? 0 : 2;
+  const formatter = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: compact ? 0 : fractionDigits,
+    maximumFractionDigits: compact ? 1 : fractionDigits,
+  });
+
+  let displayValue = convertedAmount;
+  let suffix = '';
+  if (compact && Math.abs(convertedAmount) >= 1_000_000) {
+    displayValue = convertedAmount / 1_000_000;
+    suffix = 'M';
+  } else if (compact && Math.abs(convertedAmount) >= 1_000) {
+    displayValue = convertedAmount / 1_000;
+    suffix = 'K';
   }
 
-  const config = currencyConfig[targetCurrency] || { symbol: targetCurrency, decimals: 2 }
-  
-  let formattedNumber: string
-  
-  if (compact && convertedAmount >= 1000000) {
-    const millions = convertedAmount / 1000000
-    formattedNumber = `${millions.toFixed(1)}M`
-  } else if (compact && convertedAmount >= 1000) {
-    const thousands = convertedAmount / 1000
-    formattedNumber = `${thousands.toFixed(1)}K`
-  } else {
-    formattedNumber = convertedAmount.toLocaleString('en-US', {
-      minimumFractionDigits: config.decimals,
-      maximumFractionDigits: config.decimals
-    })
-  }
-  
-  let result = formattedNumber
-  
-  if (showSymbol) {
-    result = `${config.symbol}${formattedNumber}`
-  }
-  
-  if (showCode) {
-    result = `${result} ${targetCurrency}`
-  }
-  
-  return result
+  const numberPart = `${formatter.format(displayValue)}${suffix}`;
+  const result = showSymbol ? `${targetCurrency} ${numberPart}` : numberPart;
+  return showCode ? `${result} ${targetCurrency}` : result;
 }
 
-/**
- * Detect user's currency from browser/location
- */
 export function detectUserCurrency(locale?: string): string {
-  const countryToCurrency: Record<string, string> = {
+  if (!locale) return 'RWF';
+  const country = locale.split('-')[1]?.toUpperCase();
+  if (!country) return 'RWF';
+  const map: Record<string, string> = {
     RW: 'RWF',
     US: 'USD',
     GB: 'GBP',
@@ -177,56 +88,16 @@ export function detectUserCurrency(locale?: string): string {
     IT: 'EUR',
     ES: 'EUR',
     BE: 'EUR',
-    NL: 'EUR'
-  }
-  
-  if (locale) {
-    const country = locale.split('-')[1]?.toUpperCase()
-    if (country && countryToCurrency[country]) {
-      return countryToCurrency[country]
-    }
-  }
-  
-  // Try to detect from timezone
-  try {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    if (timezone.includes('Africa/Kigali')) return 'RWF'
-    if (timezone.includes('Africa/Nairobi')) return 'KES'
-    if (timezone.includes('Africa/Dar_es_Salaam')) return 'TZS'
-    if (timezone.includes('Africa/Kampala')) return 'UGX'
-    if (timezone.includes('America/')) return 'USD'
-    if (timezone.includes('Europe/')) return 'EUR'
-  } catch (e) {
-    // Ignore timezone detection errors
-  }
-  
-  return 'RWF' // Default
+    NL: 'EUR',
+  };
+  return map[country] || 'RWF';
 }
 
-/**
- * Preload common exchange rates to minimize API calls
- */
-export async function preloadExchangeRates() {
-  const commonCurrencies = ['USD', 'EUR', 'GBP', 'KES', 'TZS', 'UGX']
-  
-  await Promise.all(
-    commonCurrencies.map(currency => getExchangeRate(currency))
-  )
+export async function preloadExchangeRates(): Promise<void> {
+  // No-op by design: canonical service does DB lookups with internal caching.
 }
 
-/**
- * Get cached rate without API call (for SSR)
- */
-export function getCachedRate(targetCurrency: string): number | null {
-  if (targetCurrency === 'RWF') return 1
-  
-  const cacheKey = `RWF_${targetCurrency}`
-  const cached = rateCache.get(cacheKey)
-  
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.rate
-  }
-  
-  // Return fallback if available
-  return FALLBACK_RATES[cacheKey] || null
+export function getCachedRate(_targetCurrency: string): number | null {
+  // Deprecated synchronous accessor intentionally unsupported.
+  return null;
 }

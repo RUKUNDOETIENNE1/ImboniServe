@@ -1,9 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { prisma } from '@/lib/prisma'
 import { sendCampaignMessages } from '@/lib/whatsapp/campaign-scheduler'
+import { ingestCampaignShadowEvent } from '@/lib/die/business-as-plugin/campaigns/campaigns.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -19,7 +22,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // Tenant boundary: a business can only trigger its own campaigns.
+    // Campaigns are stored as Promotion rows scoped by businessId.
+    const sessionBusinessId = (session.user as any)?.businessId as string | null
+    if (!sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+    const campaign = await prisma.promotion.findUnique({
+      where: { id },
+      select: { businessId: true },
+    })
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' })
+    }
+    if (campaign.businessId !== sessionBusinessId) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+
+    // Shadow: CAMPAIGN_STARTED
+    try {
+      const businessId = (session.user as any)?.businessId || ''
+      if (businessId) await ingestCampaignShadowEvent({ type: 'CAMPAIGN_STARTED', businessId, campaignId: id as string, channel: 'whatsapp' }).catch(() => {})
+    } catch {}
+
     const metrics = await sendCampaignMessages(id)
+    
+    // Shadow: completion vs failure heuristic
+    try {
+      const businessId = (session.user as any)?.businessId || ''
+      if (businessId) {
+        if (metrics.failed > 0 && metrics.sent === 0) {
+          await ingestCampaignShadowEvent({ type: 'CAMPAIGN_FAILED', businessId, campaignId: id as string, channel: 'whatsapp' }).catch(() => {})
+        } else {
+          await ingestCampaignShadowEvent({ type: 'CAMPAIGN_COMPLETED', businessId, campaignId: id as string, channel: 'whatsapp', metrics: (metrics as any) }).catch(() => {})
+          const denominator = Math.max(metrics.sent + metrics.failed, 1)
+          const rate = metrics.sent / denominator
+          if (rate >= 0.85) await ingestCampaignShadowEvent({ type: 'HIGH_CONVERSION_CAMPAIGN', businessId, campaignId: id as string, channel: 'whatsapp', metrics: ({ delivery_success_rate: rate } as any) }).catch(() => {})
+          else if (rate < 0.6) await ingestCampaignShadowEvent({ type: 'LOW_CONVERSION_CAMPAIGN', businessId, campaignId: id as string, channel: 'whatsapp', metrics: ({ delivery_success_rate: rate } as any) }).catch(() => {})
+        }
+      }
+    } catch {}
     return res.status(200).json({ 
       success: true, 
       metrics,
@@ -32,3 +74,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+// Apply commercial enforcement: Campaign execution requires marketing feature
+export default requiresFeature('hasMarketing')(baseHandler)

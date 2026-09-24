@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { requireOrderAccess } from '@/lib/api/public-order-auth'
 
 // Public endpoint to fetch kitchen -> customer messages for an order
 // GET /api/public/order/messages?orderId=...
@@ -12,9 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { orderId } = req.query as { orderId?: string }
     if (!orderId) return res.status(400).json({ error: 'orderId is required' })
 
-    // Ensure order exists
-    const order = await prisma.sale.findUnique({ where: { id: orderId }, select: { id: true } })
-    if (!order) return res.status(404).json({ error: 'Order not found' })
+    const authz = await requireOrderAccess(req, res, orderId)
+    if (!authz) return
 
     const messages = await prisma.waiterCall.findMany({
       where: { orderId, direction: 'kitchen_to_customer' },

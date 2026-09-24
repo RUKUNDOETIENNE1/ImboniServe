@@ -1,4 +1,8 @@
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
+import { ContactCustomerBridge } from './contact-customer-bridge.service'
+
+const log = logger.child({ service: 'customer' })
 
 export class CustomerService {
   static async createCustomer(data: {
@@ -7,7 +11,7 @@ export class CustomerService {
     email?: string
     businessId: string
   }) {
-    return await prisma.customer.create({
+    const customer = await prisma.customer.create({
       data: {
         name: data.name,
         phone: data.phone,
@@ -15,6 +19,15 @@ export class CustomerService {
         businessId: data.businessId,
       },
     })
+
+    // Bridge: ensure a CRM Contact exists for this new Customer
+    try {
+      await ContactCustomerBridge.ensureContactForCustomer(customer.id)
+    } catch (error) {
+      log.error('Failed to bridge customer to contact', { error: String(error), customerId: customer.id })
+    }
+
+    return customer
   }
 
   static async findByPhone(phone: string, businessId: string) {
@@ -23,14 +36,33 @@ export class CustomerService {
     })
   }
 
-  static async updateCustomerStats(customerId: string, orderAmount: number) {
-    const loyaltyPoints = Math.floor(orderAmount / 1000)
+  /**
+   * Find or create a customer by phone number.
+   * This is the canonical entry point for customer creation/lookup across all hospitality flows.
+   */
+  static async findOrCreateByPhone(phone: string, businessId: string, name?: string) {
+    const existing = await this.findByPhone(phone, businessId)
+    if (existing) return existing
+
+    log.info('Creating new customer', { phone, businessId, name: name || 'Guest' })
+    return await this.createCustomer({
+      phone,
+      businessId,
+      name: name || 'Guest',
+    })
+  }
+
+  /**
+   * Update visit stats only (visitCount, lifetimeSpendCents, totalSpent, lastVisit).
+   * Does NOT touch loyaltyPoints — that is owned by LoyaltyService.
+   */
+  static async updateVisitStats(customerId: string, orderAmountCents: number) {
     return await prisma.customer.update({
       where: { id: customerId },
       data: {
-        totalSpent: { increment: orderAmount },
+        totalSpent: { increment: orderAmountCents },
+        lifetimeSpendCents: { increment: orderAmountCents },
         visitCount: { increment: 1 },
-        loyaltyPoints: { increment: loyaltyPoints },
         lastVisit: new Date(),
       },
     })
@@ -53,26 +85,4 @@ export class CustomerService {
     })
   }
 
-  static async getTopCustomers(businessId: string, limit: number = 10) {
-    return await prisma.$queryRaw`
-      SELECT 
-        c.*,
-        COUNT(s.id) as "orderCount",
-        SUM(s."totalAmountCents") as "totalRevenue"
-      FROM "Customer" c
-      LEFT JOIN "Sale" s ON s."customerId" = c.id
-      WHERE c."businessId" = ${businessId}
-      GROUP BY c.id
-      ORDER BY "totalRevenue" DESC
-      LIMIT ${limit}
-    `
-  }
-
-  static async redeemLoyaltyPoints(customerId: string, points: number) {
-    // Use conditional update to avoid negative points
-    return await prisma.customer.updateMany({
-      where: { id: customerId, loyaltyPoints: { gte: points } },
-      data: { loyaltyPoints: { decrement: points } },
-    })
-  }
 }

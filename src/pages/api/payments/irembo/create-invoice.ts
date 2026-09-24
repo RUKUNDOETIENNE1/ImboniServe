@@ -5,6 +5,7 @@ import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { IremboPayService } from '@/lib/services/irembopay.service'
 import { prisma } from '@/lib/prisma'
 import { AuditLogService } from '@/lib/services/audit-log.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -47,7 +48,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Calculate amounts (VAT-inclusive pricing)
     const grossAmountCents = subscription.plan.priceCents
-    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents)
+    const taxRate = subscription.business.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents, taxRate)
     const gatewayFeeEstimatedCents = IremboPayService.calculateGatewayFee(grossAmountCents)
     const netToBusinessCents = IremboPayService.calculateNetToBusinessCents(
       grossAmountCents,
@@ -77,9 +79,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: invoice.transactionId,
         gateway: 'IREMBO_PAY',
         paymentMethod: 'WEB',
-        status: 'INITIATED',
+        status: 'PENDING',
         amountCents: grossAmountCents,
-        currency: 'RWF',
+        // Note: IremboPay may only support RWF — this is a provider constraint.
+        // We still read from business.currency for the transaction record.
+        currency: subscription.business.currency,
         vatAmountCents,
         exVatAmountCents,
         gatewayFeeEstimatedCents,
@@ -91,6 +95,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payerPhone: dbUser?.phone || '',
         rawRequest: invoice as any
       }
+    })
+    await ensurePaymentLedgerEvent(transaction.id, 'PENDING', {
+      source: 'payments/irembo/create-invoice',
+      invoiceNumber: invoice.invoiceNumber,
     })
 
     // Append-only audit log: payment initiation

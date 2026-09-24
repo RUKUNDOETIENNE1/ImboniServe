@@ -1,4 +1,4 @@
-﻿import { useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
+﻿import { useState, useRef, useMemo, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useRouter } from 'next/router'
 import { signIn } from 'next-auth/react'
 import { Mail, Lock, ShieldCheck, Globe, ArrowLeft, RefreshCw } from 'lucide-react'
@@ -9,6 +9,8 @@ import { useTranslation } from '@/lib/i18n'
 
 type Step = 'credentials' | 'otp'
 
+const AUTH_DEBUG = process.env.NEXT_PUBLIC_AUTH_DEBUG === 'true'
+
 export default function Login() {
   const { t, changeLocale, locale } = useTranslation()
   const router = useRouter()
@@ -18,10 +20,21 @@ export default function Login() {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [maskedEmail, setMaskedEmail] = useState('')
   const [otpChannel, setOtpChannel] = useState<string>('')
+  const [pendingToken, setPendingToken] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showLangMenu, setShowLangMenu] = useState(false)
+  const debugRequestId = useMemo(() => {
+    if (!AUTH_DEBUG || typeof crypto === 'undefined' || typeof crypto.randomUUID !== 'function') {
+      return null
+    }
+    try {
+      return crypto.randomUUID()
+    } catch {
+      return `auth-debug-${Date.now()}`
+    }
+  }, [])
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const languages = [
@@ -43,20 +56,34 @@ export default function Login() {
     setError(null)
 
     try {
+      const payload: Record<string, unknown> = { email, password }
+      if (debugRequestId) payload.debugRequestId = debugRequestId
+
       const res = await fetch('/api/auth/pre-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
 
       if (!res.ok) {
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] pre-login failure', { debugRequestId, status: res.status, error: data.error })
+        }
         setError(data.error || t('auth.invalid_credentials', 'Invalid email or password'))
         return
       }
 
       setMaskedEmail(data.maskedEmail || email)
       setOtpChannel(data.channel || 'email')
+      setPendingToken(data.pendingToken || '')
+      if (AUTH_DEBUG) {
+        console.log('[auth-debug] pre-login success', {
+          debugRequestId,
+          channel: data.channel,
+          maskedEmail: data.maskedEmail,
+        })
+      }
       setStep('otp')
     } catch {
       setError(t('auth.login_error', 'Login service unavailable. Please try again.'))
@@ -70,7 +97,7 @@ export default function Login() {
     e.preventDefault()
     const code = otp.join('')
     if (code.length !== 6) {
-      setError('Enter the complete 6-digit code.')
+      setError(t('auth.enter_6_digit_code', 'Enter the complete 6-digit code.'))
       return
     }
 
@@ -79,15 +106,31 @@ export default function Login() {
 
     try {
       // Verify OTP → get confirmToken
+      const verifyPayload: Record<string, unknown> = { email, otp: code }
+      if (debugRequestId) verifyPayload.debugRequestId = debugRequestId
+
       const verifyRes = await fetch('/api/auth/verify-mfa-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: code }),
+        body: JSON.stringify(verifyPayload),
       })
       const verifyData = await verifyRes.json()
 
       if (!verifyRes.ok) {
-        setError(verifyData.error || 'Invalid or expired code.')
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] verify-mfa-otp failure', {
+            debugRequestId,
+            status: verifyRes.status,
+            error: verifyData.error,
+          })
+        }
+        if (verifyRes.status === 429) {
+          setError(t('auth.too_many_attempts', 'Too many attempts. Please wait a few minutes, then request a new code.'))
+        } else if (verifyData.error?.toLowerCase().includes('expired') || verifyData.error?.toLowerCase().includes('not found')) {
+          setError(t('auth.code_expired', 'Your code has expired. Click "Resend code" below to get a new one.'))
+        } else {
+          setError(verifyData.error || t('auth.invalid_or_expired_code', 'Invalid or expired code.'))
+        }
         return
       }
 
@@ -96,33 +139,63 @@ export default function Login() {
         redirect: false,
         email,
         confirmToken: verifyData.confirmToken,
+        debugRequestId: debugRequestId || undefined,
       })
+
+      if (AUTH_DEBUG) {
+        console.log('[auth-debug] signIn result', {
+          debugRequestId,
+          ok: result?.ok,
+          status: result?.status,
+          error: result?.error,
+          url: result?.url,
+        })
+      }
 
       if (result?.ok) {
         const session = await fetch('/api/auth/session').then(r => r.json()).catch(() => null)
+        if (AUTH_DEBUG) {
+          console.log('[auth-debug] session fetch after sign-in', { debugRequestId, session })
+        }
         const roles = (session?.user?.roles as string[]) || []
         // Admins first
         if (roles.includes('ADMIN')) {
           await router.push('/admin')
           return
         }
-        // Check if the user is an affiliate; if the endpoint doesn't exist or returns non-200, fall back
+        // Affiliates
         try {
           const affRes = await fetch('/api/affiliate/dashboard', { method: 'GET' })
           if (affRes.ok) {
-            const data = await affRes.json().catch(() => ({}))
-            if (data && data.affiliate) {
+            const data = await affRes.json().catch(() => ({} as any))
+            if (data && (data as any).affiliate) {
               await router.push('/affiliate')
               return
             }
           }
         } catch { /* ignore and fall back */ }
+
+        // Onboarding completion validation — send first-timers to setup wizard
+        try {
+          const setupRes = await fetch('/api/business/setup-status')
+          if (setupRes.ok) {
+            const setup = await setupRes.json()
+            if (!setup.coreSetupComplete) {
+              await router.push('/setup')
+              return
+            }
+          }
+        } catch { /* ignore and fall back */ }
+
         await router.push('/dashboard')
       } else {
-        setError('Login could not be completed. The code may have expired — request a new one.')
+        setError(t('auth.login_incomplete', 'Login could not be completed. The code may have expired — request a new one.'))
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] signIn failure', { debugRequestId, result })
+        }
       }
     } catch {
-      setError('Verification failed. Please try again.')
+      setError(t('auth.verification_failed', 'Verification failed. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -133,17 +206,33 @@ export default function Login() {
     setError(null)
     setOtp(['', '', '', '', '', ''])
     try {
-      const res = await fetch('/api/auth/pre-login', {
+      const payload: Record<string, unknown> = { email, pendingToken }
+      if (debugRequestId) payload.debugRequestId = debugRequestId
+
+      const res = await fetch('/api/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       })
+      // Update pendingToken with the newly issued one
       const data = await res.json()
+      if (res.ok && data.pendingToken) {
+        setPendingToken(data.pendingToken)
+      }
       if (!res.ok) {
-        setError(data.error || 'Could not resend code.')
+        if (AUTH_DEBUG) {
+          console.warn('[auth-debug] resend-otp failure', { debugRequestId, status: res.status, error: data.error })
+        }
+        if (res.status === 429) {
+          setError(t('auth.too_many_resends', 'Too many resend requests. Please wait a few minutes and try again.'))
+        } else {
+          setError(data.error || t('auth.could_not_resend', 'Could not resend code.'))
+        }
+      } else if (AUTH_DEBUG) {
+        console.log('[auth-debug] resend-otp success', { debugRequestId })
       }
     } catch {
-      setError('Could not resend code. Try again.')
+      setError(t('auth.could_not_resend_retry', 'Could not resend code. Try again.'))
     } finally {
       setResending(false)
       otpRefs.current[0]?.focus()
@@ -194,7 +283,7 @@ export default function Login() {
               onClick={() => { setStep('credentials'); setError(null); setOtp(['','','','','','']) }}
               className="text-sm text-imboni-blue hover:text-imboni-orange transition inline-flex items-center gap-1"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> {t('auth.back', 'Back')}
             </button>
           ) : (
             <Link href="/" className="text-sm text-imboni-blue hover:text-imboni-orange transition inline-flex items-center gap-1" suppressHydrationWarning>
@@ -261,7 +350,7 @@ export default function Login() {
                     value={email}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
-                    placeholder="owner@restaurant.rw"
+                    placeholder="owner@business.rw"
                     required
                     autoComplete="email"
                   />
@@ -305,9 +394,9 @@ export default function Login() {
                   <ShieldCheck className="w-7 h-7 text-imboni-blue" />
                 </div>
                 <p className="text-sm text-gray-600">
-                  A 6-digit code was sent to <strong>{maskedEmail}</strong>
-                  {otpChannel === 'both' && ' (email + WhatsApp)'}
-                  {otpChannel === 'whatsapp' && ' via WhatsApp'}
+                  {t('auth.code_sent_to', 'A 6-digit code was sent to')} <strong>{maskedEmail}</strong>
+                  {otpChannel === 'both' && ` ${t('auth.email_and_whatsapp', '(email + WhatsApp)')}`}
+                  {otpChannel === 'whatsapp' && ` ${t('auth.via_whatsapp', 'via WhatsApp')}`}
                 </p>
               </div>
 
@@ -336,7 +425,7 @@ export default function Login() {
                 disabled={loading || otp.join('').length < 6}
                 className="w-full bg-imboni-blue text-white font-medium py-3 px-4 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-imboni-blue disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Verifying...' : 'Verify & Sign In'}
+                {loading ? t('auth.verifying', 'Verifying...') : t('auth.verify_and_signin', 'Verify & Sign In')}
               </button>
 
               <div className="text-center">
@@ -347,12 +436,12 @@ export default function Login() {
                   className="text-sm text-imboni-blue hover:text-imboni-orange inline-flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
-                  {resending ? 'Sending...' : "Didn't receive it? Resend code"}
+                  {resending ? t('auth.sending', 'Sending...') : t('auth.resend_code', "Didn't receive it? Resend code")}
                 </button>
               </div>
 
               <p className="text-xs text-gray-500 text-center">
-                🔒 Never share this code. It expires in 10 minutes.
+                {t('auth.never_share_code', '🔒 Never share this code. It expires in 10 minutes.')}
               </p>
             </form>
           )}
@@ -383,7 +472,7 @@ export default function Login() {
 
       <div className="mt-6 text-center text-xs text-gray-400">
         <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-gray-600">
-          Powered by ICTHubs
+          {t('auth.powered_by', 'Powered by ICTHubs')}
         </a>
       </div>
     </div>

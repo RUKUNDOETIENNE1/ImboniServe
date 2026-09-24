@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalization.service'
 import { logger } from '@/lib/logger'
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service'
 
 const log = logger.child({ service: 'cron-tap-leave-reconcile' })
 
@@ -27,6 +28,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ ok: true, ...result })
   } catch (error: any) {
     log.error('Tap & Leave reconcile cron failed', { error: String(error) })
+    
+    // Alert on reconciliation failure
+    await AlertDeliveryService.deliver({
+      severity: 'error',
+      title: 'Tap & Leave reconciliation job failed',
+      details: {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      },
+    }).catch((alertError) => {
+      log.error('Failed to send Tap & Leave reconciliation failure alert', { alertError })
+    })
+    
     return res.status(500).json({ error: 'Reconcile failed', message: error.message })
   }
 }

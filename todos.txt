@@ -1,0 +1,4 @@
+﻿rwandaUtils.ts:51: // Format: +250 78X XXX XXX
+rwandaUtils.ts:52: if (cleaned.length === 12) { // 250XXXXXXXXX
+BookDemoModal.tsx:143: placeholder="+250 XXX XXX XXX"
+MoMoPaymentFlow.tsx:42: // Format as XXX XXX XXX

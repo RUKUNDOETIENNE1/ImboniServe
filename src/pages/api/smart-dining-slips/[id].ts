@@ -4,6 +4,7 @@ import { authOptions } from '../auth/[...nextauth]'
 import { SmartDiningSlipService } from '@/lib/services/smart-dining-slip.service'
 import { SlipPDFGeneratorService } from '@/lib/services/slip-pdf-generator.service'
 import { NotificationService } from '@/lib/services/notification.service'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -74,6 +75,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (result.success) {
           await SmartDiningSlipService.markSlipAsSent(slip.id)
         }
+
+        // Shadow: neutral send signal for slip sent
+        try {
+          await ingestDiningSlipShadowEvent({
+            type: 'SLIP_SENT_WHATSAPP',
+            businessId: slip.businessId,
+            sessionId: (slip as any).sessionId || undefined,
+            slipId: slip.id,
+          }).catch(() => {})
+        } catch {}
 
         return res.status(200).json({ success: result.success, message: 'Smart Dining Slip™ sent' })
       }

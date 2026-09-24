@@ -1,9 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { prisma } from '@/lib/prisma'
+import { ReservationService } from '@/lib/services/reservation.service'
+import { ingestReservationShadowEvent } from '@/lib/die/business-as-plugin/reservations/reservations.shadow'
+import { PaymentTransactionStatus } from '@prisma/client'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -23,25 +26,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   return res.status(405).json({ error: 'Method not allowed' })
 }
 
+// Apply commercial enforcement: Reservations require Professional plan or higher
+export default requiresFeature('hasReservations')(handler)
+
 async function handleGet(req: NextApiRequest, res: NextApiResponse, businessId: string) {
   const { status = 'all' } = req.query
 
   try {
-    const where: any = { businessId }
-    
-    if (status !== 'all') {
-      where.status = status
-    }
+    const filters: any = {}
+    if (status !== 'all') filters.status = status
 
-    const reservations = await prisma.reservation.findMany({
-      where,
-      orderBy: { reservationDate: 'desc' },
-      include: {
-        table: {
-          select: { number: true }
-        }
-      }
-    })
+    const reservations = await ReservationService.getBusinessReservations(businessId, filters)
 
     const formatted = reservations.map(r => ({
       id: r.id,
@@ -53,7 +48,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse, businessId: 
       partySize: r.partySize,
       tableNumber: r.table?.number,
       depositAmount: r.depositCents ? r.depositCents / 100 : 0,
-      depositPaid: r.depositStatus === 'PAID',
+      depositPaid: r.depositStatus === PaymentTransactionStatus.SUCCESS,
       status: r.status,
       specialRequests: r.specialRequests,
       createdAt: r.createdAt.toISOString()
@@ -83,23 +78,25 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, businessId:
   }
 
   try {
-    const reservation = await prisma.reservation.create({
-      data: {
-        businessId,
-        customerName,
-        customerPhone,
-        customerEmail,
-        reservationDate: new Date(date),
-        reservationTime: time,
-        reservedAt: new Date(`${date}T${time}`),
-        confirmationCode: `RES-${Date.now()}`,
-        partySize,
-        depositCents: depositAmount ? depositAmount * 100 : 0,
-        depositStatus: depositAmount > 0 ? 'PENDING' : null,
-        status: 'PENDING',
-        specialRequests
-      }
+    const reservation = await ReservationService.createReservation({
+      businessId,
+      customerName,
+      customerPhone,
+      customerEmail,
+      reservationDate: new Date(date),
+      reservationTime: time,
+      partySize,
+      specialRequests,
     })
+
+    // Shadow tap: BOOKING_CREATED (feature-flagged, non-blocking)
+    ingestReservationShadowEvent({
+      type: 'BOOKING_CREATED',
+      businessId,
+      reservationId: reservation.id,
+      partySize: reservation.partySize,
+      scheduledAtIso: new Date(`${date}T${time}`).toISOString(),
+    }).catch(() => {})
 
     return res.status(201).json({
       reservation: {
@@ -111,7 +108,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, businessId:
         time: reservation.reservationTime,
         partySize: reservation.partySize,
         depositAmount: reservation.depositCents ? reservation.depositCents / 100 : 0,
-        depositPaid: reservation.depositStatus === 'PAID',
+        depositPaid: reservation.depositStatus === PaymentTransactionStatus.SUCCESS,
         status: reservation.status,
         specialRequests: reservation.specialRequests
       }

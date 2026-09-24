@@ -4,6 +4,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface PayoutSale {
   id: string;
@@ -63,7 +64,7 @@ export default function PayoutSummaryPage() {
       setPayoutData(data);
     } catch (error) {
       console.error('Error fetching payout summary:', error);
-      alert('Failed to load payout summary');
+      toast.error('Failed to load payout summary');
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { IremboPayService } from '@/lib/services/irembopay.service';
 import { logger } from '@/lib/logger';
+import { AlertDeliveryService } from '@/lib/services/alert-delivery.service';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'addon-renewals' });
 
@@ -28,8 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     log.info('Starting add-on renewal processing');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const { start: today } = getBusinessDayBoundary(new Date());
 
     // Find active add-on transactions that need renewal (30 days old)
     const thirtyDaysAgo = new Date(today);
@@ -37,31 +38,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const renewalCandidates = await prisma.paymentTransaction.findMany({
       where: {
-        status: 'COMPLETED',
-        metadata: {
-          path: ['type'],
-          equals: 'addon'
+        status: 'SUCCESS',
+        rawRequest: {
+          path: ['meta', 'type'],
+          equals: 'addon',
         },
         createdAt: {
           gte: new Date(thirtyDaysAgo.getTime() - 24 * 60 * 60 * 1000), // 1 day buffer
-          lte: new Date(thirtyDaysAgo.getTime() + 24 * 60 * 60 * 1000)
-        }
+          lte: new Date(thirtyDaysAgo.getTime() + 24 * 60 * 60 * 1000),
+        },
       },
       include: {
         business: {
           select: {
             id: true,
             name: true,
-            user: {
+            currency: true,
+            timezone: true,
+            owner: {
               select: {
                 email: true,
                 phone: true,
-                name: true
-              }
-            }
-          }
-        }
-      }
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     log.info('Found renewal candidates', { count: renewalCandidates.length });
@@ -75,17 +78,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     for (const transaction of renewalCandidates) {
       try {
-        const metadata = transaction.metadata as any;
-        
+        const meta = (transaction.rawRequest as any)?.meta || {};
+
         // Check if already renewed
         const existingRenewal = await prisma.paymentTransaction.findFirst({
           where: {
             businessId: transaction.businessId,
-            metadata: {
-              path: ['renewalOf'],
-              equals: transaction.id
-            }
-          }
+            rawRequest: {
+              path: ['meta', 'renewalOf'],
+              equals: transaction.id,
+            },
+          },
         });
 
         if (existingRenewal) {
@@ -98,12 +101,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const invoice = await IremboPayService.createInvoice({
           businessId: transaction.businessId,
           amountCents: transaction.amountCents,
-          description: `${metadata.addon} - Monthly Renewal - ${transaction.business.name}`,
+          description: `${meta.addon || 'addon'} - Monthly Renewal - ${transaction.business.name}`,
           customer: {
-            email: transaction.business.user.email,
-            phoneNumber: transaction.business.user.phone,
-            name: transaction.business.user.name
-          }
+            email: transaction.business.owner.email || undefined,
+            phoneNumber: transaction.business.owner.phone || undefined,
+            name: transaction.business.owner.name || undefined,
+          },
         });
 
         // Store renewal transaction
@@ -114,31 +117,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             transactionId: invoice.transactionId,
             gateway: 'IREMBO_PAY',
             paymentMethod: 'WEB',
-            status: 'INITIATED',
+            status: 'PENDING',
             amountCents: transaction.amountCents,
-            currency: 'RWF',
+            currency: transaction.business.currency,
             vatAmountCents: transaction.vatAmountCents,
             exVatAmountCents: transaction.exVatAmountCents,
             gatewayFeeEstimatedCents: transaction.gatewayFeeEstimatedCents,
             netToBusinessCents: transaction.netToBusinessCents,
             paymentLinkUrl: invoice.paymentLinkUrl,
             expiryAt: invoice.expiryAt ? new Date(invoice.expiryAt) : null,
-            payerName: transaction.business.user.name,
-            payerEmail: transaction.business.user.email,
-            payerPhone: transaction.business.user.phone,
-            metadata: {
-              ...metadata,
-              renewalOf: transaction.id,
-              renewalDate: today.toISOString()
-            },
-            rawRequest: invoice as any
+            payerName: transaction.business.owner.name,
+            payerEmail: transaction.business.owner.email,
+            payerPhone: transaction.business.owner.phone,
+            rawRequest: {
+              ...invoice,
+              meta: {
+                ...(typeof meta === 'object' && meta ? meta : {}),
+                renewalOf: transaction.id,
+                renewalDate: today.toISOString(),
+              },
+            }
           }
         });
 
         results.invoicesCreated++;
         log.info('Renewal invoice created', { 
           businessId: transaction.businessId, 
-          addon: metadata.addon,
+          addon: meta.addon,
           invoiceNumber: invoice.invoiceNumber
         });
 
@@ -164,6 +169,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error: any) {
     log.error('Add-on renewal cron failed', { error: error.message });
+    
+    // Alert on renewal processing failure
+    await AlertDeliveryService.deliver({
+      severity: 'error',
+      title: 'Add-on renewal job failed',
+      details: {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      },
+    }).catch((alertError) => {
+      log.error('Failed to send addon renewal failure alert', { alertError })
+    })
+    
     return res.status(500).json({ 
       error: 'Renewal processing failed',
       message: error.message 

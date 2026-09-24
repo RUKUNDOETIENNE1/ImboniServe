@@ -61,7 +61,7 @@ export class AnalyticsInsightsService {
         sale: {
           businessId,
           createdAt: { gte: since },
-          isPaid: true,
+          isPaid: true, // Sale.isPaid boolean field
         },
       },
       select: {

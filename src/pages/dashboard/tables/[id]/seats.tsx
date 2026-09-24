@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import { ArrowLeft, Plus, QrCode, Edit2, Trash2, Check, X, MapPin, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 
 type Seat = {
   id: string
@@ -36,6 +38,7 @@ export default function TableSeatsPage() {
   const [generating, setGenerating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editLabel, setEditLabel] = useState('')
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState<string | null>(null)
 
   useEffect(() => {
     if (tableId && typeof tableId === 'string') {
@@ -77,15 +80,15 @@ export default function TableSeatsPage() {
       })
       if (res.ok) {
         const data = await res.json()
-        alert(`Generated ${data.count} seats`)
+        toast.success(`Generated ${data.count} seats`)
         loadTableAndSeats()
       } else {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed: ${err.error || res.statusText}`)
+        toast.error(`Failed: ${err.error || res.statusText}`)
       }
     } catch (error) {
       console.error('Failed to generate seats:', error)
-      alert('Failed to generate seats')
+      toast.error('Failed to generate seats')
     } finally {
       setGenerating(false)
     }
@@ -97,15 +100,15 @@ export default function TableSeatsPage() {
         method: 'POST'
       })
       if (res.ok) {
-        alert('QR code generated')
+        toast.success('QR code generated')
         loadTableAndSeats()
       } else {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed: ${err.error || res.statusText}`)
+        toast.error(`Failed: ${err.error || res.statusText}`)
       }
     } catch (error) {
       console.error('Failed to generate QR:', error)
-      alert('Failed to generate QR code')
+      toast.error('Failed to generate QR code')
     }
   }
 
@@ -120,31 +123,34 @@ export default function TableSeatsPage() {
         setEditingId(null)
         setEditLabel('')
         loadTableAndSeats()
+        toast.success('Label updated')
       } else {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed: ${err.error || res.statusText}`)
+        toast.error(`Failed: ${err.error || res.statusText}`)
       }
     } catch (error) {
       console.error('Failed to update label:', error)
-      alert('Failed to update label')
+      toast.error('Failed to update label')
     }
   }
 
   const handleDeactivate = async (seatId: string) => {
-    if (!confirm('Deactivate this seat?')) return
     try {
       const res = await fetch(`/api/seats/${seatId}/deactivate`, {
         method: 'POST'
       })
       if (res.ok) {
         loadTableAndSeats()
+        toast.success('Seat deactivated')
       } else {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed: ${err.error || res.statusText}`)
+        toast.error(`Failed: ${err.error || res.statusText}`)
       }
     } catch (error) {
       console.error('Failed to deactivate seat:', error)
-      alert('Failed to deactivate seat')
+      toast.error('Failed to deactivate seat')
+    } finally {
+      setShowDeactivateConfirm(null)
     }
   }
 
@@ -155,13 +161,14 @@ export default function TableSeatsPage() {
       })
       if (res.ok) {
         loadTableAndSeats()
+        toast.success('Seat activated')
       } else {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed: ${err.error || res.statusText}`)
+        toast.error(`Failed: ${err.error || res.statusText}`)
       }
     } catch (error) {
       console.error('Failed to activate seat:', error)
-      alert('Failed to activate seat')
+      toast.error('Failed to activate seat')
     }
   }
 
@@ -383,7 +390,7 @@ export default function TableSeatsPage() {
                           )}
                           {seat.isActive ? (
                             <button
-                              onClick={() => handleDeactivate(seat.id)}
+                              onClick={() => setShowDeactivateConfirm(seat.id)}
                               className="p-1 text-red-600 hover:bg-red-50 rounded"
                               title="Deactivate"
                             >
@@ -420,6 +427,18 @@ export default function TableSeatsPage() {
           </ul>
         </div>
       </div>
+
+      {/* Deactivate Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!showDeactivateConfirm}
+        onClose={() => setShowDeactivateConfirm(null)}
+        onConfirm={() => showDeactivateConfirm && handleDeactivate(showDeactivateConfirm)}
+        title="Deactivate Seat"
+        message="Are you sure you want to deactivate this seat? It will be hidden from customers but preserved in history."
+        confirmText="Deactivate"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </DashboardLayout>
   )
 }

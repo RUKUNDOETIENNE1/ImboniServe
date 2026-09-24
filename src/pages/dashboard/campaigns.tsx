@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import { useTranslation } from '@/lib/i18n'
 import { MessageSquare, Plus, Send, Users, Calendar, TrendingUp, Eye, MousePointer } from 'lucide-react'
 import Card from '@/components/ui/Card'
@@ -27,6 +28,7 @@ export default function Campaigns() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [showNewCampaign, setShowNewCampaign] = useState(false)
+  const [showSendConfirm, setShowSendConfirm] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     message: '',
@@ -73,10 +75,6 @@ export default function Campaigns() {
   }
 
   const sendCampaign = async (campaignId: string) => {
-    if (!confirm('Send this campaign now? This will send WhatsApp messages to all customers in the selected segment.')) {
-      return
-    }
-
     try {
       const res = await fetch(`/api/campaigns/${campaignId}/send`, {
         method: 'POST'
@@ -91,6 +89,8 @@ export default function Campaigns() {
       }
     } catch (error) {
       toast.error('Failed to send campaign')
+    } finally {
+      setShowSendConfirm(null)
     }
   }
 
@@ -204,7 +204,7 @@ export default function Campaigns() {
                   </div>
                   {campaign.status === 'DRAFT' && (
                     <button
-                      onClick={() => sendCampaign(campaign.id)}
+                      onClick={() => setShowSendConfirm(campaign.id)}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2"
                     >
                       <Send className="w-4 h-4" />
@@ -323,6 +323,18 @@ export default function Campaigns() {
             </Card>
           </div>
         )}
+
+        {/* Send Campaign Confirmation Modal */}
+        <ConfirmModal
+          isOpen={!!showSendConfirm}
+          onClose={() => setShowSendConfirm(null)}
+          onConfirm={() => showSendConfirm && sendCampaign(showSendConfirm)}
+          title={t('campaigns.send_campaign', 'Send Campaign')}
+          message={t('campaigns.send_confirm', 'Send this campaign now? This will send WhatsApp messages to all customers in the selected segment.')}
+          confirmText={t('campaigns.send_now', 'Send Now')}
+          cancelText={t('common.cancel', 'Cancel')}
+          variant="primary"
+        />
       </div>
     </DashboardLayout>
   )

@@ -76,7 +76,7 @@ export default function InvitePage() {
           Invite a Business — Earn a Free Month
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Invite another restaurant, café, bar or hotel to Imboni Serve.{' '}
+          Invite another hospitality business to Imboni Serve.{' '}
           <strong>Both you and the business you invite get 1 free month</strong> when they qualify.
         </p>
       </div>
@@ -155,7 +155,7 @@ export default function InvitePage() {
                 Generate your personal invite link to share with other business owners.
                 Each link is unique and tracks your referrals automatically.
               </p>
-              <p className="text-sm text-slate-600">Earn <span className="font-bold text-green-600"><CurrencyDisplay amount={50000} /></span> for every restaurant you refer!</p>
+              <p className="text-sm text-slate-600">Earn <span className="font-bold text-green-600"><CurrencyDisplay amount={50000} /></span> for every business you refer!</p>
               <button
                 onClick={generateCode}
                 disabled={generating}

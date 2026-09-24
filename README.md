@@ -279,6 +279,8 @@ npx prisma migrate deploy
 
 ### Option 2: Vercel/Netlify
 
+Production deployments are triggered automatically from the `main` branch after a GitHub push.
+
 1. **Connect your Git repository**
 2. **Set environment variables** in dashboard
 3. **Deploy**

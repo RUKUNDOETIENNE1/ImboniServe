@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n'
 
 export default function Custom404() {
+  const { t } = useTranslation()
   return (
     <div style={{ 
       display: 'flex', 
@@ -14,10 +16,10 @@ export default function Custom404() {
     }}>
       <h1 style={{ fontSize: '72px', margin: '0', color: '#667eea' }}>404</h1>
       <h2 style={{ fontSize: '24px', fontWeight: 'normal', color: '#4a5568', marginTop: '10px' }}>
-        Page Not Found
+        {t('public.errors.404.title', 'Page Not Found')}
       </h2>
       <p style={{ color: '#718096', marginTop: '20px', maxWidth: '500px' }}>
-        The page you're looking for doesn't exist or has been moved.
+        {t("public.errors.404.description", "The page you're looking for doesn't exist or has been moved.")}
       </p>
       <Link href="/" style={{ 
         marginTop: '30px',
@@ -28,7 +30,7 @@ export default function Custom404() {
         borderRadius: '8px',
         fontWeight: '500'
       }}>
-        Go Back Home
+        {t('public.errors.404.cta_home', 'Go Back Home')}
       </Link>
     </div>
   )

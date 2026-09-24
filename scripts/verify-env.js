@@ -39,8 +39,8 @@ const requiredVars = {
   
   // Low Priority - Optional
   low: [
-    { name: 'IREMBO_PUBLIC_KEY', description: 'IremboPay public key (fallback gateway)' },
-    { name: 'IREMBO_SECRET_KEY', description: 'IremboPay secret key' },
+    { name: 'IREMBOPAY_PUBLIC_KEY', description: 'IremboPay public key (fallback gateway)' },
+    { name: 'IREMBOPAY_SECRET_KEY', description: 'IremboPay secret key' },
     { name: 'REDIS_URL', description: 'Redis URL for job queue' },
     { name: 'NEXT_PUBLIC_CRISP_WEBSITE_ID', description: 'Crisp chat widget ID' },
   ]

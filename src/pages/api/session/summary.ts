@@ -5,6 +5,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -70,6 +71,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const totalAmountCents = session.orders.reduce((sum, order) => sum + order.totalAmountCents, 0);
     const totalOrders = session.orders.length;
     const participantCount = session.participants.length;
+
+    // Shadow taps (feature-flagged inside ingestor)
+    try {
+      await ingestDiningSlipShadowEvent({ type: 'SESSION_UPDATED', businessId: session.businessId as any, sessionId: session.id, amountCents: totalAmountCents }).catch(() => {})
+      const durationMin = session.createdAt ? Math.round((Date.now() - new Date(session.createdAt).getTime()) / 60000) : undefined
+      if (typeof totalAmountCents === 'number' && totalAmountCents >= 500000) {
+        await ingestDiningSlipShadowEvent({ type: 'HIGH_VALUE_SESSION', businessId: session.businessId as any, sessionId: session.id, amountCents: totalAmountCents }).catch(() => {})
+      }
+      if (typeof durationMin === 'number' && durationMin >= 120) {
+        await ingestDiningSlipShadowEvent({ type: 'LONG_DURATION_SESSION', businessId: session.businessId as any, sessionId: session.id, durationMin }).catch(() => {})
+      }
+    } catch {}
 
     // Group orders by participant
     const ordersByParticipant = session.participants.map(participant => ({

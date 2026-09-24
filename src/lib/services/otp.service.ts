@@ -1,22 +1,20 @@
 import { prisma } from '@/lib/prisma'
 import { NotificationService } from './notification.service'
 import { logger } from '@/lib/logger'
+import { normalizePhone } from '@/lib/utils/phone'
+import crypto from 'crypto'
 
 const OTP_TTL_MINUTES = 10
 const MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MINUTES = 15
 const MAX_REQUESTS_PER_WINDOW = 3
 
+/**
+ * Security: Use crypto.randomInt() for cryptographically secure OTP generation.
+ * Math.random() is not suitable for security-sensitive values.
+ */
 function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString()
-}
-
-function normalizePhone(phone: string): string {
-  const p = phone.trim()
-  if (p.startsWith('+')) return p
-  if (p.startsWith('07')) return `+250${p.slice(1)}`
-  if (p.startsWith('2507')) return `+${p}`
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`
+  return crypto.randomInt(100000, 999999).toString()
 }
 
 export class OTPService {

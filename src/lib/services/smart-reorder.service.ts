@@ -64,7 +64,7 @@ export class SmartReorderService {
 
       const items = await prisma.inventoryItem.findMany({
         where: { businessId: input.businessId, isActive: true },
-        select: { id: true, name: true, unit: true, currentStock: true, minStockLevel: true },
+        select: { id: true, name: true, unit: true, currentStock: true, minStockLevel: true, reorderLevel: true },
         orderBy: { name: 'asc' },
       })
 

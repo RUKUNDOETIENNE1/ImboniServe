@@ -186,11 +186,11 @@ DATABASE_URL="postgresql://username:password@host:5432/database_name"
 
 3. **Update your `.env` file:**
    ```bash
-   IREMBO_PUBLIC_KEY="your_public_key"
-   IREMBO_SECRET_KEY="your_secret_key"
-   IREMBO_PAYMENT_ACCOUNT="LOYALTECH-RWF"
-   IREMBO_PAYMENT_ITEM_CODE="PC-xxxxxxxxx"
-   IREMBO_API_BASE="https://api.irembopay.com"  # Use sandbox URL for testing
+   IREMBOPAY_PUBLIC_KEY="your_public_key"
+   IREMBOPAY_SECRET_KEY="your_secret_key"
+   IREMBOPAY_PAYMENT_ACCOUNT="LOYALTECH-RWF"
+   IREMBOPAY_PAYMENT_ITEM_CODE="PC-xxxxxxxxx"
+   IREMBOPAY_API_BASE="https://api.irembopay.com"  # Use sandbox URL for testing
    ```
 
 **✅ Test it:** Make a small test payment in sandbox mode.
@@ -399,7 +399,7 @@ cp .env.example .env
    - `SENTRY_DSN` (server)
    - `PUSHER_SECRET`
    - `INTOUCH_PASSWORD`
-   - `IREMBO_SECRET_KEY`
+   - `IREMBOPAY_SECRET_KEY`
    - `OPENAI_API_KEY`
 6. Redeploy your app
 

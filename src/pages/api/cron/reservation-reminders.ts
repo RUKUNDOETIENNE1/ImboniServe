@@ -17,11 +17,11 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Verify cron secret for security
-  const cronSecret = req.headers['x-cron-secret'] || req.query.secret;
+  // Verify cron secret for security — fail closed if CRON_SECRET is not set
+  const authHeader = req.headers.authorization;
   const expectedSecret = process.env.CRON_SECRET;
 
-  if (expectedSecret && cronSecret !== expectedSecret) {
+  if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

@@ -45,6 +45,11 @@ export class MarketerCommissionService {
       return existing;
     }
 
+    const business = await prisma.business.findUnique({
+      where: { id: params.businessId },
+      select: { currency: true }
+    });
+
     const lockedUntil = new Date();
     lockedUntil.setDate(lockedUntil.getDate() + VALIDATION_PERIOD_DAYS);
 
@@ -54,7 +59,7 @@ export class MarketerCommissionService {
         businessId: params.businessId,
         type: 'SIGNUP_BONUS',
         amountCents: SIGNUP_BONUS_CENTS,
-        currency: 'RWF',
+        currency: business?.currency || 'RWF',
         status: 'PENDING',
         lockedUntil,
         description: params.description || 'Signup bonus for new business'
@@ -127,6 +132,11 @@ export class MarketerCommissionService {
       (params.invoiceAmountCents * RECURRING_RATE_PERCENT) / 100
     );
 
+    const business = await prisma.business.findUnique({
+      where: { id: params.businessId },
+      select: { currency: true }
+    });
+
     const lockedUntil = new Date();
     lockedUntil.setDate(lockedUntil.getDate() + VALIDATION_PERIOD_DAYS);
 
@@ -137,7 +147,7 @@ export class MarketerCommissionService {
         invoiceId: params.invoiceId,
         type: 'RECURRING_REVENUE',
         amountCents: commissionAmount,
-        currency: 'RWF',
+        currency: business?.currency || 'RWF',
         status: 'PENDING',
         lockedUntil,
         periodMonth,

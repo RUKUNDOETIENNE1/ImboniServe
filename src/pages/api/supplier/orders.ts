@@ -1,8 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/middleware/auth.middleware'
+import { ingestProcurementShadowEvent } from '@/lib/die/business-as-plugin/procurement/procurement.shadow'
+import { ingestSuppliersShadowEvent } from '@/lib/die/business-as-plugin/suppliers/suppliers.shadow'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await requireAuth(req, res)
     if (!session) return
@@ -100,6 +103,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       })
 
+      // Shadow taps (feature-flagged, non-blocking)
+      ingestProcurementShadowEvent({
+        type: 'PURCHASE_ORDER_CREATED',
+        businessId: isAdmin ? resolvedBusinessId : (businessIdFromUser as string),
+        poId: order.id,
+        supplierId,
+        orderNumber,
+      }).catch(() => {})
+
+      ingestSuppliersShadowEvent({
+        type: 'SUPPLIER_ORDER_ASSIGNED',
+        businessId: isAdmin ? resolvedBusinessId : (businessIdFromUser as string),
+        supplierId,
+        orderId: order.id,
+        orderNumber,
+      }).catch(() => {})
+
       return res.status(201).json(order)
     }
 
@@ -111,3 +131,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+// Apply commercial enforcement: Supplier Orders require Business plan or higher
+export default requiresFeature('hasSupplierOrders')(baseHandler)

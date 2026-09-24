@@ -4,8 +4,9 @@ import { authOptions } from '../auth/[...nextauth]'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { hasPermission } from '@/lib/permissions/staff'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -112,5 +113,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Tables require Starter plan or higher
+const handler = requiresFeature('hasTables')(baseHandler)
 
 export default requirePermission('tables.read')(handler)

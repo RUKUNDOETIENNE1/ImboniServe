@@ -17,3 +17,12 @@
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+/* Hide scrollbar for horizontal scroll sections (e.g. carousel) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

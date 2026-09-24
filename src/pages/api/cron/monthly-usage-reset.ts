@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { renewAllDueAllocations } from '@/lib/services/credits/credit-wallet.service';
+import { expireStaleReservations } from '@/lib/services/credits/credit-consumption-engine.service';
+import { seedDefaultFeatureCosts } from '@/lib/services/credits/feature-cost-registry.service';
+import { seedDefaultPolicies } from '@/lib/services/credits/credit-policy.service';
+import { seedDefaultPackages } from '@/lib/services/credits/credit-purchase.service';
 
 const log = logger.child({ service: 'monthly-usage-reset' });
 
@@ -26,6 +31,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     log.info('Starting monthly usage reset');
+
+    // Seed defaults if not present (idempotent)
+    await seedDefaultFeatureCosts();
+    await seedDefaultPolicies();
+    await seedDefaultPackages();
+
+    // Renew AI credit allocations via the new platform
+    const renewalResult = await renewAllDueAllocations();
+    log.info('AI credit allocations renewed', renewalResult);
+
+    // Expire stale credit reservations
+    const expiryResult = await expireStaleReservations();
+    log.info('Stale reservations expired', expiryResult);
 
     // Reset CMS post counter for all businesses
     const cmsResult = await prisma.business.updateMany({
@@ -54,6 +72,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       stats: {
         cmsPostsReset: cmsResult.count,
         aiCreditsResetDue: aiResetDue,
+        creditPlatform: {
+          allocationsRenewed: renewalResult.processed,
+          creditsGranted: renewalResult.totalCreditsGranted,
+          reservationsExpired: expiryResult.expired,
+        },
         timestamp: new Date().toISOString()
       }
     });

@@ -9,9 +9,15 @@ import { InTouchService } from './services/intouch.service'
 import { DiningSessionSlipService } from './services/dining-session-slip.service'
 import { TapLeaveFinalizationService } from './services/tap-leave-finalization.service'
 import { WhatsAppCloudService } from './services/whatsapp-cloud.service'
+import { AlertDeliveryService } from './services/alert-delivery.service'
 import { runAutopilotCheck } from './cron/autopilot-features'
 import { prisma } from './prisma'
 import { logger } from './logger'
+import { PaymentTransactionStatus } from '@prisma/client'
+import { ReservationService } from './services/reservation.service'
+import { TrialPolicyService } from './services/trial-policy.service'
+import { PromiseEngine } from './promise-engine'
+import { GuardianService } from './guardian'
 
 function toLocalHHMM(date: Date, timezone: string): string {
   try {
@@ -59,6 +65,9 @@ export class CronService {
     this.scheduleTapLeaveFinalizationSweeper()
     this.scheduleWhatsappReorderFunnel()
     this.scheduleReservationNoShowForfeit()
+    this.scheduleGenericPaymentWatchdog()
+    this.schedulePromiseEvaluation()
+    this.scheduleGuardianEvaluation()
 
     logger.info('All cron jobs started')
   }
@@ -177,12 +186,22 @@ export class CronService {
         }
         const candidates: any[] = await prisma.business.findMany(findArgs)
 
+        // Batch update: collect all eligible business IDs and update in a single query
+        const eligibleBusinessIds: string[] = []
         for (const biz of candidates) {
           if (!biz.trialStartDate) continue
-          const end = new Date(new Date(biz.trialStartDate).getTime() + 14 * 24 * 60 * 60 * 1000)
+          const end = TrialPolicyService.computeTrialEndDate(new Date(biz.trialStartDate), TrialPolicyService.getDefaultTrialDays())
           if (end.getTime() >= now.getTime() && end.getTime() <= threeDaysAhead.getTime()) {
-            await prisma.business.update({ where: { id: biz.id }, data: { salesStatus: 'Trial Ending Soon' } } as any)
+            eligibleBusinessIds.push(biz.id)
           }
+        }
+
+        // Single batch update instead of sequential per-business updates
+        if (eligibleBusinessIds.length > 0) {
+          await prisma.business.updateMany({
+            where: { id: { in: eligibleBusinessIds } },
+            data: { salesStatus: 'Trial Ending Soon' },
+          } as any)
         }
       } catch (err) {
         logger.error('Sales trial status update scheduler error', { error: String(err) })
@@ -215,25 +234,41 @@ export class CronService {
           },
         })
 
+        // Filter eligible businesses first, then process in parallel batches
+        const eligible: typeof businesses = []
         for (const business of businesses) {
-          try {
-            const tz = business.timezone || 'Africa/Kigali'
-            const targetTime = business.dailyReportLocalTime || '07:30'
-            const localHHMM = toLocalHHMM(now, tz)
-            const localDate = toLocalDateString(now, tz)
+          const tz = business.timezone || 'Africa/Kigali'
+          const targetTime = business.dailyReportLocalTime || '07:30'
+          const localHHMM = toLocalHHMM(now, tz)
+          const localDate = toLocalDateString(now, tz)
 
-            if (localHHMM === targetTime && business.lastDailyReportSentForDate !== localDate) {
-              await prisma.business.update({
-                where: { id: business.id },
-                data: { lastDailyReportSentForDate: localDate },
-              })
-              const report = await ReportService.generateDailyReport(business.id, now)
-              await NotificationService.sendDailyReport(business.id, report)
-              logger.info(`Daily report sent for ${business.name}`, { businessId: business.id, localDate, localTime: localHHMM })
-            }
-          } catch (err) {
-            logger.error(`Daily report failed for business ${business.id}`, { error: String(err) })
+          if (localHHMM === targetTime && business.lastDailyReportSentForDate !== localDate) {
+            eligible.push(business)
           }
+        }
+
+        // Process eligible businesses in parallel batches of 5
+        const REPORT_BATCH_SIZE = 5
+        for (let i = 0; i < eligible.length; i += REPORT_BATCH_SIZE) {
+          const batch = eligible.slice(i, i + REPORT_BATCH_SIZE)
+          await Promise.allSettled(
+            batch.map(async (business) => {
+              try {
+                const tz = business.timezone || 'Africa/Kigali'
+                const localDate = toLocalDateString(now, tz)
+
+                await prisma.business.update({
+                  where: { id: business.id },
+                  data: { lastDailyReportSentForDate: localDate },
+                })
+                const report = await ReportService.generateDailyReport(business.id, now)
+                await NotificationService.sendDailyReport(business.id, report)
+                logger.info(`Daily report sent for ${business.name}`, { businessId: business.id, localDate, localTime: toLocalHHMM(now, tz) })
+              } catch (err) {
+                logger.error(`Daily report failed for ${business.name}`, { businessId: business.id, error: String(err) })
+              }
+            })
+          )
         }
       } catch (err) {
         logger.error('Per-business daily report scheduler error', { error: String(err) })
@@ -304,13 +339,11 @@ export class CronService {
 
   private static scheduleInsightGeneration() {
     const checkTime = () => {
+      // EGR-016: Use timezone-aware time instead of manual UTC+2 offset
       const now = new Date()
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000
-      const kigali = new Date(utc + 2 * 3600000)
-      const hour = kigali.getHours()
-      const minute = kigali.getMinutes()
+      const localHHMM = toLocalHHMM(now, 'Africa/Kigali')
 
-      if (hour === 1 && minute === 0) {
+      if (localHHMM === '01:00') {
         this.generateInsights()
       }
     }
@@ -371,6 +404,9 @@ export class CronService {
   private static scheduleReconciliation() {
     const reconcile = async () => {
       try {
+        // Platform-level reconciliation runs at 02:00 in the primary market timezone.
+        // EGR-016: This is a platform operation, not a per-business operation.
+        // When multi-region deployment is needed, this should be parameterized.
         const now = new Date()
         const tz = 'Africa/Kigali'
         const localHHMM = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: tz })
@@ -394,7 +430,7 @@ export class CronService {
         const ordersToRelease = await prisma.sale.findMany({
           where: {
             orderSource: 'QR_REMOTE',
-            paymentStatus: 'PAID',
+            paymentStatus: 'COMPLETED',
             kitchenReleasedAt: null,
             scheduledAt: { not: null }
           },
@@ -454,7 +490,12 @@ export class CronService {
           if (!slipId || !sessionId) continue
 
           try {
-            const status = await InTouchService.getPaymentStatus(p.transactionId)
+            // PAY-002: GetTransactionStatus requires both requesttransactionid
+            // and transactionid (doc Section 4.5).
+            const providerTransactionId = (p.rawCallback as any)?.transactionid
+              ? String((p.rawCallback as any).transactionid)
+              : undefined
+            const status = await InTouchService.getPaymentStatus(p.transactionId, providerTransactionId)
             const isSuccess = InTouchService.isSuccess(status.responsecode)
             const isPending = InTouchService.isPending(status.responsecode)
 
@@ -462,7 +503,7 @@ export class CronService {
               await prisma.paymentTransaction.update({
                 where: { id: p.id },
                 data: {
-                  status: 'PAID' as any,
+                  status: PaymentTransactionStatus.SUCCESS,
                   paidAt: new Date(),
                   rawStatus: { ...(p.rawStatus as any), reconciled: status },
                 },
@@ -476,7 +517,7 @@ export class CronService {
               // Mark as failed
               await prisma.paymentTransaction.update({
                 where: { id: p.id },
-                data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), reconciled: status } },
+                data: { status: PaymentTransactionStatus.FAILED, rawStatus: { ...(p.rawStatus as any), reconciled: status } },
               })
               await DiningSessionSlipService.markPaymentFailed(slipId, p.id, InTouchService.getErrorMessage(status.responsecode))
               continue
@@ -484,8 +525,8 @@ export class CronService {
 
             // Pending too long → timeout
             const ageMs = now.getTime() - new Date(p.createdAt).getTime()
-            if (ageMs > 5 * 60 * 1000) {
-              await prisma.paymentTransaction.update({ where: { id: p.id }, data: { status: 'FAILED' as any, rawStatus: { ...(p.rawStatus as any), timeout: true } } })
+            if (ageMs > 20 * 60 * 1000) {
+              await prisma.paymentTransaction.update({ where: { id: p.id }, data: { status: PaymentTransactionStatus.FAILED, rawStatus: { ...(p.rawStatus as any), timeout: true } } })
               await DiningSessionSlipService.markPaymentFailed(slipId, p.id, 'Payment timeout (reconciler)')
             }
           } catch (err) {
@@ -502,7 +543,7 @@ export class CronService {
   }
 
   /**
-   * Finalization Sweeper: recover any PAID Tap & Leave payments that missed finalization
+   * Finalization Sweeper: recover any SUCCESS Tap & Leave payments that missed finalization
    */
   private static scheduleTapLeaveFinalizationSweeper() {
     const tick = async () => {
@@ -510,7 +551,7 @@ export class CronService {
         const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
         const candidates = await prisma.paymentTransaction.findMany({
           where: {
-            status: 'PAID' as any,
+            status: PaymentTransactionStatus.SUCCESS,
             gateway: 'INTOUCH' as any,
             updatedAt: { lt: twoMinutesAgo },
           },
@@ -544,7 +585,7 @@ export class CronService {
   }
 
   /**
-   * WhatsApp re-order funnel: message customers 7 days after a paid order
+   * WhatsApp re-order funnel: message customers 7 days after a successful order
    */
   private static scheduleWhatsappReorderFunnel() {
     const tick = async () => {
@@ -584,18 +625,17 @@ export class CronService {
       }
     }
 
-    // Run daily at 10:00 Kigali time
+    // Run daily at 10:00 in the primary market timezone (EGR-016: timezone-aware)
     const interval = setInterval(() => {
       const now = new Date()
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000
-      const kigali = new Date(utc + 2 * 3600000)
-      if (kigali.getHours() === 10 && kigali.getMinutes() === 0) tick()
+      const localHHMM = toLocalHHMM(now, 'Africa/Kigali')
+      if (localHHMM === '10:00') tick()
     }, 60 * 1000)
     this.intervals.set('whatsapp-reorder-funnel', interval)
   }
 
   /**
-   * No-show forfeit: mark paid deposits as FORFEITED if guest did not show within 60 minutes after reservedAt
+   * No-show forfeit: mark successful deposits as FORFEITED if guest did not show within 60 minutes after reservedAt
    */
   private static scheduleReservationNoShowForfeit() {
     const tick = async () => {
@@ -606,23 +646,20 @@ export class CronService {
           where: {
             reservedAt: { lte: cutoff },
             status: { in: ['PENDING', 'CONFIRMED'] },
-            depositStatus: 'PAID' as any,
+            depositStatus: PaymentTransactionStatus.SUCCESS,
             completedAt: null,
             noShowReason: null,
           },
           select: { id: true, depositCents: true },
         })
 
-        for (const r of toForfeit) {
-          await prisma.reservation.update({
-            where: { id: r.id },
-            data: {
-              depositStatus: 'FORFEITED' as any,
-              forfeitCents: r.depositCents || 0,
-              noShowReason: 'NO_SHOW',
-              status: 'CANCELLED',
-            },
-          })
+        // Process forfeits in parallel batches of 10 to avoid sequential N+1
+        const FORFEIT_BATCH_SIZE = 10
+        for (let i = 0; i < toForfeit.length; i += FORFEIT_BATCH_SIZE) {
+          const batch = toForfeit.slice(i, i + FORFEIT_BATCH_SIZE)
+          await Promise.allSettled(
+            batch.map((r) => ReservationService.forfeitDeposit(r.id, r.depositCents || 0, 'NO_SHOW'))
+          )
         }
       } catch (err) {
         logger.error('No-show forfeit job error', { error: String(err) })
@@ -653,11 +690,129 @@ export class CronService {
     this.intervals.set('autopilot-features', interval)
   }
 
+  /**
+   * Generic Payment Watchdog: Monitor all providers for stuck PENDING/PROCESSING payments
+   */
+  private static scheduleGenericPaymentWatchdog() {
+    const tick = async () => {
+      try {
+        const PENDING_THRESHOLD_MINUTES = 20
+        const PROCESSING_THRESHOLD_MINUTES = 25
+        const cutoffPending = new Date(Date.now() - PENDING_THRESHOLD_MINUTES * 60 * 1000)
+        const cutoffProcessing = new Date(Date.now() - PROCESSING_THRESHOLD_MINUTES * 60 * 1000)
+
+        // Find stuck PENDING payments
+        const stuckPending = await prisma.paymentTransaction.findMany({
+          where: {
+            status: PaymentTransactionStatus.PENDING,
+            createdAt: { lt: cutoffPending },
+          },
+          select: { id: true, gateway: true, transactionId: true, businessId: true, amountCents: true, createdAt: true },
+          take: 50,
+        })
+
+        // Find stuck PROCESSING payments
+        const stuckProcessing = await prisma.paymentTransaction.findMany({
+          where: {
+            status: PaymentTransactionStatus.PROCESSING,
+            updatedAt: { lt: cutoffProcessing },
+          },
+          select: { id: true, gateway: true, transactionId: true, businessId: true, amountCents: true, updatedAt: true },
+          take: 50,
+        })
+
+        const stuckCount = stuckPending.length + stuckProcessing.length
+
+        if (stuckCount > 0) {
+          logger.warn('[PaymentWatchdog] Stuck payments detected', {
+            pendingCount: stuckPending.length,
+            processingCount: stuckProcessing.length,
+          })
+
+          // Alert on high stuck payment count
+          if (stuckCount >= 10) {
+            await AlertDeliveryService.deliver({
+              severity: 'error',
+              title: `High stuck payment count: ${stuckCount}`,
+              details: {
+                pendingCount: stuckPending.length,
+                processingCount: stuckProcessing.length,
+                pendingThresholdMinutes: PENDING_THRESHOLD_MINUTES,
+                processingThresholdMinutes: PROCESSING_THRESHOLD_MINUTES,
+              },
+            })
+          }
+
+          // Alert on individual high-value stuck payments
+          for (const p of [...stuckPending, ...stuckProcessing]) {
+            if (p.amountCents >= 5000000) { // 50,000 RWF or more
+              await AlertDeliveryService.deliver({
+                severity: 'warn',
+                title: `High-value stuck payment: ${p.amountCents / 100} RWF`,
+                details: {
+                  paymentId: p.id,
+                  gateway: p.gateway,
+                  transactionId: p.transactionId,
+                  businessId: p.businessId,
+                  amountCents: p.amountCents,
+                },
+              })
+            }
+          }
+        }
+      } catch (err) {
+        logger.error('[PaymentWatchdog] Tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 5 minutes
+    const interval = setInterval(tick, 5 * 60 * 1000)
+    this.intervals.set('payment-watchdog', interval)
+  }
+
   static async runManualReport(businessId: string) {
     const today = new Date()
     const report = await ReportService.generateDailyReport(businessId, today)
     await NotificationService.sendDailyReport(businessId, report)
     return report
+  }
+
+  private static schedulePromiseEvaluation() {
+    const tick = async () => {
+      try {
+        const result = await PromiseEngine.evaluateActivePromises()
+        if (result.transitions > 0) {
+          logger.info('[PromiseEngine] Cron tick', { ...result })
+        }
+      } catch (err) {
+        logger.error('[PromiseEngine] Cron tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 2 minutes
+    const interval = setInterval(tick, 2 * 60 * 1000)
+    this.intervals.set('promise-evaluation', interval)
+  }
+
+  private static scheduleGuardianEvaluation() {
+    const tick = async () => {
+      try {
+        const signalsProcessed = await GuardianService.evaluateActiveSignals()
+        const casesVerified = await GuardianService.verifyActiveCases()
+        if (signalsProcessed > 0 || casesVerified > 0) {
+          logger.info('[Guardian] Cron tick', { signalsProcessed, casesVerified })
+        }
+      } catch (err) {
+        logger.error('[Guardian] Cron tick error', { error: String(err) })
+      }
+    }
+
+    // Run every 2 minutes, offset by 30 seconds from Promise Engine tick
+    setTimeout(() => {
+      tick()
+      const interval = setInterval(tick, 2 * 60 * 1000)
+      this.intervals.set('guardian-evaluation', interval)
+    }, 30 * 1000)
   }
 }
 

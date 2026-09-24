@@ -6,6 +6,8 @@ import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
 
 /**
  * GET /api/payments/intouch/status/[id]
@@ -41,13 +43,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // If already completed or failed, return current status
-    if (payment.status === 'PAID' || payment.status === 'FAILED') {
+    if (payment.status === 'SUCCESS' || payment.status === 'FAILED') {
       return res.status(200).json(
         successResponse({
           paymentId: payment.id,
-          status: payment.status.toLowerCase(),
+          status: payment.status === 'SUCCESS' ? 'paid' : 'failed',
           amount: payment.amountCents / 100,
-          message: payment.status === 'PAID' ? 'Payment completed' : 'Payment failed',
+          message: payment.status === 'SUCCESS' ? 'Payment completed' : 'Payment failed',
         })
       )
     }
@@ -57,11 +59,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json(errorResponse('Invalid payment record'))
     }
 
-    const statusResponse = await InTouchService.getPaymentStatus(payment.transactionId)
+    // PAY-002: GetTransactionStatus requires both requesttransactionid and
+    // transactionid (doc Section 4.5). The provider's own transactionid is
+    // captured in rawCallback from the initial RequestPayment response.
+    const providerTransactionId = (payment.rawCallback as any)?.transactionid
+      ? String((payment.rawCallback as any).transactionid)
+      : undefined
+    const statusResponse = await InTouchService.getPaymentStatus(payment.transactionId, providerTransactionId)
 
     // Determine new status
     const newStatus = InTouchService.isSuccess(statusResponse.responsecode)
-      ? 'PAID'
+      ? 'SUCCESS'
       : InTouchService.isPending(statusResponse.responsecode)
       ? 'PENDING'
       : 'FAILED'
@@ -72,20 +80,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: { id: payment.id },
         data: {
           status: newStatus,
-          paidAt: newStatus === 'PAID' ? new Date() : null,
+          paidAt: newStatus === 'SUCCESS' ? new Date() : null,
           rawStatus: {
             ...(payment.rawStatus as any),
             statusPoll: { ...statusResponse, timestamp: new Date().toISOString() },
           },
         },
       })
+      await ensurePaymentLedgerEvent(payment.id, undefined, {
+        source: 'payments/intouch/status',
+        responsecode: statusResponse.responsecode,
+      })
 
-      // Update order if payment completed
-      if (newStatus === 'PAID' && payment.referenceId) {
-        await prisma.order.update({
-          where: { id: payment.referenceId },
-          data: { paymentStatus: 'PAID' },
-        }).catch((err: any) => console.log('[InTouch Status] Order update failed:', err.message))
+      // Update order if payment completed — delegate all side effects to PaymentCompletionService
+      if (newStatus === 'SUCCESS' && payment.referenceId) {
+        try {
+          await PaymentCompletionService.onPaymentSuccess(
+            payment.id,
+            payment.referenceId,
+            { source: 'intouch-status-polling' }
+          )
+        } catch (error) {
+          console.error('[InTouch Status] Error in PaymentCompletionService:', error)
+        }
+      } else if (newStatus === 'FAILED' && payment.referenceId) {
+        try {
+          await PaymentCompletionService.onPaymentFailure(
+            payment.id,
+            payment.referenceId,
+            'InTouch payment failed',
+            { source: 'intouch-status-polling' }
+          )
+        } catch (error) {
+          console.error('[InTouch Status] Error in PaymentCompletionService failure:', error)
+        }
       }
     }
 

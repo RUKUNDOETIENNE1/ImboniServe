@@ -64,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       businessId: business.id,
       tableId: table.id,
       taxMode: (business.taxMode as any) || 'EXCLUSIVE',
-      taxRate: business.taxRate || 18,
+      taxRate: business.taxRate ?? 0, // 0 means no tax configured — business should configure their tax rate
     })
 
     // Ensure there are menu items for this business

@@ -18,11 +18,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.service'
 import { InTouchService } from '@/lib/services/intouch.service'
-import { convertToRWF, getExchangeRate } from '@/lib/services/currency-conversion.service'
+import { convertMinorUnits, getDefaultPaymentRateMaxAgeHours, getRateTypeForOperation } from '@/lib/services/currency-exchange.service'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { getPlatformFee, FeeType } from '@/lib/services/platform-fee.service'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -94,34 +96,65 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const gatewayFee = Math.round(totalAmount * 0.03) // cents (est.)
     const platformMargin = paymentFee - gatewayFee // cents
 
-    // Determine business currency and convert to RWF for gateway
+    // Determine order currency and convert to payment currency (InTouch = RWF)
     const business = await prisma.business.findUnique({
       where: { id: slip.businessId },
       select: { currency: true },
     })
 
-    const businessCurrency = business?.currency || 'RWF'
-    const totalInBusinessUnits = totalAmount / 100
-    let totalRwfUnits = totalInBusinessUnits
+    const orderCurrency = (business?.currency || 'RWF').toUpperCase()
+    const paymentCurrency = 'RWF'
+    let amountRwfCents = totalAmount
     let fxRateRwfPerUnit = 1
+    let exchangeRateSnapshotId: string | null = null
+    let exchangeRateValue: string | null = null
+    let exchangeRateType: 'AVERAGE' | 'BUYING' | 'SELLING' | null = null
+    let exchangeRateSource: string | null = null
+    let exchangeRateBaseCurrency: string | null = null
+    let exchangeRateQuoteCurrency: string | null = null
+    let exchangeRateDate: Date | null = null
+    let exchangeRateRecordId: string | null = null
 
-    if (businessCurrency !== 'RWF') {
-      // convertToRWF returns amount in RWF units
-      totalRwfUnits = await convertToRWF(totalInBusinessUnits, businessCurrency)
-      const rate = await getExchangeRate(businessCurrency) // RWF->currency rate
-      fxRateRwfPerUnit = rate > 0 ? 1 / rate : 1
+    if (orderCurrency !== paymentCurrency) {
+      const converted = await convertMinorUnits(totalAmount, orderCurrency, paymentCurrency, {
+        rateType: getRateTypeForOperation('payment'),
+        maxAgeHours: getDefaultPaymentRateMaxAgeHours(),
+        allowStale: false,
+      })
+      amountRwfCents = converted.toAmountMinor
+      fxRateRwfPerUnit = Number(converted.rateSnapshot.rate.toString())
+      exchangeRateSnapshotId = converted.rateSnapshot.rateId !== 'IDENTITY' ? converted.rateSnapshot.rateId : null
+      exchangeRateValue = converted.rateSnapshot.rate.toString()
+      exchangeRateType = converted.rateSnapshot.rateType
+      exchangeRateSource = converted.rateSnapshot.source
+      exchangeRateBaseCurrency = converted.rateSnapshot.fromCurrency
+      exchangeRateQuoteCurrency = converted.rateSnapshot.toCurrency
+      exchangeRateDate = converted.rateSnapshot.effectiveDate
+      exchangeRateRecordId = converted.rateSnapshot.sourceRecordId || null
     }
 
-    const amountRwfCents = Math.round(totalRwfUnits * 100)
-
-    // Create payment record (amount in RWF cents)
+    // Create payment record with explicit order/payment currency split
     const payment = await prisma.paymentTransaction.create({
       data: {
         invoiceNumber: `INV-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
         transactionId: requestTransactionId,
         referenceId: sessionId, // Link to session, not individual order
         amountCents: amountRwfCents,
-        currency: 'RWF',
+        currency: paymentCurrency,
+        orderAmountCents: totalAmount,
+        orderCurrency,
+        paymentAmountCents: amountRwfCents,
+        paymentCurrency,
+        settlementAmountCents: amountRwfCents,
+        settlementCurrency: paymentCurrency,
+        exchangeRateSnapshotId: exchangeRateSnapshotId || undefined,
+        exchangeRateValue: exchangeRateValue ? (exchangeRateValue as any) : undefined,
+        exchangeRateType: exchangeRateType || undefined,
+        exchangeRateSource: exchangeRateSource || undefined,
+        exchangeRateBaseCurrency: exchangeRateBaseCurrency || undefined,
+        exchangeRateQuoteCurrency: exchangeRateQuoteCurrency || undefined,
+        exchangeRateEffectiveDate: exchangeRateDate || undefined,
+        exchangeRateRecordId: exchangeRateRecordId || undefined,
         vatAmountCents: 0,
         exVatAmountCents: amountRwfCents,
         gatewayFeeEstimatedCents: gatewayFee,
@@ -137,9 +170,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           sessionId,
           slipId: slip.id,
           slipNumber: slip.slipNumber,
-          originalAmount: finalAmount,
-          originalCurrency: businessCurrency,
+          originalAmount: totalAmount,
+          originalCurrency: orderCurrency,
+          paymentAmount: amountRwfCents,
+          paymentCurrency,
           fxRateRwfPerUnit,
+          exchangeRateType,
+          exchangeRateSource,
+          exchangeRateDate: exchangeRateDate?.toISOString() || null,
           paymentFee,
           paymentFeePercent,
           gatewayFee,
@@ -156,7 +194,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await DiningSessionSlipService.markPaymentTriggered(slip.id, payment.id)
 
     // Prepare callback URL
-    const callbackUrl = `${process.env.NEXTAUTH_URL}/api/checkout/tap-and-leave/webhook`
+    // PAY-002: prefer the explicit INTOUCH_CALLBACK_URL (e.g. an ngrok tunnel
+    // during sandbox testing) over NEXTAUTH_URL. Previously this always
+    // derived the callback from NEXTAUTH_URL, silently ignoring
+    // INTOUCH_CALLBACK_URL even when configured — meaning the founder-facing
+    // instruction to set INTOUCH_CALLBACK_URL (FOUNDER-GPV-001 environment
+    // prerequisites) had no effect on the Tap & Leave flow. This mirrors the
+    // fallback order already used by InTouchProvider (the marketplace/
+    // subscription payment path).
+    const callbackUrl = process.env.INTOUCH_CALLBACK_URL || `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`
 
     // Development-only: simulation mode to bypass external gateway
     const simulate = (req.query?.simulate === '1') || (req.body && req.body.simulate === true)
@@ -187,8 +233,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       )
     }
 
-    // Request payment from InTouch (amount in RWF units)
-    const amountRwf = Math.round(totalRwfUnits)
+    // Request payment from InTouch (RWF major units)
+    const amountRwf = Math.round(amountRwfCents / 100)
     const intouchResponse = await InTouchService.requestPayment({
       amount: amountRwf,
       mobilePhoneNo: phone,
@@ -202,13 +248,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: intouchResponse as any,
         status: InTouchService.isSuccess(intouchResponse.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(intouchResponse.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
       },
     })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'checkout/tap-and-leave/initiate',
+      responsecode: intouchResponse.responsecode,
+      sessionId,
+      slipId: slip.id,
+    })
+
+    // Shadow taps: payment lifecycle
+    try {
+      const success = InTouchService.isSuccess(intouchResponse.responsecode)
+      const pending = InTouchService.isPending(intouchResponse.responsecode)
+      if (success) {
+        await ingestDiningSlipShadowEvent({ type: 'SLIP_PAID', businessId: slip.businessId, sessionId, slipId: slip.id, amountCents: finalAmount }).catch(() => {})
+      } else if (!pending) {
+        await ingestDiningSlipShadowEvent({ type: 'PAYMENT_EXCEPTION', businessId: slip.businessId, sessionId, slipId: slip.id, reason: String(intouchResponse.responsecode) }).catch(() => {})
+      }
+    } catch {}
 
     // Check if payment failed immediately
     if (!InTouchService.isSuccess(intouchResponse.responsecode) && !InTouchService.isPending(intouchResponse.responsecode)) {
@@ -218,6 +281,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payment.id,
         InTouchService.getErrorMessage(intouchResponse.responsecode)
       )
+
+      // Shadow: immediate failure
+      try {
+        await ingestDiningSlipShadowEvent({ type: 'PAYMENT_EXCEPTION', businessId: slip.businessId, sessionId, slipId: slip.id, reason: String(intouchResponse.responsecode) }).catch(() => {})
+      } catch {}
 
       return res.status(400).json(
         errorResponse(InTouchService.getErrorMessage(intouchResponse.responsecode), {

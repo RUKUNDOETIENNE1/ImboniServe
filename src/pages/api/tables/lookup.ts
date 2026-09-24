@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 /**
  * Public endpoint to lookup table information by ID
  * Used by /t/[id] short URL route
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -25,23 +26,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         number: true,
         businessId: true,
         capacity: true,
-        isActive: true,
+        status: true,
         business: {
           select: {
             id: true,
             name: true,
-            enableQRInVenue: true
-          }
+            enableQRInVenue: true,
+          },
         }
       }
     })
 
     if (!table) {
       return res.status(404).json({ error: 'Table not found' })
-    }
-
-    if (!table.isActive) {
-      return res.status(403).json({ error: 'Table is not active' })
     }
 
     if (!table.business.enableQRInVenue) {
@@ -60,3 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Tables require Starter plan or higher
+export default requiresFeature('hasTables')(baseHandler)

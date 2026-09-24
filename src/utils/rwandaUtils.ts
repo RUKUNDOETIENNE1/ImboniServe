@@ -76,16 +76,6 @@ export function generateUSSDCode(network: string, amount: number): string {
   return codes[network as keyof typeof codes] || `*182*${amount}#`
 }
 
-export function getVATRate(): number {
-  // Rwanda VAT rate (can be fetched from API in future)
-  return 18 // 18%
-}
-
-export function calculateVAT(amount: number): number {
-  const vatRate = getVATRate()
-  return amount * (vatRate / 100)
-}
-
 export function getBusinessHours(): { open: string; close: string } {
   // Default Rwanda restaurant hours
   return {

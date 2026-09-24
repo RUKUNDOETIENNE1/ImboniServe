@@ -1,6 +1,22 @@
 /**
  * Global Currency System
  * 
+ * ⚠️ DEPRECATED: This static currency utility is being phased out.
+ * 
+ * ARCHITECTURAL RULE:
+ * Use currency-exchange.service.ts as the SINGLE SOURCE OF TRUTH for:
+ * - Exchange rates (DB-backed, not static)
+ * - Currency conversion
+ * - Display formatting
+ * 
+ * This file remains for backward compatibility during migration only.
+ * DO NOT add new functions. DO NOT use in new code.
+ * 
+ * Migration path:
+ * - Replace formatCurrency() with CurrencyExchangeService.format()
+ * - Replace convertFromRWF() with CurrencyExchangeService.convert()
+ * - Replace EXCHANGE_RATES with DB-backed rates
+ * 
  * Rules:
  * - All prices stored in RWF (base currency)
  * - Conversion ONLY for display
@@ -19,7 +35,7 @@ export interface CurrencyConfig {
 export const SUPPORTED_CURRENCIES: Record<string, CurrencyConfig> = {
   RWF: {
     code: 'RWF',
-    symbol: 'FRw',
+    symbol: 'RWF',
     name: 'Rwandan Franc',
     decimalDigits: 0,
     symbolPosition: 'after'
@@ -68,16 +84,11 @@ export const SUPPORTED_CURRENCIES: Record<string, CurrencyConfig> = {
   }
 };
 
-// Exchange rates (RWF as base)
-// In production, these should be fetched from database or external API
+// Legacy compatibility placeholder.
+// Canonical exchange rates are now provided server-side by currency-exchange.service.ts
+// and BNR ingestion persistence. Do not use this object for runtime conversion.
 export const EXCHANGE_RATES: Record<string, number> = {
-  RWF: 1,
-  USD: 0.000769, // 1 USD ≈ 1,300 RWF
-  EUR: 0.000714, // 1 EUR ≈ 1,400 RWF
-  GBP: 0.000625, // 1 GBP ≈ 1,600 RWF
-  KES: 0.1,      // 1 KES ≈ 10 RWF
-  TZS: 2,        // 1 TZS ≈ 0.5 RWF
-  UGX: 3         // 1 UGX ≈ 0.33 RWF
+  RWF: 1
 };
 
 /**
@@ -99,14 +110,9 @@ export function getCurrencySymbol(currencyCode: string): string {
  */
 export function convertFromRWF(amountRWF: number, targetCurrency: string): number {
   if (targetCurrency === 'RWF') return amountRWF;
-  
-  const rate = EXCHANGE_RATES[targetCurrency];
-  if (!rate) {
-    console.warn(`Exchange rate not found for ${targetCurrency}, defaulting to RWF`);
-    return amountRWF;
-  }
-  
-  return amountRWF * rate;
+  throw new Error(
+    `Client-side conversion RWF -> ${targetCurrency} is disabled. Use the canonical server FX service.`
+  );
 }
 
 /**
@@ -114,14 +120,9 @@ export function convertFromRWF(amountRWF: number, targetCurrency: string): numbe
  */
 export function convertToRWF(amount: number, sourceCurrency: string): number {
   if (sourceCurrency === 'RWF') return amount;
-  
-  const rate = EXCHANGE_RATES[sourceCurrency];
-  if (!rate) {
-    console.warn(`Exchange rate not found for ${sourceCurrency}`);
-    return amount;
-  }
-  
-  return amount / rate;
+  throw new Error(
+    `Client-side conversion ${sourceCurrency} -> RWF is disabled. Use the canonical server FX service.`
+  );
 }
 
 /**
@@ -141,9 +142,12 @@ export function formatCurrency(
   } = {}
 ): string {
   const { showSymbol = true, showCode = false, compact = false } = options;
-  
-  const config = getCurrencyConfig(targetCurrency);
-  const convertedAmount = convertFromRWF(amountInRWF, targetCurrency);
+
+  // Safety rule: do not relabel RWF-denominated values as another currency
+  // unless an explicit canonical conversion has happened server-side.
+  const safeCurrency = targetCurrency === 'RWF' ? 'RWF' : 'RWF';
+  const config = getCurrencyConfig(safeCurrency);
+  const convertedAmount = amountInRWF;
   
   // Format number with proper decimal places
   let formattedNumber: string;
@@ -208,7 +212,9 @@ export function parseCurrencyInput(
   const amount = parseFloat(cleaned) || 0;
   
   // Convert to RWF if needed
-  const amountInRWF = convertToRWF(amount, sourceCurrency);
+  const amountInRWF = sourceCurrency === 'RWF' ? amount : (() => {
+    throw new Error('Client-side parse conversion is disabled for non-RWF. Use server conversion.');
+  })();
   
   // Return in cents
   return Math.round(amountInRWF * 100);

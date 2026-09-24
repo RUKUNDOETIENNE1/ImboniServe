@@ -48,7 +48,7 @@ export default function PaymentMethods({ onSelect }: { onSelect: (method: string
       color: 'bg-green-100',
       textColor: 'text-green-800',
       description: 'Pay with cash',
-      instructions: 'Pay at restaurant location'
+      instructions: 'Pay at business location'
     }
   ]
   

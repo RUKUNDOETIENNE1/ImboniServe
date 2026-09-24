@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { SmartReorderService } from '@/lib/services/smart-reorder.service'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -69,3 +69,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' })
   }
 }
+
+export default baseHandler

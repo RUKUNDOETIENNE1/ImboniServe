@@ -71,15 +71,15 @@ export function PaymentFlow({
         const response = await fetch(`/api/payments/irembo/status?transactionId=${txnId}`)
         const result = await response.json()
 
-        if (result.data.status === 'PAID') {
+        if (result.data.status === 'SUCCESS') {
           clearInterval(interval)
           setPaymentStatus('success')
           onSuccess?.()
-        } else if (result.data.status === 'FAILED' || result.data.status === 'EXPIRED') {
+        } else if (result.data.status === 'FAILED' || result.data.status === 'CANCELLED') {
           clearInterval(interval)
           setPaymentStatus('failed')
-          setError('Payment failed or expired. Please try again.')
-          onError?.('Payment failed or expired')
+          setError('Payment failed or was cancelled. Please try again.')
+          onError?.('Payment failed or was cancelled')
         } else if (attempts >= maxAttempts) {
           clearInterval(interval)
           setError('Payment status check timed out. Please refresh to check status.')

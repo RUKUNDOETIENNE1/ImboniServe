@@ -151,7 +151,7 @@ export default function AchievementBadges({ achievements, newlyUnlocked = [] }: 
       {!showAll && lockedAchievements.length > 0 && (
         <div className="mt-3 text-center">
           <p className="text-xs text-gray-500">
-            {t('achievements.more_to_unlock', { count: lockedAchievements.length })}
+            {t('achievements.more_to_unlock', 'More to unlock')} {lockedAchievements.length}
           </p>
         </div>
       )}

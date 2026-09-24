@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useTranslation } from '@/lib/i18n'
 import { Plus, Minus, Search, Utensils, Clock, User, Check } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface MenuItem {
   id: string
@@ -94,7 +95,7 @@ export default function TabletOrdering() {
   const handlePlaceOrder = () => {
     // In production, this would send the order to the server
     console.log('Placing order:', { table: selectedTable, items: cart })
-    alert(t('tablet.orderPlaced', 'Order placed successfully!'))
+    toast.success(t('tablet.orderPlaced', 'Order placed successfully!'))
     setCart([])
     setSelectedTable(null)
   }

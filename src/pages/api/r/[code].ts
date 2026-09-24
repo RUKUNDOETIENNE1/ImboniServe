@@ -39,12 +39,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.redirect(302, '/')
     }
 
-    // Set referral cookie (expires in 30 days)
+    // Set referral cookies (expires in 30 days)
+    // im_ref is the canonical cookie read by signup attribution.
+    // referral_code is kept for backward compatibility with legacy code.
     const cookieMaxAge = 30 * 24 * 60 * 60 // 30 days in seconds
-    res.setHeader(
-      'Set-Cookie',
-      `referral_code=${code}; Path=/; Max-Age=${cookieMaxAge}; HttpOnly; SameSite=Lax`
-    )
+    const cookieFlags = `Path=/; Max-Age=${cookieMaxAge}; HttpOnly; SameSite=Lax`
+    res.setHeader('Set-Cookie', [
+      `im_ref=${code}; ${cookieFlags}`,
+      `referral_code=${code}; ${cookieFlags}`,
+    ])
 
     // Redirect to home page
     return res.redirect(302, '/')

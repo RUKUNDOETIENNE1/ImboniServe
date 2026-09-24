@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
-import { Download, Calendar, TrendingUp, DollarSign, TrendingDown, BarChart3 } from 'lucide-react'
+import { Download, Calendar, TrendingUp, DollarSign, TrendingDown, BarChart3, Loader2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { useToast } from '@/components/Toast'
 
@@ -11,6 +11,30 @@ export default function Reports() {
   const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [reportData, setReportData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const [exporting, setExporting] = useState(false)
+
+  const handleExportPDF = async () => {
+    setExporting(true)
+    try {
+      const res = await fetch(`/api/reports/export?type=${reportType}`)
+      if (!res.ok) throw new Error('Export failed')
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${reportType}-report-${new Date().toISOString().split('T')[0]}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      showToast('success', t('reports.export_success', 'Report exported successfully'))
+    } catch (error) {
+      console.error('PDF export failed:', error)
+      showToast('error', t('reports.export_failed', 'Failed to export PDF. Please try again.'))
+    } finally {
+      setExporting(false)
+    }
+  }
 
   const fetchReport = async () => {
     setLoading(true)
@@ -39,11 +63,12 @@ export default function Reports() {
             <p className="text-sm text-slate-500 mt-1">{t('reports.subtitle', 'View and download your business reports')}</p>
           </div>
           <button 
-            onClick={() => showToast('info', t('reports.export_coming_soon', 'PDF export coming soon'))}
-            className="bg-gradient-to-r from-imboni-green to-green-600 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-green-200 flex items-center transition-all"
+            onClick={handleExportPDF}
+            disabled={exporting || loading || !reportData}
+            className="bg-gradient-to-r from-imboni-green to-green-600 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-green-200 flex items-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Download className="w-4 h-4 mr-2" />
-            {t('reports.export_pdf', 'Export PDF')}
+            {exporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            {exporting ? t('reports.exporting', 'Exporting...') : t('reports.export_pdf', 'Export PDF')}
           </button>
         </div>
       </div>

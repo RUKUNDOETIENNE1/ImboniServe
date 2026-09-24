@@ -19,7 +19,7 @@ export default function WhatsAppBot() {
     'REPORT DAILY': 'Daily report',
     'REPORT WEEKLY': 'Weekly summary',
     'MENU': 'View menu items',
-    'STATUS': 'Restaurant status',
+    'STATUS': 'Business status',
     'PAYMENT [amount] [method]': 'Record payment'
   }
   
@@ -62,7 +62,7 @@ export default function WhatsAppBot() {
           </div>
           <div>
             <h3 className="font-semibold">WhatsApp Bot</h3>
-            <p className="text-sm text-gray-500">Live chat with your restaurant</p>
+            <p className="text-sm text-gray-500">Live chat with your business</p>
           </div>
         </div>
         <button className="text-green-600 hover:text-green-700">

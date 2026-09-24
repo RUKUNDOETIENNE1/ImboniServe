@@ -4,6 +4,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { BranchService } from '@/lib/services/branch.service'
 import { getUserEffectivePermissions, hasPermission } from '@/lib/permissions/staff'
 import { z } from 'zod'
+import { requiresResourceLimit } from '@/lib/middleware/withFeatureCheck'
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
@@ -14,7 +15,12 @@ const createSchema = z.object({
   longitude: z.number().optional(),
 })
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+// Helper function to get branch count for resource limit check
+async function getBranchCount(businessId: string): Promise<number> {
+  return await BranchService.getBranchCount(businessId)
+}
+
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
   if (!session?.user || !businessId) return res.status(401).json({ error: 'Unauthorized' })
@@ -44,3 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' })
 }
+
+// Apply commercial enforcement: Branches have resource limits based on plan
+export default requiresResourceLimit('branches', getBranchCount)(baseHandler)

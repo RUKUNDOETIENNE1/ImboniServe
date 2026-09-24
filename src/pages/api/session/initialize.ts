@@ -9,6 +9,7 @@ import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.ser
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -107,6 +108,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       taxMode: business.taxMode as 'INCLUSIVE' | 'EXCLUSIVE',
       taxRate: business.taxRate,
     })
+
+    // Shadow taps (feature-flagged inside ingestor)
+    try {
+      const nowTs = new Date().toISOString()
+      await ingestDiningSlipShadowEvent({ type: 'SESSION_STARTED', businessId, sessionId: result.session.id }).catch(() => {})
+      await ingestDiningSlipShadowEvent({ type: 'SLIP_CREATED', businessId, sessionId: result.session.id, slipId: slip.id }).catch(() => {})
+    } catch {}
 
     return res.status(201).json(
       successResponse({

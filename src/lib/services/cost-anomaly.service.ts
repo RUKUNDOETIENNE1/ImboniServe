@@ -25,20 +25,36 @@ export class CostAnomalyService {
       const sinceDate = new Date(Date.now() - daysWindow * 24 * 60 * 60 * 1000)
 
       // Weighted averages over trailing window for same supplier + product name
-      const rows = await prisma.$queryRaw<Array<{
-        wavg_price: number | null
-        wavg_sq: number | null
-      }>>`
-        SELECT 
-          COALESCE(SUM(gi."unitPriceCents" * gi."receivedQuantity")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_price,
-          COALESCE(SUM(gi."receivedQuantity" * gi."unitPriceCents" * gi."unitPriceCents")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_sq
-        FROM "GoodsReceivedNoteItem" gi
-        JOIN "GoodsReceivedNote" g ON gi."grnId" = g."id"
-        WHERE g."supplierId" = ${input.supplierId}
-          AND gi."productName" = ${input.productName}
-          AND g."receivedAt" >= ${sinceDate}
-          AND (${input.grnItemId ?? null} IS NULL OR gi."id" <> ${input.grnItemId ?? null})
-      `
+      // Note: avoid passing nullable params directly — use Prisma.sql with explicit casts
+      const grnItemId = input.grnItemId ?? null
+      const rows = grnItemId
+        ? await prisma.$queryRaw<Array<{
+            wavg_price: number | null
+            wavg_sq: number | null
+          }>>`
+            SELECT 
+              COALESCE(SUM(gi."unitPriceCents" * gi."receivedQuantity")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_price,
+              COALESCE(SUM(gi."receivedQuantity" * gi."unitPriceCents" * gi."unitPriceCents")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_sq
+            FROM "GoodsReceivedNoteItem" gi
+            JOIN "GoodsReceivedNote" g ON gi."grnId" = g."id"
+            WHERE g."supplierId" = ${input.supplierId}
+              AND gi."productName" = ${input.productName}
+              AND g."receivedAt" >= ${sinceDate}
+              AND gi."id" <> ${grnItemId}
+          `
+        : await prisma.$queryRaw<Array<{
+            wavg_price: number | null
+            wavg_sq: number | null
+          }>>`
+            SELECT 
+              COALESCE(SUM(gi."unitPriceCents" * gi."receivedQuantity")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_price,
+              COALESCE(SUM(gi."receivedQuantity" * gi."unitPriceCents" * gi."unitPriceCents")::float / NULLIF(SUM(gi."receivedQuantity")::float, 0), 0) AS wavg_sq
+            FROM "GoodsReceivedNoteItem" gi
+            JOIN "GoodsReceivedNote" g ON gi."grnId" = g."id"
+            WHERE g."supplierId" = ${input.supplierId}
+              AND gi."productName" = ${input.productName}
+              AND g."receivedAt" >= ${sinceDate}
+          `
 
       const agg = rows?.[0] ?? { wavg_price: 0, wavg_sq: 0 }
       const trailingAvg = Math.max(0, Number(agg.wavg_price ?? 0))

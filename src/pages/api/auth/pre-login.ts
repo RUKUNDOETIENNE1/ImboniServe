@@ -13,6 +13,7 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { AuthOTPService } from '@/lib/services/auth-otp.service'
 import { SecurityEventService } from '@/lib/services/security-event.service'
+import { logAuthDebug, hashIdentifier, redactedEmail } from '@/lib/utils/auth-debug'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 
 function getIP(req: NextApiRequest): string {
@@ -24,11 +25,18 @@ function getIP(req: NextApiRequest): string {
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { email, password } = req.body ?? {}
+  const { email, password, debugRequestId } = req.body ?? {}
   const ip = getIP(req)
   const userAgent = req.headers['user-agent'] ?? null
+  const requestId: string | null = typeof debugRequestId === 'string' ? debugRequestId : null
+
+  logAuthDebug(requestId, 'password_validation', 'start', {
+    email: redactedEmail(email),
+    ip: hashIdentifier(ip),
+  })
 
   if (!email || !password) {
+    logAuthDebug(requestId, 'password_validation', 'fail', { reason: 'missing_credentials' })
     return res.status(400).json({ error: 'Email and password are required.' })
   }
 
@@ -48,6 +56,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const validPassword = user ? await bcrypt.compare(password, user.password) : false
 
     if (!user || !user.isActive || !validPassword) {
+      logAuthDebug(requestId, 'password_validation', 'fail', {
+        reason: !user ? 'user_not_found' : !user.isActive ? 'account_inactive' : 'wrong_password',
+        email: redactedEmail(email),
+      })
       await SecurityEventService.log({
         userId: user?.id,
         eventType: 'LOGIN_FAILED',
@@ -58,6 +70,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // Generic message prevents user enumeration
       return res.status(401).json({ error: 'Invalid email or password.' })
     }
+
+    logAuthDebug(requestId, 'password_validation', 'success', {
+      userId: user.id,
+      email: redactedEmail(user.email),
+    })
 
     // Check per-user brute force
     const userFailures = await SecurityEventService.countRecentFailures({ userId: user.id, windowMinutes: 15 })
@@ -73,6 +90,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       name: user.name,
       phone: user.whatsappNumber || user.phone,
       ip,
+      debugContext: { requestId, emailHash: hashIdentifier(user.email) },
     })
 
     await SecurityEventService.log({
@@ -84,8 +102,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!sendResult.success) {
-      return res.status(503).json({ error: 'Could not send verification code. Check your contact details or try again.' })
+      logAuthDebug(requestId, 'otp_delivery', 'fail', {
+        userId: user.id,
+        email: redactedEmail(user.email),
+        reason: sendResult.reason || 'send_failed',
+      })
+      return res.status(503).json({ error: 'Could not send verification code. Please verify email/phone settings or try again.' })
     }
+
+    logAuthDebug(requestId, 'otp_delivery', 'success', {
+      userId: user.id,
+      channel: sendResult.channel,
+      email: redactedEmail(user.email),
+    })
 
     // Mask email for display
     const parts = user.email.split('@')
@@ -97,9 +126,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       maskedEmail: masked,
       channel: sendResult.channel,
       message: `A 6-digit code was sent to ${masked}.`,
+      debugRequestId: requestId ?? undefined,
+      pendingToken: sendResult.pendingToken,
     })
-  } catch (err) {
-    console.error('[pre-login] Error:', err)
+  } catch (err: any) {
+    logAuthDebug(requestId, 'password_validation', 'fail', { exception: err?.message || String(err) })
     return res.status(500).json({ error: 'Login service error. Please try again.' })
   }
 }
@@ -108,3 +139,7 @@ export default withRateLimit(handler, {
   windowMs: 15 * 60 * 1000, // 15 min
   maxRequests: 10,
 })
+
+export const config = {
+  runtime: 'nodejs',
+}

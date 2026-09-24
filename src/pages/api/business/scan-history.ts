@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { requirePermission } from '@/lib/middleware/permission.middleware';
 import { resolveBusinessContext } from '@/lib/api/business-context';
+import { requiresActiveSubscription } from '@/lib/middleware/withFeatureCheck';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -35,4 +36,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default requirePermission('settings.read')(handler);
+// Apply commercial enforcement: Scan history requires active subscription
+export default requiresActiveSubscription(requirePermission('settings.read')(handler));

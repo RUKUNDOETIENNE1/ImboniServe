@@ -20,13 +20,35 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
+/**
+ * Security: Fail-closed trial hash secret resolution.
+ * In production, TRIAL_HASH_SECRET MUST be set. An empty secret would make
+ * trial eligibility hashes predictable and forgeable.
+ */
+const _isProd = process.env.NODE_ENV === 'production'
+function getTrialHashSecret(): string {
+  const v = process.env.TRIAL_HASH_SECRET
+  if (v) return v
+  if (_isProd) {
+    throw new Error(
+      'SECURITY FATAL: TRIAL_HASH_SECRET is not set in production. ' +
+      'Refusing to hash trial eligibility data with an empty secret.'
+    )
+  }
+  if (!hashHmac._warned) {
+    console.warn('⚠️  SECURITY WARNING: TRIAL_HASH_SECRET is not set. Using empty default (development only).')
+    hashHmac._warned = true
+  }
+  return ''
+}
+
 function hashHmac(value: string) {
-  const secret = process.env.TRIAL_HASH_SECRET || ''
+  const secret = getTrialHashSecret()
   return crypto.createHmac('sha256', secret).update(value).digest('hex')
 }
 
 function hashLegacy(value: string) {
-  const secret = process.env.TRIAL_HASH_SECRET || ''
+  const secret = getTrialHashSecret()
   return crypto.createHash('sha256').update(secret + '|' + value).digest('hex')
 }
 

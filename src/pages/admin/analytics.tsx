@@ -9,7 +9,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions);
   if (!session?.user) return { redirect: { destination: '/login', permanent: false } };
   const roles: string[] = (session.user as any).roles || [];
-  if (!roles.includes('ADMIN') && !roles.includes('OWNER')) {
+  if (!roles.includes('ADMIN')) {
     return { redirect: { destination: '/dashboard', permanent: false } };
   }
   return { props: {} };

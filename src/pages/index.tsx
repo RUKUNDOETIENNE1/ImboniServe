@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
+import PublicLayout from '@/components/PublicLayout'
 import { useTranslation } from '@/lib/i18n'
 import {
   Check,
@@ -12,21 +12,18 @@ import {
   Utensils,
   Package,
   BrainCircuit,
-  Building2,
   MessageCircle,
   Smartphone,
   Shield,
   Star,
   ArrowRight,
   ChevronRight,
-  ChevronDown,
   TrendingUp,
   Users,
   Clock,
   Receipt,
   Gift,
   Tag,
-  Hotel,
   Palette,
   Sparkles,
   Rss,
@@ -36,23 +33,15 @@ import {
   Calendar,
   Megaphone,
   Beaker,
-  Mic,
+  Play,
+  DollarSign,
+  AlertTriangle,
+  Target,
   ChevronLeft,
   Bell,
-  Moon,
-  Sun,
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/currency'
-import { PRICING_PLANS } from '@/config/pricing'
-import { useTheme } from '@/hooks/useTheme'
-import { usePWAInstall } from '@/hooks/usePWAInstall'
-import InstallAppButton from '@/components/InstallAppButton'
-import PublicSupportWidget from '@/components/PublicSupportWidget'
-import PWAInstallPrompt from '@/components/PWAInstallPrompt'
-import CookieConsentBanner from '@/components/CookieConsentBanner'
-import BookDemoModal from '@/components/BookDemoModal'
-import NewsletterSignup from '@/components/NewsletterSignup'
-import SocialShare from '@/components/SocialShare'
+import { PRICING_PLANS, PRICING_CONFIG } from '@/config/pricing'
 
 // Use unified pricing config (show all plans on homepage)
 const plans = PRICING_PLANS.map(p => ({
@@ -83,32 +72,26 @@ const features = [
   },
   {
     icon: <BrainCircuit className="w-6 h-6" />,
-    title: 'AI-Powered Insights',
-    desc: 'Smart reorder recommendations and cost anomaly alerts that protect your profit margins.',
+    title: 'Smart Analytics',
+    desc: 'Reorder recommendations and cost anomaly alerts that protect your profit margins.',
     color: 'bg-yellow-50 text-imboni-gold',
   },
   {
-    icon: <Rss className="w-6 h-6" />,
-    title: 'Content & Discovery Feed',
-    desc: 'Publish posts, promos, and photos. Let customers discover and order directly from your feed.',
+    icon: <Globe className="w-6 h-6" />,
+    title: 'Discovery Listing',
+    desc: 'Get listed on our public directory where customers find hospitality businesses near them.',
     color: 'bg-indigo-50 text-indigo-700',
   },
   {
     icon: <Receipt className="w-6 h-6" />,
     title: 'Smart Dining Slips™',
-    desc: 'Auto-generated digital receipts with referral links — share & earn 1,000 RWF per friend.',
+    desc: 'Auto-generated digital receipts with shareable links for seamless customer experience.',
     color: 'bg-cyan-50 text-cyan-700',
   },
   {
-    icon: <Gift className="w-6 h-6" />,
-    title: 'Loyalty & Rewards',
-    desc: 'Build customer loyalty with points, tiers, and redemption tracking across visits.',
-    color: 'bg-pink-50 text-pink-700',
-  },
-  {
-    icon: <Tag className="w-6 h-6" />,
-    title: 'Promotions & Happy Hours',
-    desc: 'Set time-based discounts and combo deals that activate and expire automatically.',
+    icon: <Bell className="w-6 h-6" />,
+    title: 'Low-Stock Push Alerts',
+    desc: 'Never run out. Get automatic alerts before inventory drops below reorder points.',
     color: 'bg-amber-50 text-amber-700',
   },
   {
@@ -120,14 +103,8 @@ const features = [
   {
     icon: <Smartphone className="w-6 h-6" />,
     title: 'Mobile Money Payments',
-    desc: 'Accept MTN MoMo and Airtel Money natively — no POS terminal required.',
+    desc: 'Accept mobile money payments natively — no POS terminal required.',
     color: 'bg-purple-50 text-purple-700',
-  },
-  {
-    icon: <Building2 className="w-6 h-6" />,
-    title: 'Multi-Branch Control',
-    desc: 'Manage multiple locations from one dashboard with consolidated and per-branch reporting.',
-    color: 'bg-slate-50 text-slate-700',
   },
   {
     icon: <Shield className="w-6 h-6" />,
@@ -137,50 +114,29 @@ const features = [
   },
 ]
 
-const advancedFeatures = [
-  {
-    icon: <Hotel className="w-5 h-5" />,
-    title: 'Hotel Mode',
-    desc: 'Room management, service areas, and front desk operations built-in.',
-  },
-  {
-    icon: <Palette className="w-5 h-5" />,
-    title: 'Site Builder',
-    desc: 'Launch your own website with customizable templates — no code needed.',
-  },
-  {
-    icon: <Sparkles className="w-5 h-5" />,
-    title: 'AI Menu Builder',
-    desc: 'Upload a photo or document and let AI build your menu for you.',
-  },
-  {
-    icon: <Globe className="w-5 h-5" />,
-    title: 'Discovery Marketplace',
-    desc: 'Get listed on a public directory where customers search for places to eat.',
-  },
-  {
-    icon: <Gift className="w-5 h-5" />,
-    title: 'Referral Program',
-    desc: 'Customers earn 1,000 RWF per referral. No limits, no caps — just instant rewards.',
-  },
-  {
-    icon: <Users className="w-5 h-5" />,
-    title: 'Staff & Roles',
-    desc: 'Granular role permissions: waiter, cashier, supervisor, manager, and more.',
-  },
-]
+// advancedFeatures moved inside component for t() access
 
 // Stats will be rendered with translations inline
 
 const heroSlides = [
   {
-    title: 'Turn Every Table Into',
-    highlight: 'Faster Revenue',
-    subtitle: 'Be Seen. Get Orders. Grow Fast.',
-    description: 'Reduce wait times, serve more customers, and streamline your operations—QR ordering, POS, and AI insights in one platform.',
+    key: 'os',
+    title: 'The Operating System',
+    highlight: 'for Hospitality.',
+    subtitle: 'Run your café, hotel, bar, or hospitality business from one intelligent platform.',
+    description: 'Everything you need to run your business — from orders and inventory to payments and insights — in one platform built for hospitality.',
     image: '/imgs/ideogr1.jpg'
   },
   {
+    key: 'replay',
+    title: 'Service Replay™',
+    highlight: 'See What Really Happened',
+    subtitle: 'Rewind Any Service Period',
+    description: 'Replay events like a match—every order, table, station, and hand-off. Diagnose issues fast, coach teams, and prevent loss.',
+    image: '/imgs/ideogr 3.jpg'
+  },
+  {
+    key: 'qr',
     title: 'Smart QR Ordering',
     highlight: 'Zero Wait Time',
     subtitle: 'Customers Order from Their Phones',
@@ -188,13 +144,15 @@ const heroSlides = [
     image: '/imgs/ideogr 2.jpg'
   },
   {
-    title: 'AI-Powered Insights',
+    key: 'analytics',
+    title: 'Smart Analytics',
     highlight: 'Data-Driven Growth',
     subtitle: 'Know Your Business Inside Out',
-    description: 'Track sales, predict demand, optimize inventory, and make smarter decisions with actionable AI recommendations.',
+    description: 'Track sales, optimize inventory, and make smarter decisions with actionable recommendations based on your real data.',
     image: '/imgs/ideogr 3.jpg'
   },
   {
+    key: 'platform',
     title: 'All-in-One Platform',
     highlight: 'Complete Control',
     subtitle: 'POS, QR, Inventory, Analytics',
@@ -206,35 +164,16 @@ const heroSlides = [
 export default function HomePage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
-  const { darkMode, toggleDarkMode } = useTheme()
-  const { isInstalled } = usePWAInstall()
   const [billing, setBilling] = React.useState<'monthly' | 'annual'>('annual')
-  const [solutionsOpen, setSolutionsOpen] = React.useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
-  const [scrolled, setScrolled] = React.useState(false)
   const [currentSlide, setCurrentSlide] = React.useState(0)
-  const [showDemo, setShowDemo] = React.useState(false)
   const rtRef = React.useRef<HTMLDivElement>(null)
   const growthRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 5000)
+    }, 10000)
     return () => clearInterval(timer)
-  }, [])
-
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(typeof window !== 'undefined' && window.scrollY > 4)
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', onScroll)
-      onScroll()
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('scroll', onScroll)
-      }
-    }
   }, [])
 
   const scrollCarousel = (ref: React.RefObject<HTMLDivElement>, dir: -1 | 1) => {
@@ -304,11 +243,11 @@ export default function HomePage() {
       cta: t('homepage.growth.ab_cta', 'Run a Test')
     },
     {
-      icon: <Mic className="w-6 h-6" />, 
-      title: t('homepage.growth.voice_title', 'Voice Ordering (WhatsApp AI)'),
-      desc: t('homepage.growth.voice_desc', 'Let customers order by voice in EN / FR / RW.'),
-      href: '/dashboard/ai',
-      cta: t('homepage.growth.voice_cta', 'Explore AI')
+      icon: <Play className="w-6 h-6" />, 
+      title: t('homepage.growth.replay_title', 'Service Replay™'),
+      desc: t('homepage.growth.replay_desc', 'Replay any service period event-by-event — like a football match.'),
+      href: '/dashboard/operations/service-replay',
+      cta: t('homepage.growth.replay_cta', 'Try Service Replay')
     },
     {
       icon: <Bell className="w-6 h-6" />, 
@@ -326,46 +265,47 @@ export default function HomePage() {
     }
   ]
 
+  const advancedFeatures = [
+    {
+      icon: <Sparkles className="w-5 h-5" />,
+      title: t('homepage.advanced.ai_menu', 'AI Menu Builder'),
+      desc: t('homepage.advanced.ai_menu_desc', 'Upload a photo or document and let AI build your menu for you.'),
+    },
+    {
+      icon: <Globe className="w-5 h-5" />,
+      title: t('homepage.advanced.marketplace', 'Business Discovery'),
+      desc: t('homepage.advanced.marketplace_desc', 'Get discovered by customers searching for hospitality businesses powered by ImboniServe.'),
+    },
+    {
+      icon: <Gift className="w-5 h-5" />,
+      title: t('homepage.advanced.referral', 'Referral Program'),
+      desc: t('homepage.advanced.referral_desc', 'Customers earn rewards for every referral. No limits, no caps — just instant rewards.'),
+    },
+    {
+      icon: <Play className="w-5 h-5" />,
+      title: t('homepage.advanced.service_replay', 'Service Replay™'),
+      desc: t('homepage.advanced.service_replay_desc', 'Replay any service period event-by-event — like a football match. Understand exactly what happened.'),
+    },
+    {
+      icon: <Package className="w-5 h-5" />,
+      title: t('homepage.advanced.inventory_alerts', 'Inventory Alerts & Auto-Reorder'),
+      desc: t('homepage.advanced.inventory_alerts_desc', 'Automatic stock alerts and AI-powered draft purchase orders for your suppliers.'),
+    },
+    {
+      icon: <Receipt className="w-5 h-5" />,
+      title: t('homepage.advanced.smart_slips', 'Smart Dining Slips'),
+      desc: t('homepage.advanced.smart_slips_desc', 'Auto-generated digital receipts with shareable links for seamless customer experience.'),
+    }
+  ]
+
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://imboniserve.com'
-  const navClass = `bg-imboni-blue/95 dark:bg-gray-800/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10 dark:border-gray-700 transition-colors transition-shadow ${scrolled ? 'shadow-md' : ''}`
+  const displayCurrency = process.env.NEXT_PUBLIC_DISPLAY_CURRENCY || 'RWF'
+  const supportWhatsAppUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || 'https://wa.me/250735214496'
 
   return (
-    <>
+    <PublicLayout title={t('home.title_page', 'Imboni Serve — Hospitality Operating System')}>
     <Head>
-      <title>Imboni Serve — Restaurant & Hotel Management Platform</title>
-      <meta name="description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
       <meta name="robots" content="index,follow" />
-      {siteUrl && <link rel="canonical" href={`${siteUrl}${router.asPath.split('?')[0]}`} />}
-
-      {/* Open Graph */}
-      <meta property="og:type" content="website" />
-      <meta property="og:title" content="Imboni Serve — Restaurant & Hotel Management Platform" />
-      <meta property="og:description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
-      {siteUrl && <meta property="og:url" content={`${siteUrl}${router.asPath.split('?')[0]}`} />}
-      <meta property="og:image" content={(siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'} />
-
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Imboni Serve — Restaurant & Hotel Management Platform" />
-      <meta name="twitter:description" content="From QR code ordering to AI-powered insights — manage orders, menus, staff, customers and analytics in one seamless system." />
-      <meta name="twitter:image" content={(siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'} />
-
-      
-
-      {/* JSON-LD: Organization */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: 'Imboni Serve',
-          url: `${siteUrl}/`,
-          logo: `${siteUrl}/imgs/logo2.png`,
-          sameAs: [],
-        }) }}
-      />
-
-      {/* JSON-LD: SoftwareApplication */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -377,171 +317,13 @@ export default function HomePage() {
           offers: {
             '@type': 'Offer',
             price: '15000',
-            priceCurrency: 'RWF',
+            priceCurrency: displayCurrency,
           },
           url: `${siteUrl}/`,
         }) }}
       />
     </Head>
-    <div key={locale} className="min-h-screen bg-imboni-light dark:bg-gray-900 font-sans transition-colors">
-
-      {/* ── NAV ── */}
-      <nav className={navClass}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[56px] md:min-h-[60px] lg:min-h-[64px] py-0.5 md:py-1 flex items-center justify-between md:grid md:grid-cols-[max-content,1fr,max-content] md:items-center md:gap-6">
-          <div className="flex items-center gap-3 md:justify-self-start">
-            <div className="flex flex-col items-center md:items-start">
-              <Image src="/imgs/logo2.png" alt="Imboni Serve" width={120} height={48} className="h-10 w-auto md:h-12" priority />
-              <span className="hidden xl:block mt-1 text-xs lg:text-sm text-white/90 font-medium tracking-wide leading-tight" suppressHydrationWarning>
-                {t('homepage.nav_tagline', 'Run Smarter. Serve Better.')}
-              </span>
-            </div>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 text-[13px] xl:text-sm text-white/80 md:justify-self-center" aria-label="Primary">
-            <Link href="/#features" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
-            <Link href="/#pricing" className="hover:text-white transition whitespace-nowrap" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
-            <div className="relative">
-              <button
-                onClick={() => setSolutionsOpen(!solutionsOpen)}
-                onBlur={() => setTimeout(() => setSolutionsOpen(false), 200)}
-                className="flex items-center gap-1 hover:text-white transition whitespace-nowrap"
-                suppressHydrationWarning
-                aria-haspopup="menu"
-                aria-expanded={solutionsOpen}
-              >
-                {t('public.nav.solutions', 'Solutions')} <ChevronDown className="w-3 h-3" />
-              </button>
-              {solutionsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50" role="menu">
-                  <Link href="/dashboard/site-builder" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.site_builder', 'Site Builder')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.create_website', 'Create your website')}</div>
-                  </Link>
-                  <Link href="/discover" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.marketplace', 'Marketplace')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.find_suppliers', 'Find suppliers & partners')}</div>
-                  </Link>
-                  <Link href="/store" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.store', 'Store')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.procurement_market', 'Procurement marketplace')}</div>
-                  </Link>
-                  <Link href="/dashboard/profile" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.list_business', 'List Your Business')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.get_discovered', 'Get discovered by customers')}</div>
-                  </Link>
-                  <Link href="/refer" className="block px-4 py-2 text-slate-700 hover:bg-imboni-light transition">
-                    <div className="font-medium">{t('public.nav.referral', 'Referral Program')}</div>
-                    <div className="text-xs text-slate-500">{t('public.nav.share_earn', 'Share & earn rewards')}</div>
-                  </Link>
-                </div>
-              )}
-            </div>
-            <Link href="#store" className="hover:text-white transition whitespace-nowrap">{t('public.nav.store', 'Store')}</Link>
-            <Link
-              href="/refer"
-              className="whitespace-nowrap inline-flex items-center rounded-full bg-imboni-orange text-white px-4 py-2 shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
-            >
-              {t('public.nav.share_earn', 'Share & earn rewards').replace(/\p{Extended_Pictographic}/gu, '')}
-            </Link>
-            <Link href="/discover" className="hover:text-white transition whitespace-nowrap">{t('public.nav.discover', 'Discover')}</Link>
-            <a href="https://wa.me/250735214496" className="hover:text-white transition whitespace-nowrap">{t('public.nav.contact', 'Contact')}</a>
-          </div>
-          
-          {/* Right side actions */}
-          <div className="flex items-center gap-2 md:gap-3 md:justify-self-end flex-nowrap">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-white/20 transition"
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
-            >
-              {darkMode ? (
-                <Sun size={20} className="text-yellow-300" />
-              ) : (
-                <Moon size={20} className="text-white" />
-              )}
-            </button>
-            <LanguageSwitcher />
-            {isInstalled && (
-              <span className="hidden md:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
-                {t('public.cta.installed', 'Installed')}
-              </span>
-            )}
-            
-            {/* Desktop CTA */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/login" className="text-white/80 text-sm hover:text-white transition">{t('public.cta.sign_in', 'Sign in')}</Link>
-              <Link
-                href="/signup"
-                className="bg-imboni-orange text-white font-semibold rounded-lg hover:bg-accent-dark transition whitespace-nowrap shrink-0 text-xs px-3 py-1.5 md:text-sm md:px-4 md:py-2"
-              >
-                <span className="hidden lg:inline">{t('public.cta.start_trial', 'Start Free Trial')}</span>
-                <span className="lg:hidden">{t('public.cta.free_trial', 'Free Trial')}</span>
-              </Link>
-            </div>
-            
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/20 transition text-white"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-
-
-        {/* Mobile Navigation Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10">
-            <div className="px-4 py-3 space-y-2">
-              <Link href="/#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
-              <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition" suppressHydrationWarning>{t('public.nav.pricing', 'Pricing')}</Link>
-              <div className="py-2">
-                <div className="text-white/80 font-medium mb-2">{t('public.nav.solutions', 'Solutions')}</div>
-                <div className="pl-4 space-y-1">
-                  <Link href="/dashboard/site-builder" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.site_builder', 'Site Builder')}</Link>
-                  <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.marketplace', 'Marketplace')}</Link>
-                  <Link href="/store" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.store', 'Store')}</Link>
-                  <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.list_business', 'List Your Business')}</Link>
-                  <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-white/60 hover:text-white text-sm">{t('public.nav.referral', 'Referral Program')}</Link>
-                </div>
-              </div>
-              <Link href="#store" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.store', 'Store')}</Link>
-              <Link href="/refer" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.share_earn', 'Share & Earn').replace(/\p{Extended_Pictographic}/gu, '')}</Link>
-              <Link href="/discover" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.discover', 'Discover')}</Link>
-              <a href="https://wa.me/250735214496" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white/80 hover:text-white transition">{t('public.nav.contact', 'Contact')}</a>
-              
-              <div className="pt-3 mt-3 border-t border-white/10 space-y-2">
-                {isInstalled && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">
-                    {t('public.cta.installed', 'Installed')}
-                  </span>
-                )}
-                <InstallAppButton className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-colors text-sm" label={t('public.cta.install', 'Install App')} />
-                <Link href="/login" className="block w-full text-center py-2 text-white/80 hover:text-white transition text-sm">{t('public.cta.sign_in', 'Sign in')}</Link>
-                <Link
-                  href="/signup"
-                  className="block w-full text-center bg-imboni-orange text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-accent-dark transition"
-                >
-                  {t('public.cta.start_trial', 'Start Free Trial')}
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div key={locale}>
 
       {/* ── HERO WITH CAROUSEL ── */}
       <section className="bg-gradient-imboni text-white py-20 px-4 relative overflow-hidden">
@@ -551,10 +333,10 @@ export default function HomePage() {
         {heroSlides.map((s, index) => {
           const slide = {
             ...s,
-            title: t(`homepage.hero.slides.${index}.title`, s.title),
-            highlight: t(`homepage.hero.slides.${index}.highlight`, s.highlight),
-            subtitle: t(`homepage.hero.slides.${index}.subtitle`, s.subtitle),
-            description: t(`homepage.hero.slides.${index}.description`, s.description),
+            title: t(`homepage.hero.slides.${s.key}.title`, s.title),
+            highlight: t(`homepage.hero.slides.${s.key}.highlight`, s.highlight),
+            subtitle: t(`homepage.hero.slides.${s.key}.subtitle`, s.subtitle),
+            description: t(`homepage.hero.slides.${s.key}.description`, s.description),
           }
           return (
             <div
@@ -571,19 +353,15 @@ export default function HomePage() {
         })}
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-block bg-white/10 border border-white/20 text-white/90 text-sm font-medium px-4 py-1.5 rounded-full mb-6 animate-fade-in-down">
-            🎉 {t('homepage.hero.launch_badge', 'Launch Special — 50% OFF All Plans')}
-          </div>
-          
           {/* Carousel Content */}
           <div className="relative min-h-[400px]">
             {heroSlides.map((s, index) => {
               const slide = {
                 ...s,
-                title: t(`homepage.hero.slides.${index}.title`, s.title),
-                highlight: t(`homepage.hero.slides.${index}.highlight`, s.highlight),
-                subtitle: t(`homepage.hero.slides.${index}.subtitle`, s.subtitle),
-                description: t(`homepage.hero.slides.${index}.description`, s.description),
+                title: t(`homepage.hero.slides.${s.key}.title`, s.title),
+                highlight: t(`homepage.hero.slides.${s.key}.highlight`, s.highlight),
+                subtitle: t(`homepage.hero.slides.${s.key}.subtitle`, s.subtitle),
+                description: t(`homepage.hero.slides.${s.key}.description`, s.description),
               }
               return (
                 <div
@@ -602,8 +380,8 @@ export default function HomePage() {
                   <p className="text-xl text-white/90 mb-4 max-w-3xl mx-auto">
                     {slide.description}
                   </p>
-                  <p className="text-sm text-white/60" suppressHydrationWarning>
-                    {t('homepage.hero.description', 'Built for restaurants, hotels, bars, and cafés.')}
+                  <p className="text-base text-white/80 font-medium" suppressHydrationWarning>
+                    {t('homepage.hero.description', 'Built for cafés, hotels, bars, and hospitality businesses.')}
                   </p>
                   <p className="text-sm text-white/80 mb-8" suppressHydrationWarning>
                     {t('homepage.hero.rt_os', 'Real-time OS: see every sale, every table, every customer action — and grow revenue automatically.')}
@@ -622,7 +400,7 @@ export default function HomePage() {
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={t('homepage.hero.aria_go_to_slide', { n: String(index + 1) })}
               />
             ))}
           </div>
@@ -631,27 +409,20 @@ export default function HomePage() {
               href="/signup"
               className="bg-imboni-orange text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-accent-dark hover:scale-105 transition-all shadow-lg shadow-orange-900/30 flex items-center gap-2"
             >
-              {t('homepage.hero.cta_primary', 'Start 14-Day Free Trial')} <ArrowRight className="w-4 h-4" />
+              {t('homepage.hero.cta_primary', `Start Free ${PRICING_CONFIG.trialDays ?? 14}-Day Trial`)} <ArrowRight className="w-4 h-4" />
             </Link>
-            <button
-              onClick={() => setShowDemo(true)}
+            <a
+              href={supportWhatsAppUrl}
               className="bg-white text-imboni-blue px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-slate-100 hover:scale-105 transition-all shadow-lg flex items-center gap-2"
             >
-              <Calendar className="w-4 h-4" /> {t('growth.book_demo', 'Book a Demo')}
-            </button>
-            <Link
-              href="/discover"
-              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-white/20 hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <MapPin className="w-4 h-4" /> {t('homepage.hero.cta_explore', 'Explore Businesses Near You')}
-            </Link>
+              <MessageCircle className="w-4 h-4" /> {t('homepage.hero.cta_talk_to_team', 'Talk to Our Team')}
+            </a>
             <Link
               href="#pricing"
               className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-white/20 hover:scale-105 transition-all"
             >
               {t('homepage.hero.cta_secondary', 'View Pricing')}
             </Link>
-            <InstallAppButton className="inline-flex items-center gap-2 px-4 py-3.5 rounded-xl border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-all text-base" label={t('homepage.hero.cta_install', 'Install App')} />
           </div>
         </div>
       </section>
@@ -687,9 +458,9 @@ export default function HomePage() {
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{s.title}</h3>
                   <p className="text-sm text-slate-600 mb-4">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-imboni-blue hover:text-imboni-orange font-medium text-sm">
-                    {s.cta} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <span className="inline-flex items-center gap-2 text-slate-500 font-medium text-sm" aria-label={s.cta}>
+                    {s.cta}
+                  </span>
                 </div>
               ))}
             </div>
@@ -697,77 +468,142 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── AUTO‑GROWTH ENGINES CAROUSEL ── */}
-      <section className="py-12 px-4 bg-imboni-light border-y border-slate-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <div className="inline-block bg-imboni-orange/10 text-imboni-orange text-xs font-semibold px-3 py-1 rounded-full mb-2" suppressHydrationWarning>
-                {t('homepage.growth.badge', 'Auto‑Growth Engines')}
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-imboni-blue" suppressHydrationWarning>
-                {t('homepage.growth.title', 'Grow Revenue on Autopilot')}
-              </h2>
+      {/* ── WHY SWITCH? — Capabilities That Solve Problems Competitors Ignore ── */}
+      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-orange/10 text-imboni-orange text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_switch.badge', 'Why Switch?')}
             </div>
-            <div className="hidden md:flex items-center gap-2">
-              <button onClick={() => scrollCarousel(growthRef, -1)} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-                <ChevronLeft className="w-5 h-5 text-slate-600" />
-              </button>
-              <button onClick={() => scrollCarousel(growthRef, 1)} className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-                <ChevronRight className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-          </div>
-
-          <div ref={growthRef} className="snap-x snap-mandatory overflow-x-auto no-scrollbar -mx-4 px-4">
-            <div className="flex gap-4 min-w-full">
-              {growthSlides.map((s, i) => (
-                <div key={i} className="snap-start shrink-0 w-80 bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
-                  <div className="w-10 h-10 rounded-xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-3">
-                    {s.icon}
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-1">{s.title}</h3>
-                  <p className="text-sm text-slate-600 mb-4">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-imboni-blue hover:text-imboni-orange font-medium text-sm">
-                    {s.cta} <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── STORE ── */}
-      <section id="store" className="py-16 px-4 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="order-2 md:order-1">
-            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
-              {t('homepage.store.badge', 'Procurement Store')}
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-3" suppressHydrationWarning>
-              {t('homepage.store.title', 'Buy supplies from trusted suppliers — all in one place')}
+            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+              {t('homepage.why_switch.title', "You're not just getting a POS. You're getting intelligence.")}
             </h2>
-            <p className="text-gray-600 mb-6 text-lg" suppressHydrationWarning>
-              {t('homepage.store.subtitle', 'Discover verified suppliers, compare prices, and order directly. Track deliveries and keep costs under control.')}
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
+              {t('homepage.why_switch.subtitle', 'Capabilities that solve problems competitors ignore.')}
             </p>
-            <div className="flex gap-3">
-              <a
-                href="/store"
-                className="bg-imboni-orange text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-accent-dark transition flex items-center gap-2"
-              >
-                <ShoppingCart className="w-4 h-4" /> {t('homepage.store.cta_browse', 'Browse Store')}
-              </a>
-              <a
-                href="/discover"
-                className="bg-slate-100 text-imboni-blue px-6 py-3 rounded-xl font-semibold text-sm hover:bg-slate-200 transition"
-              >
-                {t('homepage.store.cta_explore', 'Explore Marketplace')}
-              </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-5">
+                <Play className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.replay_title', 'Service Replay™')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.replay_desc', 'Replay any service period like a football match. Every order, every station, every table — event by event. Understand exactly what happened and why.')}
+              </p>
+              <Link href="/dashboard/operations/service-replay" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.replay_cta', 'See it in action')} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-5">
+                <Users className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.crm_title', 'Know Your Customers')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.crm_desc', 'Automatic RFM segmentation: Champions, Loyal, At Risk, Lost. Lifetime value and spend analysis — know your customers like an e-commerce brand does.')}
+              </p>
+              <Link href="/dashboard/crm" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.crm_cta', 'Explore CRM')} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition">
+              <div className="w-14 h-14 rounded-2xl bg-imboni-green/10 text-imboni-green flex items-center justify-center mb-5">
+                <Target className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                {t('homepage.why_switch.ab_title', 'Test Menu Prices')}
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                {t('homepage.why_switch.ab_desc', 'Stop guessing. Start testing. Create price variants, split traffic, measure conversion. Pick winners with real data, not gut feeling.')}
+              </p>
+              <Link href="/dashboard/ab-testing" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                {t('homepage.why_switch.ab_cta', 'Run a Test')} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
-          <div className="order-1 md:order-2 flex justify-center">
-            <Image src="/imgs/imboniserve-marketplace.png" alt="Imboni Serve" width={352} height={176} className="h-32 w-auto md:h-44" />
+        </div>
+      </section>
+
+      {/* ── WHY AI? — Where AI Creates Unfair Advantage ── */}
+      <section className="py-20 px-4 bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_ai.badge', 'Why AI?')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+              {t('homepage.why_ai.title', "AI isn't a buzzword. It's working right now in your dashboard.")}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
+              {t('homepage.why_ai.subtitle', 'AI that does real work — not just displays data.')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.menu_builder_title', 'AI Menu Builder')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.menu_builder_desc', 'Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions. No manual entry — from hours to minutes.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Package className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.auto_reorder_title', 'Auto-Reorder AI')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.auto_reorder_desc', 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-green/10 text-imboni-green flex items-center justify-center flex-shrink-0">
+                  <BrainCircuit className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.insight_reports_title', 'AI Insight Reports')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.insight_reports_desc', 'Weekly and monthly AI-generated reports with KPI snapshots, narrative analysis, and priority recommendations. Your AI business analyst.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-2xl p-8 border border-slate-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2" suppressHydrationWarning>
+                    {t('homepage.why_ai.cost_anomaly_title', 'Cost Anomaly Alerts')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.why_ai.cost_anomaly_desc', 'Automatic detection of supplier price increases with statistical analysis and severity scoring. Catch price creep before it hurts your margins.')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -779,7 +615,7 @@ export default function HomePage() {
             {t('homepage.video.title', 'See Imboni Serve in Action')}
           </h2>
           <p className="text-gray-600 mb-8 text-lg" suppressHydrationWarning>
-            {t('homepage.video.subtitle', 'Watch how restaurants streamline operations with our all-in-one platform.')}
+            {t('homepage.video.subtitle', 'Watch how hospitality businesses streamline operations with our all-in-one platform.')}
           </p>
           <a 
             href="https://www.youtube.com/watch?v=Pdh2D6uWXQo" 
@@ -789,7 +625,7 @@ export default function HomePage() {
           >
             <img 
               src={`https://img.youtube.com/vi/Pdh2D6uWXQo/maxresdefault.jpg`}
-              alt="Imboni Serve Demo Video"
+              alt={t('homepage.video.alt', 'Imboni Serve Demo Video')}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all flex items-center justify-center">
@@ -801,7 +637,7 @@ export default function HomePage() {
             </div>
             <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-4 py-3 text-left">
               <p className="text-sm font-semibold text-slate-800" suppressHydrationWarning>{t('homepage.video.cta', 'Click to watch on YouTube')}</p>
-              <p className="text-xs text-slate-500 mt-0.5" suppressHydrationWarning>{t('homepage.video.description', 'See how Imboni Serve transforms restaurant operations')}</p>
+              <p className="text-xs text-slate-500 mt-0.5" suppressHydrationWarning>{t('homepage.video.description', 'See how Imboni Serve transforms hospitality operations')}</p>
             </div>
           </a>
         </div>
@@ -818,7 +654,7 @@ export default function HomePage() {
               {t('homepage.how_it_works.title', 'How It Works')}
             </h2>
             <p className="text-white/80 text-lg max-w-2xl mx-auto" suppressHydrationWarning>
-              {t('homepage.how_it_works.subtitle', '6 simple steps to digitize your business & start serving smarter')}
+              {t('homepage.how_it_works.subtitle', '6 simple steps to digitize your hospitality business & start serving smarter')}
             </p>
           </div>
 
@@ -841,7 +677,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-3" suppressHydrationWarning>{t('homepage.how_it_works.step2_title', 'Build Your Menu')}</h3>
               <p className="text-white/80 text-sm leading-relaxed" suppressHydrationWarning>
-                {t('homepage.how_it_works.step2_desc', 'Add dishes and drinks with photos, prices, and descriptions. Use our AI Menu Builder to upload a photo or PDF and auto-generate your menu instantly.')}
+                {t('homepage.how_it_works.step2_desc', 'Add dishes and drinks with photos, prices, and descriptions. Use our AI Menu Builder to upload a photo or PDF and auto-generate your menu in seconds.')}
               </p>
             </div>
 
@@ -863,7 +699,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-3" suppressHydrationWarning>{t('homepage.how_it_works.step4_title', 'Connect WhatsApp & Payments')}</h3>
               <p className="text-white/80 text-sm leading-relaxed" suppressHydrationWarning>
-                {t('homepage.how_it_works.step4_desc', 'Link your WhatsApp number to receive instant order alerts and daily reports. Enable MTN MoMo and Airtel Money for seamless mobile payments.')}
+                {t('homepage.how_it_works.step4_desc', 'Link your WhatsApp number to receive instant order alerts and daily reports. Enable your preferred payment methods for seamless digital payments.')}
               </p>
             </div>
 
@@ -915,29 +751,29 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Users className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">500+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.businesses', 'Businesses served')}</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.trial_days', '14 days')}</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.trial', 'Free trial, no card needed')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <ShoppingCart className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">10,000+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.orders', 'Orders processed')}</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.no_card', 'No card')}</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.orders', 'needed to start')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
-              <Clock className="w-5 h-5" />
+              <Shield className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">14 days</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.trial', 'Free trial, no card needed')}</div>
+            <div className="text-2xl font-bold text-imboni-blue" suppressHydrationWarning>{t('homepage.stats.plans_count', '5 plans')}</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.plans', 'From Starter to Enterprise')}</div>
           </div>
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-full bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-2">
               <Star className="w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold text-imboni-blue">50+</div>
-            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.features', 'Features included')}</div>
+            <div className="text-2xl font-bold text-imboni-blue">38+</div>
+            <div className="text-sm text-gray-500" suppressHydrationWarning>{t('homepage.stats.features', 'Verified capabilities')}</div>
           </div>
         </div>
       </section>
@@ -953,10 +789,10 @@ export default function HomePage() {
               {t('homepage.features.title', 'Everything you need to run a tight operation')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-2" suppressHydrationWarning>
-              {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your business.')}
+              {t('homepage.features.subtitle', 'From orders to procurement, analytics to multi-branch — Imboni Serve covers every part of your hospitality business.')}
             </p>
-            <p className="text-sm text-imboni-blue/80 font-medium tracking-wide">
-              Unified. Intelligent. Reliable.
+            <p className="text-sm text-imboni-blue/80 font-medium tracking-wide" suppressHydrationWarning>
+              {t('homepage.features.tagline', 'Unified. Intelligent. Reliable.')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1000,14 +836,7 @@ export default function HomePage() {
                 <Receipt className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.smart_slips', 'Smart Dining Slips™')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.smart_slips_desc', 'Auto-generated digital receipts with referral links — share & earn 1,000 RWF per friend.')}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-pink-50 text-pink-700">
-                <Gift className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.loyalty', 'Loyalty & Rewards')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.loyalty_desc', 'Build customer loyalty with points, tiers, and redemption tracking across visits.')}</p>
+              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.smart_slips_desc', 'Auto-generated digital receipts with referral links — share & earn rewards for every friend.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-amber-50 text-amber-700">
@@ -1028,14 +857,7 @@ export default function HomePage() {
                 <Smartphone className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.mobile_money', 'Mobile Money Payments')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.mobile_money_desc', 'Accept MTN MoMo and Airtel Money natively — no POS terminal required.')}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-slate-50 text-slate-700">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.features.multi_branch', 'Multi-Branch Control')}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.multi_branch_desc', 'Manage multiple locations from one dashboard with consolidated and per-branch reporting.')}</p>
+              <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.features.mobile_money_desc', 'Accept mobile money payments natively — no POS terminal required.')}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-red-50 text-red-700">
@@ -1048,156 +870,289 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
+      {/* ── PRICING PREVIEW ── */}
       <section id="pricing" className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('pricing.heading', 'Simple Pricing for All Hospitality Businesses')}
+              {t('homepage.pricing_preview.heading', 'Transparent Pricing for Every Business Size')}
             </h2>
-            <p className="text-gray-600 mb-2 text-lg" suppressHydrationWarning>
-              {t('pricing.subheading', 'Choose the perfect plan for your restaurant, hotel, bar, or café. All plans include WhatsApp integration and mobile money support.')}
-            </p>
-            <p className="text-sm text-imboni-orange font-semibold tracking-wide" suppressHydrationWarning>
-              {t('pricing.tagline', 'Unified. Intelligent. Reliable.')}
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed" suppressHydrationWarning>
+              {t('homepage.pricing_preview.subtitle', 'ImboniServe offers flexible plans designed for hospitality businesses of all sizes.')}
             </p>
           </div>
-          {/* Billing toggle */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center bg-slate-100 rounded-xl p-1 shadow-inner">
-              <button
-                onClick={() => setBilling('monthly')}
-                className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
-                  billing === 'monthly' ? 'bg-imboni-blue text-white shadow' : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.monthly', 'Monthly')}
-              </button>
-              <button
-                onClick={() => setBilling('annual')}
-                className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
-                  billing === 'annual' ? 'bg-imboni-blue text-white shadow' : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.annual', 'Annual')}
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold" suppressHydrationWarning>
-                  {t('pricing.save_25', 'Save 25%')}
-                </span>
-              </button>
+
+          <div className="bg-imboni-light rounded-3xl p-8 md:p-12 border border-slate-200 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-sm font-semibold px-3 py-1 rounded-full mb-4">
+                  {t('homepage.pricing_preview.starting_at', 'Starting at')}
+                </div>
+                <div className="mb-4">
+                  <span className="text-5xl md:text-6xl font-extrabold text-imboni-blue">{formatCurrency(plans[0].monthlyPrice || 15000, displayCurrency, { showSymbol: false })}</span>
+                  <span className="text-gray-600 text-xl ml-2" suppressHydrationWarning>{displayCurrency}{t('homepage.pricing_preview.per_month', ' / month')}</span>
+                </div>
+                <p className="text-gray-600 text-lg mb-6" suppressHydrationWarning>
+                  {t('homepage.pricing_preview.starter_desc', 'Perfect for single-location hospitality businesses getting started with modern operations.')}
+                </p>
+                <div className="flex items-center gap-2 text-green-600 font-medium mb-2">
+                  <Check className="w-5 h-5" />
+                  <span suppressHydrationWarning>{t('homepage.pricing_preview.annual_savings', 'Annual billing saves 25% (equivalent to 3 free months)')}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <TrendingUp className="w-5 h-5" />
+                  <span suppressHydrationWarning>{t('homepage.pricing_preview.scale', 'Plans scale from single locations to multi-branch enterprises')}</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                  <h4 className="font-semibold text-gray-900 mb-2" suppressHydrationWarning>{t('homepage.pricing_preview.all_plans_include', 'All Plans Include')}</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_1', 'QR ordering, POS, and kitchen operations')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_2', 'Inventory and procurement management')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_3', 'WhatsApp integration and mobile money payments')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span suppressHydrationWarning>{t('homepage.pricing_preview.feature_4', 'Reporting and analytics')}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="bg-gradient-to-br from-imboni-blue/5 to-imboni-orange/5 rounded-xl p-5 border border-imboni-blue/20">
+                  <p className="text-sm text-gray-700 font-medium" suppressHydrationWarning>
+                    {t('homepage.pricing_preview.enterprise_note', 'Enterprise plans available with custom pricing for multi-branch operations and advanced requirements.')}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-            {plans.map((plan) => (
-              <div
-                key={plan.code}
-                className={`relative bg-white rounded-2xl border p-8 flex flex-col transition-all hover:shadow-xl ${
-                  plan.popular
-                    ? 'border-imboni-orange ring-2 ring-imboni-orange shadow-lg'
-                    : 'border-slate-200 shadow-sm'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-imboni-orange text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow" suppressHydrationWarning>
-                      {t('pricing.most_popular', '⭐ Most Popular')}
-                    </span>
-                  </div>
-                )}
-                {plan.badge && !plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-imboni-blue text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow" suppressHydrationWarning>
-                      {t('pricing.multi_branch', '🏢 Multi-Branch')}
-                    </span>
-                  </div>
-                )}
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-imboni-orange/10 to-imboni-blue/10 border border-imboni-orange/20 rounded-2xl p-6 mb-8 max-w-3xl mx-auto">
+              <p className="text-gray-700 font-medium text-lg" suppressHydrationWarning>
+                {t('homepage.pricing_preview.founding_note', '🎉 Founding Hospitality Business Program members receive 50% lifetime discount on all plans')} — <a href="#founding-program" className="text-imboni-orange hover:text-imboni-blue transition font-semibold">{t('homepage.pricing_preview.founding_link', 'Learn more below ↓')}</a>
+              </p>
+            </div>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-imboni-blue text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-imboni-blue/90 hover:scale-105 transition-all shadow-lg"
+            >
+              {t('homepage.pricing_preview.view_full_pricing', 'View Full Pricing')} <ArrowRight className="w-5 h-5" />
+            </Link>
+            <p className="text-gray-500 text-sm mt-6" suppressHydrationWarning>
+              {t('homepage.pricing_preview.help', 'Need help choosing?')}{' '}
+              <a href={supportWhatsAppUrl} className="text-imboni-blue font-medium hover:text-imboni-orange transition">
+                {t('homepage.pricing_preview.chat', 'Chat with us on WhatsApp')}
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
 
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1" suppressHydrationWarning>
-                    {t(`pricing.plan_${plan.code.toLowerCase()}_name`, plan.name)}
+      {/* ── WHY TRUST US? — Executive-Grade Intelligence ── */}
+      <section className="py-20 px-4 bg-white border-t border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block bg-imboni-blue/10 text-imboni-blue text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+              {t('homepage.why_trust.badge', 'Why Trust Us?')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+              {t('homepage.why_trust.title', "This isn't a basic POS with pretty charts. This is enterprise-grade intelligence.")}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
+              {t('homepage.why_trust.subtitle', 'Built for decision-makers, not just order-takers.')}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-gradient-to-br from-imboni-blue/5 to-blue-50 rounded-2xl p-8 border border-slate-100">
+                  <div className="w-14 h-14 rounded-2xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center mb-5">
+                    <DollarSign className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                    {t('homepage.why_trust.cfo_title', 'CFO Dashboard')}
                   </h3>
-                  <p className="text-sm text-gray-500" suppressHydrationWarning>
-                    {t(`pricing.plan_${plan.code.toLowerCase()}_desc`, plan.description)}
+                  <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                    {t('homepage.why_trust.cfo_desc', 'Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times.')}
+                  </p>
+                  <Link href="/dashboard/cfo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.cfo_cta', 'View CFO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <div className="bg-gradient-to-br from-imboni-orange/5 to-orange-50 rounded-2xl p-8 border border-slate-100">
+                  <div className="w-14 h-14 rounded-2xl bg-imboni-orange/10 text-imboni-orange flex items-center justify-center mb-5">
+                    <TrendingUp className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
+                    {t('homepage.why_trust.ceo_title', 'CEO Dashboard')}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
+                    {t('homepage.why_trust.ceo_desc', 'Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes.')}
+                  </p>
+                  <Link href="/dashboard/ceo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.ceo_cta', 'View CEO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+        </div>
+      </section>
+
+      {/* ── WHY NOW? — The Cost of Waiting ── */}
+      <section className="py-16 px-4 bg-gradient-to-br from-slate-50 to-imboni-light border-t border-slate-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-block bg-red-50 text-red-600 text-xs font-semibold px-3 py-1 rounded-full mb-3" suppressHydrationWarning>
+            {t('homepage.why_now.badge', 'Why Now?')}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
+            {t('homepage.why_now.title', 'Every day without intelligence is a day of lost revenue.')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 text-left">
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.stockouts', 'Stockouts cost you customers today. AI prevents them before they happen.')}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <Target className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.pricing', "You're pricing your menu blind. Test prices with real conversion data.")}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <Users className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.churn', "You don't know who's about to churn. RFM segmentation reveals it automatically.")}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3">
+              <DollarSign className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.supplier', 'Supplier prices are creeping up unnoticed. Cost anomaly alerts catch them early.')}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm flex items-start gap-3 md:col-span-2">
+              <Play className="w-5 h-5 text-imboni-blue flex-shrink-0 mt-0.5" />
+              <p className="text-gray-700" suppressHydrationWarning>
+                {t('homepage.why_now.replay', "You can't reconstruct what went wrong last Friday. Service Replay™ lets you replay any service period event-by-event.")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOUNDING HOSPITALITY BUSINESS PROGRAM ── */}
+      <section id="founding-program" className="py-20 px-4 bg-gradient-to-br from-imboni-blue via-imboni-blue to-indigo-700 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(231,111,81,0.15),_transparent_60%)]" />
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-imboni-orange/20 border border-imboni-orange/30 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <Star className="w-4 h-4 inline mr-2" />
+              {t('homepage.founding_program.badge', 'Limited Early-Adopter Program')}
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" suppressHydrationWarning>
+              {t('homepage.founding_program.title', 'Founding Hospitality Business Program')}
+            </h2>
+            <p className="text-white/90 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed" suppressHydrationWarning>
+              {t('homepage.founding_program.subtitle', 'Join the first 100 hospitality businesses to shape the future of hospitality operations.')}
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Tag className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-xl mb-2" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_1_title', '50% Lifetime Discount')}
+                  </h3>
+                  <p className="text-white/80 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_1_desc', 'Lock in 50% off your subscription for as long as you remain a customer. No expiration.')}
                   </p>
                 </div>
-
-                <div className="mb-6">
-                  {billing === 'monthly' ? (
-                    typeof plan.monthlyPrice === 'number' ? (
-                      <>
-                        <div className="text-lg text-gray-400 line-through">{formatCurrency((plan.monthlyPrice || 0) * 2, 'RWF')}</div>
-                        <div>
-                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency(plan.monthlyPrice || 0, 'RWF', { showSymbol: false })}</span>
-                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>RWF{t('pricing.per_month', ' / month')}</span>
-                        </div>
-                        <div className="text-xs text-green-600 font-medium mt-1" suppressHydrationWarning>50% Launch Discount</div>
-                      </>
-                    ) : (
-                      <div>
-                        <span className="text-4xl font-extrabold text-gray-900" suppressHydrationWarning>{t('pricing.custom_pricing', 'Custom Pricing')}</span>
-                      </div>
-                    )
-                  ) : (
-                    typeof plan.annualMonthly === 'number' ? (
-                      <>
-                        <div className="text-lg text-gray-400 line-through">{formatCurrency(((plan.annualMonthly as number) || 0) * 2, 'RWF')}</div>
-                        <div>
-                          <span className="text-4xl font-extrabold text-gray-900">{formatCurrency((plan.annualMonthly as number) || 0, 'RWF', { showSymbol: false })}</span>
-                          <span className="text-gray-500 text-sm ml-1" suppressHydrationWarning>RWF{t('pricing.per_month', ' / month')}</span>
-                        </div>
-                        <div className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
-                          {t('pricing.billed_annually', 'Billed annually')}: {formatCurrency((plan.annualTotal as number) || 0, 'RWF')}
-                        </div>
-                        {typeof plan.monthlyPrice === 'number' && typeof plan.annualMonthly === 'number' && (
-                          <div className="text-xs text-green-600 font-medium mt-0.5" suppressHydrationWarning>
-                            50% Launch Discount + {t('pricing.save_25', 'Save 25%')} ({formatCurrency(((plan.monthlyPrice as number) - (plan.annualMonthly as number)) * 12, 'RWF')}{t('pricing.per_year', ' / year')})
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div>
-                        <span className="text-4xl font-extrabold text-gray-900" suppressHydrationWarning>{t('pricing.custom_pricing', 'Custom Pricing')}</span>
-                      </div>
-                    )
-                  )}
-                </div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f, i) => {
-                    const key = `pricing.feature_${f
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, '_')
-                      .replace(/_+/g, '_')
-                      .replace(/^_|_$/g, '')}`
-                    return (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                        <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span suppressHydrationWarning>{t(key, f)}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-
-                <button
-                  onClick={() => router.push(`/signup?plan=${plan.code}`)}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${
-                    plan.popular
-                      ? 'bg-imboni-orange text-white hover:bg-accent-dark shadow-md hover:shadow-orange-200'
-                      : 'bg-slate-100 text-imboni-blue hover:bg-primary-100'
-                  }`}
-                >
-                  {t('pricing.choose', 'Choose')} {t(`pricing.plan_${plan.code.toLowerCase()}_name`, plan.name)}
-                </button>
               </div>
-            ))}
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-xl mb-2" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_2_title', 'Direct Founder Support')}
+                  </h3>
+                  <p className="text-white/80 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_2_desc', 'Get priority onboarding and direct access to the founding team for support and guidance.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-xl mb-2" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_3_title', 'Early Access to New Capabilities')}
+                  </h3>
+                  <p className="text-white/80 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_3_desc', 'Be the first to access selected new features and capabilities as they launch.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-imboni-orange flex items-center justify-center flex-shrink-0">
+                  <Megaphone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-xl mb-2" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_4_title', 'Shape Platform Development')}
+                  </h3>
+                  <p className="text-white/80 leading-relaxed" suppressHydrationWarning>
+                    {t('homepage.founding_program.benefit_4_desc', 'Direct input on roadmap priorities — your operational needs help guide what we build next.')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <p className="text-center text-gray-500 text-sm mt-8" suppressHydrationWarning>
-            {t('pricing.need_help', 'Need help choosing?')}{' '}
-            <a href="https://wa.me/250735214496" className="text-imboni-blue font-medium hover:text-imboni-orange transition">
-              {t('pricing.chat_whatsapp', 'Chat with us on WhatsApp')}
-            </a>
-          </p>
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg mb-6">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm font-medium" suppressHydrationWarning>
+                {t('homepage.founding_program.limited', 'Limited to first 100 hospitality businesses')}
+              </span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/signup"
+                className="bg-imboni-orange text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent-dark hover:scale-105 transition-all shadow-lg flex items-center gap-2"
+              >
+                {t('homepage.founding_program.cta', 'Join Founding Program')} <ArrowRight className="w-5 h-5" />
+              </Link>
+              <a
+                href={supportWhatsAppUrl}
+                className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5" /> {t('homepage.founding_program.learn_more', 'Learn More')}
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1213,60 +1168,17 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Hotel className="w-5 h-5" />
+            {advancedFeatures.map((f, i) => (
+              <div key={i} className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+                <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">{f.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.hotel_mode', 'Hotel Mode')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.hotel_mode_desc', 'Room management, service areas, and front desk operations built-in.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Palette className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.site_builder', 'Site Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.site_builder_desc', 'Launch your own website with customizable templates — no code needed.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.ai_menu', 'AI Menu Builder')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.ai_menu_desc', 'Upload a photo or document and let AI build your menu for you.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Globe className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.marketplace', 'Discovery Marketplace')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.marketplace_desc', 'Get listed on a public directory where customers search for places to eat.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Gift className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.referral', 'Referral Program')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.referral_desc', 'Customers earn 1,000 RWF per referral. No limits, no caps — just instant rewards.')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-              <div className="w-10 h-10 rounded-xl bg-imboni-blue/10 text-imboni-blue flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1" suppressHydrationWarning>{t('homepage.advanced.staff', 'Staff & Roles')}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed" suppressHydrationWarning>{t('homepage.advanced.staff_desc', 'Granular role permissions: waiter, cashier, supervisor, manager, and more.')}</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1329,7 +1241,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-imboni-blue mb-2" suppressHydrationWarning>{t('homepage.payments.title', '🇷🇼 Rwanda-Ready Payments')}</h2>
           <p className="text-gray-600 mb-6" suppressHydrationWarning>{t('homepage.payments.subtitle', 'Accept all major payment methods your customers use every day.')}</p>
           <div className="flex flex-wrap justify-center gap-4">
-            {['MTN MoMo', 'Airtel Money', 'Cash', 'Card / POS', 'IremboPay'].map((m) => (
+            {['MTN MoMo', 'Airtel Money', 'Cash', 'IremboPay'].map((m) => (
               <span
                 key={m}
                 className="bg-white border border-slate-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full shadow-sm"
@@ -1346,7 +1258,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" suppressHydrationWarning>{t('homepage.final_cta.title', 'Ready to grow your business?')}</h2>
           <p className="text-white/80 text-lg mb-8" suppressHydrationWarning>
-            {t('homepage.final_cta.subtitle', 'Join 500+ hospitality businesses across Rwanda using Imboni Serve. Start your free 14-day trial today — no credit card needed.')}
+            {t('homepage.final_cta.subtitle', `Start your free ${PRICING_CONFIG.trialDays ?? 14}-day trial today — no credit card needed. Join the Imboni Serve community of hospitality businesses across Rwanda.`)}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
@@ -1356,7 +1268,7 @@ export default function HomePage() {
               {t('homepage.final_cta.cta_start', 'Get Started Free')} <ArrowRight className="w-4 h-4" />
             </a>
             <a
-              href="https://wa.me/250735214496"
+              href={supportWhatsAppUrl}
               className="bg-imboni-green text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:opacity-90 transition flex items-center gap-2"
             >
               <MessageCircle className="w-4 h-4" /> {t('homepage.final_cta.cta_whatsapp', 'Chat on WhatsApp')}
@@ -1364,76 +1276,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="bg-imboni-dark text-white/50 text-sm py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Newsletter & Social Share */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-white/10">
-            <div>
-              <NewsletterSignup sourcePage="homepage-footer" variant="footer" />
-            </div>
-            <div>
-              <SocialShare 
-                title="ImboniServe" 
-                text="Discover ImboniServe – Smart Dining for Restaurants in Rwanda"
-                variant="compact"
-              />
-            </div>
-          </div>
-
-          <div className="text-center mb-4">
-            <div className="flex justify-center mb-3">
-              <Image src="/imgs/logo2.png" alt="Imboni Serve Logo" width={100} height={32} className="h-8 w-auto opacity-90" />
-            </div>
-            <p className="mb-3" suppressHydrationWarning>© {new Date().getFullYear()} {t('homepage.footer.copyright', 'Imboni Serve. Built for the hospitality industry.')}</p>
-            <div className="flex justify-center gap-6 flex-wrap">
-              <a href="/login" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.sign_in', 'Sign In')}</a>
-              <a href="/signup" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.sign_up', 'Sign Up')}</a>
-              <a href="#pricing" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.pricing', 'Pricing')}</a>
-              {isInstalled ? (
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm">
-                  {t('homepage.footer.installed', 'Installed')}
-                </span>
-              ) : (
-                <span className="inline-flex">
-                  <InstallAppButton className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/30 text-white bg-white/10 hover:bg-white/20 transition-colors text-sm" label={t('homepage.footer.install', 'Install App')} />
-                </span>
-              )}
-              <a href="#store" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.store', 'Store')}</a>
-              <a href="/discover" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.discover', 'Discover')}</a>
-              <a href="/faq" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.faqs', 'FAQs')}</a>
-              <a href="https://wa.me/250735214496" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.contact', 'Contact')}</a>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-4 text-center">
-            <div className="flex justify-center gap-6 flex-wrap text-xs">
-              <a href="/terms" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.terms', 'Terms & Conditions')}</a>
-              <a href="/privacy" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.privacy', 'Privacy Policy')}</a>
-              <a href="/cookies" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.cookies', 'Cookie Policy')}</a>
-              <button
-                type="button"
-                onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new Event('im:consent:open-preferences'))}
-                className="hover:text-white transition underline underline-offset-4"
-              >
-                {t('public.footer.cookie_prefs', 'Cookie Preferences')}
-              </button>
-              <a href="/service-terms" className="hover:text-white transition" suppressHydrationWarning>{t('homepage.footer.service_terms', 'Service Terms')}</a>
-            </div>
-            <div className="mt-3 text-xs text-white/40">
-              <a href="https://www.icthubs.com" target="_blank" rel="noreferrer" className="hover:text-white/60">
-                Powered by ICTHubs
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      <PublicSupportWidget />
-      <PWAInstallPrompt />
-      <CookieConsentBanner />
-      <BookDemoModal isOpen={showDemo} onClose={() => setShowDemo(false)} />
     </div>
-    </>
+    </PublicLayout>
   )
 }

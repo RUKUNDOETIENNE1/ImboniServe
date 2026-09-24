@@ -13,10 +13,15 @@ export function useTranslation() {
   /**
    * Translate a key with optional parameters
    * @param key - Translation key (e.g., 'homepage.hero.title')
-   * @param params - Optional parameters to replace in translation (e.g., { name: 'John' })
+   * @param paramsOrFallback - Optional params object OR explicit fallback string
+   * @param maybeParams - Optional params object when second argument is a fallback string
    */
-  const t = (key: string, params?: Record<string, string>): string => {
-    return getTranslation(locale, key, params)
+  const t = (
+    key: string,
+    paramsOrFallback?: Record<string, string> | string,
+    maybeParams?: Record<string, string>
+  ): string => {
+    return getTranslation(locale, key, paramsOrFallback as any, maybeParams)
   }
   
   /**
