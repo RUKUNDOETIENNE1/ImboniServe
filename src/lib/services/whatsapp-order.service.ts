@@ -142,6 +142,10 @@ export class WhatsAppOrderService {
     const resolved: Array<{ menuItem: any; quantity: number; note?: string; instructionTags?: string[] }> = []
     const problems: string[] = []
     for (const item of items) {
+      if (item.quantity < 1 || item.quantity > 50) {
+        problems.push(`"${item.name}" has an invalid quantity (${item.quantity}). Use 1–50.`)
+        continue
+      }
       const r = await this.resolveMenuItem(businessIdVal, item.name)
       if (r.status === 'ok') {
         resolved.push({ menuItem: r.menuItem, quantity: item.quantity, note: item.note, instructionTags: item.instructionTags })
@@ -159,11 +163,11 @@ export class WhatsAppOrderService {
       }
     }
 
-    // Create order
-    const order = await this.createOrder(businessIdVal, table.id, staff.id, resolved, orderNotes)
-
-    // Record the inbound message for deduplication (unique messageSid).
-    // A unique-violation here means a concurrent delivery already processed it.
+    // Record the inbound message for deduplication BEFORE creating the order.
+    // The unique messageSid constraint is the atomic gate: a concurrent
+    // redelivery of the same provider message loses the insert race and must
+    // not create a second Sale.
+    let dedupRecorded = false
     if (opts.messageSid) {
       try {
         await prisma.whatsAppMessage.create({
@@ -181,18 +185,34 @@ export class WhatsAppOrderService {
             messageSid: opts.messageSid,
           },
         })
+        dedupRecorded = true
       } catch (dupErr: any) {
         if (dupErr?.code === 'P2002') {
           log.info('Concurrent duplicate WhatsApp message', { messageSid: opts.messageSid })
           return {
             success: true,
             duplicate: true,
-            orderId: order.id,
             reply: 'This message was already processed. Your order was received.',
           }
         }
         log.warn('Failed to record inbound WhatsApp message', { error: String(dupErr) })
       }
+    }
+
+    // Create order. If creation fails after the dedup row was written, remove
+    // the row so a genuine provider retry can still complete the order.
+    let order
+    try {
+      order = await this.createOrder(businessIdVal, table.id, staff.id, resolved, orderNotes)
+    } catch (orderErr) {
+      if (dedupRecorded) {
+        try {
+          await prisma.whatsAppMessage.delete({ where: { messageSid: opts.messageSid } })
+        } catch (cleanupErr) {
+          log.warn('Failed to release dedup record after order failure', { messageSid: opts.messageSid, error: String(cleanupErr) })
+        }
+      }
+      throw orderErr
     }
 
     // Post attribution — if order came from a feed CTA

@@ -11,7 +11,7 @@ const mockPrisma = {
   table: { findFirst: jest.fn() },
   menuItem: { findFirst: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
   sale: { create: jest.fn(), findUnique: jest.fn() },
-  whatsAppMessage: { findFirst: jest.fn(), create: jest.fn() },
+  whatsAppMessage: { findFirst: jest.fn(), create: jest.fn(), delete: jest.fn() },
   postAttribution: { create: jest.fn() },
 }
 
@@ -50,6 +50,7 @@ function mockHappyPath() {
   })
   mockPrisma.whatsAppMessage.findFirst.mockResolvedValue(null)
   mockPrisma.whatsAppMessage.create.mockResolvedValue({})
+  mockPrisma.whatsAppMessage.delete.mockResolvedValue({})
 }
 
 describe('WhatsAppOrderService.processIncomingMessage', () => {
@@ -170,7 +171,7 @@ describe('WhatsAppOrderService.processIncomingMessage', () => {
     expect(mockPrisma.sale.create).not.toHaveBeenCalled()
   })
 
-  it('records inbound message with messageSid after order creation', async () => {
+  it('records inbound message with messageSid BEFORE order creation (dedup gate)', async () => {
     await WhatsAppOrderService.processIncomingMessage('whatsapp:+250788000001', 'ORDER T5 1x Tea', { messageSid: 'SM_NEW' })
     expect(mockPrisma.whatsAppMessage.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -182,12 +183,35 @@ describe('WhatsAppOrderService.processIncomingMessage', () => {
         }),
       })
     )
+    // The unique insert must precede sale.create so a concurrent redelivery
+    // loses the race before any order exists.
+    const dedupOrder = mockPrisma.whatsAppMessage.create.mock.invocationCallOrder[0]
+    const saleOrder = mockPrisma.sale.create.mock.invocationCallOrder[0]
+    expect(dedupOrder).toBeLessThan(saleOrder)
   })
 
-  it('treats P2002 unique violation as concurrent duplicate', async () => {
+  it('treats P2002 unique violation as concurrent duplicate — no second Sale', async () => {
     mockPrisma.whatsAppMessage.create.mockRejectedValue({ code: 'P2002' })
     const r = await WhatsAppOrderService.processIncomingMessage('whatsapp:+250788000001', 'ORDER T5 1x Tea', { messageSid: 'SM_RACE' })
     expect(r.duplicate).toBe(true)
+    expect(mockPrisma.sale.create).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it('releases the dedup record when order creation fails (retry can succeed)', async () => {
+    mockPrisma.sale.create.mockRejectedValue(new Error('db down'))
+    await expect(
+      WhatsAppOrderService.processIncomingMessage('whatsapp:+250788000001', 'ORDER T5 1x Tea', { messageSid: 'SM_FAIL' })
+    ).rejects.toThrow('db down')
+    expect(mockPrisma.whatsAppMessage.delete).toHaveBeenCalledWith({ where: { messageSid: 'SM_FAIL' } })
+  })
+
+  // ── Quantity validation ──────────────────────────────────────────
+  it('rejects quantities above the safety bound — no sale created', async () => {
+    const r = await WhatsAppOrderService.processIncomingMessage('whatsapp:+250788000001', 'ORDER T5 999x Tea')
+    expect(r.success).toBe(false)
+    expect(r.reply).toMatch(/invalid quantity/i)
+    expect(mockPrisma.sale.create).not.toHaveBeenCalled()
   })
 
   // ── Kitchen dispatch ──────────────────────────────────────────────
