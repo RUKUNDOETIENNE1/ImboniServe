@@ -89,43 +89,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     const firstProcess = updatedTx.count > 0 && finalStatus === 'SUCCESS'
-    if (!firstProcess && transaction.status === 'SUCCESS') {
-      // Already processed by a prior call
-      console.log('[Webhook] Idempotent replay; transaction already SUCCESS', { invoiceNumber })
-      return res.status(200).json({ success: true, message: 'Already processed' })
-    }
+    const alreadySuccess = !firstProcess && transaction.status === 'SUCCESS'
 
-    // If became PAID in this call, cascade to Sale and downstream effects
-    if (firstProcess) {
-      // Note: logBillingEvent and AuditLogService.log for PAYMENT_SUCCESS are handled
-      // by PaymentCompletionService.onPaymentSuccess below — do not duplicate here.
-      // Update subscription if applicable
-      if (transaction.subscriptionId) {
-        await prisma.subscription.update({
-          where: { id: transaction.subscriptionId },
-          data: {
-            status: 'ACTIVE',
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    if (finalStatus === 'SUCCESS') {
+      if (firstProcess) {
+        // Note: logBillingEvent and AuditLogService.log for PAYMENT_SUCCESS are handled
+        // by PaymentCompletionService.onPaymentSuccess below — do not duplicate here.
+        // Update subscription if applicable
+        if (transaction.subscriptionId) {
+          await prisma.subscription.update({
+            where: { id: transaction.subscriptionId },
+            data: {
+              status: 'ACTIVE',
+              endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            }
+          })
+          // Trigger invite qualification on first subscription payment
+          try {
+            await BusinessInviteService.processPaymentQualification(transaction.businessId)
+          } catch (e) {
+            console.error('[Invite] processPaymentQualification error:', e)
           }
-        })
-        // Trigger invite qualification on first subscription payment
-        try {
-          await BusinessInviteService.processPaymentQualification(transaction.businessId)
-        } catch (e) {
-          console.error('[Invite] processPaymentQualification error:', e)
         }
       }
 
+      // Phase 3R — P2-2: self-healing completion. Even on replayed webhooks
+      // (transaction already SUCCESS), ensure the bound sale actually
+      // completed. PaymentCompletionService is idempotent; a completion
+      // failure returns 500 so IremboPay retries instead of leaving the
+      // sale unpaid with a SUCCESS transaction.
       const sale = await prisma.sale.findFirst({
         where: { paymentTransactionId: transaction.id },
         include: { business: true }
       })
 
-      if (sale) {
-        // Delegate all post-payment side effects to canonical PaymentCompletionService
-        // This handles: sale status update, dining slip, guest recognition, notification,
-        // broadcast, ledger entry, audit log, order token
+      if (sale && sale.paymentStatus !== 'COMPLETED') {
         try {
           await PaymentCompletionService.onPaymentSuccess(
             transaction.id,
@@ -134,17 +133,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           )
         } catch (error) {
           console.error('Error in PaymentCompletionService:', error)
+          return res.status(500).json({ error: 'Payment completion failed' })
         }
       }
 
-      // Create affiliate commissions if applicable
-      await createAffiliateCommissions(transaction)
+      if (firstProcess) {
+        // Create affiliate commissions if applicable
+        await createAffiliateCommissions(transaction)
 
-      // Create Founder Partner commissions if applicable
-      await createFounderCommissions(transaction)
+        // Create Founder Partner commissions if applicable
+        await createFounderCommissions(transaction)
 
-      // Create Professional Marketer commissions if applicable
-      await createMarketerCommissions(transaction)
+        // Create Professional Marketer commissions if applicable
+        await createMarketerCommissions(transaction)
+      }
+    } else if (alreadySuccess) {
+      // Already processed by a prior call
+      console.log('[Webhook] Idempotent replay; transaction already SUCCESS', { invoiceNumber })
+      return res.status(200).json({ success: true, message: 'Already processed' })
     }
 
     // For non-SUCCESS statuses or if already processed, we updated raw data above; finish

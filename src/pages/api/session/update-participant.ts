@@ -5,6 +5,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -28,6 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!participant) {
       return res.status(404).json({ error: 'Participant not found' });
+    }
+
+    // Capability bound to the participant's session. A participant may only
+    // update their own record; staff may update any participant in-session.
+    const access = await requireTableSessionAccess(req, res, participant.sessionId)
+    if (!access) return
+    if (access.via === 'participant' && access.participantId !== participant.id) {
+      return res.status(403).json({ error: 'Forbidden' })
     }
 
     const updated = await prisma.sessionParticipant.update({

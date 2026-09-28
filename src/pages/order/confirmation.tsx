@@ -264,7 +264,8 @@ export default function OrderConfirmationPage() {
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         sessionId: session.sessionId,
-                        inviterId: session.participantId
+                        inviterId: session.participantId,
+                        tempId: session.tempId
                       })
                     })
 

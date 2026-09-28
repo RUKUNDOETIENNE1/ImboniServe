@@ -95,6 +95,8 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
     // GPV-D010 FIX: Pass the sale's paymentTransactionId instead of empty string.
     // This ensures the PaymentTransaction is updated to SUCCESS and a proper
     // FinancialLedgerEntry is created in the canonical financial source of truth.
+    // Phase 3R — P2-2: a completion failure must not be reported as success.
+    // The sale remains unpaid and confirmable on retry.
     try {
       await PaymentCompletionService.onPaymentSuccess(
         sale.paymentTransactionId || '',
@@ -102,7 +104,10 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
         { source: 'manual-confirmation' }
       )
     } catch (error) {
-      console.error('Error in PaymentCompletionService:', error)
+      console.error('PaymentCompletionService failed for manual confirmation:', error)
+      return res.status(502).json({
+        error: 'Payment completion failed — the order remains unpaid. Please retry.',
+      })
     }
 
     const updatedSale = await prisma.sale.findUnique({

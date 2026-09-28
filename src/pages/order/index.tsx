@@ -320,7 +320,7 @@ export default function OrderPage() {
       return;
     }
 
-    joinTableSession(tableId, branchId, participantInput || undefined).then(info => {
+    joinTableSession(tableId, branchId, participantInput || undefined, { version, signature }).then(info => {
       if (info) {
         setSession(info);
         if (info.participantName) setParticipantInput(info.participantName);

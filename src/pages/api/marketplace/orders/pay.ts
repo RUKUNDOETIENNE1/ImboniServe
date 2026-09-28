@@ -46,6 +46,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Order not found' })
     }
 
+    // Ownership: only the order's customer, or staff of the order's business,
+    // may initiate payment. A body-supplied orderId must never let a caller
+    // create a PaymentTransaction against another user/tenant.
+    const caller = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { businessId: true },
+    })
+    const isOrderOwner = order.userId === userId
+    const isBusinessStaff = !!caller?.businessId && caller.businessId === order.businessId
+    if (!isOrderOwner && !isBusinessStaff) {
+      return res.status(403).json({ error: 'You are not authorized to pay for this order' })
+    }
+
     // Determine provider
     let providerType: PaymentProviderType
     let pmForTx: PaymentMethod

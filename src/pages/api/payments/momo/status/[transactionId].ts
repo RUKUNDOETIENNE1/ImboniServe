@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { MoMoService } from '@/lib/services/momo.service'
 import { PaymentCompletionService } from '@/lib/services/payment-completion.service'
+import { requireOrderAccess } from '@/lib/api/public-order-auth'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -36,6 +39,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'Transaction not found' })
     }
 
+    // Authorization (Phase 3R — P2-3): staff for this business, or the
+    // order-bound QR access token of the paying customer. Transactions with
+    // no bound sale are only visible to staff.
+    // Session lookup failure degrades to the order-token path.
+    const session = await getServerSession(req, res, authOptions).catch(() => null)
+    const sessionBusinessId = (session?.user as any)?.businessId as string | undefined
+    const isAdmin = (session?.user as any)?.role === 'ADMIN'
+    const isStaffForBusiness =
+      !!session?.user && (isAdmin || sessionBusinessId === paymentTx.businessId)
+
+    if (!isStaffForBusiness) {
+      if (!paymentTx.sale?.id) {
+        return res.status(403).json({ error: 'Forbidden' })
+      }
+      const authz = await requireOrderAccess(req, res, paymentTx.sale.id)
+      if (!authz) return
+    }
+
     // Determine provider from payment method
     const provider = paymentTx.paymentMethod === 'MTN_MOBILE_MONEY' ? 'MTN' : 'AIRTEL'
 
@@ -53,7 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    // If successful and not already processed, delegate to PaymentCompletionService
+    // If successful and not already processed, delegate to PaymentCompletionService.
+    // Completion failure propagates — a 500 is honest and lets polling retry.
     if (status.status === 'SUCCESSFUL' && paymentTx.status !== 'SUCCESS') {
       if (paymentTx.sale?.id) {
         await PaymentCompletionService.onPaymentSuccess(

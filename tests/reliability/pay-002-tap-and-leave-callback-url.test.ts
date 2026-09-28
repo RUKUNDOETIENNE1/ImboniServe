@@ -60,6 +60,18 @@ jest.mock('@/lib/die/business-as-plugin/dining-slips/slips.shadow', () => ({
   ingestDiningSlipShadowEvent: jest.fn().mockResolvedValue(undefined),
 }))
 
+// PHASE 4R: tap-and-leave now requires session-bound authorization. These
+// tests exercise callback-URL selection, not auth — the capability guard is
+// covered by tests/security/p4r-p1-remediation.test.ts. Mock it as authorized.
+jest.mock('@/lib/api/table-session-auth', () => ({
+  requireTableSessionAccess: jest.fn(async () => ({
+    session: { id: 'session-1', businessId: 'biz-1', tableId: 't1', status: 'active' },
+    via: 'participant',
+    participantId: 'part-1',
+  })),
+  getStaffBusinessId: jest.fn(async () => null),
+}))
+
 const requestPaymentSpy = jest.fn().mockResolvedValue({
   responsecode: '1000',
   status: 'Pending',

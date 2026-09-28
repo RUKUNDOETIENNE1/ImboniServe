@@ -56,6 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Delegate all post-payment side effects to canonical PaymentCompletionService
         // This handles: sale status update, dining slip, guest recognition, notification,
         // broadcast, ledger entry, audit log, order token
+        // Phase 3R — P2-2: propagate completion failure as 500 so the
+        // provider retries rather than leaving the sale unpaid with a
+        // SUCCESS transaction. PaymentCompletionService is idempotent.
         try {
           await PaymentCompletionService.onPaymentSuccess(
             transaction.id,
@@ -64,6 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           )
         } catch (error) {
           console.error('MTN MoMo callback: PaymentCompletionService error:', error)
+          return res.status(500).json({ error: 'Payment completion failed' })
         }
       } else {
         // No sale associated — log billing event for subscription/other payments

@@ -6,6 +6,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -19,14 +20,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'sessionId is required' });
     }
 
-    const session = await prisma.tableSession.findUnique({
-      where: { id: sessionId },
-      select: { id: true, status: true },
-    });
+    // Session-bound capability required: participant tempId, seat session
+    // token, or staff of the owning business.
+    const access = await requireTableSessionAccess(req, res, sessionId)
+    if (!access) return
 
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
-    }
+    const session = access.session;
 
     if (session.status === 'closed') {
       return res.status(400).json({ error: 'Session already closed' });
@@ -42,10 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Shadow: SESSION_CLOSED (feature-flagged inside ingestor)
     try {
-      const s = await prisma.tableSession.findUnique({ where: { id: sessionId }, select: { businessId: true } })
-      if (s?.businessId) {
-        await ingestDiningSlipShadowEvent({ type: 'SESSION_CLOSED', businessId: s.businessId, sessionId }).catch(() => {})
-      }
+      await ingestDiningSlipShadowEvent({ type: 'SESSION_CLOSED', businessId: session.businessId, sessionId }).catch(() => {})
     } catch {}
 
     return res.status(200).json({

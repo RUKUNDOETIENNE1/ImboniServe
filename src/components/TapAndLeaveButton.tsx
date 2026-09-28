@@ -6,6 +6,17 @@
 import { useState } from 'react'
 import TipSuggestionModal from './TipSuggestionModal'
 import { CreditCard, Loader2, CheckCircle, XCircle } from 'lucide-react'
+import { getSessionInfo } from '@/lib/sessionManager'
+
+function getSessionCredentials(sessionId: string) {
+  if (typeof window === 'undefined') return {}
+  const creds: { tempId?: string; seatSessionToken?: string } = {}
+  const info = getSessionInfo()
+  if (info?.sessionId === sessionId && info.tempId) creds.tempId = info.tempId
+  const seatToken = localStorage.getItem('seat_session_token')
+  if (seatToken) creds.seatSessionToken = seatToken
+  return creds
+}
 
 interface TapAndLeaveButtonProps {
   sessionId: string
@@ -58,6 +69,7 @@ export function TapAndLeaveButton({
           sessionId,
           phone,
           tipCents: Math.max(0, Math.round((tipRwfValue || 0) * 100)),
+          ...getSessionCredentials(sessionId),
         }),
       })
 
@@ -114,7 +126,9 @@ export function TapAndLeaveButton({
   const startPolling = (paymentId: string) => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/checkout/tap-and-leave/status/${paymentId}`)
+        const creds = getSessionCredentials(sessionId)
+        const qs = new URLSearchParams(creds as Record<string, string>).toString()
+        const response = await fetch(`/api/checkout/tap-and-leave/status/${paymentId}${qs ? `?${qs}` : ''}`)
         const data = await response.json()
 
         if (data.success) {

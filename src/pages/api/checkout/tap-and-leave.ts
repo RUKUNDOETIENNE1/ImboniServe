@@ -25,6 +25,7 @@ import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { getPlatformFee, FeeType } from '@/lib/services/platform-fee.service'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
 import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -37,6 +38,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!sessionId || !phone) {
     return res.status(400).json(errorResponse('Session ID and phone number are required'))
   }
+
+  // Authorization: caller must prove session capability (participant tempId,
+  // seat session token) or be staff of the owning business before any
+  // session freeze / PaymentTransaction creation / provider initiation.
+  const access = await requireTableSessionAccess(req, res, sessionId)
+  if (!access) return
 
   try {
     // ============================================

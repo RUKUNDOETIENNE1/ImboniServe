@@ -21,6 +21,15 @@ async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const where: any = {
       status: { not: 'CANCELLED' },
+      // Phase 3R — P2-1: hide abandoned QR drafts. A QR-sourced order only
+      // becomes actionable once the customer confirms it (customerConfirmedAt)
+      // or the canonical dispatcher has actually dispatched it (e.g. paid
+      // WEB orders and add-on items that bypass the confirm step).
+      NOT: {
+        orderSource: { in: ['QR_IN_VENUE', 'QR_REMOTE'] },
+        customerConfirmedAt: null,
+        kitchenDispatchStatus: 'pending',
+      },
     }
 
     const isAdmin = userRoles.includes('ADMIN')

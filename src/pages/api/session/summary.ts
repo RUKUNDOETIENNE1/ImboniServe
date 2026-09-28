@@ -6,6 +6,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -18,6 +19,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!sessionId || typeof sessionId !== 'string') {
       return res.status(400).json({ error: 'sessionId is required' });
     }
+
+    // Summary contains per-participant order + spend data: require
+    // session-bound capability (participant tempId, seat token, staff).
+    const access = await requireTableSessionAccess(req, res, sessionId)
+    if (!access) return
 
     const session = await prisma.tableSession.findUnique({
       where: { id: sessionId },

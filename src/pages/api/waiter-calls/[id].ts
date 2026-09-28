@@ -14,7 +14,13 @@ import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindi
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  
+
+  // Mutations are staff-only: an authenticated session is required
+  // unconditionally, and ownership is enforced per-business below.
+  if ((req.method === 'PATCH' || req.method === 'DELETE') && !session?.user) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
   if (req.method === 'PATCH') {
     return handleUpdateWaiterCall(req, res, session)
   }
@@ -60,16 +66,15 @@ async function handleUpdateWaiterCall(
       return res.status(404).json({ error: 'Waiter call not found' })
     }
 
-    // Verify user has access to this business (if authenticated)
-    if (session?.user) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { businessId: true }
-      })
+    // Verify user has access to this business (session is guaranteed
+    // non-null by the handler gate above)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { businessId: true }
+    })
 
-      if (user?.businessId !== call.table.businessId) {
-        return res.status(403).json({ error: 'Access denied' })
-      }
+    if (!user || user.businessId !== call.table.businessId) {
+      return res.status(403).json({ error: 'Access denied' })
     }
 
     // Update call based on action
@@ -166,16 +171,14 @@ async function handleDeleteWaiterCall(
       return res.status(404).json({ error: 'Waiter call not found' })
     }
 
-    // Verify access (if authenticated)
-    if (session?.user) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { businessId: true }
-      })
+    // Verify access (session is guaranteed non-null by the handler gate)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { businessId: true }
+    })
 
-      if (user?.businessId !== call.table.businessId) {
-        return res.status(403).json({ error: 'Access denied' })
-      }
+    if (!user || user.businessId !== call.table.businessId) {
+      return res.status(403).json({ error: 'Access denied' })
     }
 
     // Delete call

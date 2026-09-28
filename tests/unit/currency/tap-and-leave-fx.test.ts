@@ -68,6 +68,18 @@ jest.mock('@/lib/die/business-as-plugin/dining-slips/slips.shadow', () => ({
   ingestDiningSlipShadowEvent: jest.fn().mockResolvedValue(undefined),
 }))
 
+// PHASE 4R: tap-and-leave now requires session-bound authorization. These
+// tests exercise FX persistence, not auth — the capability guard is covered
+// by tests/security/p4r-p1-remediation.test.ts. Mock it as authorized.
+jest.mock('@/lib/api/table-session-auth', () => ({
+  requireTableSessionAccess: jest.fn(async () => ({
+    session: { id: 'session-1', businessId: 'biz-1', tableId: 't1', status: 'active' },
+    via: 'participant',
+    participantId: 'part-1',
+  })),
+  getStaffBusinessId: jest.fn(async () => null),
+}))
+
 import { convertMinorUnits } from '@/lib/services/currency-exchange.service'
 
 function makeSlip(businessId = 'biz-1', runningTotalCents = 10000) {

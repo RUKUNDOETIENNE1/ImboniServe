@@ -14,6 +14,7 @@ import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { TapLeaveFinalizationService } from '@/lib/services/tap-leave-finalization.service'
 import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -34,6 +35,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (!payment) {
       return res.status(404).json(errorResponse('Payment not found'))
+    }
+
+    // Authorization: status polling can finalize/fail payment state, so the
+    // caller must prove capability for the dining session this payment is
+    // bound to (referenceId = sessionId) or be staff of the owning business.
+    const boundSessionId = payment.referenceId || (payment.rawRequest as any)?.sessionId
+    if (!boundSessionId || typeof boundSessionId !== 'string') {
+      return res.status(403).json(errorResponse('Payment is not bound to a dining session'))
+    }
+    const access = await requireTableSessionAccess(req, res, boundSessionId)
+    if (!access) return
+    if (access.session.businessId !== payment.businessId) {
+      return res.status(403).json(errorResponse('Forbidden'))
     }
 
     // If already completed or failed, return current status

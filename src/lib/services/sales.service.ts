@@ -9,7 +9,27 @@ import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 export class SalesService {
   static async createSale(userId: string, input: CreateSaleInput) {
-    let totalAmountCents = input.items.reduce((sum, item) => sum + (item.unitPriceCents * item.quantity), 0)
+    // Server-authoritative pricing (Phase 3R — P1-1): resolve every menu item
+    // from the database, scoped to this business, and derive prices
+    // server-side. Client-supplied unitPriceCents is never financial truth.
+    const menuItemIds = [...new Set(input.items.map(i => i.menuItemId))]
+    const menuItems = await prisma.menuItem.findMany({
+      where: { id: { in: menuItemIds }, businessId: input.businessId },
+      select: { id: true, priceCents: true },
+    })
+    const priceById = new Map(menuItems.map(mi => [mi.id, mi.priceCents]))
+    const missingIds = menuItemIds.filter(id => !priceById.has(id))
+    if (missingIds.length > 0) {
+      throw new Error('Invalid menu items for this business')
+    }
+
+    const pricedItems = input.items.map(item => ({
+      menuItemId: item.menuItemId,
+      quantity: item.quantity,
+      unitPriceCents: priceById.get(item.menuItemId)!,
+    }))
+
+    let totalAmountCents = pricedItems.reduce((sum, item) => sum + (item.unitPriceCents * item.quantity), 0)
     const subtotalRWF = Math.round(totalAmountCents / 100)
 
     const feeCalc = calculateConvenienceFee(
@@ -56,7 +76,7 @@ export class SalesService {
         notes: input.notes,
         isPaid: false,
         items: {
-          create: input.items.map(item => ({
+          create: pricedItems.map(item => ({
             menuItemId: item.menuItemId,
             quantity: item.quantity,
             unitPriceCents: item.unitPriceCents,
@@ -85,21 +105,19 @@ export class SalesService {
       // Route through canonical PaymentCompletionService for all post-payment side effects
       // GPV-D010 FIX: PaymentCompletionService now handles the full atomic transition
       // including status='COMPLETED', ledger entry creation, and all side effects.
-      try {
-        await PaymentCompletionService.onPaymentSuccess(
-          '', // CASH has no payment transaction — service will create ledger from sale data
-          sale.id,
-          {
-            clientPhone: input.clientPhone,
-            clientEmail: input.clientEmail,
-            clientConsentedWhatsApp: input.clientConsentedWhatsApp,
-            consentCollectedBy: userId,
-            source: 'cash-sale',
-          }
-        )
-      } catch (error) {
-        console.error('Failed to process payment completion for CASH sale:', error)
-      }
+      // Phase 3R — P2-2: completion failure must propagate. Swallowing it
+      // returned a created sale that looked successful while unpaid.
+      await PaymentCompletionService.onPaymentSuccess(
+        '', // CASH has no payment transaction — service will create ledger from sale data
+        sale.id,
+        {
+          clientPhone: input.clientPhone,
+          clientEmail: input.clientEmail,
+          clientConsentedWhatsApp: input.clientConsentedWhatsApp,
+          consentCollectedBy: userId,
+          source: 'cash-sale',
+        }
+      )
     }
 
     return sale
@@ -212,15 +230,13 @@ export class SalesService {
       // Route through canonical PaymentCompletionService
       // GPV-D010 FIX: Pass the sale's paymentTransactionId so the ledger entry
       // is created with the correct transaction reference.
-      try {
-        await PaymentCompletionService.onPaymentSuccess(
-          sale.paymentTransactionId || '',
-          sale.id,
-          { source: 'sale-update' }
-        )
-      } catch (error) {
-        console.error('Failed to process payment completion on sale update:', error)
-      }
+      // Phase 3R — P2-2: propagate completion failure so callers cannot
+      // receive a successful response for an incomplete payment.
+      await PaymentCompletionService.onPaymentSuccess(
+        sale.paymentTransactionId || '',
+        sale.id,
+        { source: 'sale-update' }
+      )
     }
 
     return sale
