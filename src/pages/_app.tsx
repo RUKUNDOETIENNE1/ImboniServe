@@ -77,8 +77,8 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
   return (
     <SessionProviderNoSSR session={(pageProps as any).session}>
       <Head>
-        <link rel="icon" href="/imgs/imboni-serve-favicon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/imgs/imboni-serve-favicon.png" />
+        <link rel="icon" href="/imgs/favicon-1.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/imgs/favicon-2.png" />
         <meta name="application-name" content="Imboni Serve" />
         <meta name="description" content={getTranslation(ssrLocale, 'public.meta.description', 'Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments.')} />
       </Head>

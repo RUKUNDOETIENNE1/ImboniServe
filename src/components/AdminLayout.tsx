@@ -79,15 +79,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="h-full bg-white border-r border-slate-200/60 flex flex-col">
           {/* Logo */}
           <div className="p-6 border-b border-slate-200/60">
-            <div className="flex items-center gap-3">
-              <Image 
-                src="/imgs/logo1.png" 
-                alt="Imboni Serve" 
-                width={160}
-                height={40}
-                className="h-10 w-auto max-h-10"
-                priority
-              />
+            <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'gap-0'}`} data-testid="admin-sidebar-branding">
+              {sidebarOpen ? (
+                <Image
+                  src="/imgs/imboni-serve-logo-2.png"
+                  alt="Imboni Serve"
+                  width={120}
+                  height={50}
+                  className="h-10 w-auto"
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/imgs/favicon-2.png"
+                  alt="Imboni Serve"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10"
+                  priority
+                />
+              )}
               {sidebarOpen && (
                 <div>
                   <h2 className="font-bold text-imboni-blue text-lg">Imboni AI</h2>
@@ -169,6 +180,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="absolute -right-3 top-20 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all"
+            aria-label="Toggle sidebar"
           >
             <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${sidebarOpen ? 'rotate-90' : '-rotate-90'}`} />
           </button>
@@ -182,9 +194,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white">
             <div className="h-full flex flex-col">
               {/* Mobile Header */}
-              <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
+              <div className="p-6 border-b border-slate-200/60 flex items-center justify-between" data-testid="admin-mobile-header">
                 <div className="flex items-center gap-3">
-                  <Image src="/imgs/logo1.png" alt="Imboni Serve" width={160} height={40} className="h-10 w-auto max-h-10" />
+                  <Image src="/imgs/imboni-serve-logo-2.png" alt="Imboni Serve" width={120} height={50} className="h-10 w-auto" />
                   <div>
                     <h2 className="font-bold text-imboni-blue text-lg">Imboni AI</h2>
                     <p className="text-xs text-slate-500">Admin Panel</p>

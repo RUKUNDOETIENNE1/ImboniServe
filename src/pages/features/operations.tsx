@@ -19,7 +19,7 @@ import {
 const heroCapability = {
   icon: <ShoppingCart className="w-8 h-8" />,
   title: 'QR Code Ordering',
-  desc: 'Customers scan, browse your menu, and order directly from their phones — no app needed. Group sessions, OTP verification, upsell recommendations, dietary preferences, seat selection, and call-waiter functionality.',
+  desc: 'Customers scan, browse your menu, and order directly from their phones. No app needed. Group sessions, OTP verification, upsell recommendations, dietary preferences, seat selection, and call-waiter functionality.',
 }
 
 const featuredCapabilities = [
@@ -27,7 +27,7 @@ const featuredCapabilities = [
     key: 'service_replay',
     icon: <Play className="w-6 h-6" />,
     title: 'Service Replay™',
-    desc: 'Replay any service period event-by-event — like a football match. Every order, every station, every table. Playback controls with speed adjustment and filtering by table, station, waiter, or event type.',
+    desc: 'Replay any service period, event by event, like a football match. Every order, every station, every table. Playback controls with speed adjustment and filtering by table, station, waiter, or event type.',
   },
   {
     key: 'smart_dining_slips',

@@ -30,12 +30,12 @@ export default function Welcome() {
             {/* Logo */}
             <div className="inline-flex items-center justify-center mb-6">
               <Image
-                src="/imgs/logo2.png"
+                src="/imgs/imboni-serve-logo-2.png"
                 alt="Imboni Serve"
-                width={200}
-                height={76}
+                width={195}
+                height={80}
                 priority
-                className="h-20 w-auto"
+                className="h-16 sm:h-20 w-auto"
               />
             </div>
 

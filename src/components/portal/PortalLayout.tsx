@@ -53,15 +53,26 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
           <div className="h-full bg-white border-r border-slate-200/60 flex flex-col">
             {/* Logo */}
             <div className="p-6 border-b border-slate-200/60">
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/imgs/logo1.png"
-                  alt="Imboni Serve"
-                  width={160}
-                  height={40}
-                  className="h-10 w-auto max-h-10"
-                  priority
-                />
+              <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'gap-0'}`} data-testid="portal-sidebar-branding">
+                {sidebarOpen ? (
+                  <Image
+                    src="/imgs/imboni-serve-logo-2.png"
+                    alt="Imboni Serve"
+                    width={120}
+                    height={50}
+                    className="h-10 w-auto"
+                    priority
+                  />
+                ) : (
+                  <Image
+                    src="/imgs/favicon-2.png"
+                    alt="Imboni Serve"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10"
+                    priority
+                  />
+                )}
                 {sidebarOpen && (
                   <div>
                     <h2 className="font-bold text-emerald-700 text-lg">ImboniServe</h2>
@@ -135,9 +146,9 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
         </aside>
 
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between" data-testid="portal-mobile-header">
           <div className="flex items-center gap-2">
-            <Image src="/imgs/logo1.png" alt="Imboni Serve" width={120} height={30} className="h-8 w-auto" />
+            <Image src="/imgs/imboni-serve-logo-2.png" alt="Imboni Serve" width={120} height={50} className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />

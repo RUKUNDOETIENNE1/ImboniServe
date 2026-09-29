@@ -35,7 +35,7 @@ export default function ArticleLayout({
   const pageTitle = `${title} | ImboniServe`
   const description = metaDescription || ''
   const canonical = canonicalUrl || undefined
-  const ogImg = ogImage || (siteUrl ? `${siteUrl}/imgs/logo2.png` : '/imgs/logo2.png')
+  const ogImg = ogImage || (siteUrl ? `${siteUrl}/imgs/imboni-serve-logo-2.png` : '/imgs/imboni-serve-logo-2.png')
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -51,7 +51,7 @@ export default function ArticleLayout({
       name: 'ImboniServe',
       logo: {
         '@type': 'ImageObject',
-        url: siteUrl ? `${siteUrl}/imgs/logo2.png` : '/imgs/logo2.png',
+        url: siteUrl ? `${siteUrl}/imgs/imboni-serve-logo-2.png` : '/imgs/imboni-serve-logo-2.png',
       },
     },
     mainEntityOfPage: canonical ? { '@type': 'WebPage', '@id': canonical } : undefined,

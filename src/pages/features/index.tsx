@@ -32,7 +32,7 @@ const featureCategories = [
     key: 'ai',
     icon: <BrainCircuit className="w-8 h-8" />,
     title: 'AI',
-    desc: 'AI that works while you work — not just dashboards.',
+    desc: 'AI that does real work, beyond dashboards.',
     href: '/features/ai',
     color: 'bg-yellow-50 text-imboni-gold',
     highlights: ['AI Menu Builder', 'Auto-Reorder AI', 'A/B Testing'],
@@ -50,7 +50,7 @@ const featureCategories = [
     key: 'finance',
     icon: <DollarSign className="w-8 h-8" />,
     title: 'Finance',
-    desc: 'Every franc tracked — from mobile money to CFO intelligence.',
+    desc: 'Track every franc, from mobile money to CFO intelligence.',
     href: '/features/finance',
     color: 'bg-purple-50 text-purple-700',
     highlights: ['Payout Summary', 'Payment Monitor', 'Transactions'],
@@ -90,10 +90,10 @@ export default function FeaturesPage() {
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="text-center mb-14">
             <h1 className="text-4xl md:text-5xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('features_page.title', 'Everything You Need to Run Your Hospitality Business')}
+              {t('features_page.title', 'Capabilities to run your hospitality business')}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>
-              {t('features_page.subtitle', '38 verified, production-ready capabilities. Organized by what they do for your business — not by internal modules.')}
+              {t('features_page.subtitle', '38 verified, production-ready capabilities. Organized by what they do for your business, not by internal modules.')}
             </p>
           </div>
 

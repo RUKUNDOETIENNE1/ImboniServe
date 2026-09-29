@@ -23,7 +23,7 @@ const featuredCapabilities = [
   {
     icon: <Megaphone className="w-6 h-6" />,
     title: 'WhatsApp Campaigns',
-    desc: 'Targeted campaigns to CRM segments — Champions, At Risk, New — directly on WhatsApp. Personalized messages with delivery tracking.',
+    desc: 'Targeted campaigns to CRM segments such as Champions, At Risk, and New, directly on WhatsApp. Personalized messages with delivery tracking.',
   },
   {
     icon: <Palette className="w-6 h-6" />,

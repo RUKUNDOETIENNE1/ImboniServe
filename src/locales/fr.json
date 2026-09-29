@@ -287,9 +287,9 @@
       "launch_badge": "Offre de Lancement — 50% de Réduction sur Tous les Plans",
       "title": "Transformez Chaque Table en",
       "title_highlight": "Revenus Plus Rapides",
-      "subtitle": "Réduisez les temps d'attente, servez plus de clients et rationalisez vos opérations—commande QR, POS et informations IA sur une seule plateforme.",
+      "subtitle": "Réduisez les temps d'attente, servez plus de clients et rationalisez vos opérations : commande QR, POS et informations IA sur une seule plateforme.",
       "description": "Conçu pour les restaurants, hôtels, bars et cafés.",
-      "rt_os": "OS en temps réel : voyez chaque vente, chaque table, chaque action client — et augmentez les revenus automatiquement.",
+      "rt_os": "OS en temps réel : voyez chaque vente, chaque table et chaque action client. Repérez les problèmes à mesure qu'ils surviennent et réagissez plus vite.",
       "cta_primary": "Commencer l'essai gratuit de 14 jours",
       "cta_secondary": "Voir les tarifs",
       "cta_talk_to_team": "Parler à notre équipe",
@@ -300,7 +300,7 @@
           "title": "Transformez Chaque Table en",
           "highlight": "Revenus Plus Rapides",
           "subtitle": "Soyez visible. Recevez des commandes. Croissez vite.",
-          "description": "Réduisez les temps d'attente, servez plus de clients et rationalisez vos opérations — commande par QR, POS et analyses IA sur une seule plateforme."
+          "description": "Réduisez les temps d'attente, servez plus de clients et rationalisez vos opérations : commande par QR, POS et analyses IA sur une seule plateforme."
         },
         "1": {
           "title": "Commande QR Intelligente",
@@ -324,13 +324,13 @@
           "title": "Le Système d'Exploitation",
           "highlight": "pour l'Hôtellerie.",
           "subtitle": "Gérez votre café, hôtel, bar ou entreprise d'hospitalité depuis une plateforme intelligente.",
-          "description": "Tout ce dont vous avez besoin — des commandes et de l'inventaire aux paiements et aux insights — sur une seule plateforme."
+          "description": "Tout ce dont vous avez besoin, des commandes et de l'inventaire aux paiements et aux insights, sur une seule plateforme."
         },
         "replay": {
           "title": "Service Replay™",
           "highlight": "Voyez ce qui s'est vraiment passé",
           "subtitle": "Revivez n'importe quel service",
-          "description": "Rejouez les événements comme un match — chaque commande, table, poste et transfert. Diagnostiquez vite, coachez les équipes, évitez les pertes."
+          "description": "Rejouez les événements comme un match : chaque commande, table, poste et transfert. Diagnostiquez vite, coachez les équipes, corrigez les écarts avant le prochain service."
         },
         "qr": {
           "title": "Commande QR intelligente",
@@ -354,10 +354,10 @@
     },
     "features": {
       "title": "Une seule plateforme. Des opérations complètes.",
-      "subtitle": "Gérez toute votre activité d’hôtellerie-restauration depuis une plateforme intelligente — commandes, inventaire, paiements, insights et croissance.",
+      "subtitle": "Gérez toute votre activité d’hôtellerie-restauration depuis une plateforme intelligente : commandes, inventaire, paiements, insights et croissance.",
       "tagline": "Unifié. Intelligent. Fiable.",
       "qr_ordering": "Commande par QR Code",
-      "qr_ordering_desc": "Les clients scannent, consultent votre menu et commandent directement depuis leur téléphone — aucune application nécessaire.",
+      "qr_ordering_desc": "Les clients scannent, consultent votre menu et commandent directement depuis leur téléphone. Aucune application nécessaire.",
       "inventory": "Inventaire & Approvisionnement",
       "inventory_desc": "Suivez les niveaux de stock, définissez les points de recommande et gérez les bons de commande avec un historique complet.",
       "reports": "Rapports & Analyses",
@@ -375,7 +375,7 @@
       "whatsapp": "Intégration WhatsApp",
       "whatsapp_desc": "Recevez des alertes de commande, des résumés quotidiens et des notifications de stock bas directement sur WhatsApp.",
       "mobile_money": "Paiements Mobile Money",
-      "mobile_money_desc": "Acceptez les paiements mobile money nativement — aucun terminal de paiement requis.",
+      "mobile_money_desc": "Acceptez les paiements mobile money nativement. Aucun terminal de paiement requis.",
       "multi_branch": "Contrôle Multi-Établissements",
       "multi_branch_desc": "Gérez plusieurs emplacements depuis un tableau de bord unique avec des rapports consolidés et par établissement.",
       "roles": "Accès Basé sur les Rôles",
@@ -383,11 +383,11 @@
     },
     "advanced": {
       "title": "Conçu pour la croissance",
-      "subtitle": "Tout ce qu’il vous faut pour passer d’un seul établissement à une activité d’hospitalité moderne—depuis une plateforme intelligente unique.",
+      "subtitle": "Tout ce qu’il vous faut pour passer d’un seul établissement à une activité d’hospitalité moderne, depuis une plateforme intelligente unique.",
       "hotel_mode": "Opérations Hôtelières",
       "hotel_mode_desc": "Gestion des chambres, zones de service et opérations de réception pour les activités d’hospitalité.",
       "site_builder": "Créateur de Site",
-      "site_builder_desc": "Lancez votre propre site web avec des modèles personnalisables — aucun code nécessaire.",
+      "site_builder_desc": "Lancez votre propre site web avec des modèles personnalisables. Aucun code nécessaire.",
       "ai_menu": "Créateur de Menu IA",
       "ai_menu_desc": "Transformez vos menus en expériences digitales en quelques minutes. Téléchargez une photo ou un document et laissez l’IA créer un menu digital professionnel prêt à la commande.",
       "marketplace": "Découverte de l’établissement",
@@ -395,7 +395,7 @@
       "procurement": "Approvisionnement & Inventaire",
       "procurement_desc": "Gérez les achats, les fournisseurs, les niveaux de stock et les coûts alimentaires avec une visibilité opérationnelle complète, de la livraison à la consommation.",
       "referral": "Programme de Parrainage",
-      "referral_desc": "Partagez et gagnez — les clients parrainent des amis et gagnent automatiquement des crédits repas.",
+      "referral_desc": "Partagez et gagnez. Les clients parrainent des amis et gagnent automatiquement des crédits repas.",
       "staff": "Personnel & Rôles",
       "staff_desc": "Contrôlez qui peut accéder à quoi grâce à des rôles et permissions flexibles pour chaque membre de votre équipe.",
       "multi_branch": "Opérations Multi-Établissements",
@@ -426,7 +426,7 @@
     },
     "payments": {
       "title": "Acceptez les paiements que vos clients utilisent déjà",
-      "subtitle": "Des options de paiement flexibles configurées pour votre marché — mobile money, cartes, espèces et portefeuilles numériques.",
+      "subtitle": "Des options de paiement flexibles configurées pour votre marché : mobile money, cartes, espèces et portefeuilles numériques.",
       "mobile_money": "Mobile Money",
       "cards": "Cartes & TPE",
       "cash": "Espèces",
@@ -537,7 +537,7 @@
     "why_now": {
       "badge": "Pourquoi maintenant ?",
       "title": "Chaque jour sans intelligence est un jour de revenus perdus.",
-      "stockouts": "Les ruptures de stock vous coûtent des clients. L'IA les prévient.",
+      "stockouts": "Les ruptures de stock vous coûtent des clients. L'IA signale les risques tôt pour vous permettre d'agir.",
       "pricing": "Vous fixez vos prix à l'aveugle. Testez avec des données réelles.",
       "churn": "Vous ignorez qui va partir. Le RFM le révèle.",
       "supplier": "Les prix fournisseurs grimpent discrètement. Les alertes d'anomalies les détectent.",
@@ -577,8 +577,8 @@
       "orders_cta": "Ouvrir les Commandes"
     },
     "growth": {
-      "badge": "Moteurs de Croissance Automatique",
-      "title": "Augmentez les Revenus en Pilote Automatique",
+      "badge": "Outils de Croissance",
+      "title": "Augmentez les Revenus avec des automatisations",
       "crm_title": "CRM Client (RFM)",
       "crm_desc": "Segmentez les clients en Champions, Fidèles et À Risque.",
       "crm_cta": "Ouvrir le CRM",
@@ -592,7 +592,7 @@
       "voice_desc": "Laissez les clients commander par voix en EN / FR / RW.",
       "voice_cta": "Explorer l'IA",
       "alerts_title": "Alertes Push Stock Faible",
-      "alerts_desc": "Ne manquez jamais de stock. Soyez alerté avant.",
+      "alerts_desc": "Restez en stock. Recevez des alertes avant que le stock soit bas.",
       "alerts_cta": "Configurer les Alertes",
       "resv_title": "Dépôts & Réservations",
       "resv_desc": "Réduisez les absences avec des dépôts et confirmations intelligents.",
@@ -1668,55 +1668,83 @@
   "faq": {
     "title_page": "FAQ — Imboni Serve",
     "heading": "Foire aux questions",
-    "subtitle": "Frais de paiement et politiques de la plateforme",
+    "subtitle": "Commande QR, Paiements & Assistance",
     "contact": {
       "heading": "Vous avez encore des questions ?",
-      "body": "Notre équipe d'assistance est là pour vous aider ! Contactez-nous à tout moment.",
+      "body": "Notre équipe d'assistance est là pour vous aider. Contactez-nous à tout moment.",
       "email_label": "Email :",
       "phone_label": "Téléphone :",
       "hours_label": "Horaires :",
-      "hours_value": "Lundi - Dimanche, 8:00 - 22:00"
+      "hours_value": "Lundi – Dimanche, 8:00 – 22:00"
     },
     "items": {
       "0": {
-        "q": "Pourquoi y a-t-il des frais de service pour les paiements numériques ?",
-        "a": "Les frais de 5% couvrent le traitement sécurisé des paiements, la prévention de la fraude, la confirmation instantanée et la réconciliation. Ces services garantissent un paiement sûr, rapide et correctement enregistré. Les paiements en espèces n'ont pas de frais."
+        "q": "Dois-je télécharger une application pour scanner le code QR ?",
+        "a": "Non. Vous n'avez pas besoin d'une application spéciale.\n\nOuvrez simplement l'appareil photo de votre iPhone ou Android, pointez-le vers le code QR Imboni Serve, puis touchez le lien qui apparaît sur votre écran.\n\nOuvrir l'appareil photo → Scanner le QR → Toucher le lien → Commencer la commande.\n\nAucun téléchargement. Aucune installation. Aucune complication."
       },
       "1": {
-        "q": "Comment éviter les frais de service ?",
-        "a": "Payez simplement en espèces ! Les frais s'appliquent uniquement aux paiements par carte et mobile money. En espèces, vous payez exactement le prix du menu sans frais supplémentaires."
+        "q": "Comment commander avec un code QR ?",
+        "a": "C'est simple. Scannez le code QR sur votre table avec l'appareil photo de votre téléphone. Votre menu numérique s'ouvrira instantanément. Choisissez ce que vous souhaitez, passez votre commande et suivez les instructions à l'écran.\n\nVous pouvez commander sans télécharger d'application."
       },
       "2": {
-        "q": "Quel est le frais minimum et maximum ?",
-        "a": "Le frais minimum est de 100 RWF (pour les petites commandes) et le maximum de 3 500 RWF (pour rester équitable sur les grosses commandes). Vous ne paierez jamais plus de 3 500 RWF de frais, quelle que soit la taille de votre commande."
+        "q": "Ai-je besoin d'un compte pour commander ?",
+        "a": "Non. Vous pouvez parcourir le menu et passer une commande sans télécharger d'application ni créer de compte.\n\nSi l'établissement propose des fonctionnalités supplémentaires telles que des récompenses de fidélité ou l'historique des commandes, on pourra vous proposer de créer un compte."
       },
       "3": {
-        "q": "Les pourboires sont-ils inclus dans le calcul des frais ?",
-        "a": "Non. Les pourboires sont exclus du calcul. Le frais est calculé uniquement sur le total de votre commande de nourriture et de boissons."
+        "q": "Puis-je commander depuis mon propre téléphone ?",
+        "a": "Oui. Imboni Serve est conçu pour fonctionner directement depuis le navigateur web de votre téléphone. Vous n'avez pas besoin d'installer une application distincte.\n\nScannez simplement le code QR et commencez à commander."
       },
       "4": {
-        "q": "La TVA est-elle incluse dans les frais ?",
-        "a": "Oui. Le frais de 5% affiché est TTC. Le prix affiché est le prix final — aucune taxe cachée à la validation."
+        "q": "Que faire si mon téléphone ne scanne pas le code QR ?",
+        "a": "La plupart des smartphones modernes peuvent scanner les codes QR directement avec l'appareil photo. Si votre appareil ne reconnaît pas le code, vous pouvez utiliser le scanner QR intégré de votre téléphone ou Google Lens sur Android.\n\nVous pouvez également demander l'aide d'un membre du personnel."
       },
       "5": {
-        "q": "Quels moyens de paiement ont ces frais ?",
-        "a": "Les frais s'appliquent aux paiements par carte (Visa, Mastercard) et Mobile Money (MTN, Airtel). Les espèces et virements bancaires n'ont pas de frais."
+        "q": "Puis-je toujours demander à un membre du personnel de prendre ma commande ?",
+        "a": "Absolument. La commande numérique est conçue pour faciliter la commande, pas pour remplacer l'hospitalité.\n\nSelon l'établissement, vous pouvez commander vous-même via le menu QR, commander via WhatsApp, ou simplement demander l'aide d'un membre du personnel."
       },
       "6": {
-        "q": "Comment la commission marketplace est-elle calculée ?",
-        "a": "Pour les commandes marketplace, les vendeurs paient une commission : 10% + TVA pour les nouveaux vendeurs, 7% + TVA pour le standard, et 5% + TVA pour gros volumes (plus de 5M RWF/mois). Elle couvre les services plateforme, le marketing et le traitement des paiements."
+        "q": "Puis-je commander via WhatsApp ?",
+        "a": "Si l'établissement a activé la commande via WhatsApp, oui. Vous pouvez interagir avec l'établissement via WhatsApp et obtenir de l'aide pour votre commande sans avoir à télécharger une autre application."
       },
       "7": {
-        "q": "Puis-je obtenir un reçu pour mon paiement ?",
-        "a": "Oui ! Tous les paiements génèrent un reçu conforme EBM indiquant votre commande, le frais (le cas échéant), le détail de TVA et le total. Vous le recevrez par email et pourrez aussi le consulter dans votre compte."
+        "q": "Pourquoi y a-t-il des frais de service pour les paiements numériques ?",
+        "a": "Les frais de service de 5% couvrent le coût du traitement sécurisé des paiements, de la prévention de la fraude, de la confirmation instantanée des paiements et des services de rapprochement. Ces services garantissent que votre paiement est sûr, rapide et correctement enregistré.\n\nLes paiements en espèces n'ont pas de frais de service."
       },
       "8": {
-        "q": "Que faire en cas de problème avec le frais appliqué ?",
-        "a": "Si vous pensez avoir été facturé à tort, contactez l'assistance à support@imboni.resto ou au +250 788 917 126. Nous examinerons votre transaction et résoudrons sous 24–48h."
+        "q": "Comment éviter les frais de service ?",
+        "a": "Payez simplement en espèces.\n\nLes frais de service s'appliquent uniquement aux paiements par carte et mobile money. Lorsque vous payez en espèces, vous payez exactement le prix du menu, sans frais de service supplémentaires."
       },
       "9": {
-        "q": "Les frais peuvent-ils changer à l'avenir ?",
-        "a": "Nous pouvons ajuster les frais selon le marché et les coûts. Tout changement sera communiqué au moins 30 jours à l'avance par email et sur la plateforme. Consultez la page Conditions générales pour la politique à jour."
+        "q": "Quels sont les frais de service minimum et maximum ?",
+        "a": "Les frais de service minimum sont de RWF 100 pour les petites commandes, et le maximum est de RWF 3,500.\n\nCela signifie que vous ne paierez jamais plus de RWF 3,500 de frais de service, quelle que soit la taille de votre commande."
+      },
+      "10": {
+        "q": "Les pourboires sont-ils inclus dans le calcul des frais ?",
+        "a": "Non. Les pourboires sont exclus du calcul des frais de service.\n\nLes frais sont calculés uniquement sur le total de votre commande de nourriture et de boissons, et non sur les pourboires que vous choisissez de donner."
+      },
+      "11": {
+        "q": "La TVA est-elle incluse dans les frais de service ?",
+        "a": "Oui. Les frais de service de 5% qui vous sont affichés sont TTC.\n\nCela signifie que les frais affichés au paiement incluent déjà la TVA. Aucune taxe supplémentaire n'est ajoutée aux frais de service."
+      },
+      "12": {
+        "q": "Quels moyens de paiement ont des frais de service ?",
+        "a": "Les frais de service s'appliquent à :\n\n* Les paiements par carte, y compris Visa et Mastercard\n* Mobile Money, y compris MTN Mobile Money et Airtel Money\n\nLes espèces et les virements bancaires n'ont pas de frais de service."
+      },
+      "13": {
+        "q": "Puis-je payer en espèces ?",
+        "a": "Oui. Si l'établissement accepte les espèces, vous pouvez choisir de payer en espèces.\n\nLes paiements en espèces ne sont pas soumis aux frais de service des paiements numériques."
+      },
+      "14": {
+        "q": "Puis-je obtenir un reçu pour mon paiement ?",
+        "a": "Oui. Les paiements génèrent un reçu officiel conforme EBM indiquant les détails de votre commande, les frais de service applicables, le détail de la TVA et le montant total.\n\nSelon l'établissement et votre commande, votre reçu peut être délivré numériquement et/ou mis à disposition via votre compte."
+      },
+      "15": {
+        "q": "Que faire en cas de problème avec les frais facturés ?",
+        "a": "Si vous pensez avoir été facturé à tort, veuillez contacter notre équipe d'assistance à support@imboniserve.com ou au +250 735 214 496.\n\nNous examinerons votre transaction et travaillerons à résoudre le problème."
+      },
+      "16": {
+        "q": "Les frais de service changeront-ils à l'avenir ?",
+        "a": "Nous pouvons ajuster les frais en fonction des conditions du marché et des coûts d'exploitation.\n\nToute modification sera communiquée au moins 30 jours à l'avance par email et sur notre plateforme. Vous pouvez toujours consulter la politique de frais en vigueur sur notre page Conditions générales."
       }
     }
   },

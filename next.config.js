@@ -202,7 +202,7 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/favicon.ico', destination: '/imgs/imboni-serve-favicon.png' },
+      { source: '/favicon.ico', destination: '/imgs/favicon-1.png' },
     ]
   },
 }

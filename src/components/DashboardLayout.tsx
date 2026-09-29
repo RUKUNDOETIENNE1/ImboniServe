@@ -1,5 +1,6 @@
 import { ReactNode, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { 
   LayoutDashboard, TrendingUp, Package, Users, Settings, 
@@ -247,12 +248,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="h-full bg-gradient-to-b from-imboni-blue to-blue-800 dark:from-gray-800 dark:to-gray-900 border-r border-blue-900/30 dark:border-gray-700 flex flex-col">
           {/* Logo */}
           <div className="p-6 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/imgs/logo1.png" 
-                alt="Imboni Serve" 
-                className="h-10 w-auto max-h-10"
-              />
+            <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'gap-0'}`} data-testid="dashboard-sidebar-branding">
+              {sidebarOpen ? (
+                <Image
+                  src="/imgs/imboni-serve2-logo.png"
+                  alt="Imboni Serve"
+                  width={120}
+                  height={50}
+                  className="h-10 w-auto"
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/imgs/favicon-2.png"
+                  alt="Imboni Serve"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10"
+                  priority
+                />
+              )}
               {sidebarOpen && (
                 <div>
                   <h2 className="font-bold text-white text-lg">Imboni Serve</h2>
@@ -351,6 +366,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="absolute -right-3 top-20 w-6 h-6 bg-white border border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all"
+            aria-label="Toggle sidebar"
           >
             <ChevronDown className={`w-4 h-4 text-imboni-blue transition-transform ${sidebarOpen ? 'rotate-90' : '-rotate-90'}`} />
           </button>
@@ -364,9 +380,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <aside className="fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-imboni-blue to-blue-800 dark:from-gray-800 dark:to-gray-900">
             <div className="h-full flex flex-col">
               {/* Mobile Header */}
-              <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="p-6 border-b border-white/10 flex items-center justify-between" data-testid="dashboard-mobile-header">
                 <div className="flex items-center gap-3 mb-6">
-                  <img src="/imgs/logo1.png" alt="Imboni Serve" className="h-10 w-auto max-h-10" />
+                  <Image src="/imgs/imboni-serve2-logo.png" alt="Imboni Serve" width={120} height={50} className="h-10 w-auto" />
                   <div>
                     <h2 className="font-bold text-white text-lg">Imboni Serve</h2>
                     <p className="text-xs text-white/60" suppressHydrationWarning>{t('dashboard.brand.tagline', 'Hospitality Management')}</p>
@@ -475,6 +491,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <button
                   onClick={() => setMobileMenuOpen(true)}
                   className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
+                  aria-label="Open menu"
                 >
                   <Menu className="w-6 h-6 text-slate-600 dark:text-gray-300" />
                 </button>

@@ -91,13 +91,13 @@ const features = [
   {
     icon: <Bell className="w-6 h-6" />,
     title: 'Low-Stock Push Alerts',
-    desc: 'Never run out. Get automatic alerts before inventory drops below reorder points.',
+    desc: 'Stay in stock. Get alerts before inventory runs low or drops below reorder points.',
     color: 'bg-amber-50 text-amber-700',
   },
   {
     icon: <MessageCircle className="w-6 h-6" />,
-    title: 'WhatsApp Integration',
-    desc: 'Receive order alerts, daily summaries, and low-stock notifications directly on WhatsApp.',
+    title: 'WhatsApp Assisted Ordering',
+    desc: 'Customers can order through your business WhatsApp while staff-assisted orders flow into ImboniServe and your kitchen workflow.',
     color: 'bg-emerald-50 text-emerald-700',
   },
   {
@@ -123,8 +123,8 @@ const heroSlides = [
     key: 'os',
     title: 'The Operating System',
     highlight: 'for Hospitality.',
-    subtitle: 'Run your café, hotel, bar, or hospitality business from one intelligent platform.',
-    description: 'Everything you need to run your business — from orders and inventory to payments and insights — in one platform built for hospitality.',
+    subtitle: 'Keep orders, tables, payments, and daily operations in one place.',
+    description: 'Manage orders, inventory, payments, and insights in one place, built for hospitality.',
     image: '/imgs/ideogr1.jpg'
   },
   {
@@ -132,7 +132,7 @@ const heroSlides = [
     title: 'Service Replay™',
     highlight: 'See What Really Happened',
     subtitle: 'Rewind Any Service Period',
-    description: 'Replay events like a match—every order, table, station, and hand-off. Diagnose issues fast, coach teams, and prevent loss.',
+    description: 'Step through a past service and see every order, table, station, and hand-off. Spot delays, coach the team, and fix gaps before the next shift.',
     image: '/imgs/ideogr 3.jpg'
   },
   {
@@ -142,6 +142,14 @@ const heroSlides = [
     subtitle: 'Customers Order from Their Phones',
     description: 'Scan, browse menu, and place orders instantly. No app downloads. No staff interruptions. Pure efficiency.',
     image: '/imgs/ideogr 2.jpg'
+  },
+  {
+    key: 'whatsapp',
+    title: 'Order through WhatsApp.',
+    highlight: 'Serve through ImboniServe.',
+    subtitle: 'WhatsApp Assisted Ordering',
+    description: 'Let customers order through WhatsApp with staff-assisted ordering that connects directly to your menu, orders, and kitchen.',
+    image: '/imgs/ideogr 4.jpg'
   },
   {
     key: 'analytics',
@@ -245,14 +253,14 @@ export default function HomePage() {
     {
       icon: <Play className="w-6 h-6" />, 
       title: t('homepage.growth.replay_title', 'Service Replay™'),
-      desc: t('homepage.growth.replay_desc', 'Replay any service period event-by-event — like a football match.'),
+      desc: t('homepage.growth.replay_desc', 'Replay any service period, event by event, like a football match.'),
       href: '/dashboard/operations/service-replay',
       cta: t('homepage.growth.replay_cta', 'Try Service Replay')
     },
     {
       icon: <Bell className="w-6 h-6" />, 
       title: t('homepage.growth.alerts_title', 'Low‑Stock Push Alerts'),
-      desc: t('homepage.growth.alerts_desc', 'Never run out. Get alerted before you do.'),
+      desc: t('homepage.growth.alerts_desc', 'Stay in stock. Get alerts before inventory runs low.'),
       href: '/dashboard/inventory-alerts',
       cta: t('homepage.growth.alerts_cta', 'Configure Alerts')
     },
@@ -284,7 +292,7 @@ export default function HomePage() {
     {
       icon: <Play className="w-5 h-5" />,
       title: t('homepage.advanced.service_replay', 'Service Replay™'),
-      desc: t('homepage.advanced.service_replay_desc', 'Replay any service period event-by-event — like a football match. Understand exactly what happened.'),
+      desc: t('homepage.advanced.service_replay_desc', 'Replay any service period, event by event, like a football match. Understand exactly what happened.'),
     },
     {
       icon: <Package className="w-5 h-5" />,
@@ -384,7 +392,7 @@ export default function HomePage() {
                     {t('homepage.hero.description', 'Built for cafés, hotels, bars, and hospitality businesses.')}
                   </p>
                   <p className="text-sm text-white/80 mb-8" suppressHydrationWarning>
-                    {t('homepage.hero.rt_os', 'Real-time OS: see every sale, every table, every customer action — and grow revenue automatically.')}
+                    {t('homepage.hero.rt_os', 'Live view of sales, tables, and customer activity. See issues as they happen and respond faster.')}
                   </p>
                 </div>
               )
@@ -436,7 +444,7 @@ export default function HomePage() {
                 {t('homepage.rt.badge', 'Real‑Time Operating System')}
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-imboni-blue" suppressHydrationWarning>
-                {t('homepage.rt.title', 'Every Sale. Every Table. Every Action — Live')}
+                {t('homepage.rt.title', 'Live view of sales, tables, and customer activity')}
               </h2>
             </div>
             <div className="hidden md:flex items-center gap-2">
@@ -476,7 +484,7 @@ export default function HomePage() {
               {t('homepage.why_switch.badge', 'Why Switch?')}
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>
-              {t('homepage.why_switch.title', "You're not just getting a POS. You're getting intelligence.")}
+              {t('homepage.why_switch.title', 'A POS with operational intelligence.')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
               {t('homepage.why_switch.subtitle', 'Capabilities that solve problems competitors ignore.')}
@@ -491,7 +499,7 @@ export default function HomePage() {
                 {t('homepage.why_switch.replay_title', 'Service Replay™')}
               </h3>
               <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
-                {t('homepage.why_switch.replay_desc', 'Replay any service period like a football match. Every order, every station, every table — event by event. Understand exactly what happened and why.')}
+                {t('homepage.why_switch.replay_desc', 'Replay any service period like a football match. Every order, every station, every table, event by event. Understand exactly what happened and why.')}
               </p>
               <Link href="/dashboard/operations/service-replay" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
                 {t('homepage.why_switch.replay_cta', 'See it in action')} <ArrowRight className="w-4 h-4" />
@@ -540,7 +548,7 @@ export default function HomePage() {
               {t('homepage.why_ai.title', "AI isn't a buzzword. It's working right now in your dashboard.")}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg" suppressHydrationWarning>
-              {t('homepage.why_ai.subtitle', 'AI that does real work — not just displays data.')}
+              {t('homepage.why_ai.subtitle', 'AI that does real work, beyond dashboards.')}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -569,7 +577,7 @@ export default function HomePage() {
                     {t('homepage.why_ai.auto_reorder_title', 'Auto-Reorder AI')}
                   </h3>
                   <p className="text-gray-600 leading-relaxed" suppressHydrationWarning>
-                    {t('homepage.why_ai.auto_reorder_desc', 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again.')}
+                    {t('homepage.why_ai.auto_reorder_desc', 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Reduce stockouts.')}
                   </p>
                 </div>
               </div>

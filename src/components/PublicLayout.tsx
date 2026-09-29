@@ -38,7 +38,7 @@ export default function PublicLayout({ children, title, metaDescription }: Publi
     'Imboni Serve is a modern platform for hospitality businesses: QR ordering, real-time operations, AI insights, and mobile payments.'
   )
   const description = metaDescription || defaultDesc
-  const shareImage = (siteUrl ? `${siteUrl}` : '') + '/imgs/logo2.png'
+  const shareImage = (siteUrl ? `${siteUrl}` : '') + '/imgs/imboni-serve-logo-2.png'
   return (
     <>
     <Head>
@@ -68,7 +68,7 @@ export default function PublicLayout({ children, title, metaDescription }: Publi
             '@type': 'Organization',
             name: 'Imboni Serve',
             url: siteUrl || undefined,
-            logo: siteUrl ? `${siteUrl}/imgs/logo2.png` : '/imgs/logo2.png'
+            logo: siteUrl ? `${siteUrl}/imgs/imboni-serve-logo-2.png` : '/imgs/imboni-serve-logo-2.png'
           }),
         }}
       />
@@ -91,10 +91,18 @@ export default function PublicLayout({ children, title, metaDescription }: Publi
     </Head>
     <div className="min-h-screen bg-imboni-light dark:bg-gray-900 font-sans flex flex-col transition-colors">
       {/* NAV */}
-      <nav className="bg-imboni-blue/95 dark:bg-gray-800/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10 dark:border-gray-700">
+      <nav className="bg-imboni-blue/95 dark:bg-gray-800/95 backdrop-blur-sm sticky top-0 z-50 border-b border-white/10 dark:border-gray-700" data-testid="public-navbar">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/imgs/logo2.png" alt="Imboni Serve" className="h-8 w-auto" />
+            <Image
+              src="/imgs/imboni-serve2-logo.png"
+              alt="Imboni Serve"
+              width={146}
+              height={60}
+              sizes="(max-width: 640px) 96px, (max-width: 1024px) 112px, 146px"
+              className="h-10 md:h-12 xl:h-14 w-auto"
+              priority
+            />
           </Link>
           <div className="hidden md:flex items-center gap-5 xl:gap-7 text-[13px] xl:text-sm text-white/80 whitespace-nowrap">
             <Link href="/features" className="hover:text-white transition" suppressHydrationWarning>{t('public.nav.features', 'Features')}</Link>
@@ -231,9 +239,16 @@ export default function PublicLayout({ children, title, metaDescription }: Publi
               />
             </div>
           </div>
-          <div className="text-center mb-4">
+          <div className="text-center mb-4" data-testid="public-footer">
             <div className="flex justify-center mb-3">
-              <img src="/imgs/logo2.png" alt="Imboni Serve Logo" className="h-8 w-auto opacity-90" />
+              <Image
+                src="/imgs/imboni-serve2-logo.png"
+                alt="Imboni Serve Logo"
+                width={146}
+                height={60}
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 112px, 130px"
+                className="h-9 md:h-10 xl:h-12 w-auto opacity-90"
+              />
             </div>
             <p className="mb-3" suppressHydrationWarning> {new Date().getFullYear()} Imboni Serve. {t('public.footer.tagline', 'Built for the hospitality industry.')}</p>
             <div className="flex justify-center gap-6 flex-wrap">

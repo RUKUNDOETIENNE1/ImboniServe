@@ -18,14 +18,14 @@ import {
 const heroCapability = {
   icon: <Sparkles className="w-8 h-8" />,
   title: 'AI Menu Builder',
-  desc: 'Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions automatically. No manual entry — from hours to minutes.',
+  desc: 'Upload a photo or PDF of your existing menu. AI extracts items, prices, and descriptions automatically. No manual entry. From hours to minutes.',
 }
 
 const aiCapabilities = [
   {
     icon: <Package className="w-6 h-6" />,
     title: 'Auto-Reorder AI',
-    desc: 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Never run out again.',
+    desc: 'AI analyzes demand patterns, lead times, and safety stock to suggest reorders with confidence scores. One click to approve. Reduce stockouts.',
   },
   {
     icon: <BrainCircuit className="w-6 h-6" />,
@@ -45,7 +45,7 @@ const aiCapabilities = [
   {
     icon: <Sparkles className="w-6 h-6" />,
     title: 'Optimization Hub',
-    desc: 'AI-driven recommendations from Business Scanner, AI Insights, and Autopilot — with measured impact tracking.',
+    desc: 'AI-driven recommendations from Business Scanner, AI Insights, and Autopilot, with measured impact tracking.',
   },
 ]
 
@@ -61,7 +61,7 @@ export default function AIFeaturesPage() {
   return (
     <PublicLayout
       title={t('features_ai.title_page', 'AI Features — Imboni Serve')}
-      metaDescription={t('features_ai.meta_description', 'AI Menu Builder, auto-reorder, insight reports, cost anomaly alerts, A/B testing, and optimization hub — AI that does real work.')}
+      metaDescription={t('features_ai.meta_description', 'AI Menu Builder, auto-reorder, insight reports, cost anomaly alerts, A/B testing, and an optimization hub. AI that does real work.')}
     >
       <Head>
         <meta name="robots" content="index,follow" />
@@ -77,7 +77,7 @@ export default function AIFeaturesPage() {
               {t('features_ai.badge', 'AI')}
             </div>
             <h1 className="text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>{t('features_ai.h1', 'AI That Works While You Work')}</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>{t("features_ai.subheading", "AI isn't a feature. It's the foundation. Every AI capability does real work — not just displays data.")}</p>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>{t("features_ai.subheading", "AI isn't a feature. It's the foundation. Every AI capability does real work, not just display data.")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 mb-12">

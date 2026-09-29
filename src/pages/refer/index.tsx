@@ -47,7 +47,7 @@ export default function ReferPage() {
     if (!referralCode) return
 
     const referralLink = `${window.location.origin}/signup?ref=${referralCode}`
-    const message = t('refer.share_message', 'Join Imboni Serve and transform your hospitality business! Use my referral code: {{code}}\n\n{{link}}\n\nGet started with smart QR ordering, inventory management, and more.', { code: referralCode, link: referralLink })
+    const message = t('refer.share_message', 'Join Imboni Serve to streamline your hospitality operations. Use my referral code: {{code}}\n\n{{link}}\n\nGet started with QR ordering, inventory, and more.', { code: referralCode, link: referralLink })
 
     if (navigator.share) {
       navigator.share({
@@ -74,13 +74,13 @@ export default function ReferPage() {
           </div>
           <h1 className="text-4xl font-bold text-imboni-blue mb-4">{t('refer.h1', 'Share & Earn 1,000 RWF Per Friend')}</h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            {t('refer.subtitle', 'Share your referral link with friends. When they order, you both get 1,000 RWF. No limits, no recurring fees — just instant rewards!')}
+            {t('refer.subtitle', 'Share your referral link with friends. When they order, you both get 1,000 RWF. No limits, no recurring fees. Just instant rewards!')}
           </p>
         </div>
 
         {/* How It Works Timeline */}
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-imboni-blue mb-8 text-center">{t('refer.how_it_works_title', 'How It Works — Simple & Fast')}</h2>
+          <h2 className="text-2xl font-bold text-imboni-blue mb-8 text-center">{t('refer.how_it_works_title', 'How It Works')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <div className="w-14 h-14 bg-imboni-blue rounded-full flex items-center justify-center mx-auto mb-3">
@@ -219,7 +219,7 @@ export default function ReferPage() {
                 </p>
                 <div className="flex items-center gap-2 text-xs text-slate-600">
                   <Check className="w-3 h-3" />
-                  <span>{t('refer.unlimited_note', 'Share as much as you want — every referral counts!')}</span>
+                  <span>{t('refer.unlimited_note', 'Share as much as you want. Every referral counts!')}</span>
                 </div>
               </div>
             </div>

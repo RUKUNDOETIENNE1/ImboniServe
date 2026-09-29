@@ -318,7 +318,7 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <Image src="/imgs/logo2.png" alt="Imboni Serve" width={256} height={96} priority className="h-24 w-auto" />
+            <Image src="/imgs/imboni-serve-logo-2.png" alt="Imboni Serve" width={234} height={96} priority className="h-20 sm:h-24 w-auto" />
           </div>
           <h1 className="text-3xl font-bold text-imboni-blue">Imboni Serve</h1>
           <p className="text-gray-600" suppressHydrationWarning>

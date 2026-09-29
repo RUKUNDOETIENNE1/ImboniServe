@@ -21,12 +21,12 @@ const heroCapabilities = [
   {
     icon: <DollarSign className="w-8 h-8" />,
     title: 'CFO Dashboard',
-    desc: 'Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times.',
+    desc: 'Financial health, revenue intelligence, and subscription metrics with AI-generated narratives and correlation analysis. Cached for sub‑1s load times.',
   },
   {
     icon: <TrendingUp className="w-8 h-8" />,
     title: 'CEO Dashboard',
-    desc: 'Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes.',
+    desc: 'Business health across revenue, customers, operations, and hospitality data. Aggregated from multiple intelligence services. Auto‑refreshes every 5 minutes.',
   },
 ]
 
