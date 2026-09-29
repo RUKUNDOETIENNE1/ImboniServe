@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, Loader2, Mail, User } from 'lucide-react'
-import { PRICING_PLANS } from '@/config/pricing'
+import { PRICING_PLANS, PRICING_CONFIG } from '@/config/pricing'
 import { formatCurrency } from '@/lib/utils/currency'
 
 interface Message {
@@ -88,7 +88,7 @@ export default function PublicSupportWidget() {
   })()
 
   const quickReplies = [
-    { text: 'How do I get started?', response: 'Getting started is easy! Click "Start Free Trial" at the top of the page to create your account. You\'ll get 14 days free to explore all features.' },
+    { text: 'How do I get started?', response: `Getting started is easy! Click "Start Free Trial" at the top of the page to create your account. You'll get ${PRICING_CONFIG.trialDays ?? 14} days free to explore all features.` },
     { text: 'What are the pricing plans?', response: pricingSummary },
     { text: 'Do you offer training?', response: 'Yes! We provide free onboarding training for all new customers, plus video tutorials and 24/7 email support. Enterprise customers get dedicated phone support.' },
     { text: 'Can I use it offline?', response: 'Yes! Imboni Serve works offline. You can take orders, record sales, and manage inventory without internet. Data syncs automatically when you\'re back online.' },

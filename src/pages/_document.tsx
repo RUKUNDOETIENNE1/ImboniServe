@@ -23,8 +23,8 @@ export default class MyDocument extends Document {
           <meta name="theme-color" content="#667eea" />
           
           {/* Favicon */}
-          <link rel="icon" type="image/png" href="/imgs/imboni-serve-favicon.png" />
-          <link rel="apple-touch-icon" href="/imgs/imboni-serve-favicon.png" />
+          <link rel="icon" type="image/png" href="/imgs/favicon-1.png" />
+          <link rel="apple-touch-icon" href="/imgs/favicon-2.png" />
           
           {/* Manifest */}
           <link rel="manifest" href="/manifest.json" />

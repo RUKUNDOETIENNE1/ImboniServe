@@ -1,14 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
-
-function normalizePhone(phone: string): string {
-  const p = phone.trim()
-  if (p.startsWith('+')) return p
-  if (p.startsWith('07')) return `+250${p.slice(1)}`
-  if (p.startsWith('2507')) return `+${p}`
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`
-}
+import { normalizePhone } from '@/lib/utils/phone'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

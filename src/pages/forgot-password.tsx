@@ -29,10 +29,10 @@ export default function ForgotPasswordPage() {
       if (res.ok) {
         setIsSuccess(true)
       } else {
-        setError(data.error || 'Failed to send reset email')
+        setError(data.error || t('auth.forgot_failed', 'Failed to send reset email'))
       }
     } catch (err) {
-      setError('Network error. Please try again.')
+      setError(t('auth.network_error', 'Network error. Please try again.'))
     } finally {
       setIsLoading(false)
     }
@@ -47,20 +47,20 @@ export default function ForgotPasswordPage() {
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Check Your Email
+              {t('auth.check_email', 'Check Your Email')}
             </h1>
             <p className="text-gray-600 mb-6">
-              If an account exists with <strong>{email}</strong>, you will receive a password reset link shortly.
+              {t('auth.reset_link_sent', 'If an account exists with')} <strong>{email}</strong>, {t('auth.reset_link_will_arrive', 'you will receive a password reset link shortly.')}
             </p>
             <p className="text-sm text-gray-500 mb-6">
-              The link will expire in 1 hour. Check your spam folder if you don't see it.
+              {t('auth.reset_link_expires', 'The link will expire in 1 hour. Check your spam folder if you don\'t see it.')}
             </p>
             <Link
               href="/login"
               className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Login
+              {t('auth.back_to_login', 'Back to Login')}
             </Link>
           </div>
         </div>
@@ -76,17 +76,17 @@ export default function ForgotPasswordPage() {
             <Mail className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Forgot Password?
+            {t('auth.forgot_password_title', 'Forgot Password?')}
           </h1>
           <p className="text-gray-600">
-            No worries! Enter your email and we'll send you a reset link.
+            {t('auth.forgot_password_desc', "No worries! Enter your email and we'll send you a reset link.")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
+              {t('auth.email_address', 'Email Address')}
             </label>
             <input
               id="email"
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
             disabled={isLoading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Sending...' : 'Send Reset Link'}
+            {isLoading ? t('auth.sending', 'Sending...') : t('auth.send_reset_link', 'Send Reset Link')}
           </button>
 
           <div className="text-center">
@@ -119,16 +119,16 @@ export default function ForgotPasswordPage() {
               className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
-              Back to Login
+              {t('auth.back_to_login', 'Back to Login')}
             </Link>
           </div>
         </form>
 
         <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
           <p>
-            Don't have an account?{' '}
+            {t('auth.no_account', "Don't have an account?")}{' '}
             <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign up
+              {t('auth.sign_up', 'Sign up')}
             </Link>
           </p>
         </div>

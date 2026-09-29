@@ -116,7 +116,6 @@ export class ReferralTrackingTierService {
 
       // Fraud check for signup
       const fraudCheck = await FraudDetectionService.checkSignup({
-        customerId: params.customerId,
         phone: params.phone,
         referralLinkId: referralLink.id,
         ipAddress: params.ipAddress,
@@ -226,10 +225,26 @@ export class ReferralTrackingTierService {
         return { success: false, error: 'Reward already earned for this session' }
       }
 
+      const session = await prisma.tableSession.findUnique({
+        where: { id: params.sessionId },
+        select: { businessId: true },
+      })
+      if (!session) {
+        return { success: false, error: 'Session not found' }
+      }
+
+      const referralLink = await prisma.referralLink.findFirst({
+        where: { businessId: session.businessId },
+        select: { id: true },
+      })
+      if (!referralLink) {
+        return { success: false, error: 'No referral link configured for this business' }
+      }
+
       // Award Tier 3 reward
       await prisma.referralReward.create({
         data: {
-          referralLinkId: null, // Table invites don't use referral links
+          referralLinkId: referralLink.id,
           customerId: params.inviterId,
           tier: 'TIER_3',
           type: 'TABLE_INVITE',
@@ -305,6 +320,40 @@ export class ReferralTrackingTierService {
       console.error('Error processing lifecycle validation:', error)
       return { processed: 0 }
     }
+  }
+
+  /**
+   * Expire stale dining credits past their expiry date
+   */
+  static async expireStaleDiningCredits(): Promise<number> {
+    const now = new Date()
+    const result = await prisma.diningCredit.updateMany({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: { lt: now },
+      },
+      data: {
+        status: 'EXPIRED',
+      },
+    })
+    return result.count
+  }
+
+  /**
+   * Unlock dining credits that have passed their lock period (if applicable)
+   */
+  static async unlockDueCredits(): Promise<number> {
+    const now = new Date()
+    const result = await prisma.diningCredit.updateMany({
+      where: {
+        status: 'LOCKED',
+        expiresAt: { gt: now },
+      },
+      data: {
+        status: 'ACTIVE',
+      },
+    })
+    return result.count
   }
 
   /**

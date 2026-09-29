@@ -2,8 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -14,13 +16,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { businessId } = ctx
 
   try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    // Fetch business timezone for timezone-aware day boundary
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+      select: { timezone: true },
+    })
+    const { start: today, end: todayEnd } = getBusinessDayBoundary(new Date(), business?.timezone)
+    const tomorrow = new Date(todayEnd.getTime() + 1)
 
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
 
     const [todaySales, yesterdaySales, totalStaff, activeStaff, inventoryItems, tables] = await Promise.all([
       prisma.sale.aggregate({
@@ -108,14 +112,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   } catch (error) {
     console.error('Dashboard stats error:', error)
-    // Fail soft with empty/default stats to avoid UI breaking
-    res.status(200).json({
-      todaySales: { revenue: 0, count: 0, change: '0%' },
-      staff: { total: 0, active: 0 },
-      inventory: { lowStockCount: 0 },
-      tables: []
+    // Return an explicit error to avoid masking failures on the frontend
+    res.status(500).json({
+      error: 'Failed to load dashboard stats. Please try again.',
     })
   }
 }
 
-export default requirePermission('reports.view')(handler)
+// Apply commercial enforcement: Dashboard analytics requires analytics feature
+export default requiresFeature('hasBasicReports')(baseHandler)

@@ -14,8 +14,8 @@ export const PerformanceMonitor: React.FC = () => {
         // Largest Contentful Paint (LCP)
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries()
-          const lastEntry = entries[entries.length - 1]
-          console.log('[Performance] LCP:', lastEntry.renderTime || lastEntry.loadTime)
+          const lastEntry: any = entries[entries.length - 1]
+          console.log('[Performance] LCP:', lastEntry?.renderTime || lastEntry?.loadTime)
         })
         lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
 

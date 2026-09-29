@@ -84,7 +84,8 @@ export function clearSessionInfo(): void {
 export async function joinTableSession(
   tableId: string,
   branchId: string,
-  name?: string
+  name?: string,
+  qrCredentials?: { version?: string; signature?: string }
 ): Promise<SessionInfo | null> {
   try {
     const tempId = getTempId();
@@ -97,6 +98,8 @@ export async function joinTableSession(
         branchId,
         tempId,
         name,
+        version: qrCredentials?.version,
+        signature: qrCredentials?.signature,
       }),
     });
 
@@ -142,7 +145,9 @@ export async function validateSession(sessionId: string): Promise<boolean> {
  */
 export async function getGroupOrderSummary(sessionId: string) {
   try {
-    const response = await fetch(`/api/session/summary?sessionId=${sessionId}`);
+    const info = getSessionInfo();
+    const tempParam = info?.tempId ? `&tempId=${encodeURIComponent(info.tempId)}` : '';
+    const response = await fetch(`/api/session/summary?sessionId=${sessionId}${tempParam}`);
     if (!response.ok) throw new Error('Failed to get summary');
     return await response.json();
   } catch (error) {
@@ -167,6 +172,7 @@ export async function setParticipantName(name: string): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         participantId: info.participantId,
+        tempId: info.tempId,
         name,
       }),
     });

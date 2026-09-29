@@ -7,6 +7,7 @@ export const createInventoryItemSchema = z.object({
   unit: z.string().min(1),
   currentStock: z.number().nonnegative(),
   minStockLevel: z.number().nonnegative(),
+  reorderLevel: z.number().nonnegative().optional(),
   unitCostCents: z.number().int().positive(),
   businessId: z.string().cuid(),
 })
@@ -18,6 +19,7 @@ export const updateInventoryItemSchema = z.object({
   unit: z.string().min(1).optional(),
   currentStock: z.number().nonnegative().optional(),
   minStockLevel: z.number().nonnegative().optional(),
+  reorderLevel: z.number().nonnegative().optional(),
   unitCostCents: z.number().int().positive().optional(),
   isActive: z.boolean().optional(),
 })

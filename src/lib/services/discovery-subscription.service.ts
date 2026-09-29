@@ -5,6 +5,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { getBusinessDayBoundary } from '@/lib/utils/timezone';
 
 const log = logger.child({ service: 'discovery-subscription' });
 
@@ -218,15 +219,12 @@ export async function getFeaturedBusinesses(limit: number = 10) {
     },
     include: {
       discoverySubscription: true,
-      businessProfile: {
-        include: {
-          businessReviews: {
-            select: {
-              rating: true
-            }
-          }
-        }
-      }
+      businessProfile: true,
+      businessReviews: {
+        select: {
+          rating: true,
+        },
+      },
     },
     take: 100 // Get more than needed for filtering
   });
@@ -236,9 +234,9 @@ export async function getFeaturedBusinesses(limit: number = 10) {
     businesses
       .filter(b => b.businessProfile)
       .map(async (business) => {
-        const avgRating = business.businessProfile!.businessReviews.length > 0
-          ? business.businessProfile!.businessReviews.reduce((sum, r) => sum + r.rating, 0) / 
-            business.businessProfile!.businessReviews.length
+        const avgRating = business.businessReviews.length > 0
+          ? business.businessReviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) /
+            business.businessReviews.length
           : 0;
 
         const baseScore = avgRating * 20; // Convert 5-star to 100-point scale
@@ -323,9 +321,13 @@ export async function getDiscoveryStats(businessId: string) {
   const access = await checkDiscoveryAccess(businessId);
 
   // Get monthly order count and GMV from marketplace
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { timezone: true },
+  });
+  const startOfMonthRaw = new Date();
+  startOfMonthRaw.setDate(1);
+  const startOfMonth = getBusinessDayBoundary(startOfMonthRaw, business?.timezone).start;
 
   const monthlyOrders = await prisma.marketplaceOrder.count({
     where: {

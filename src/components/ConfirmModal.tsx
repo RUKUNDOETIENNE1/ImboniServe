@@ -9,7 +9,8 @@ interface ConfirmModalProps {
   message: string
   confirmText?: string
   cancelText?: string
-  type?: 'danger' | 'warning' | 'info'
+  type?: 'danger' | 'warning' | 'info' | 'primary'
+  variant?: 'danger' | 'warning' | 'info' | 'primary'
 }
 
 export default function ConfirmModal({
@@ -20,12 +21,14 @@ export default function ConfirmModal({
   message,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  type = 'warning'
+  type,
+  variant
 }: ConfirmModalProps) {
+  const resolvedType = type || variant || 'warning'
   if (!isOpen) return null
 
   const getColors = () => {
-    switch (type) {
+    switch (resolvedType) {
       case 'danger':
         return {
           bg: 'bg-red-50',
@@ -39,6 +42,13 @@ export default function ConfirmModal({
           border: 'border-yellow-200',
           icon: 'text-yellow-600',
           button: 'bg-gradient-to-r from-yellow-600 to-yellow-700 hover:shadow-lg hover:shadow-yellow-200'
+        }
+      case 'primary':
+        return {
+          bg: 'bg-green-50',
+          border: 'border-green-200',
+          icon: 'text-green-600',
+          button: 'bg-gradient-to-r from-green-600 to-green-700 hover:shadow-lg hover:shadow-green-200'
         }
       default:
         return {

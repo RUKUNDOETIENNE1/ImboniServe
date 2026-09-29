@@ -3,10 +3,13 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { InTouchService } from '@/lib/services/intouch.service'
+import { IremboPayService } from '@/lib/services/irembopay.service'
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { ensurePaymentLedgerEvent } from '@/lib/services/payment-ledger-events.service'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json(errorResponse('Method not allowed'))
   }
@@ -32,6 +35,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(404).json(errorResponse('Reservation not found'))
     }
 
+    // Tenant isolation: only staff of the reservation's business may initiate
+    // a deposit charge against its customer.
+    const sessionBusinessId = (session.user as any).businessId
+    if (reservation.businessId !== sessionBusinessId) {
+      return res.status(403).json(errorResponse('Forbidden'))
+    }
+
     if (!reservation.depositCents || reservation.depositCents <= 0) {
       return res.status(400).json(errorResponse('No deposit configured for this reservation'))
     }
@@ -43,15 +53,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const amountCents = reservation.depositCents
     const amountRwf = Math.round(amountCents / 100)
 
+    const business = await prisma.business.findUnique({
+      where: { id: reservation.businessId },
+      select: { currency: true, taxRate: true }
+    })
+
+    // VAT: extract from the VAT-inclusive deposit gross using the business's
+    // configured tax rate (0 = not configured / legitimately non-VAT).
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(
+      amountCents,
+      business?.taxRate ?? 0
+    )
+
     const payment = await prisma.paymentTransaction.create({
       data: {
         invoiceNumber: `RES-DEP-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
         transactionId: requestTransactionId,
         referenceId: reservation.id,
         amountCents,
-        currency: 'RWF',
-        vatAmountCents: 0,
-        exVatAmountCents: amountCents,
+        currency: business?.currency || 'RWF',
+        vatAmountCents,
+        exVatAmountCents,
         gatewayFeeEstimatedCents: 0,
         platformFeeCents: 0,
         netToBusinessCents: amountCents,
@@ -61,7 +83,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         paymentMethod: phone.startsWith('078') || phone.startsWith('079') ? 'MTN_MOBILE_MONEY' : 'AIRTEL_MONEY',
         paymentProvider: phone.startsWith('078') || phone.startsWith('079') ? 'MTN' : 'AIRTEL',
         businessId: reservation.businessId,
-        callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+        callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
         rawRequest: {
           reservationId: reservation.id,
           type: 'RESERVATION_DEPOSIT',
@@ -73,7 +95,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       amount: amountRwf,
       mobilePhoneNo: phone,
       requestTransactionId,
-      callbackUrl: `${process.env.NEXTAUTH_URL}/api/payments/intouch/webhook`,
+      callbackUrl: `${process.env.NEXTAUTH_URL}/api/webhooks/intouch`,
     })
 
     await prisma.paymentTransaction.update({
@@ -81,12 +103,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       data: {
         rawCallback: intouchResponse as any,
         status: InTouchService.isSuccess(intouchResponse.responsecode)
-          ? 'PAID'
+          ? 'SUCCESS'
           : InTouchService.isPending(intouchResponse.responsecode)
           ? 'PENDING'
           : 'FAILED',
         paidAt: InTouchService.isSuccess(intouchResponse.responsecode) ? new Date() : null,
       },
+    })
+    await ensurePaymentLedgerEvent(payment.id, undefined, {
+      source: 'reservations/deposit/initiate',
+      reservationId: reservation.id,
+      responsecode: intouchResponse.responsecode,
     })
 
     return res.status(200).json(successResponse({
@@ -100,5 +127,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json(errorResponse(error.message || 'Failed to initiate deposit'))
   }
 }
+
+// Apply commercial enforcement: Reservations require Professional plan or higher
+const handler = requiresFeature('hasReservations')(baseHandler)
 
 export default withErrorHandler(handler)

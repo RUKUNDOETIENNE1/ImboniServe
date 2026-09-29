@@ -8,6 +8,7 @@ import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.ser
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
+import { requireTableSessionAccess } from '@/lib/api/table-session-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -19,6 +20,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!sessionId || typeof sessionId !== 'string') {
     return res.status(400).json(errorResponse('Session ID is required'))
   }
+
+  // Slip contents are session-private: require session-bound capability
+  // (participant tempId, seat token) or staff of the owning business.
+  const access = await requireTableSessionAccess(req, res, sessionId)
+  if (!access) return
 
   try {
     const slip = await DiningSessionSlipService.getSlipBySessionId(sessionId)

@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { MarketplaceService } from '@/lib/services/marketplace.service'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     // Allow public access for browsing products
     try {
@@ -46,3 +47,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).json({ error: 'Method not allowed' })
 }
+
+// Apply commercial enforcement: Supplier Marketplace requires Starter plan or higher
+export default requiresFeature('hasMarketplace')(baseHandler)

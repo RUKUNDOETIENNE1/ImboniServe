@@ -1,0 +1,1139 @@
+﻿
+> imboni-serve@2.0.1 test
+> jest --verbose
+
+npm : FAIL tests/edge-cases/order-edge-cases.test.ts
+At line:1 char:1
++ npm test -- --verbose 2>&1 | Out-File -FilePath 
+"test-results-full.tx ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL tests/ 
+   edge...e-cases.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ­ƒôª Order Edge Cases
+    Scenario 1: Empty order submission
+      ├ù reject order with zero items (32 ms)
+      ├ù reject order with items but all quantity = 0 (3 
+ms)
+    Scenario 2: Extremely large orders
+      ├ù handle order with 1000 items (2 ms)
+      ÔêÜ handle order with single item, quantity 1000 
+(2 ms)
+      ÔêÜ performance: large order completes within 
+acceptable time (3 ms)
+    Scenario 3: Duplicate order detection
+      ÔêÜ detect identical order submitted twice (4 ms)
+      ÔêÜ unique orderNumber constraint prevents 
+duplicates (5 ms)
+    Scenario 4: Order cancellation during payment
+      ├ù cannot cancel order with COMPLETED payment (4 
+ms)
+      ÔêÜ can cancel order with PENDING payment (2 ms)
+      ├ù cancellation blocked if payment is PROCESSING 
+(2 ms)
+    Scenario 5: Unavailable menu items
+      ÔêÜ reject order with unavailable menu item (2 ms)
+      ÔêÜ reject order with non-existent menu item (2 ms)
+      ÔêÜ accept order with all available items (2 ms)
+    Scenario 6: Negative quantities
+      ├ù reject order with negative quantity (2 ms)
+      ├ù reject order with fractional quantity (2 ms)
+    Scenario 7: Order number generation
+      ÔêÜ order numbers are unique (6 ms)
+      ÔêÜ order number format is consistent (2 ms)
+    Scenario 8: Partial order failures
+      ÔêÜ transaction rollback on partial failure (8 ms)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 1: Empty order 
+submission ÔÇ║ reject order with zero items
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"depositCents": 0, 
+"platformFeeCents": 0, "remainingCents": 0, 
+"subtotalCents": 0, "taxMode": "EXCLUSIVE", "taxRate": 
+18, "totalCents": 0, "vatCents": 0}
+
+    [0m [90m 27 |[39m       mockPrisma[33m.[39mmenuI
+tem[33m.[39mfindMany[33m.[39mmockResolvedValue([])[3
+3m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m       
+[36mawait[39m expect(
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 30 |[39m         
+calculateOrderPricing([32m'biz-1'[39m[33m,[39m 
+[][33m,[39m [32m'DIGITAL'[39m[33m,[39m 
+[36mfalse[39m[33m,[39m [36mfalse[39m)
+     [90m 31 |[39m       
+)[33m.[39mrejects[33m.[39mtoThrow()[33m;[39m
+     [90m 32 |[39m     })[33m;[39m[0m
+
+      at expect 
+(node_modules/expect/build/index.js:113:15)
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:29:13)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 1: Empty order 
+submission ÔÇ║ reject order with items but all quantity 
+= 0
+
+    Order must have at least one item
+
+    [0m [90m 44 |[39m       
+     [90m 45 |[39m       [36mif[39m (totalQty 
+[33m===[39m [35m0[39m) {
+    [31m[1m>[22m[39m[90m 46 |[39m         
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Order must have at least one 
+item'[39m)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 47 |[39m       }
+     [90m 48 |[39m     })[33m;[39m
+     [90m 49 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:46:15)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 2: Extremely 
+large orders ÔÇ║ handle order with 1000 items
+
+    Some menu items not found or unavailable
+
+    [0m [90m 65 |[39m   
+     [90m 66 |[39m   [36mif[39m 
+(menuItems[33m.[39mlength [33m!==[39m 
+menuItemIds[33m.[39mlength) {
+    [31m[1m>[22m[39m[90m 67 |[39m     
+[36mthrow[39m [36mnew[39m [33mError[39m([32m'Some 
+menu items not found or unavailable'[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 68 |[39m   }
+     [90m 69 |[39m   
+     [90m 70 |[39m   [36mconst[39m menuPriceSumCents 
+[33m=[39m items[33m.[39mreduce((sum[33m,[39m item) 
+[33m=>[39m {[0m
+
+      at calculateOrderPricing 
+(src/lib/services/qr-order.service.ts:67:11)
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:65:23)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 4: Order 
+cancellation during payment ÔÇ║ cannot cancel order with 
+COMPLETED payment
+
+    Cannot cancel paid order
+
+    [0m [90m 154 |[39m       
+     [90m 155 |[39m       [36mif[39m 
+(fetchedOrder[33m![39m[33m.[39mpaymentStatus 
+[33m===[39m [32m'PAID'[39m) {
+    [31m[1m>[22m[39m[90m 156 |[39m         
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Cannot cancel paid 
+order'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 157 |[39m       }
+     [90m 158 |[39m     })[33m;[39m
+     [90m 159 |[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:156:15)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 4: Order 
+cancellation during payment ÔÇ║ cancellation blocked if 
+payment is PROCESSING
+
+    Cannot cancel order while payment is processing
+
+    [0m [90m 192 |[39m
+     [90m 193 |[39m       [36mif[39m 
+(processingPayment) {
+    [31m[1m>[22m[39m[90m 194 |[39m         
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Cannot cancel order while payment 
+is processing'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 195 |[39m       }
+     [90m 196 |[39m     })[33m;[39m
+     [90m 197 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:194:15)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 6: Negative 
+quantities ÔÇ║ reject order with negative quantity
+
+    Quantity must be positive
+
+    [0m [90m 240 |[39m
+     [90m 241 |[39m       [36mif[39m (hasNegative) {
+    [31m[1m>[22m[39m[90m 242 |[39m         
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Quantity must be 
+positive'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 243 |[39m       }
+     [90m 244 |[39m     })[33m;[39m
+     [90m 245 |[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:242:15)
+
+  ÔùÅ ƒôª Order Edge Cases ÔÇ║ Scenario 6: Negative 
+quantities ÔÇ║ reject order with fractional quantity
+
+    Quantity must be an integer
+
+    [0m [90m 251 |[39m
+     [90m 252 |[39m       [36mif[39m (hasFractional) 
+{
+    [31m[1m>[22m[39m[90m 253 |[39m         
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Quantity must be an 
+integer'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 254 |[39m       }
+     [90m 255 |[39m     })[33m;[39m
+     [90m 256 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/order-edge-cases.test.ts:253:15)
+
+FAIL tests/edge-cases/seating-conflicts.test.ts
+  ­ƒ¬æ Seating Conflicts ÔÇö CRITICAL
+    Scenario 1: Two users select same seat simultaneously
+      ÔêÜ only ONE active order per seat allowed (38 ms)
+      ÔêÜ seat becomes available after order completed 
+(1 ms)
+      ÔêÜ database unique constraint on (seatId, active 
+status) prevents duplicates (61 ms)
+    Scenario 2: QR code points to wrong table/seat
+      ÔêÜ detect when seatId does not belong to tableId 
+(2 ms)
+      ├ù reject order when QR tableId != seat.tableId (4 
+ms)
+    Scenario 3: Order has tableId but wrong seatId
+      ÔêÜ foreign key constraint prevents orphan seat 
+references (3 ms)
+      ÔêÜ seat must belong to specified table (2 ms)
+    Scenario 4: Seat deactivated while order in progress
+      ÔêÜ existing order continues even if seat 
+deactivated (3 ms)
+      ├ù new orders blocked on deactivated seat (2 ms)
+    Scenario 5: QR code uniqueness enforcement
+      ÔêÜ each seat has unique QR code (2 ms)
+      ÔêÜ duplicate QR code rejected by unique 
+constraint (3 ms)
+      ÔêÜ checkSeatQR detects existing QR before 
+generation (1 ms)
+      ÔêÜ checkSeatQR returns null for seat without QR 
+(1 ms)
+    Scenario 6: Seat auto-detection and creation
+      ÔêÜ detectSeatsFromCapacity generates correct seat 
+count (2 ms)
+      ├ù createSeatsForTable creates missing seats (2 ms)
+      ├ù createSeatsForTable handles existing seats 
+gracefully (2 ms)
+    Scenario 7: Seat position conflicts
+      ÔêÜ two seats cannot have identical position 
+coordinates (3 ms)
+      ├ù updateSeatPosition updates position correctly 
+(1 ms)
+    Scenario 8: Orphan seat detection
+      ÔêÜ detect seats with deleted tables (3 ms)
+      ÔêÜ cascade delete removes seats when table 
+deleted (9 ms)
+
+  ÔùÅ ƒ¬æ Seating Conflicts ÔÇö CRITICAL ÔÇ║ Scenario 2: 
+QR code points to wrong table/seat ÔÇ║ reject order when 
+QR tableId != seat.tableId
+
+    QR code mismatch: seat does not belong to this table
+
+    [0m [90m 119 |[39m
+     [90m 120 |[39m       [36mif[39m (fetchedSeat 
+[33m&&[39m fetchedSeat[33m.[39mtableId [33m!==[39m 
+urlTableId) {
+    [31m[1m>[22m[39m[90m 121 |[39m         
+[36mthrow[39m [36mnew[39m [33mError[39m([32m'QR 
+code mismatch: seat does not belong to this 
+table'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 122 |[39m       }
+     [90m 123 |[39m
+     [90m 124 |[39m       [90m// Should throw 
+error[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/seating-conflicts.test.ts:121:15)
+
+  ÔùÅ ƒ¬æ Seating Conflicts ÔÇö CRITICAL ÔÇ║ Scenario 4: 
+Seat deactivated while order in progress ÔÇ║ new orders 
+blocked on deactivated seat
+
+    Seat is not active
+
+    [0m [90m 205 |[39m       
+     [90m 206 |[39m       [36mif[39m 
+([33m![39mfetchedSeat [33m||[39m 
+[33m![39mfetchedSeat[33m.[39misActive) {
+    [31m[1m>[22m[39m[90m 207 |[39m         
+[36mthrow[39m [36mnew[39m [33mError[39m([32m'Seat 
+is not active'[39m)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 208 |[39m       }
+     [90m 209 |[39m
+     [90m 210 |[39m       [90m// Should throw error 
+preventing new order[39m[0m
+
+      at Object.<anonymous> 
+(tests/edge-cases/seating-conflicts.test.ts:207:15)
+
+  ÔùÅ ƒ¬æ Seating Conflicts ÔÇö CRITICAL ÔÇ║ Scenario 6: 
+Seat auto-detection and creation ÔÇ║ createSeatsForTable 
+creates missing seats
+
+    Table not found
+
+    [0m [90m 116 |[39m
+     [90m 117 |[39m   [36mif[39m ([33m![39mtable) {
+    [31m[1m>[22m[39m[90m 118 |[39m     
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Table not found'[39m)[33m;[39m
+     [90m     |[39m           [31m[1m^[22m[39m
+     [90m 119 |[39m   }
+     [90m 120 |[39m
+     [90m 121 |[39m   [90m// Create seats in 
+transaction[39m[0m
+
+      at createSeatsForTable 
+(src/lib/services/seat-detection.service.ts:118:11)
+      at Object.<anonymous> 
+(tests/edge-cases/seating-conflicts.test.ts:294:7)
+
+  ÔùÅ ƒ¬æ Seating Conflicts ÔÇö CRITICAL ÔÇ║ Scenario 6: 
+Seat auto-detection and creation ÔÇ║ createSeatsForTable 
+handles existing seats gracefully
+  console.error
+    Error updating kitchen status: TypeError: prisma_1.prisma.$transaction is not a function
+        at handler (C:\Dev\ImboniResto\src\pages\api\kitchen\update-status.ts:109:39)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at Object.<anonymous> (C:\Dev\ImboniResto\tests\api\kitchen-sales.smoke.test.ts:111:5)
+
+    [0m [90m 186 |[39m     })[33m;[39m
+     [90m 187 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 188 |[39m     console[33m.[39merror([32m'Error updating kitchen status:'[39m[33m,[39m error)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 189 |[39m     [36mreturn[39m res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ error[33m:[39m [32m'Failed to update status'[39m })[33m;[39m
+     [90m 190 |[39m   }
+     [90m 191 |[39m }[0m
+
+      at handler (src/pages/api/kitchen/update-status.ts:188:13)
+      at Object.<anonymous> (tests/api/kitchen-sales.smoke.test.ts:111:5)
+
+
+    Table not found
+
+    [0m [90m 116 |[39m
+     [90m 117 |[39m   [36mif[39m ([33m![39mtable) {
+    [31m[1m>[22m[39m[90m 118 |[39m     
+[36mthrow[39m [36mnew[39m 
+[33mError[39m([32m'Table not found'[39m)[33m;[39m
+     [90m     |[39m           [31m[1m^[22m[39m
+     [90m 119 |[39m   }
+     [90m 120 |[39m
+     [90m 121 |[39m   [90m// Create seats in 
+transaction[39m[0m
+
+      at createSeatsForTable 
+(src/lib/services/seat-detection.service.ts:118:11)
+      at Object.<anonymous> 
+(tests/edge-cases/seating-conflicts.test.ts:307:7)
+
+  ÔùÅ ƒ¬æ Seating Conflicts ÔÇö CRITICAL ÔÇ║ Scenario 7: 
+Seat position conflicts ÔÇ║ updateSeatPosition updates 
+position correctly
+
+    Seat not found
+
+    [0m [90m 232 |[39m
+     [90m 233 |[39m   [36mif[39m ([33m![39mseat) {
+    [31m[1m>[22m[39m[90m 234 |[39m     
+[36mthrow[39m [36mnew[39m [33mError[39m([32m'Seat 
+not found'[39m)[33m;[39m
+     [90m     |[39m           [31m[1m^[22m[39m
+     [90m 235 |[39m   }
+     [90m 236 |[39m
+     [90m 237 |[39m   [90m// Check for position 
+overlap with other seats at the same table[39m[0m
+
+      at updateSeatPosition 
+(src/lib/services/seat-detection.service.ts:234:11)
+      at Object.<anonymous> 
+(tests/edge-cases/seating-conflicts.test.ts:334:7)
+
+FAIL tests/service-replay/service-replay.test.ts (5.204 
+s)
+  Event Transformation
+    transformTicketEvent
+      ÔêÜ should transform a ticket event to replay 
+event format (41 ms)
+      ÔêÜ should include correlation ID from metadata (1 
+ms)
+      ÔêÜ should handle missing relations gracefully (4 
+ms)
+    transformTicketEvents
+      ÔêÜ should transform multiple events (4 ms)
+    buildEventDescription
+      ÔêÜ should build description with order number (3 
+ms)
+      ÔêÜ should include table number (1 ms)
+      ÔêÜ should include station name
+  Statistics Calculation
+    createEmptyStatistics
+      ÔêÜ should create statistics with all zeros (4 ms)
+      ÔêÜ should accept custom replay time (1 ms)
+    calculateStatistics
+      ÔêÜ should count active orders after ORDER_CREATED 
+(3 ms)
+      ÔêÜ should track kitchen queue after ITEM_ROUTED 
+(2 ms)
+      ÔêÜ should track items preparing (1 ms)
+      ÔêÜ should track items ready (1 ms)
+      ÔêÜ should count completed orders (1 ms)
+      ÔêÜ should count completed payments (1 ms)
+    StatisticsTracker
+      ÔêÜ should track statistics incrementally (2 ms)
+      ÔêÜ should reset correctly (1 ms)
+      ÔêÜ should initialize from batch of events (1 ms)
+  Time Utilities
+    getTimeRangeForPreset
+      ÔêÜ should return valid time range for today_lunch 
+(194 ms)
+      ÔêÜ should return valid time range for yesterday 
+(4 ms)
+    formatReplayTime
+      ÔêÜ should format time correctly (3 ms)
+      ÔêÜ should include seconds when requested (2 ms)
+      ÔêÜ should include date when requested (3 ms)
+    formatDuration
+      ÔêÜ should format seconds correctly (1 ms)
+      ÔêÜ should format minutes correctly (2 ms)
+      ÔêÜ should format hours correctly
+    calculateProgress
+      ÔêÜ should return 0 at start (1 ms)
+      ÔêÜ should return 100 at end (1 ms)
+      ÔêÜ should return 50 at midpoint (1 ms)
+    calculateTimeAtProgress
+      ÔêÜ should return start time at 0% (1 ms)
+      ÔêÜ should return end time at 100% (1 ms)
+      ÔêÜ should return midpoint at 50% (1 ms)
+    findEventIndexAtTime
+      ÔêÜ should find closest event (1 ms)
+      ÔêÜ should return -1 for empty array (1 ms)
+    calculateNextEventDelay
+      ÔêÜ should calculate delay at 1x speed (1 ms)
+      ÔêÜ should halve delay at 2x speed
+      ÔêÜ should clamp minimum delay (1 ms)
+      ÔêÜ should clamp maximum delay (1 ms)
+  Type Helpers
+    getEventCategory
+      ÔêÜ should return correct category for order 
+events (1 ms)
+      ÔêÜ should return correct category for kitchen 
+events (1 ms)
+      ÔêÜ should return correct category for completed 
+events (1 ms)
+      ÔêÜ should return correct category for failure 
+events (1 ms)
+    getEventLabel
+      ÔêÜ should return human-readable labels (2 ms)
+    getEventColors
+      ÔêÜ should return color classes for each category 
+(1 ms)
+    EVENT_TYPE_METADATA
+      ÔêÜ should have metadata for all event types (26 
+ms)
+    EVENT_CATEGORY_COLORS
+      ÔêÜ should have colors for all categories (12 ms)
+  Edge Cases
+    Empty data handling
+      ÔêÜ should handle empty events array (1 ms)
+      ÔêÜ should handle single event (1 ms)
+    Canceled order handling
+      ÔêÜ should track canceled orders (1 ms)
+    Multiple orders handling
+      ÔêÜ should track multiple concurrent orders (1 ms)
+    Table occupancy tracking
+      ÔêÜ should track table occupancy from orders
+  Performance
+    ÔêÜ should handle large event arrays efficiently (14 
+ms)
+    ├ù should efficiently find events at time (156 ms)
+
+  ÔùÅ Performance ÔÇ║ should efficiently find events at 
+time
+
+    expect(received).toBeLessThan(expected)
+
+    Expected: < 10
+    Received:   40.07379999999921
+
+    [0m [90m 769 |[39m     
+     [90m 770 |[39m     [90m// Should complete in 
+under 10ms[39m
+    [31m[1m>[22m[39m[90m 771 |[39m     
+expect(endTime [33m-[39m 
+startTime)[33m.[39mtoBeLessThan([35m10[39m)
+     [90m     |[39m                                 
+[31m[1m^[22m[39m
+     [90m 772 |[39m     expect(index)[33m.[39mtoBeGre
+aterThanOrEqual([35m0[39m)
+     [90m 773 |[39m   })
+     [90m 774 |[39m })[0m
+
+      at Object.<anonymous> 
+(tests/service-replay/service-replay.test.ts:771:33)
+
+FAIL tests/api/kitchen-sales.smoke.test.ts (5.37 s)
+  Kitchen & Sales API (RBAC smoke)
+    ÔêÜ Kitchen GET /kitchen/orders: MANAGER allowed 
+(200) (37 ms)
+    ÔêÜ Kitchen GET /kitchen/orders: no-role user denied 
+(401/403) (2 ms)
+    ├ù Kitchen POST /kitchen/update-status: MANAGER can 
+move pendingÔåÆaccepted (200) (478 ms)
+    ÔêÜ Kitchen POST /kitchen/update-status: invalid 
+status returns 400 (3 ms)
+    ÔêÜ Kitchen POST /kitchen/update-status: 
+cross-business blocked for non-ADMIN (403) (1 ms)
+    ÔêÜ Sales GET /sales: MANAGER allowed, returns 
+paginated data (200) (10 ms)
+    ÔêÜ Sales GET /sales: no-role user denied (401/403) 
+(4 ms)
+    ÔêÜ Sales POST /sales: MANAGER can create sale (201) 
+(205 ms)
+    ÔêÜ Sales POST /sales: no-role user denied (401/403) 
+(3 ms)
+    ÔêÜ Sales POST /sales: non-ADMIN cannot specify a 
+different businessId (403) (3 ms)
+
+  ÔùÅ Kitchen & Sales API (RBAC smoke) ÔÇ║ Kitchen POST 
+/kitchen/update-status: MANAGER can move 
+pendingÔåÆaccepted (200)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 111 |[39m     [36mawait[39m 
+kitchenUpdateHandler(req[33m,[39m res)
+     [90m 112 |[39m
+    [31m[1m>[22m[39m[90m 113 |[39m     expect(res[
+33m.[39mstatusCode)[33m.[39mtoBe([35m200[39m)
+     [90m     |[39m                            
+[31m[1m^[22m[39m
+     [90m 114 |[39m     expect(res[33m.[39mbody)[33m
+.[39mtoHaveProperty([32m'success'[39m[33m,[39m 
+[36mtrue[39m)
+     [90m 115 |[39m   })
+     [90m 116 |[39m[0m
+
+      at Object.<anonymous> 
+(tests/api/kitchen-sales.smoke.test.ts:113:28)
+
+FAIL tests/unit/calculations/business-commission.test.ts
+  Business Commission & Payout Calculations
+    5% Business Commission
+      ÔêÜ RWF 10,000 gross ÔåÆ RWF 500 commission ÔåÆ 
+RWF 9,500 net (12 ms)
+      ÔêÜ RWF 1,000 gross ÔåÆ RWF 50 commission ÔåÆ RWF 
+950 net (1 ms)
+      ÔêÜ RWF 100,000 gross ÔåÆ RWF 5,000 commission ÔåÆ 
+RWF 95,000 net (2 ms)
+      ÔêÜ gross = commission + net (no money lost) (4 ms)
+    Fallback to Default (5%) When DB Fails
+      ÔêÜ uses 5% default when database query fails (4 
+ms)
+      ÔêÜ uses 5% default when no fee config exists in 
+DB (2 ms)
+    Dynamic Fee from Unified System
+      ├ù uses 3% when admin changes commission rate (7 
+ms)
+      ├ù uses 10% when admin sets higher rate (1 ms)
+      ├ù uses 0% when commission disabled (2 ms)
+    Edge Cases
+      ÔêÜ zero gross amount (2 ms)
+      ÔêÜ 1 cent gross amount (3 ms)
+      ÔêÜ large amount: RWF 10,000,000 (2 ms)
+      ÔêÜ odd amount: RWF 3,333 (3 ms)
+      ÔêÜ commission is always non-negative (14 ms)
+      ÔêÜ net payout never exceeds gross (12 ms)
+    Fee Type Enum Integrity
+      ÔêÜ all fee types are defined (2 ms)
+      ÔêÜ no duplicate fee types (1 ms)
+
+  ÔùÅ Business Commission & Payout Calculations ÔÇ║ 
+Dynamic Fee from Unified System ÔÇ║ uses 3% when admin 
+changes commission rate
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 30000
+    Received: 50000
+
+    [0m [90m 85 |[39m       )[33m;[39m
+     [90m 86 |[39m       [36mconst[39m result 
+[33m=[39m [36mawait[39m 
+calculateBusinessPayout([35m1000000[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 87 |[39m       expect(resu
+lt[33m.[39mplatformCommissionCents)[33m.[39mtoBe([35
+m30000[39m)[33m;[39m
+     [90m    |[39m                                     
+         [31m[1m^[22m[39m
+     [90m 88 |[39m       expect(result[33m.[39mcommis
+sionPercent)[33m.[39mtoBe([35m3.0[39m)[33m;[39m
+     [90m 89 |[39m     })[33m;[39m
+     [90m 90 |[39m[0m
+
+      at Object.<anonymous> (tests/unit/calculations/busi
+ness-commission.test.ts:87:46)
+
+  ÔùÅ Business Commission & Payout Calculations ÔÇ║ 
+Dynamic Fee from Unified System ÔÇ║ uses 10% when admin 
+sets higher rate
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 100000
+    Received: 50000
+
+    [0m [90m  95 |[39m       )[33m;[39m
+     [90m  96 |[39m       [36mconst[39m result 
+[33m=[39m [36mawait[39m 
+calculateBusinessPayout([35m1000000[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m  97 |[39m       expect(res
+ult[33m.[39mplatformCommissionCents)[33m.[39mtoBe([3
+5m100000[39m)[33m;[39m
+     [90m     |[39m                                    
+          [31m[1m^[22m[39m
+     [90m  98 |[39m     })[33m;[39m
+     [90m  99 |[39m
+     [90m 100 |[39m     test([32m'uses 0% when 
+commission disabled'[39m[33m,[39m [36masync[39m () 
+[33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/unit/calculations/busi
+ness-commission.test.ts:97:46)
+
+  ÔùÅ Business Commission & Payout Calculations ÔÇ║ 
+Dynamic Fee from Unified System ÔÇ║ uses 0% when 
+commission disabled
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 50000
+
+    [0m [90m 104 |[39m       )[33m;[39m
+     [90m 105 |[39m       [36mconst[39m result 
+[33m=[39m [36mawait[39m 
+calculateBusinessPayout([35m1000000[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 106 |[39m       expect(res
+ult[33m.[39mplatformCommissionCents)[33m.[39mtoBe([3
+5m0[39m)[33m;[39m
+     [90m     |[39m                                    
+          [31m[1m^[22m[39m
+     [90m 107 |[39m       expect(result[33m.[39mnetPa
+youtCents)[33m.[39mtoBe([35m1000000[39m)[33m;[39m
+     [90m 108 |[39m     })[33m;[39m
+     [90m 109 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/unit/calculations/busi
+ness-commission.test.ts:106:46)
+
+FAIL tests/services/staff-performance.test.ts
+  Staff Performance Metrics
+    Performance Score Calculation
+      ├ù should give perfect score to excellent 
+performer (7 ms)
+      ÔêÜ should give low score to poor performer (1 ms)
+      ÔêÜ should reward high order volume (1 ms)
+      ÔêÜ should reward fast service
+      ÔêÜ should reward high customer ratings (1 ms)
+      ÔêÜ should reward high tips (1 ms)
+    Badge Assignment
+      ÔêÜ should assign Gold badge to top performers (1 
+ms)
+      ÔêÜ should assign Silver badge to good performers 
+(1 ms)
+      ÔêÜ should assign Bronze badge to average 
+performers
+      ÔêÜ should assign Rookie badge to new staff
+      ÔêÜ should assign Rising Star to improving 
+performers (1 ms)
+      ÔêÜ should not give badge to underperformers (1 ms)
+    Edge Cases
+      ÔêÜ should handle zero values (1 ms)
+      ÔêÜ should cap scores at 100 (1 ms)
+      ÔêÜ should handle negative service time gracefully 
+(2 ms)
+    Leaderboard Ranking
+      ÔêÜ should rank staff correctly (1 ms)
+
+  ÔùÅ Staff Performance Metrics ÔÇ║ Performance Score 
+Calculation ÔÇ║ should give perfect score to excellent 
+performer
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 95
+    Received:    80
+
+    [0m [90m 40 |[39m       })
+     [90m 41 |[39m       
+    [31m[1m>[22m[39m[90m 42 |[39m       expect(scor
+e)[33m.[39mtoBeGreaterThanOrEqual([35m95[39m)
+     [90m    |[39m                     
+[31m[1m^[22m[39m
+     [90m 43 |[39m       expect(score)[33m.[39mtoBeLe
+ssThanOrEqual([35m100[39m)
+     [90m 44 |[39m     })
+     [90m 45 |[39m[0m
+
+      at Object.<anonymous> 
+(tests/services/staff-performance.test.ts:42:21)
+
+PASS tests/unit/calculations/payment-fees.test.ts
+  Payment Fee Calculations
+    calculateFeeAmount
+      ÔêÜ calculates 5% business commission correctly (3 
+ms)
+      ÔêÜ calculates 7.5% supplier fee correctly (1 ms)
+      ÔêÜ calculates 2.5% tipping fee correctly (1 ms)
+      ÔêÜ calculates 1.5% split payment fee correctly (1 
+ms)
+      ÔêÜ handles zero amount (1 ms)
+      ÔêÜ handles zero percent (2 ms)
+      ÔêÜ rounds correctly using Math.round (nearest 
+integer RWF) (2 ms)
+      ÔêÜ respects minAmountCents (1 ms)
+      ÔêÜ respects maxAmountCents (1 ms)
+      ÔêÜ respects both min and max together (1 ms)
+      ÔêÜ handles very large amounts without overflow (1 
+ms)
+      ÔêÜ handles very small amounts (1 cent) (3 ms)
+      ÔêÜ handles fractional percentages (1 ms)
+    Customer Fee Policy
+      ÔêÜ customer should NEVER pay platform fee (0%) (2 
+ms)
+    RWF Rounding (Nearest Integer)
+      ÔêÜ all fees produce integer results (10 ms)
+      ÔêÜ fee + remaining always equals original amount 
+(3 ms)
+
+PASS tests/unit/calculations/tipping-logic.test.ts
+  Digital Tipping Logic
+    Bills under RWF 5,000 (round to nearest 500)
+      ÔêÜ RWF 3,200 ÔåÆ rounds up to RWF 3,500 (tip: RWF 
+300) (3 ms)
+      ÔêÜ RWF 1,000 ÔåÆ already at 500 boundary (tip: 
+RWF 0) (4 ms)
+      ÔêÜ RWF 1,500 ÔåÆ already at 500 boundary (tip: 
+RWF 0) (2 ms)
+      ÔêÜ RWF 2,001 ÔåÆ rounds to RWF 2,500 (tip: RWF 
+499) (1 ms)
+      ÔêÜ RWF 4,999 ÔåÆ rounds to RWF 5,000 (tip: RWF 1) 
+(2 ms)
+      ÔêÜ RWF 100 ÔåÆ rounds to RWF 500 (tip: RWF 400) 
+(2 ms)
+    Bills RWF 5,000+ (round to nearest 1,000)
+      ÔêÜ RWF 5,200 ÔåÆ rounds to RWF 6,000 (tip: RWF 
+800) (1 ms)
+      ÔêÜ RWF 10,000 ÔåÆ already at 1000 boundary (tip: 
+RWF 0) (1 ms)
+      ÔêÜ RWF 9,500 ÔåÆ rounds to RWF 10,000 (tip: RWF 
+500) (3 ms)
+      ÔêÜ RWF 15,001 ÔåÆ rounds to RWF 16,000 (tip: RWF 
+999) (4 ms)
+      ÔêÜ RWF 50,000 ÔåÆ already at 1000 boundary (tip: 
+RWF 0) (3 ms)
+      ÔêÜ RWF 99,999 ÔåÆ rounds to RWF 100,000 (tip: RWF 
+1) (1 ms)
+    Boundary at RWF 5,000
+      ÔêÜ RWF 4,999 uses 500 rounding ÔåÆ RWF 5,000 (2 
+ms)
+      ÔêÜ RWF 5,000 uses 1000 rounding ÔåÆ tip is 0 (1 
+ms)
+      ÔêÜ RWF 5,001 uses 1000 rounding ÔåÆ RWF 6,000
+    Edge Cases
+      ÔêÜ RWF 0 ÔåÆ tip is 0, disabled (5 ms)
+      ÔêÜ RWF 1 (1 cent) ÔåÆ rounds to RWF 500 (1 ms)
+      ÔêÜ very large bill: RWF 500,000 ÔåÆ no tip (at 
+boundary) (2 ms)
+      ÔêÜ tip amount is always non-negative (10 ms)
+      ÔêÜ suggested amount is always >= original (2 ms)
+      ÔêÜ tipAmount = suggestedAmount - originalAmount 
+(math identity) (3 ms)
+    Platform Fee on Tips (2.5%)
+      ÔêÜ fee on RWF 500 tip = RWF 12.50 ÔåÆ rounds to 
+13 (1 ms)
+      ÔêÜ fee on RWF 1,000 tip = RWF 25
+      ÔêÜ fee on RWF 1 tip = 0 (too small) (1 ms)
+      ÔêÜ fee + net always equals original tip (no money 
+lost) (2 ms)
+
+PASS tests/edge-cases/payment-edge-cases.test.ts
+  ­ƒÆ© Payment Edge Cases ÔÇö CRITICAL
+    Scenario 1: Payment succeeds but order not updated
+      ÔêÜ reconciliation should detect COMPLETED payment 
+with PENDING sale (8 ms)
+    Scenario 2: Double-click rapid payment
+      ÔêÜ invoiceNumber unique constraint blocks second 
+charge (86 ms)
+      ÔêÜ before retry, check for existing COMPLETED 
+payment first (3 ms)
+    Scenario 3: Payment gateway failure
+      ÔêÜ order remains PENDING and retryable after 
+gateway failure (2 ms)
+    Scenario 4: Network interruption
+      ÔêÜ PENDING payment can be queried without 
+creating duplicate (6 ms)
+      ÔêÜ orphan detection: finds PENDING payments older 
+than 5 min (2 ms)
+    Scenario 5: Tipping toggle consistency
+      ÔêÜ getTipSuggestionForSale returns null when 
+tipping is OFF (1 ms)
+      ÔêÜ getTipSuggestionForSale returns suggestion 
+when tipping is ON (2 ms)
+      ÔêÜ createTipForSale records tip with correct 
+platform fee (4 ms)
+    Scenario 6: 5% business commission accuracy
+      ÔêÜ calculates exact 5% across diverse amounts (15 
+ms)
+      ÔêÜ zero gross ÔåÆ zero commission, zero net (1 ms)
+      ÔêÜ 1 cent gross ÔåÆ commission rounds to 0, full 
+cent to business (2 ms)
+    Scenario 7: 0% customer platform fee
+      ÔêÜ calculateOrderPricing always returns 
+platformFeeCents = 0 (2 ms)
+      ÔêÜ customer fee is 0 regardless of payment method 
+(3 ms)
+    Scenario 8: Amount integrity
+      ÔêÜ payment amountCents must equal sale 
+totalAmountCents (2 ms)
+      ÔêÜ detect mismatched payment vs order amount (1 
+ms)
+
+PASS tests/unit/calculations/tax-calculations.test.ts
+  Tax Calculation Logic
+    EXCLUSIVE Tax Mode (VAT added on top)
+      ÔêÜ RWF 10,000 subtotal ÔåÆ RWF 1,800 VAT ÔåÆ RWF 
+11,800 total (5 ms)
+      ÔêÜ RWF 5,000 subtotal ÔåÆ RWF 900 VAT ÔåÆ RWF 
+5,900 total (2 ms)
+      ÔêÜ subtotal + VAT always equals total (3 ms)
+      ÔêÜ VAT is exactly 18% of subtotal (rounded) (3 ms)
+    INCLUSIVE Tax Mode (VAT included in price)
+      ÔêÜ RWF 11,800 total ÔåÆ extracts RWF 1,800 VAT 
+ÔåÆ RWF 10,000 subtotal (3 ms)
+      ÔêÜ RWF 5,900 total ÔåÆ extracts RWF 900 VAT ÔåÆ 
+RWF 5,000 subtotal (2 ms)
+      ÔêÜ total = subtotal + VAT always holds (4 ms)
+      ÔêÜ INCLUSIVE total equals menu price (no extra 
+charge) (3 ms)
+    Cross-Mode Consistency
+      ÔêÜ EXCLUSIVE subtotal X ÔåÆ INCLUSIVE total 
+should extract same subtotal (3 ms)
+      ÔêÜ round-trip consistency for various amounts (2 
+ms)
+    Tax Edge Cases
+      ÔêÜ zero amount ÔåÆ zero everything (3 ms)
+      ÔêÜ 1 cent amount (smallest possible) (1 ms)
+      ÔêÜ 0% tax rate ÔåÆ no VAT (1 ms)
+      ÔêÜ 100% tax rate ÔåÆ doubles the price 
+(EXCLUSIVE) (1 ms)
+      ÔêÜ all results are integers (no floating point 
+cents) (13 ms)
+      ÔêÜ very large amount handles correctly (1 ms)
+    Deposit Calculation
+      ÔêÜ remote order with 50% deposit (2 ms)
+      ÔêÜ in-venue order ÔåÆ no deposit (1 ms)
+      ÔêÜ remote but deposit not required ÔåÆ no deposit 
+(3 ms)
+      ÔêÜ deposit + remaining = total (always) (16 ms)
+      ÔêÜ 100% deposit ÔåÆ remaining is 0 (2 ms)
+
+PASS tests/unit/rbac/permission-enforcement.test.ts
+  hasPermission
+    ÔêÜ returns true for an explicitly granted 
+permission (2 ms)
+    ÔêÜ returns false for an explicitly denied 
+permission (1 ms)
+    ÔêÜ returns false when the group is missing (1 ms)
+    ÔêÜ returns false when the key is missing within the 
+group (1 ms)
+    ÔêÜ returns false for empty permissions (1 ms)
+  mergePermissions
+    ÔêÜ merges two non-overlapping permission groups (2 
+ms)
+    ÔêÜ later matrix overrides earlier for the same key 
+(1 ms)
+    ÔêÜ handles empty array (2 ms)
+  System role permissions
+    OWNER
+      ÔêÜ has full permissions (3 ms)
+    MANAGER
+      ÔêÜ can read reports and manage staff (2 ms)
+      ÔêÜ cannot issue refunds or manage settings (1 ms)
+    CASHIER
+      ÔêÜ can read payments but cannot refund (8 ms)
+      ÔêÜ cannot view reports or manage settings (1 ms)
+    WAITER
+      ÔêÜ can read and update tables (1 ms)
+      ÔêÜ cannot create tables or make payments (2 ms)
+    KITCHEN
+      ÔêÜ can read and update inventory (1 ms)
+      ÔêÜ cannot access financial or settings (3 ms)
+
+PASS tests/api/reservations.test.ts
+  Reservation API
+    Reservation Creation
+      ÔêÜ should create reservation with valid data (2 
+ms)
+      ÔêÜ should require customer name (1 ms)
+      ÔêÜ should require customer phone (1 ms)
+      ÔêÜ should validate party size (7 ms)
+      ÔêÜ should validate date format (2 ms)
+      ÔêÜ should validate time format (2 ms)
+      ÔêÜ should validate phone number format (3 ms)
+    Deposit Management
+      ÔêÜ should calculate deposit as 20% of estimated 
+bill (1 ms)
+      ÔêÜ should track deposit status (3 ms)
+      ÔêÜ should mark deposit as PAID when payment 
+confirmed
+      ÔêÜ should allow refund for cancelled reservations
+      ÔêÜ should forfeit deposit for no-shows (1 ms)
+    Reservation Status Workflow
+      ÔêÜ should start as PENDING (1 ms)
+      ÔêÜ should move to CONFIRMED when deposit paid (1 
+ms)
+      ÔêÜ should move to COMPLETED when customer arrives 
+(1 ms)
+      ÔêÜ should allow CANCELLED status (1 ms)
+      ÔêÜ should track NO_SHOW status (1 ms)
+    Table Assignment
+      ÔêÜ should assign table based on party size (1 ms)
+      ÔêÜ should check table availability (1 ms)
+    Confirmation Code Generation
+      ÔêÜ should generate unique confirmation code (2 ms)
+    Special Requests
+      ÔêÜ should accept special requests (3 ms)
+      ÔêÜ should limit special requests length (1 ms)
+    Business Rules
+      ÔêÜ should not allow same-day reservations after 
+6pm (4 ms)
+      ÔêÜ should require deposit for parties of 6 or 
+more (1 ms)
+      ÔêÜ should send confirmation SMS (1 ms)
+
+PASS tests/performance/lighthouse.test.ts
+  Performance Testing
+    ÔêÜ should meet performance budget for homepage (2 
+ms)
+    ÔêÜ should meet Core Web Vitals targets (1 ms)
+    ÔêÜ should have acceptable bundle sizes (1 ms)
+    ÔêÜ should load critical resources quickly (2 ms)
+    ÔêÜ should use efficient caching strategies (1 ms)
+    ÔêÜ should compress resources (1 ms)
+    ÔêÜ should lazy load non-critical resources (12 ms)
+    ÔêÜ should prefetch critical routes (3 ms)
+  Mobile Performance
+    ÔêÜ should meet performance budget on mobile (2 ms)
+    ÔêÜ should use responsive images (1 ms)
+    ÔêÜ should minimize main thread work
+  Network Performance
+    ÔêÜ should minimize HTTP requests (2 ms)
+    ÔêÜ should use HTTP/2 (3 ms)
+    ÔêÜ should enable gzip/brotli compression (1 ms)
+
+PASS tests/api/seats-routes.smoke.test.ts
+  Seats & Table-Seats API (RBAC smoke)
+    ÔêÜ GET /api/tables/[id]/seats (tables.read): 
+CASHIER allowed (200) (6 ms)
+    ÔêÜ POST /api/seats/[id]/qr (tables.update): CASHIER 
+forbidden (403) (3 ms)
+    ÔêÜ POST /api/seats/[id]/qr (tables.update): WAITER 
+allowed and generates QR (200) (10 ms)
+    ÔêÜ POST /api/seats/[id]/qr: 404 when seat belongs 
+to another business (2 ms)
+
+PASS tests/unit/calculations/refund-math.test.ts
+  Refund amount validation
+    ÔêÜ allows full refund (2 ms)
+    ÔêÜ allows partial refund (1 ms)
+    ÔêÜ rejects refund exceeding original (1 ms)
+    ÔêÜ rejects zero amount (1 ms)
+    ÔêÜ rejects negative amount (1 ms)
+    ÔêÜ allows 1-cent partial refund (1 ms)
+  resolveRefundAmount
+    ÔêÜ uses requested amount when provided (1 ms)
+    ÔêÜ defaults to original amount when undefined (1 ms)
+  InTouch amount conversion (cents to RWF units)
+    ÔêÜ converts 5000 RWF cents to 50 RWF (2 ms)
+    ÔêÜ converts 100000 RWF cents to 1000 RWF (1 ms)
+    ÔêÜ rounds fractional cents down (1 ms)
+    ÔêÜ handles 1 RWF (100 cents)
+    ÔêÜ handles large amounts (500,000 RWF)
+  Payout net calculation
+    ÔêÜ calculates net correctly with 2% platform + 1% 
+gateway (1 ms)
+    ÔêÜ calculates net correctly with no fees (1 ms)
+    ÔêÜ never produces negative net for reasonable fee 
+rates (1 ms)
+    ÔêÜ handles rounding on odd amounts (1 ms)
+
+PASS tests/services/rfm-segmentation.test.ts
+  RFM Customer Segmentation
+    Score Calculation
+      ÔêÜ should assign highest scores to recent, 
+frequent, high-value customers (7 ms)
+      ÔêÜ should assign lowest scores to old, 
+infrequent, low-value customers (3 ms)
+      ÔêÜ should handle mid-range customers correctly (3 
+ms)
+    Segment Assignment
+      ÔêÜ should classify as Champions when all scores 
+are high (1 ms)
+      ÔêÜ should classify as Loyal when scores are good 
+(1 ms)
+      ÔêÜ should classify as New when recent but low 
+frequency (1 ms)
+      ÔêÜ should classify as At Risk when not recent but 
+frequent (1 ms)
+      ÔêÜ should classify as Lost when all scores are 
+low (1 ms)
+      ÔêÜ should classify as Promising for mixed scores 
+(1 ms)
+    Edge Cases
+      ÔêÜ should handle zero values (2 ms)
+      ÔêÜ should handle very large values (1 ms)
+    Business Logic
+      ÔêÜ should prioritize recency for Champions (1 ms)
+      ÔêÜ should identify At Risk customers correctly (2 
+ms)
+      ÔêÜ should welcome New customers (1 ms)
+
+FAIL tests/formatDateTimeRW.test.ts
+  ÔùÅ Test suite failed to run
+
+    AssertionError [ERR_ASSERTION]: Expected no-seconds 
+format (rw), got: 2024-03-10 14:34
+
+    [0m [90m 22 |[39m   [36mconst[39m rwNoSec 
+[33m=[39m formatDateTimeRW(iso[33m,[39m 
+[32m'rw'[39m)
+     [90m 23 |[39m   
+assert[33m.[39mstrictEqual([36mtypeof[39m 
+rwNoSec[33m,[39m [32m'string'[39m)
+    [31m[1m>[22m[39m[90m 24 |[39m   
+assert[33m.[39mok(matchNoSeconds(rwNoSec)[33m,[39m 
+[32m`Expected no-seconds format (rw), got: 
+${rwNoSec}`[39m)
+     [90m    |[39m          [31m[1m^[22m[39m
+     [90m 25 |[39m
+     [90m 26 |[39m   
+console[33m.[39mlog([32m'formatDateTimeRW tests 
+passed'[39m)
+     [90m 27 |[39m })()[0m
+
+      at run (tests/formatDateTimeRW.test.ts:24:10)
+      at Object.<anonymous> 
+(tests/formatDateTimeRW.test.ts:27:3)
+
+FAIL tests/accessibility/a11y.test.ts
+  ÔùÅ Test suite failed to run
+
+    Playwright Test needs to be invoked via 'npx 
+playwright test' and excluded from Jest test runs.
+    Creating one directory for Playwright tests and one 
+for Jest is the recommended way of doing it.
+    See https://playwright.dev/docs/intro for more 
+information about Playwright Test.
+
+    [0m [90m  6 |[39m [90m// import { injectAxe, 
+checkA11y } from 'axe-playwright'[39m
+     [90m  7 |[39m
+    [31m[1m>[22m[39m[90m  8 |[39m 
+test[33m.[39mdescribe([32m'Accessibility 
+Audit'[39m[33m,[39m () [33m=>[39m {
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m  9 |[39m   test([32m'homepage should be 
+accessible'[39m[33m,[39m [36masync[39m ({ page }) 
+[33m=>[39m {
+     [90m 10 |[39m     [36mawait[39m 
+page[33m.[39mgoto([32m'/'[39m)
+     [90m 11 |[39m     [0m
+
+      at throwIfRunningInsideJest 
+(node_modules/playwright/lib/common/testType.js:276:11)
+      at TestTypeImpl._describe 
+(node_modules/playwright/lib/common/testType.js:114:5)
+      at Function.describe (node_modules/playwright/lib/t
+ransform/transform.js:275:12)
+      at Object.<anonymous> 
+(tests/accessibility/a11y.test.ts:8:6)
+
+  console.error
+    [SubscriptionEngine] Activation error: Error: Payment transaction not completed
+        at Function.activateSubscription (C:\Dev\ImboniResto\src\lib\payments\subscription.engine.ts:36:15)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at Object.<anonymous> (C:\Dev\ImboniResto\tests\integration\payment-lifecycle.test.ts:193:32)
+
+    [0m [90m 109 |[39m       }
+     [90m 110 |[39m     } [36mcatch[39m (error[33m:[39m any) {
+    [31m[1m>[22m[39m[90m 111 |[39m       console[33m.[39merror([32m'[SubscriptionEngine] Activation error:'[39m[33m,[39m error)
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 112 |[39m       [36mreturn[39m {
+     [90m 113 |[39m         success[33m:[39m [36mfalse[39m[33m,[39m
+     [90m 114 |[39m         error[33m:[39m error[33m.[39mmessage[33m,[39m[0m
+
+      at Function.activateSubscription (src/lib/payments/subscription.engine.ts:111:15)
+      at Object.<anonymous> (tests/integration/payment-lifecycle.test.ts:193:32)
+
+PASS tests/integration/payment-lifecycle.test.ts (33.035 
+s)
+  Payment Lifecycle Integration Tests
+    Successful Payment Flow
+      ÔêÜ should create payment transaction, activate 
+subscription, and log billing events (5843 ms)
+    Failed Payment Flow
+      ÔêÜ should handle failed payment and log failure 
+event (877 ms)
+    Duplicate Webhook Handling
+      ÔêÜ should handle duplicate webhooks idempotently 
+(3461 ms)
+    Delayed Webhook Handling
+      ÔêÜ should handle delayed webhooks correctly (2113 
+ms)
+    Subscription Renewal Flow
+      ÔêÜ should renew subscription with new payment 
+(4684 ms)
+    Subscription Cancellation
+      ÔêÜ should cancel subscription and log event (3232 
+ms)
+    Billing Event Ledger
+      ÔêÜ should maintain chronological billing history 
+(2571 ms)
+
+Test Suites: 8 failed, 11 passed, 19 total
+Tests:       18 failed, 292 passed, 310 total
+Snapshots:   0 total
+Time:        42.044 s
+Ran all test suites.

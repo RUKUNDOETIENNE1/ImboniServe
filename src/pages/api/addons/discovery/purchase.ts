@@ -5,13 +5,14 @@ import { IremboPayService } from '@/lib/services/irembopay.service';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api/response-helpers';
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
 const PRICING = {
   FEATURED: 800000,  // 8,000 RWF/month
   PREMIUM: 1500000   // 15,000 RWF/month
 };
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
   const businessId = (session?.user as any)?.businessId;
 
@@ -37,7 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const business = await prisma.business.findUnique({
       where: { id: businessId },
-      select: { id: true, name: true }
+      select: { id: true, name: true, taxRate: true, currency: true }
     });
 
     if (!business) {
@@ -46,7 +47,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Calculate amounts
     const grossAmountCents = PRICING[tier as keyof typeof PRICING];
-    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents);
+    const taxRate = business.taxRate ?? 0; // 0 means no tax configured — business should configure their tax rate
+    const { vatAmountCents, exVatAmountCents } = IremboPayService.calculateVATAmounts(grossAmountCents, taxRate);
     const gatewayFeeEstimatedCents = IremboPayService.calculateGatewayFee(grossAmountCents);
     const netToBusinessCents = IremboPayService.calculateNetToBusinessCents(
       grossAmountCents,
@@ -74,9 +76,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         transactionId: invoice.transactionId,
         gateway: 'IREMBO_PAY',
         paymentMethod: 'WEB',
-        status: 'INITIATED',
+        status: 'PENDING',
         amountCents: grossAmountCents,
-        currency: 'RWF',
+        currency: business.currency,
         vatAmountCents,
         exVatAmountCents,
         gatewayFeeEstimatedCents,
@@ -86,13 +88,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payerName: (session.user as any).name,
         payerEmail: (session.user as any).email,
         payerPhone: (session.user as any).phone,
-        metadata: {
-          type: 'addon',
-          addon: 'discovery',
-          tier: tier,
-          billingPeriod: 'monthly'
-        },
-        rawRequest: invoice as any
+        rawRequest: {
+          ...invoice,
+          meta: {
+            type: 'addon',
+            addon: 'discovery',
+            tier,
+            billingPeriod: 'monthly',
+          },
+        }
       }
     });
 
@@ -108,5 +112,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 }
+
+// Apply commercial enforcement: Discovery addon purchase requires discovery listing feature
+const handler = requiresFeature('hasDiscoveryListing')(baseHandler);
 
 export default withErrorHandler(handler);

@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { realtimeService } from '@/lib/realtime'
+import { WaiterCallsPluginAdapter } from '@/lib/die/business-as-plugin/waiter-calls/waiter-calls.adapter'
+import { routeDomainEvent } from '@/lib/die/business-as-plugin/conversion/event-router'
+import { shadowBindings } from '@/lib/die/business-as-plugin/shadow/shadow-bindings'
 
 /**
  * Waiter Call Management API
@@ -11,7 +14,13 @@ import { realtimeService } from '@/lib/realtime'
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  
+
+  // Mutations are staff-only: an authenticated session is required
+  // unconditionally, and ownership is enforced per-business below.
+  if ((req.method === 'PATCH' || req.method === 'DELETE') && !session?.user) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
   if (req.method === 'PATCH') {
     return handleUpdateWaiterCall(req, res, session)
   }
@@ -57,16 +66,15 @@ async function handleUpdateWaiterCall(
       return res.status(404).json({ error: 'Waiter call not found' })
     }
 
-    // Verify user has access to this business (if authenticated)
-    if (session?.user) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { businessId: true }
-      })
+    // Verify user has access to this business (session is guaranteed
+    // non-null by the handler gate above)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { businessId: true }
+    })
 
-      if (user?.businessId !== call.table.businessId) {
-        return res.status(403).json({ error: 'Access denied' })
-      }
+    if (!user || user.businessId !== call.table.businessId) {
+      return res.status(403).json({ error: 'Access denied' })
     }
 
     // Update call based on action
@@ -98,6 +106,32 @@ async function handleUpdateWaiterCall(
         action
       }
     )
+
+    // Shadow taps (feature-flagged inside bindings)
+    try {
+      const adapter = new WaiterCallsPluginAdapter()
+      const ts = new Date().toISOString()
+      if (action === 'acknowledge') {
+        await routeDomainEvent(adapter, shadowBindings, {
+          domain: 'waiter-calls',
+          type: 'CALL_ACKNOWLEDGED',
+          timestamp: ts,
+          businessId: call.table.businessId,
+          severity: 'INFO',
+          data: { callId: updatedCall.id, tableId: call.tableId },
+        })
+      }
+      if (action === 'resolve') {
+        await routeDomainEvent(adapter, shadowBindings, {
+          domain: 'waiter-calls',
+          type: 'CALL_RESOLVED',
+          timestamp: ts,
+          businessId: call.table.businessId,
+          severity: 'INFO',
+          data: { callId: updatedCall.id, tableId: call.tableId },
+        })
+      }
+    } catch {}
 
     return res.status(200).json({
       success: true,
@@ -137,16 +171,14 @@ async function handleDeleteWaiterCall(
       return res.status(404).json({ error: 'Waiter call not found' })
     }
 
-    // Verify access (if authenticated)
-    if (session?.user) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { businessId: true }
-      })
+    // Verify access (session is guaranteed non-null by the handler gate)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { businessId: true }
+    })
 
-      if (user?.businessId !== call.table.businessId) {
-        return res.status(403).json({ error: 'Access denied' })
-      }
+    if (!user || user.businessId !== call.table.businessId) {
+      return res.status(403).json({ error: 'Access denied' })
     }
 
     // Delete call

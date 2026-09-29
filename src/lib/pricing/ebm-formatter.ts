@@ -44,9 +44,9 @@ export function formatEBMReceipt(
     vatRate?: number;
   }>,
   feeCalculation: FeeCalculationResult,
-  currency: string = 'RWF'
+  currency: string = 'RWF',
+  vatRate: number = 18.0 // Rwanda EBM requires 18% by default; can be overridden by business config
 ): EBMReceipt {
-  const vatRate = 18.0; // Rwanda standard VAT
 
   // Format order items
   const lines: EBMReceiptLine[] = orderItems.map((item) => {

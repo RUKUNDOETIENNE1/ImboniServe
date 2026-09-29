@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import { FileText, Plus, Search, Filter, Eye, Edit, Trash2, Send, Settings } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 
 type Post = {
   id: string
@@ -23,6 +25,7 @@ export default function CmsIndexPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -55,12 +58,19 @@ export default function CmsIndexPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this post?')) return
     try {
       const res = await fetch(`/api/cms/posts/${id}`, { method: 'DELETE' })
-      if (res.ok) fetchPosts()
+      if (res.ok) {
+        fetchPosts()
+        toast.success('Post deleted')
+      } else {
+        toast.error('Failed to delete post')
+      }
     } catch (error) {
       console.error('Failed to delete post:', error)
+      toast.error('Failed to delete post')
+    } finally {
+      setShowDeleteConfirm(null)
     }
   }
 
@@ -210,7 +220,7 @@ export default function CmsIndexPage() {
                         </button>
                       )}
                       <button
-                        onClick={() => handleDelete(post.id)}
+                        onClick={() => setShowDeleteConfirm(post.id)}
                         className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -234,6 +244,18 @@ export default function CmsIndexPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </DashboardLayout>
   )
 }

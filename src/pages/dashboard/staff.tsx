@@ -34,7 +34,7 @@ export default function Staff() {
   const [statusFilter, setStatusFilter] = useState('')
   const [addStep, setAddStep] = useState<1 | 2 | 3>(1)
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false)
-  const [newRole, setNewRole] = useState({ name: '', description: '', color: '', icon: '', baseRole: 'MANAGER', permissions: defaultPermissions() })
+  const [newRole, setNewRole] = useState<{ name: string; description: string; color: string; icon: string; baseRole: string; permissions: Record<string, any> }>({ name: '', description: '', color: '', icon: '', baseRole: 'MANAGER', permissions: defaultPermissions() as any })
 
   useEffect(() => {
     fetchFilters()
@@ -121,7 +121,7 @@ export default function Staff() {
           showToast('success', 'Staff member added successfully!')
           setShowAddModal(false)
           setAddStep(1)
-          setFormData({ name: '', email: '', phone: '', password: '', role: 'CASHIER', branchId: '', customRoleId: '' })
+          setFormData({ name: '', email: '', phone: '', password: '', role: 'CASHIER', branchId: '', customRoleId: '', newPassword: '' })
           fetchStaff()
         } else {
           const error = await res.json()
@@ -745,7 +745,22 @@ export default function Staff() {
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(cfg).map(([k, v]: any) => (
                       <label key={k} className="inline-flex items-center gap-2 text-sm text-slate-700">
-                        <input type="checkbox" checked={Boolean(v)} onChange={(e) => setNewRole({ ...newRole, permissions: { ...newRole.permissions, [group]: { ...newRole.permissions[group], [k]: e.target.checked } } })} />
+                        <input
+                          type="checkbox"
+                          checked={Boolean(v)}
+                          onChange={(e) =>
+                            setNewRole({
+                              ...newRole,
+                              permissions: {
+                                ...(newRole.permissions as Record<string, any>),
+                                [group]: {
+                                  ...(newRole.permissions as Record<string, any>)[group],
+                                  [k]: e.target.checked,
+                                },
+                              },
+                            })
+                          }
+                        />
                         <span className="capitalize">{k}</span>
                       </label>
                     ))}
@@ -762,7 +777,7 @@ export default function Staff() {
                   if (res.ok) {
                     showToast('success', 'Role created')
                     setShowCreateRoleModal(false)
-                    setNewRole({ name: '', description: '', color: '', icon: '', baseRole: 'MANAGER', permissions: defaultPermissions() })
+                    setNewRole({ name: '', description: '', color: '', icon: '', baseRole: 'MANAGER', permissions: defaultPermissions() as any })
                     fetchFilters()
                   } else {
                     const err = await res.json()

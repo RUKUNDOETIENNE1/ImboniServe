@@ -25,6 +25,7 @@ export interface CommissionCalculationResult {
   commissionPercent: number;
   commissionAmount: number;
   commissionVAT: number;
+  vatRate: number;
   totalCommission: number;
   whtAmount: number;
   netToSeller: number;
@@ -133,6 +134,7 @@ export function calculateMarketplaceCommission(
     commissionPercent,
     commissionAmount,
     commissionVAT,
+    vatRate,
     totalCommission,
     whtAmount,
     netToSeller,

@@ -1,5 +1,19 @@
+/**
+ * ⚠️ DEPRECATED: Direct MTN MoMo integration bypasses provider factory.
+ * 
+ * ARCHITECTURAL RULE:
+ * MTN MoMo payments MUST be routed through InTouch provider abstraction.
+ * Use: PaymentProviderFactory.getProvider(PaymentProviderType.INTOUCH)
+ * 
+ * This service remains for backward compatibility during migration only.
+ * DO NOT use in new code. DO NOT add new methods.
+ * 
+ * Migration: All MTN MoMo flows should use InTouch as the aggregator gateway.
+ */
+
 import crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
+import { normalizePhoneForProvider } from '@/lib/utils/phone'
 
 export interface MoMoCollectionParams {
   amount: number
@@ -33,7 +47,25 @@ export interface MoMoAccessTokenResponse {
 }
 
 export class MTNMoMoService {
-  private static readonly ENVIRONMENT = process.env.MTN_MOMO_ENVIRONMENT || 'sandbox'
+  /**
+   * Security: In production, MTN_MOMO_ENVIRONMENT must be explicitly set.
+   * Defaulting to 'sandbox' in production would route real payments to the
+   * test environment.  This service is DEPRECATED and should not be used in
+   * new code — MTN MoMo payments MUST go through the InTouch provider
+   * abstraction.  This guard prevents accidental production use of the
+   * deprecated direct integration with sandbox defaults.
+   */
+  private static readonly ENVIRONMENT = (() => {
+    const v = process.env.MTN_MOMO_ENVIRONMENT
+    if (v) return v
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'SECURITY FATAL: MTN_MOMO_ENVIRONMENT is not set in production. ' +
+        'Refusing to default to sandbox. (This direct MTN MoMo service is DEPRECATED — use InTouch provider.)'
+      )
+    }
+    return 'sandbox'
+  })()
   private static readonly SUBSCRIPTION_KEY = process.env.MTN_MOMO_SUBSCRIPTION_KEY!
   private static readonly API_USER = process.env.MTN_MOMO_API_USER!
   private static readonly API_KEY = process.env.MTN_MOMO_API_KEY!
@@ -162,16 +194,6 @@ export class MTNMoMoService {
   }
 
   static normalizePhoneNumber(phoneNumber: string): string {
-    let normalized = phoneNumber.replace(/\s+/g, '')
-    
-    if (normalized.startsWith('+250')) {
-      normalized = normalized.substring(4)
-    } else if (normalized.startsWith('250')) {
-      normalized = normalized.substring(3)
-    } else if (normalized.startsWith('0')) {
-      normalized = normalized.substring(1)
-    }
-    
-    return `25${normalized}`
+    return normalizePhoneForProvider(phoneNumber)
   }
 }

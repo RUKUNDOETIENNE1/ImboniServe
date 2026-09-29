@@ -107,7 +107,7 @@ export default function ServiceTerms() {
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li><strong>Custom Domain:</strong> Connect your own domain or use a free imboni.site subdomain</li>
-                <li><strong>Templates:</strong> Choose from restaurant, hotel, bar, and café templates</li>
+                <li><strong>Templates:</strong> Choose from hospitality business, hotel, bar, and café templates</li>
                 <li><strong>SEO:</strong> Built-in SEO optimization for better search visibility</li>
                 <li><strong>Ownership:</strong> You retain full ownership of your content</li>
               </ul>
@@ -132,7 +132,7 @@ export default function ServiceTerms() {
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">7.1 Customer Referral Program (Tier 2)</h3>
                 <p className="text-gray-700 mb-3">
-                  Customers can earn rewards by referring friends to order from restaurants using Imboni Serve.
+                  Customers can earn rewards by referring friends to order from hospitality businesses using Imboni Serve.
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                   <li><strong>Reward Amount:</strong> 1,000 RWF per qualified referral (one-time, not recurring)</li>
@@ -140,7 +140,7 @@ export default function ServiceTerms() {
                   <li><strong>Validation Period:</strong> 7-day lock period after order confirmation to prevent fraud</li>
                   <li><strong>Reward Distribution:</strong> Both referrer and referred friend receive 1,000 RWF each</li>
                   <li><strong>Withdrawal:</strong> Minimum 10,000 RWF balance required to cash out via Mobile Money</li>
-                  <li><strong>Usage:</strong> Credits can be used at any restaurant on Imboni Serve or withdrawn to MoMo/Airtel Money</li>
+                  <li><strong>Usage:</strong> Credits can be used at any hospitality business on Imboni Serve or withdrawn to MoMo/Airtel Money</li>
                   <li><strong>Fraud Prevention:</strong> Self-referrals, duplicate accounts, and suspicious activity will result in reward forfeiture</li>
                   <li><strong>No Expiration:</strong> Customer referral credits do not expire</li>
                 </ul>
@@ -149,15 +149,15 @@ export default function ServiceTerms() {
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">7.2 B2B Affiliate Program (Tier 1)</h3>
                 <p className="text-gray-700 mb-3">
-                  Professional marketers can earn recurring commissions by bringing restaurants to Imboni Serve.
+                  Professional marketers can earn recurring commissions by bringing hospitality businesses to Imboni Serve.
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                   <li><strong>Eligibility:</strong> Application required; for professional marketers and influencers only</li>
-                  <li><strong>Commission:</strong> 15% of restaurant's subscription payments for 12 months</li>
-                  <li><strong>Qualification:</strong> Referred restaurant must generate 30 Smart Dining Slips within 14 days</li>
+                  <li><strong>Commission:</strong> 15% of the hospitality business's subscription payments for 12 months</li>
+                  <li><strong>Qualification:</strong> Referred hospitality business must generate 30 Smart Dining Slips within 14 days</li>
                   <li><strong>Lock Period:</strong> 7-day hold on each commission payment for chargeback protection</li>
                   <li><strong>Payout:</strong> Monthly payouts via bank transfer or Mobile Money</li>
-                  <li><strong>Duration:</strong> Commission ends after 12 subscription payments or if restaurant cancels</li>
+                  <li><strong>Duration:</strong> Commission ends after 12 subscription payments or if the hospitality business cancels</li>
                   <li><strong>Separate Terms:</strong> Full affiliate terms provided upon application approval</li>
                 </ul>
               </div>
@@ -312,7 +312,7 @@ export default function ServiceTerms() {
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li><strong>Domaine personnalisé :</strong> Connectez votre domaine ou utilisez un sous-domaine imboni.site gratuit</li>
-                <li><strong>Modèles :</strong> Restaurants, hôtels, bars et cafés</li>
+                <li><strong>Modèles :</strong> Hôtels, bars, cafés et autres entreprises d'hospitalité</li>
                 <li><strong>SEO :</strong> Optimisation intégrée pour les moteurs de recherche</li>
                 <li><strong>Propriété :</strong> Vous conservez la pleine propriété de votre contenu</li>
               </ul>
@@ -337,7 +337,7 @@ export default function ServiceTerms() {
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">7.1 Programme de parrainage clients (Niveau 2)</h3>
                 <p className="text-gray-700 mb-3">
-                  Les clients peuvent gagner des récompenses en parrainant des amis pour commander auprès de restaurants utilisant Imboni Serve.
+                  Les clients peuvent gagner des récompenses en parrainant des amis pour commander auprès d'entreprises d'hospitalité utilisant Imboni Serve.
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                   <li><strong>Montant de la récompense :</strong> 1,000 RWF par parrainage éligible (unique, non récurrent)</li>
@@ -345,7 +345,7 @@ export default function ServiceTerms() {
                   <li><strong>Période de validation :</strong> 7 jours après confirmation pour prévenir la fraude</li>
                   <li><strong>Distribution :</strong> 1,000 RWF chacun (parrain et ami parrainé)</li>
                   <li><strong>Retrait :</strong> Solde minimum de 10,000 RWF pour retrait Mobile Money</li>
-                  <li><strong>Utilisation :</strong> Crédits utilisables dans tout restaurant sur Imboni Serve ou retrait MoMo/Airtel</li>
+                  <li><strong>Utilisation :</strong> Crédits utilisables dans toute entreprise d'hospitalité sur Imboni Serve ou retrait MoMo/Airtel</li>
                   <li><strong>Prévention de la fraude :</strong> Auto-parrainage, comptes dupliqués, activités suspectes ⇒ perte des récompenses</li>
                   <li><strong>Pas d'expiration :</strong> Les crédits des clients n'expirent pas</li>
                 </ul>
@@ -354,15 +354,15 @@ export default function ServiceTerms() {
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">7.2 Programme d'affiliation B2B (Niveau 1)</h3>
                 <p className="text-gray-700 mb-3">
-                  Les marketeurs professionnels peuvent gagner des commissions récurrentes en amenant des restaurants sur Imboni Serve.
+                  Les marketeurs professionnels peuvent gagner des commissions récurrentes en amenant des entreprises d'hospitalité sur Imboni Serve.
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                   <li><strong>Éligibilité :</strong> Candidature requise ; réservé aux marketeurs et influenceurs professionnels</li>
-                  <li><strong>Commission :</strong> 15% des paiements d'abonnement du restaurant pendant 12 mois</li>
-                  <li><strong>Qualification :</strong> Le restaurant référé doit générer 30 Smart Dining Slips en 14 jours</li>
+                  <li><strong>Commission :</strong> 15% des paiements d'abonnement de l'entreprise d'hospitalité pendant 12 mois</li>
+                  <li><strong>Qualification :</strong> L'entreprise d'hospitalité référée doit générer 30 Smart Dining Slips en 14 jours</li>
                   <li><strong>Période de blocage :</strong> 7 jours de délai sur chaque paiement (protection contre rétrofacturation)</li>
                   <li><strong>Paiement :</strong> Mensuel par virement bancaire ou Mobile Money</li>
-                  <li><strong>Durée :</strong> Se termine après 12 paiements d'abonnement ou annulation du restaurant</li>
+                  <li><strong>Durée :</strong> Se termine après 12 paiements d'abonnement ou annulation de l'entreprise d'hospitalité</li>
                   <li><strong>Conditions séparées :</strong> Communiquées après approbation de la candidature</li>
                 </ul>
               </div>

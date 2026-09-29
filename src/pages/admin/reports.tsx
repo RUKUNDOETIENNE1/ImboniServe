@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import { FileText, Download, TrendingUp, DollarSign, Users, Building2 } from 'lucide-react'
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
+}
 
 export default function AdminReports() {
   const { data: session, status } = useSession()
@@ -46,7 +58,7 @@ export default function AdminReports() {
 
   const stats = [
     { label: 'Platform Revenue', value: `RWF ${((reportData?.totalRevenue || 0) / 100).toLocaleString()}`, icon: DollarSign, color: 'green' },
-    { label: 'Total Restaurants', value: reportData?.totalRestaurants || 0, icon: Building2, color: 'blue' },
+    { label: 'Total Businesses', value: reportData?.totalRestaurants || 0, icon: Building2, color: 'blue' },
     { label: 'Active Users', value: reportData?.activeUsers || 0, icon: Users, color: 'purple' },
     { label: 'Growth Rate', value: `${reportData?.growthRate || 0}%`, icon: TrendingUp, color: 'orange' }
   ]

@@ -4,8 +4,9 @@ import { authOptions } from '../auth/[...nextauth]'
 import { SupplierPayoutService } from '@/lib/services/supplier-payout.service'
 import { AuditLogService } from '@/lib/services/audit-log.service'
 import { withRateLimit } from '@/lib/middleware/rateLimit.redis'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user) {
@@ -67,5 +68,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Supplier Payouts require Business plan or higher
+const handler = requiresFeature('hasSupplierMarketplace')(baseHandler)
 
 export default withRateLimit({ maxRequests: 30, windowMs: 60_000, keyPrefix: 'supplier-payout' })(handler)

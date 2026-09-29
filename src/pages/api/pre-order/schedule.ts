@@ -18,8 +18,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const { businessId, items, scheduledAt, customerName, customerPhone, orderType } = req.body
 
-  if (!businessId || !items || !scheduledAt) {
-    return res.status(400).json(errorResponse('businessId, items, and scheduledAt are required'))
+  if (!items || !Array.isArray(items) || items.length === 0 || !scheduledAt) {
+    return res.status(400).json(errorResponse('items and scheduledAt are required'))
   }
 
   // Validate scheduled time is in the future
@@ -28,18 +28,41 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(errorResponse('Scheduled time must be in the future'))
   }
 
-  // Calculate total
+  // Server-authoritative tenant context: the business is derived from the
+  // referenced menu items, never trusted from the request body. Every item
+  // must exist and belong to exactly one business.
+  const requestedIds = items.map((item: any) => item.menuItemId)
   const menuItems = await prisma.menuItem.findMany({
-    where: {
-      id: { in: items.map((item: any) => item.menuItemId) },
-      businessId
-    }
+    where: { id: { in: requestedIds } }
   })
+
+  if (menuItems.length !== new Set(requestedIds).size) {
+    return res.status(400).json(errorResponse('One or more menu items were not found'))
+  }
+
+  const itemBusinessIds = new Set(menuItems.map(mi => mi.businessId))
+  if (itemBusinessIds.size !== 1) {
+    return res.status(400).json(errorResponse('All items must belong to a single business'))
+  }
+
+  const authoritativeBusinessId = menuItems[0].businessId
+
+  if (businessId && businessId !== authoritativeBusinessId) {
+    return res.status(403).json(errorResponse('businessId does not match the items\' business'))
+  }
+
+  // Staff sessions may only schedule within their own business; customer
+  // accounts (no businessId) may schedule at the items' business.
+  const staffBusinessId = (session.user as any).businessId
+  if (staffBusinessId && staffBusinessId !== authoritativeBusinessId) {
+    return res.status(403).json(errorResponse('Cannot schedule orders for another business'))
+  }
 
   let totalCents = 0
   const orderItems = items.map((item: any) => {
     const menuItem = menuItems.find(mi => mi.id === item.menuItemId)
     if (!menuItem) throw new Error(`Menu item ${item.menuItemId} not found`)
+    if (menuItem.businessId !== authoritativeBusinessId) throw new Error('Cross-business item rejected')
     
     const itemTotal = menuItem.priceCents * item.quantity
     totalCents += itemTotal
@@ -57,7 +80,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Create pre-order
   const order = await prisma.sale.create({
     data: {
-      businessId,
+      businessId: authoritativeBusinessId,
       userId: (session.user as any).id,
       orderSource: 'QR_REMOTE',
       paymentMethod: 'CASH',

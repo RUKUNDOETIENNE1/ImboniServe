@@ -3,8 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -16,12 +18,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { businessId: userBusinessId, roles: userRoles } = ctx
 
     const now = new Date()
-    const start = new Date(now)
-    start.setHours(0, 0, 0, 0)
 
     const where: any = {
-      createdAt: { gte: start },
       status: { not: 'CANCELLED' },
+      // Phase 3R — P2-1: hide abandoned QR drafts. A QR-sourced order only
+      // becomes actionable once the customer confirms it (customerConfirmedAt)
+      // or the canonical dispatcher has actually dispatched it (e.g. paid
+      // WEB orders and add-on items that bypass the confirm step).
+      NOT: {
+        orderSource: { in: ['QR_IN_VENUE', 'QR_REMOTE'] },
+        customerConfirmedAt: null,
+        kitchenDispatchStatus: 'pending',
+      },
     }
 
     const isAdmin = userRoles.includes('ADMIN')
@@ -34,6 +42,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     } else if (userBusinessId) {
       where.businessId = userBusinessId
     }
+
+    // Fetch business timezone for timezone-aware day boundary
+    const business = where.businessId ? await prisma.business.findUnique({
+      where: { id: where.businessId },
+      select: { timezone: true },
+    }) : null
+    const { start } = getBusinessDayBoundary(now, business?.timezone)
+    where.createdAt = { gte: start }
 
     const orders = await prisma.sale.findMany({
       where,
@@ -74,5 +90,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Kitchen Tickets require Starter plan or higher
+const handler = requiresFeature('hasKitchenTickets')(baseHandler)
 
 export default requirePermission('orders.read')(handler)

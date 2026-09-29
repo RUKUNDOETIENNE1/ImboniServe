@@ -18,10 +18,9 @@ export function initSentry() {
   }
 
   try {
-    // TODO: Install @sentry/nextjs package
-    // npm install @sentry/nextjs
-    // Then uncomment the code below:
-    
+    // @sentry/nextjs installation deferred post-v1.
+    // Error tracking is handled via structured logging and console.error
+    // in v1. Sentry integration is a production hardening enhancement.
     /*
     const Sentry = require('@sentry/nextjs')
     
@@ -70,7 +69,7 @@ export function captureException(error: Error, context?: Record<string, any>) {
     return
   }
   
-  // TODO: Uncomment when @sentry/nextjs is installed
+  // @sentry/nextjs deferred post-v1 — structured logging used in v1
   // const Sentry = require('@sentry/nextjs')
   // Sentry.captureException(error, { extra: context })
 }
@@ -81,7 +80,7 @@ export function captureException(error: Error, context?: Record<string, any>) {
 export function addBreadcrumb(message: string, data?: Record<string, any>) {
   if (!initialized) return
   
-  // TODO: Uncomment when @sentry/nextjs is installed
+  // @sentry/nextjs deferred post-v1 — structured logging used in v1
   // const Sentry = require('@sentry/nextjs')
   // Sentry.addBreadcrumb({
   //   message,
@@ -97,7 +96,7 @@ export function addBreadcrumb(message: string, data?: Record<string, any>) {
 export function setUser(user: { id: string; email?: string; name?: string } | null) {
   if (!initialized) return
   
-  // TODO: Uncomment when @sentry/nextjs is installed
+  // @sentry/nextjs deferred post-v1 — structured logging used in v1
   // const Sentry = require('@sentry/nextjs')
   // Sentry.setUser(user)
 }

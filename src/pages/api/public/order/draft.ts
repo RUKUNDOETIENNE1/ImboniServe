@@ -9,15 +9,8 @@ import { Prisma } from '@prisma/client';
 import { formatDateTimeRW } from '@/utils/datetimeRW';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
-
-function normalizePhone(phone: string | undefined): string | undefined {
-  if (!phone) return undefined;
-  const p = phone.trim();
-  if (p.startsWith('+')) return p;
-  if (p.startsWith('07')) return `+250${p.slice(1)}`;
-  if (p.startsWith('2507')) return `+${p}`;
-  return p.startsWith('0') ? `+250${p.slice(1)}` : `+${p}`;
-}
+import { IdempotencyService } from '@/lib/services/idempotency.service';
+import { normalizePhone } from '@/lib/utils/phone';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -34,7 +27,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         notes: z.string().max(500).optional(),
         instructionTags: z.array(z.string()).max(10).optional()
       })).min(1).max(50),
-      mode: z.enum(['dine-in', 'preorder', 'pickup']).optional(),
+      // Canonical order-mode vocabulary is 'invenue' | 'preorder' | 'pickup'
+      // (qr-generator.service.ts, /api/public/order/link, token.ts, order page).
+      // 'dine-in' is kept as a backward-compatible alias for in-venue orders.
+      mode: z.enum(['invenue', 'dine-in', 'preorder', 'pickup']).optional(),
       scheduledAt: z.string().datetime().optional(),
       phone: z.string().optional(),
       customerName: z.string().max(100).optional(),
@@ -43,11 +39,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       participantId: z.string().cuid().optional(),
       branchId: z.string().cuid().optional(),
       paymentMethod: z.enum(['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'WEB', 'OTHER']).optional(),
-      sessionToken: z.string().optional()
+      sessionToken: z.string().optional(),
+      idempotencyKey: z.string().optional()
     });
 
     const validatedBody = draftOrderSchema.parse(req.body);
-    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken } = validatedBody;
+    const { accessToken, items, mode, scheduledAt, phone, customerName, postId, tableSessionId, participantId, paymentMethod, sessionToken, idempotencyKey } = validatedBody;
 
     // Validate access token
     const claims = await validateAccessToken(accessToken, req.body.branchId || '');
@@ -73,6 +70,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });
     }
+    
+    // Idempotency check
+    if (idempotencyKey) {
+      const idempotencyCheck = await IdempotencyService.checkAndLock(
+        idempotencyKey,
+        business.id,
+        '/api/public/order/draft',
+        req.body
+      )
+      
+      if (!idempotencyCheck.isNew && idempotencyCheck.existingResponse) {
+        return res
+          .status(idempotencyCheck.existingResponse.statusCode)
+          .json(idempotencyCheck.existingResponse.body)
+      }
+    }
 
     // Validate order source
     const isRemote = mode === 'preorder' || mode === 'pickup';
@@ -83,7 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'In-venue QR ordering not enabled' });
     }
 
-    const phoneE164 = normalizePhone(phone);
+    const phoneE164 = phone ? normalizePhone(phone) : undefined;
     if (isRemote) {
       if (!phoneE164) {
         return res.status(400).json({ error: 'Phone is required for remote orders' });
@@ -142,7 +155,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
             customerPhone: phoneE164,
             customerName,
-            paymentMethod: selectedPaymentMethod
+            paymentMethod: selectedPaymentMethod,
+            orderTokenJti: claims.jti
           },
           pricing,
           tx
@@ -185,8 +199,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const isManualPayment = ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod);
+        // PaymentGateway enum: MTN/Airtel MoMo methods both map to MOBILE_MONEY
         const gateway = isManualPayment 
-          ? (selectedPaymentMethod === 'CASH' ? 'CASH' : selectedPaymentMethod === 'MTN_MOBILE_MONEY' ? 'MTN_MONEY' : selectedPaymentMethod === 'AIRTEL_MONEY' ? 'AIRTEL_MONEY' : 'BANK_TRANSFER')
+          ? (selectedPaymentMethod === 'CASH' ? 'CASH' : selectedPaymentMethod === 'BANK_TRANSFER' ? 'BANK_TRANSFER' : selectedPaymentMethod === 'OTHER' ? 'CASH' : 'MOBILE_MONEY')
           : 'IREMBO_PAY';
         
         const pt = await tx.paymentTransaction.create({
@@ -198,7 +213,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             paymentMethod: selectedPaymentMethod as any,
             status: 'PENDING',
             amountCents: amountToCharge,
-            currency: 'RWF',
+            currency: business.currency,
             vatAmountCents: pricing.vatCents,
             exVatAmountCents: pricing.subtotalCents,
             gatewayFeeEstimatedCents: isManualPayment ? 0 : Math.round(amountToCharge * 0.0342),
@@ -352,13 +367,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ? formatDateTimeRW(scheduledAt, 'en')
       : '15-20 minutes';
 
-    return res.status(201).json({
+    const response = {
       orderId: saleId,
       orderNumber,
       paymentTransactionId,
       paymentMethod: selectedPaymentMethod,
       paymentLinkUrl: invoice ? invoice.paymentLinkUrl : null,
-      requiresManualConfirmation: ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod),
+      // WEB payment requires an IremboPay payment link. While that provider is
+      // not configured the invoice step yields no link — flag manual staff
+      // confirmation so the customer is never shown a dead-end payment path.
+      requiresManualConfirmation:
+        ['CASH', 'MTN_MOBILE_MONEY', 'AIRTEL_MONEY', 'BANK_TRANSFER', 'OTHER'].includes(selectedPaymentMethod)
+        || (selectedPaymentMethod === 'WEB' && !invoice?.paymentLinkUrl),
       momoInitiationUrl: ['MTN_MOBILE_MONEY', 'AIRTEL_MONEY'].includes(selectedPaymentMethod) ? '/api/payments/momo/initiate' : null,
       summary: {
         subtotalCents: pricing.subtotalCents,
@@ -379,7 +399,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       eta,
       scheduledAt: scheduledAt || null,
       slotAvailable: true
-    });
+    };
+    
+    // Store idempotency response
+    if (idempotencyKey) {
+      await IdempotencyService.storeResponse(idempotencyKey, 201, response)
+    }
+    
+    return res.status(201).json(response);
   } catch (error: any) {
     console.error('Error creating draft order:', error);
     

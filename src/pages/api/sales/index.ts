@@ -10,6 +10,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getPaginationParams, getPaginationMeta, createPaginatedResponse } from '@/lib/middleware/pagination'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { IdempotencyService } from '@/lib/services/idempotency.service'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -64,20 +65,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(403).json({ error: 'Forbidden' })
       }
       const input = { ...rawInput, businessId: effectiveBusinessId }
+      
+      // Idempotency check
+      const idempotencyKey = IdempotencyService.extractKey(req)
+      if (idempotencyKey) {
+        const idempotencyCheck = await IdempotencyService.checkAndLock(
+          idempotencyKey,
+          effectiveBusinessId,
+          '/api/sales',
+          req.body
+        )
+        
+        if (!idempotencyCheck.isNew && idempotencyCheck.existingResponse) {
+          return res
+            .status(idempotencyCheck.existingResponse.statusCode)
+            .json(idempotencyCheck.existingResponse.body)
+        }
+      }
+      
       const sale = await SalesService.createSale(ctx.userId || input.businessId, input)
 
       const business = await (await import('@/lib/prisma')).prisma.business.findUnique({
         where: { id: effectiveBusinessId },
-        select: { currency: true }
+        select: { currency: true, taxRate: true }
       })
       const currency = business?.currency || 'RWF'
+      const taxRate = business?.taxRate ?? 18 // EBM requires a rate; default to 18 if not configured
 
       // Build EBM receipt using the items and calculated fee
       const orderItems = sale.items.map((it: any) => ({
         name: it.menuItem.name as string,
         quantity: it.quantity as number,
         price: Math.round(it.unitPriceCents / 100) as number,
-        vatRate: 18,
+        vatRate: taxRate,
       }))
 
       const subtotalRWF = orderItems.reduce((sum: number, it: any) => sum + (it.price * it.quantity), 0)
@@ -88,11 +108,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         0
       )
 
-      const ebmReceipt = formatEBMReceipt(orderItems, feeCalc, currency)
+      const ebmReceipt = formatEBMReceipt(orderItems, feeCalc, currency, taxRate)
       const ebmText = generateEBMReceiptText(ebmReceipt, 'en')
       const ebmJson = generateEBMJSON(ebmReceipt)
 
-      return res.status(201).json({ sale, ebm: { receipt: ebmReceipt, text: ebmText, json: ebmJson } })
+      const response = { sale, ebm: { receipt: ebmReceipt, text: ebmText, json: ebmJson } }
+      
+      // Store idempotency response
+      if (idempotencyKey) {
+        await IdempotencyService.storeResponse(idempotencyKey, 201, response)
+      }
+      
+      return res.status(201).json(response)
     }
 
     return res.status(405).json({ error: 'Method not allowed' })

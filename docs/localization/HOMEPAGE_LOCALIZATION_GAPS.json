@@ -1,0 +1,73 @@
+{
+  "homepage": {
+    "growth": {
+      "replay_title": "Service Replay™",
+      "replay_desc": "Replay any service period event-by-event — like a football match.",
+      "replay_cta": "Try Service Replay"
+    },
+    "advanced": {
+      "service_replay": "Service Replay™",
+      "service_replay_desc": "Replay any service period event-by-event — like a football match. Understand exactly what happened.",
+      "inventory_alerts": "Inventory Alerts & Auto-Reorder",
+      "inventory_alerts_desc": "Automatic stock alerts and AI-powered draft purchase orders for your suppliers.",
+      "smart_slips": "Smart Dining Slips",
+      "smart_slips_desc": "Auto-generated digital receipts with shareable links for seamless customer experience."
+    },
+    "why_switch": {
+      "replay_cta": "See it in action",
+      "crm_cta": "Explore CRM",
+      "ab_cta": "Run a Test"
+    },
+    "video": {
+      "alt": "Imboni Serve Demo Video"
+    },
+    "stats": {
+      "plans": "From Starter to Enterprise"
+    },
+    "pricing_preview": {
+      "heading": "Transparent Pricing for Every Business Size",
+      "subtitle": "ImboniServe offers flexible plans designed for hospitality businesses of all sizes.",
+      "starting_at": "Starting at",
+      "per_month": " / month",
+      "starter_desc": "Perfect for single-location hospitality businesses getting started with modern operations.",
+      "annual_savings": "Annual billing saves 25% (equivalent to 3 free months)",
+      "scale": "Plans scale from single locations to multi-branch enterprises",
+      "all_plans_include": "All Plans Include",
+      "feature_1": "QR ordering, POS, and kitchen operations",
+      "feature_2": "Inventory and procurement management",
+      "feature_3": "WhatsApp integration and mobile money payments",
+      "feature_4": "Reporting and analytics",
+      "enterprise_note": "Enterprise plans available with custom pricing for multi-branch operations and advanced requirements.",
+      "founding_note": "🎉 Founding Hospitality Business Program members receive 50% lifetime discount on all plans",
+      "founding_link": "Learn more below ↓",
+      "view_full_pricing": "View Full Pricing",
+      "help": "Need help choosing?",
+      "chat": "Chat with us on WhatsApp"
+    },
+    "founding_program": {
+      "badge": "Limited Early-Adopter Program",
+      "title": "Founding Hospitality Business Program",
+      "subtitle": "Join the first 100 hospitality businesses to shape the future of hospitality operations.",
+      "benefit_1_title": "50% Lifetime Discount",
+      "benefit_1_desc": "Lock in 50% off your subscription for as long as you remain a customer. No expiration.",
+      "benefit_2_title": "Direct Founder Support",
+      "benefit_2_desc": "Get priority onboarding and direct access to the founding team for support and guidance.",
+      "benefit_3_title": "Early Access to New Capabilities",
+      "benefit_3_desc": "Be the first to access selected new features and capabilities as they launch.",
+      "benefit_4_title": "Shape Platform Development",
+      "benefit_4_desc": "Direct input on roadmap priorities — your operational needs help guide what we build next.",
+      "limited": "Limited to first 100 hospitality businesses",
+      "cta": "Join Founding Program",
+      "learn_more": "Learn More"
+    },
+    "discovery": {
+      "feature_posts": "Shoppable Posts",
+      "feature_media": "Photo & Video",
+      "feature_promos": "Promos & Combos",
+      "feature_attribution": "Order Attribution"
+    }
+  },
+  "home": {
+    "title_page": "Imboni Serve — Hospitality Operating System"
+  }
+}

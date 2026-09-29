@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils/currency';
 import { NotificationService } from './notification.service';
 import { formatDateTimeRW } from '@/utils/datetimeRW';
+import { ReservationService } from './reservation.service';
 
 export interface ReminderResult {
   sent: boolean;
@@ -126,13 +127,8 @@ Need to cancel? Reply to this message or call ${reservation.business.phone}
         message
       );
 
-      // Update reservation with reminder timestamp
-      await prisma.reservation.update({
-        where: { id: reservationId },
-        data: {
-          reminderSentAt: new Date()
-        }
-      });
+      // Update reservation with reminder timestamp via canonical ReservationService
+      await ReservationService.markReminderSent(reservationId);
 
       return {
         sent: true,
@@ -187,14 +183,8 @@ export async function confirmReservation(reservationId: string): Promise<boolean
     return true;
   }
 
-  // Mark as confirmed
-  await prisma.reservation.update({
-    where: { id: reservationId },
-    data: {
-      confirmedAt: new Date(),
-      status: 'CONFIRMED'
-    }
-  });
+  // Mark as confirmed via canonical ReservationService
+  await ReservationService.confirmReservation(reservationId);
 
   return true;
 }
@@ -296,15 +286,8 @@ export async function handleNoShow(reservationId: string): Promise<{
     reason = 'No-show without confirmation - 50% forfeit';
   }
 
-  // Update reservation status
-  await prisma.reservation.update({
-    where: { id: reservationId },
-    data: {
-      status: 'NO_SHOW',
-      forfeitCents,
-      noShowReason: reason
-    }
-  });
+  // Update reservation status via canonical ReservationService
+  await ReservationService.markNoShow(reservationId, forfeitCents, reason);
 
   return {
     forfeitCents,
@@ -316,11 +299,5 @@ export async function handleNoShow(reservationId: string): Promise<{
  * Mark reservation as completed (customer showed up)
  */
 export async function completeReservation(reservationId: string): Promise<void> {
-  await prisma.reservation.update({
-    where: { id: reservationId },
-    data: {
-      status: 'COMPLETED',
-      completedAt: new Date()
-    }
-  });
+  await ReservationService.completeReservation(reservationId);
 }

@@ -199,7 +199,7 @@ Jane Smith,jane@example.com,+250788999888,SUPPLIER,ACTIVE,Kigali,Nyarugenge,Owne
                 <li>• Optional fields: email, type, status, city, district, role, job title, address, whatsapp, tags, notes</li>
                 <li>• Contact type must be: CLIENT, SUPPLIER, STAFF, CUSTOMER, PARTNER, or LEAD</li>
                 <li>• Status must be: ACTIVE, INACTIVE, LEAD, or BLOCKED</li>
-                <li>• Tags should be separated by semicolons (e.g., "vip;kigali;restaurant")</li>
+                <li>• Tags should be separated by semicolons (e.g., "vip;kigali;business")</li>
                 <li>• Download the template below for the correct format</li>
               </ul>
             </div>

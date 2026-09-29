@@ -12,6 +12,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
 import { AuthOTPService } from '@/lib/services/auth-otp.service'
 import { SecurityEventService } from '@/lib/services/security-event.service'
+import { logAuthDebug, hashIdentifier, redactedEmail } from '@/lib/utils/auth-debug'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
 
 function getIP(req: NextApiRequest): string {
@@ -23,9 +24,10 @@ function getIP(req: NextApiRequest): string {
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { email, otp } = req.body ?? {}
+  const { email, otp, debugRequestId } = req.body ?? {}
   const ip = getIP(req)
   const userAgent = req.headers['user-agent'] ?? null
+  const requestId: string | null = typeof debugRequestId === 'string' ? debugRequestId : null
 
   if (!email || !otp) {
     return res.status(400).json({ error: 'Email and verification code are required.' })
@@ -42,12 +44,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!user || !user.isActive) {
+      logAuthDebug(requestId, 'otp_verification_request', 'fail', {
+        reason: 'user_not_found_or_inactive',
+        email: redactedEmail(email),
+      })
       return res.status(401).json({ error: 'Invalid request.' })
     }
 
-    const result = await AuthOTPService.verify({ userId: user.id, otp: String(otp).trim() })
+    const result = await AuthOTPService.verify({ userId: user.id, otp: String(otp).trim(), debugContext: { requestId, emailHash: hashIdentifier(email) } })
 
     if (!result.ok) {
+      logAuthDebug(requestId, 'otp_verification_request', 'fail', {
+        reason: result.error,
+        userId: user.id,
+      })
       await SecurityEventService.log({
         userId: user.id,
         eventType: 'MFA_OTP_FAILED',
@@ -57,6 +67,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
       return res.status(401).json({ error: result.error })
     }
+
+    logAuthDebug(requestId, 'otp_verification_request', 'success', {
+      userId: user.id,
+    })
 
     await SecurityEventService.log({
       userId: user.id,
@@ -75,6 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       success: true,
       confirmToken: result.confirmToken,
       email: email.toLowerCase().trim(),
+      debugRequestId: requestId ?? undefined,
     })
   } catch (err) {
     console.error('[verify-mfa-otp] Error:', err)

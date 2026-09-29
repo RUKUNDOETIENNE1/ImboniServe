@@ -9,16 +9,32 @@ import { DiningSessionSlipService } from '@/lib/services/dining-session-slip.ser
 import { successResponse, errorResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
 import { withRateLimit } from '@/lib/middleware/withRateLimit'
+import { ingestDiningSlipShadowEvent } from '@/lib/die/business-as-plugin/dining-slips/slips.shadow'
+import { validateQRSignature } from '@/lib/services/qr-token.service'
+import { getStaffBusinessId } from '@/lib/api/table-session-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json(errorResponse('Method not allowed'))
   }
 
-  const { tableId, businessId, participantName } = req.body
+  const { tableId, businessId, participantName, version, signature } = req.body
 
   if (!tableId || !businessId) {
     return res.status(400).json(errorResponse('Table ID and Business ID are required'))
+  }
+
+  // Authorization: session creation requires a valid QR signature binding
+  // (businessId, tableId) — the physical-presence proof — or a staff session
+  // of the target business. Anonymous arbitrary session creation is rejected.
+  const staffBusinessId = await getStaffBusinessId(req, res)
+  if (staffBusinessId !== businessId) {
+    const hasValidQR = typeof signature === 'string' && typeof version === 'string'
+      ? validateQRSignature(businessId, tableId, version, signature)
+      : false
+    if (!hasValidQR) {
+      return res.status(401).json(errorResponse('Valid QR signature or staff session required'))
+    }
   }
 
   try {
@@ -107,6 +123,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       taxMode: business.taxMode as 'INCLUSIVE' | 'EXCLUSIVE',
       taxRate: business.taxRate,
     })
+
+    // Shadow taps (feature-flagged inside ingestor)
+    try {
+      const nowTs = new Date().toISOString()
+      await ingestDiningSlipShadowEvent({ type: 'SESSION_STARTED', businessId, sessionId: result.session.id }).catch(() => {})
+      await ingestDiningSlipShadowEvent({ type: 'SLIP_CREATED', businessId, sessionId: result.session.id, slipId: slip.id }).catch(() => {})
+    } catch {}
 
     return res.status(201).json(
       successResponse({

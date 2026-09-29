@@ -67,7 +67,14 @@ export function requireRole(allowedRoles: string[], verifyInDb: boolean = false)
       }
 
       // Validate that roles are from the allowed enum
-      const validRoles = ['OWNER', 'ADMIN', 'CASHIER', 'WAITER', 'SUPERVISOR', 'MANAGER', 'FRONT_DESK', 'KITCHEN_MANAGER']
+      const validRoles = [
+        'OWNER', 'ADMIN', 'CASHIER', 'WAITER', 'SUPERVISOR', 'MANAGER',
+        'FRONT_DESK', 'KITCHEN_MANAGER',
+        // Executive roles (EOS-001A)
+        'CEO', 'CFO', 'COO', 'CMO', 'PARTNERSHIP_DIRECTOR',
+        'CUSTOMER_SUCCESS_DIRECTOR', 'EXECUTIVE', 'FINANCE',
+        'OPERATIONS_MANAGER', 'PARTNERSHIP_MANAGER', 'LEGAL', 'SUPPORT',
+      ]
       const sanitizedRoles = userRoles.filter((role: string) => validRoles.includes(role))
 
       if (sanitizedRoles.length === 0) {

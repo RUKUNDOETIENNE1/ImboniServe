@@ -1,3 +1,20 @@
+/**
+ * InventoryService
+ * 
+ * Handles MANUAL inventory operations:
+ * - Creating/updating inventory items
+ * - Recording manual stock adjustments (ADD, REMOVE, WASTE, ADJUSTMENT)
+ * - Stock alerts and low stock queries
+ * 
+ * NOTE: This service is for MANUAL inventory management, NOT kitchen consumption.
+ * Kitchen consumption flows through:
+ *   SaleItemStatusService → ConsumptionEngineService → InventoryLedgerService
+ * 
+ * The two paths are intentionally separate:
+ * - InventoryService: Manual adjustments (deliveries, waste, corrections)
+ * - InventoryLedgerService: Automated consumption from kitchen execution
+ */
+
 import { prisma } from '@/lib/prisma'
 import type { CreateInventoryItemInput, UpdateInventoryItemInput, InventoryUpdateInput } from '@/lib/validations/inventory.schema'
 
@@ -151,20 +168,32 @@ export class InventoryService {
       name: string
       currentStock: number
       minStockLevel: number
+      reorderLevel: number
       unit: string
+      category: string | null
     }>>`
-      SELECT id, name, "currentStock", "minStockLevel", unit
+      SELECT id, name, "currentStock", "minStockLevel", COALESCE("reorderLevel", 0) AS "reorderLevel", unit, category
       FROM "InventoryItem"
       WHERE "businessId" = ${businessId}
         AND "isActive" = true
-        AND "currentStock" <= "minStockLevel"
-      ORDER BY ("currentStock" / "minStockLevel") ASC
+        AND (
+          "currentStock" <= "minStockLevel"
+          OR ("reorderLevel" > 0 AND "currentStock" <= "reorderLevel")
+        )
+      ORDER BY
+        CASE
+          WHEN "currentStock" = 0 THEN 0
+          WHEN "currentStock" <= "minStockLevel" THEN 1
+          ELSE 2
+        END ASC,
+        ("currentStock" / NULLIF("minStockLevel", 0)) ASC
     `
 
     return items.map(item => ({
       ...item,
-      alertLevel: item.currentStock === 0 ? 'CRITICAL' : 
-                  item.currentStock < item.minStockLevel * 0.5 ? 'HIGH' : 'MEDIUM',
+      alertLevel: item.currentStock === 0 ? 'CRITICAL' :
+                  item.currentStock < item.minStockLevel * 0.5 ? 'HIGH' :
+                  item.currentStock <= item.minStockLevel ? 'MEDIUM' : 'LOW',
     }))
   }
 }

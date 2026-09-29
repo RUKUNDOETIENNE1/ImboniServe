@@ -186,9 +186,9 @@ export default function SupplierDashboard() {
               </button>
             </div>
 
-            {/* Top Restaurants */}
+            {/* Top Businesses */}
             <div className="bg-white rounded-xl shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">🏆 Top Restaurants</h3>
+              <h3 className="text-lg font-semibold mb-4">🏆 Top Businesses</h3>
               <div className="space-y-3">
                 {[
                   { name: "Nyama Cafe", orders: 42, amount: "RWF 1.2M" },

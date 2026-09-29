@@ -10,14 +10,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { branchId, tableId, version, signature, mode } = req.body;
+    const { branchId, tableId, seatId, outletId, version, signature, mode } = req.body;
 
     if (!branchId || !signature) {
       return res.status(400).json({ error: 'branchId and signature are required' });
     }
 
-    // Validate HMAC signature
-    const isValid = validateQRSignature(branchId, tableId, version || '1', signature);
+    // The QR signature payload's entity slot is tableId || seatId || outletId
+    // (same precedence as QRGeneratorService.generateURL). Seat/outlet QRs
+    // must forward their id for the signature to validate.
+    const entityId = tableId || seatId || outletId;
+    const isValid = validateQRSignature(branchId, entityId, version || '1', signature);
     
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid QR signature' });
@@ -51,17 +54,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json({ error: 'In-venue QR ordering not enabled for this business' });
     }
 
-    // Validate table exists if provided
+    // Validate the referenced entity belongs to the business
     if (tableId) {
       const table = await prisma.table.findFirst({
-        where: {
-          id: tableId,
-          businessId: branchId
-        }
+        where: { id: tableId, businessId: branchId }
       });
-
       if (!table) {
         return res.status(404).json({ error: 'Table not found' });
+      }
+    } else if (seatId) {
+      const seat = await (prisma as any).seat.findFirst({
+        where: { id: seatId, table: { businessId: branchId } }
+      });
+      if (!seat) {
+        return res.status(404).json({ error: 'Seat not found' });
+      }
+    } else if (outletId) {
+      const outlet = await (prisma as any).outlet.findFirst({
+        where: { id: outletId, businessId: branchId }
+      });
+      if (!outlet) {
+        return res.status(404).json({ error: 'Outlet not found' });
       }
     }
 

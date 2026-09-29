@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { MarketplaceService } from '@/lib/services/marketplace.service'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 
@@ -54,5 +55,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(405).json({ error: 'Method not allowed' })
 }
+
+// Apply commercial enforcement: Supplier Marketplace requires Starter plan or higher
+const handler = requiresFeature('hasMarketplace')(baseHandler)
 
 export default requirePermission('orders.read')(handler)

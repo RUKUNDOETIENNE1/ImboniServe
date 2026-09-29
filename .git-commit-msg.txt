@@ -1,0 +1,26 @@
+docs(payments): PAY-003 revise runbook and questions for InTouch real-URL certification
+
+Revises PAY-003 documents based on founder-provided information about
+InTouch's actual certification process:
+
+- InTouch requires a REAL public URL (not localhost/ngrok) for webhook
+- InTouch requires a REAL payment with REAL money (they verify on their side)
+- Test credentials already provided by InTouch (production comes after)
+- We must send InTouch our webhook URL for them to configure
+
+Cross-referenced all 15 provider questions against the InTouch API document
+(v1.2): 2 answered by document (R1, R2), 5 partially answered, 8 not
+answered, 3 answered by founder. Added 3 new questions (G4-G6) for the
+founder-provided information.
+
+Updated documents:
+- Runbook: rewritten from localhost+ngrok to deploy+real-payment
+- Provider Questions Register: added document cross-reference status
+- Sandbox Integration Contract: real-URL requirement, credential status
+- Executive Summary: founder information and cross-reference summary
+
+No production code changes. No test changes. 611/611 tests still pass.
+
+Generated with [Devin](https://devin.ai)
+
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>

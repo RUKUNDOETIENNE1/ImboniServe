@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { WhatsAppCloudService } from '@/lib/services/whatsapp-cloud.service'
+import { withRateLimit } from '@/lib/middleware/withRateLimit'
+import { maskPhone } from '@/lib/utils/phone'
 import { logger } from '@/lib/logger'
 
 export const config = { api: { bodyParser: false } }
@@ -13,7 +15,16 @@ async function getRawBody(req: NextApiRequest): Promise<string> {
   })
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+/**
+ * Meta WhatsApp Cloud API webhook.
+ *
+ * Security (WhatsApp Foundation Phase 1):
+ * - FAIL-CLOSED on POST: WHATSAPP_APP_SECRET must be configured, the
+ *   x-hub-signature-256 header must be present, and the HMAC must validate.
+ *   Inbound processing remains log-only by design (customer ordering is a
+ *   later phase) — this endpoint is a secured boundary, not an order intake.
+ */
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const mode = req.query['hub.mode']
     const token = req.query['hub.verify_token']
@@ -25,10 +36,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
+    if (!process.env.WHATSAPP_APP_SECRET) {
+      logger.error('WHATSAPP_APP_SECRET not configured — rejecting webhook')
+      return res.status(503).end()
+    }
+
     const rawBody = await getRawBody(req)
     const signature = req.headers['x-hub-signature-256'] as string || ''
 
-    if (process.env.WHATSAPP_APP_SECRET && !WhatsAppCloudService.verifyWebhookSignature(rawBody, signature)) {
+    if (!signature || !WhatsAppCloudService.verifyWebhookSignature(rawBody, signature)) {
       logger.warn('WhatsApp webhook signature invalid')
       return res.status(401).end()
     }
@@ -41,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (value?.messages) {
         for (const msg of value.messages) {
-          logger.info('WhatsApp inbound message', { from: msg.from, type: msg.type, msgId: msg.id })
+          logger.info('WhatsApp inbound message', { from: maskPhone(msg.from), type: msg.type, msgId: msg.id })
         }
       }
 
@@ -59,3 +75,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).end()
 }
+
+export default withRateLimit(async (req, res) => { await handler(req, res) }, { windowMs: 60 * 1000, maxRequests: 60 })

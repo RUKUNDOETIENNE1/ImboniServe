@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -18,3 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // For now, we'll just acknowledge the dismissal
   return res.status(200).json({ success: true, id })
 }
+
+// Apply commercial enforcement: Inventory Alerts require Professional plan or higher
+export default requiresFeature('hasInventoryAlerts')(baseHandler)

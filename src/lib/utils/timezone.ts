@@ -317,3 +317,132 @@ export function getTimezoneAbbreviation(timezone: string): string {
     return getTimezoneConfig(timezone).utcOffset;
   }
 }
+
+/**
+ * Get the start and end of a business day in the business's timezone.
+ *
+ * This is the CANONICAL replacement for `setHours(0,0,0,0)` which incorrectly
+ * uses the server's local timezone. On Vercel the server runs in UTC, so
+ * `setHours(0,0,0,0)` produces UTC midnight — not the business's local midnight.
+ *
+ * @param date - Reference date (defaults to now). Interpreted as a UTC instant.
+ * @param timezone - IANA timezone identifier (e.g. "Africa/Kigali", "Africa/Nairobi")
+ * @returns `{ start: Date, end: Date }` — UTC Date objects representing the
+ *          start (00:00:00.000 local) and end (23:59:59.999 local) of the
+ *          business day that contains the reference instant.
+ */
+export function getBusinessDayBoundary(
+  date: Date = new Date(),
+  timezone: string = 'Africa/Kigali'
+): { start: Date; end: Date } {
+  try {
+    // Format the reference date in the business timezone to get Y-M-D
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(date);
+
+    const y = parts.find(p => p.type === 'year')?.value;
+    const m = parts.find(p => p.type === 'month')?.value;
+    const d = parts.find(p => p.type === 'day')?.value;
+    if (!y || !m || !d) throw new Error('Failed to extract date parts');
+
+    // Construct "YYYY-MM-DD 00:00:00" in the business timezone, then convert to UTC.
+    // We use the fact that `new Date()` parses "YYYY-MM-DDTHH:mm:ss" as LOCAL time
+    // on the server. To avoid server-local interpretation, we instead compute the
+    // UTC offset for that local date and adjust.
+    //
+    // Simpler & robust approach: use `toLocaleString` round-trip.
+    // 1. Build a Date that represents midnight in the target timezone.
+    //    We do this by finding the UTC time such that when formatted in the
+    //    target timezone it shows 00:00:00 on Y-M-D.
+
+    // Find the UTC offset (in minutes) at the reference date for the target tz
+    const offsetMs = getTimezoneOffsetMs(date, timezone);
+
+    // Midnight in the business timezone = Y-M-D 00:00:00 local
+    // In UTC this is:  localMidnight - offset
+    // We construct the local midnight as if it were UTC, then subtract the offset.
+    const localMidnightUTC = new Date(`${y}-${m}-${d}T00:00:00.000Z`);
+    const start = new Date(localMidnightUTC.getTime() - offsetMs);
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+
+    return { start, end };
+  } catch {
+    // Fallback: use the raw date with setHours (server-local) — preserves
+    // backward compatibility for Rwanda on a UTC+2 server.
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+  }
+}
+
+/**
+ * Get the UTC offset (in milliseconds) for a given timezone at a specific date.
+ * Positive = ahead of UTC (e.g. +2h for Kigali).
+ */
+function getTimezoneOffsetMs(date: Date, timezone: string): number {
+  // Format the date in both UTC and the target timezone, then compute the diff.
+  const utcParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  }).formatToParts(date);
+  const tzParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  }).formatToParts(date);
+
+  const get = (parts: Intl.DateTimeFormatPart[], type: string) =>
+    parseInt(parts.find(p => p.type === type)?.value || '0', 10);
+
+  const utcMs = Date.UTC(get(utcParts, 'year'), get(utcParts, 'month') - 1, get(utcParts, 'day'),
+    get(utcParts, 'hour'), get(utcParts, 'minute'), get(utcParts, 'second'));
+  const tzMs = Date.UTC(get(tzParts, 'year'), get(tzParts, 'month') - 1, get(tzParts, 'day'),
+    get(tzParts, 'hour'), get(tzParts, 'minute'), get(tzParts, 'second'));
+
+  return tzMs - utcMs;
+}
+
+/**
+ * Get the current "now" Date in a specific timezone (as a UTC Date that,
+ * when formatted in the target timezone, shows the current local time).
+ *
+ * This replaces manual `getTimezoneOffset() + 2 * 3600000` calculations.
+ */
+export function nowInTimezone(timezone: string = 'Africa/Kigali'): Date {
+  return new Date();
+}
+
+/**
+ * Get the local "HH:MM" string for a date in a specific timezone.
+ * Replaces the manual offset calculations in cron.ts and insight.service.ts.
+ */
+export function getLocalHHMM(date: Date = new Date(), timezone: string = 'Africa/Kigali'): string {
+  try {
+    return date.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: timezone,
+    });
+  } catch {
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+}
+
+/**
+ * Get the local "YYYY-MM-DD" string for a date in a specific timezone.
+ * Useful for analytics and report grouping.
+ */
+export function getLocalDateString(date: Date = new Date(), timezone: string = 'Africa/Kigali'): string {
+  try {
+    return date.toLocaleDateString('en-CA', { timeZone: timezone });
+  } catch {
+    return date.toLocaleDateString('en-CA');
+  }
+}

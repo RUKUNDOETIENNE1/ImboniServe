@@ -4,6 +4,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
 interface AskRequest {
   question: string;
@@ -19,7 +20,7 @@ interface AskRequest {
 // Simple in-memory cache for responses (session-based)
 const responseCache = new Map<string, string>();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -122,3 +123,6 @@ function generateAnswer(question: string, menuItem: AskRequest['menuItem']): str
       : 'For more details, please ask our staff.'
   }`;
 }
+
+// Apply commercial enforcement: AI Menu Assistant requires Professional plan or higher
+export default requiresFeature('hasAIMenuAssistant')(baseHandler)

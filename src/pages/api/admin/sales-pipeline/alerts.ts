@@ -4,6 +4,7 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { successResponse, forbiddenResponse } from '@/lib/api/response-helpers'
 import { withErrorHandler } from '@/lib/middleware/error-handler.middleware'
+import { getBusinessDayBoundary } from '@/lib/utils/timezone'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -18,15 +19,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const tomorrow = new Date(today)
-  tomorrow.setDate(tomorrow.getDate() + 1)
+  const { start: todayStart, end: todayEnd } = getBusinessDayBoundary(today)
+  const tomorrow = todayEnd
 
   // Find businesses with actions due today
   const actionsDue = await prisma.business.findMany({
     where: {
       nextActionDate: {
-        gte: today,
+        gte: todayStart,
         lt: tomorrow
       },
       nextActionCompleted: false

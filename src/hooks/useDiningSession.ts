@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { getSessionInfo } from '@/lib/sessionManager'
 
 export interface DiningSessionSlip {
   id: string
@@ -57,7 +58,14 @@ export function useDiningSession({
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/session/slip/${sessionId}`)
+      // Session-bound credentials: participant tempId and/or seat token
+      const params = new URLSearchParams()
+      const info = getSessionInfo()
+      if (info?.sessionId === sessionId && info.tempId) params.set('tempId', info.tempId)
+      const seatToken = typeof window !== 'undefined' ? localStorage.getItem('seat_session_token') : null
+      if (seatToken) params.set('seatSessionToken', seatToken)
+      const qs = params.toString()
+      const response = await fetch(`/api/session/slip/${sessionId}${qs ? `?${qs}` : ''}`)
       const data = await response.json()
 
       if (response.ok && data.success) {

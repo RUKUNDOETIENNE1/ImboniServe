@@ -36,6 +36,7 @@ export interface CreateOrderInput {
   customerPhone?: string;
   customerName?: string;
   paymentMethod: 'CASH' | 'MTN_MOBILE_MONEY' | 'AIRTEL_MONEY' | 'BANK_TRANSFER' | 'WEB' | 'DIGITAL' | 'OTHER';
+  orderTokenJti?: string;
 }
 
 /**
@@ -222,6 +223,7 @@ export async function createDraftOrder(
       depositCents: pricing.depositCents,
       customerPhone: input.customerPhone,
       customerName: input.customerName,
+      orderTokenJti: input.orderTokenJti,
       items: {
         create: input.items.map(item => {
           const unitPrice = menuPriceMap.get(item.menuItemId) || 0;

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { TrialPolicyService } from '@/lib/services/trial-policy.service'
 
 interface BusinessIdentity {
   businessName: string
@@ -308,7 +309,7 @@ export class BusinessApprovalService {
       business.businessType || ''
     )
     const trialEnd = isHospitality
-      ? new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+      ? TrialPolicyService.computeTrialEndDate(now, TrialPolicyService.getDefaultTrialDays())
       : null
 
     await prisma.business.update({

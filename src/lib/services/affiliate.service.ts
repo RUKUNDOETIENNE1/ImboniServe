@@ -4,6 +4,10 @@ export class AffiliateService {
   /**
    * Create commission when an invoice is paid
    * 15% recurring for up to 12 months
+   *
+   * REL-CRIT-002 (OEC-001C): Added idempotency check on invoiceId.
+   * If a webhook retry calls this method twice for the same invoice,
+   * the second call returns the existing commission instead of creating a duplicate.
    */
   static async createCommissionForInvoice(invoiceId: string) {
     const invoice = await prisma.invoice.findUnique({
@@ -28,6 +32,17 @@ export class AffiliateService {
     const affiliate = invoice.subscription.business.referredByAffiliate
     if (affiliate.status !== 'ACTIVE') {
       return null
+    }
+
+    // Idempotency: check if a commission already exists for this invoice
+    const existingForInvoice = await prisma.affiliateCommission.findFirst({
+      where: {
+        invoiceId: invoice.id,
+        status: { not: 'void' },
+      },
+    })
+    if (existingForInvoice) {
+      return existingForInvoice
     }
 
     // Count existing commissions for this restaurant
@@ -182,6 +197,11 @@ export class AffiliateService {
 
   /**
    * Admin: Mark payout as paid and update commissions
+   *
+   * REL-CRIT-001 (OEC-001C): Wrapped in prisma.$transaction to guarantee atomicity.
+   * If either the payout update or the commission updateMany fails, both are rolled back.
+   * This prevents the double-payout scenario where a payout is marked paid but
+   * commissions remain approved (allowing them to be included in a future payout).
    */
   static async markPayoutPaid(payoutId: string, method: string, reference: string) {
     const payout = await prisma.affiliatePayout.findUnique({
@@ -196,27 +216,27 @@ export class AffiliateService {
       throw new Error('Payout already marked as paid')
     }
 
-    // Update payout
-    const updatedPayout = await prisma.affiliatePayout.update({
-      where: { id: payoutId },
-      data: {
-        status: 'paid',
-        method,
-        reference,
-        paidAt: new Date(),
-      },
-    })
-
-    // Mark all approved commissions for this affiliate as paid
-    await prisma.affiliateCommission.updateMany({
-      where: {
-        affiliateId: payout.affiliateId,
-        status: 'approved',
-      },
-      data: {
-        status: 'paid',
-      },
-    })
+    // Atomic: payout update + commission updateMany in a single transaction
+    const [updatedPayout] = await prisma.$transaction([
+      prisma.affiliatePayout.update({
+        where: { id: payoutId },
+        data: {
+          status: 'paid',
+          method,
+          reference,
+          paidAt: new Date(),
+        },
+      }),
+      prisma.affiliateCommission.updateMany({
+        where: {
+          affiliateId: payout.affiliateId,
+          status: 'approved',
+        },
+        data: {
+          status: 'paid',
+        },
+      }),
+    ])
 
     return updatedPayout
   }

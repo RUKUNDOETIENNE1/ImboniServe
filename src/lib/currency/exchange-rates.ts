@@ -1,79 +1,47 @@
-type Rates = { [code: string]: number }
+import { getRatesForBaseCurrency } from '@/lib/services/currency-exchange.service';
 
-const cache = new Map<string, { rates: Rates; fetchedAt: number }>()
-const TTL_MS = 6 * 60 * 60 * 1000 // 6 hours
+type Rates = { [code: string]: number };
 
-// Minimal fallback rates to avoid breaking the dashboard when
-// the external exchange rate API is unavailable or not configured.
-// These are approximate and can be adjusted later.
-const FALLBACK_RATES: Record<string, Rates> = {
-  RWF: {
-    USD: 0.0008,
-    EUR: 0.00074,
-    KES: 0.087,
-    UGX: 3.1,
-  },
-  USD: {
-    RWF: 1300,
-    EUR: 0.93,
-    KES: 130,
-    UGX: 3800,
-  },
-  EUR: {
-    RWF: 1400,
-    USD: 1.07,
-    KES: 140,
-    UGX: 4100,
-  },
-}
+const cache = new Map<string, { rates: Rates; fetchedAt: number }>();
+const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function getFallbackRates(base: string): { base: string; rates: Rates; fetchedAt: number } {
-  const key = base.toUpperCase()
-  const rates = FALLBACK_RATES[key] || {}
-  const fetchedAt = Date.now()
-  cache.set(key, { rates, fetchedAt })
-  return { base: key, rates, fetchedAt }
+  // Canonical policy: no hardcoded fallback rates.
+  // If rates are unavailable, return base=1 and empty others.
+  const key = base.toUpperCase();
+  const fallback: Rates = { [key]: 1 };
+  const fetchedAt = Date.now();
+  cache.set(key, { rates: fallback, fetchedAt });
+  return { base: key, rates: fallback, fetchedAt };
 }
 
 export async function fetchRates(base: string): Promise<{ base: string; rates: Rates; fetchedAt: number }> {
-  const key = base.toUpperCase()
-  const now = Date.now()
-  const hit = cache.get(key)
+  const key = base.toUpperCase();
+  const now = Date.now();
+  const hit = cache.get(key);
   if (hit && now - hit.fetchedAt < TTL_MS) {
-    return { base: key, rates: hit.rates, fetchedAt: hit.fetchedAt }
+    return { base: key, rates: hit.rates, fetchedAt: hit.fetchedAt };
   }
 
-  const apiKey = process.env.EXCHANGE_RATES_API_KEY
-
-  // Try external API first if an API key is configured
-  if (apiKey) {
-    try {
-      const url = `https://api.exchangerate.host/latest?base=${encodeURIComponent(key)}&access_key=${encodeURIComponent(apiKey)}`
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`Failed to fetch rates (${res.status})`)
-      const data = await res.json()
-      if (!data?.rates) throw new Error('Invalid rates response')
-
-      const rates: Rates = data.rates
-      cache.set(key, { rates, fetchedAt: now })
-      return { base: key, rates, fetchedAt: now }
-    } catch (error) {
-      console.warn('Exchange rates API failed, falling back to static rates:', error)
-    }
-  }
-
-  // If there is no API key or the external request fails, use static fallbacks
-  return getFallbackRates(key)
+  const payload = await getRatesForBaseCurrency(key, {
+    rateType: 'AVERAGE',
+    maxAgeHours: parseInt(process.env.FX_MAX_RATE_AGE_HOURS || '168', 10),
+    allowStale: false,
+  });
+  cache.set(key, { rates: payload.rates, fetchedAt: now });
+  return { base: key, rates: payload.rates, fetchedAt: now };
 }
 
 export function convert(amount: number, from: string, to: string, rates: Rates): number {
-  const f = from.toUpperCase(), t = to.toUpperCase()
-  if (f === t) return amount
-  if (Object.keys(rates).length === 0) return amount
-  if (rates[t] && rates[f]) {
-    // Convert via base: amount in base * (t / f)
-    return amount * (rates[t] / rates[f])
+  const f = from.toUpperCase();
+  const t = to.toUpperCase();
+  if (f === t) return amount;
+  if (!rates[t]) {
+    throw new Error(`Missing conversion rate for ${f} -> ${t}`);
   }
-  if (rates[t] && f === 'BASE') return amount * rates[t]
-  return amount
+  if (f !== 'BASE' && !rates[f]) {
+    throw new Error(`Missing base reference rate for ${f}`);
+  }
+  if (f === 'BASE') return amount * rates[t];
+  return amount * (rates[t] / rates[f]);
 }

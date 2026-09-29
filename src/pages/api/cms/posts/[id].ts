@@ -27,14 +27,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(successResponse(post))
   }
 
-  if (req.method === 'PUT') {
-    const input = req.body || {}
-    const post = await CmsService.updatePost(businessId, id, input)
-    return res.status(200).json(successResponse(post))
-  }
-
-  if (req.method === 'DELETE') {
+  if (req.method === 'PUT' || req.method === 'DELETE') {
+    // Tenant isolation: verify the post belongs to the caller's business
+    // before mutating (service methods scope by businessId but update by id).
     const { prisma } = await import('@/lib/prisma')
+    const post = await (prisma as any).contentPost.findFirst({ where: { id, businessId } })
+    if (!post) return res.status(404).json(errorResponse('Post not found'))
+
+    if (req.method === 'PUT') {
+      const input = req.body || {}
+      const updated = await CmsService.updatePost(businessId, id, input)
+      return res.status(200).json(successResponse(updated))
+    }
+
     await (prisma as any).contentPost.delete({ where: { id } })
     return res.status(200).json(successResponse({ ok: true }))
   }

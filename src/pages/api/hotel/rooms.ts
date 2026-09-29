@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { CustomerService } from '@/lib/services/customer.service'
+import { normalizePhone } from '@/lib/utils/phone'
 
 const createSchema = z.object({
   roomNumber: z.string().min(1),
@@ -23,6 +25,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const rooms = await prisma.room.findMany({
       where: { businessId },
       orderBy: [{ floor: 'asc' }, { roomNumber: 'asc' }],
+      include: {
+        customer: {
+          select: { id: true, name: true, phone: true, vipTier: true, loyaltyPoints: true, visitCount: true },
+        },
+      },
     })
     return res.status(200).json({ rooms })
   }
@@ -34,10 +41,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const parsed = createSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ error: 'Invalid', issues: parsed.error.issues })
+
+    // Auto-resolve customer from guestPhone for hospitality intelligence linkage
+    let customerId: string | undefined
+    if (parsed.data.guestPhone) {
+      try {
+        const normalized = normalizePhone(parsed.data.guestPhone)
+        const customer = await CustomerService.findOrCreateByPhone(
+          normalized,
+          businessId,
+          parsed.data.guestName
+        )
+        customerId = customer.id
+      } catch (error) {
+        console.error('[Hotel] Failed to resolve customer:', error)
+      }
+    }
+
     const room = await prisma.room.create({
       data: {
         ...parsed.data,
         businessId,
+        customerId,
         checkInDate: parsed.data.checkInDate ? new Date(parsed.data.checkInDate) : undefined,
         checkOutDate: parsed.data.checkOutDate ? new Date(parsed.data.checkOutDate) : undefined,
       },

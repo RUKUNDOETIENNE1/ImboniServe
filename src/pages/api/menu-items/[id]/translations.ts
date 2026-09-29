@@ -2,7 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { TranslationService, SUPPORTED_LOCALES } from '@/lib/services/translation.service'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
 const upsertSchema = z.object({
   locale: z.enum(SUPPORTED_LOCALES),
@@ -10,13 +12,20 @@ const upsertSchema = z.object({
   description: z.string().optional(),
 })
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const businessId = (session?.user as any)?.businessId
   if (!session?.user || !businessId) return res.status(401).json({ error: 'Unauthorized' })
 
   const { id: menuItemId } = req.query
   if (!menuItemId || typeof menuItemId !== 'string') return res.status(400).json({ error: 'menuItemId required' })
+
+  // Tenant isolation: the menu item must belong to the caller's business.
+  const menuItem = await prisma.menuItem.findFirst({
+    where: { id: menuItemId, businessId },
+    select: { id: true },
+  })
+  if (!menuItem) return res.status(404).json({ error: 'Menu item not found' })
 
   if (req.method === 'GET') {
     const translations = await TranslationService.getTranslations(menuItemId)
@@ -39,3 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return res.status(405).end()
 }
+
+// Apply commercial enforcement: Menu Translations require Professional plan or higher
+export default requiresFeature('hasMultiLanguageMenus')(baseHandler)

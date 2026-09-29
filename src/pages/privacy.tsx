@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li><strong>Service Providers:</strong> Payment processors (IremboPay), cloud hosting (AWS), analytics tools</li>
-                <li><strong>Business Partners:</strong> Restaurants and suppliers you transact with</li>
+                <li><strong>Business Partners:</strong> Hospitality businesses and suppliers you transact with</li>
                 <li><strong>Legal Authorities:</strong> When required by law or to protect our rights</li>
                 <li><strong>Business Transfers:</strong> In case of merger, acquisition, or asset sale</li>
               </ul>
@@ -194,7 +194,7 @@ export default function PrivacyPolicy() {
               <p className="text-gray-700 mb-3">Nous ne vendons pas vos données personnelles. Nous pouvons partager vos données avec :</p>
               <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
                 <li><strong>Fournisseurs de services :</strong> Processeurs de paiement (IremboPay), hébergement cloud (AWS), outils d'analyse</li>
-                <li><strong>Partenaires commerciaux :</strong> Restaurants et fournisseurs avec lesquels vous transigez</li>
+                <li><strong>Partenaires commerciaux :</strong> Entreprises d'hospitalité et fournisseurs avec lesquels vous transigez</li>
                 <li><strong>Autorités :</strong> Lorsque la loi l'exige ou pour protéger nos droits</li>
                 <li><strong>Transferts d'entreprise :</strong> En cas de fusion, acquisition ou cession d'actifs</li>
               </ul>

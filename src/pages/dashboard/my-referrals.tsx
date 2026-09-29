@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
 import QRCode from 'qrcode'
+import { toast } from 'react-hot-toast'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { getServerSession } = await import('next-auth/next')
@@ -80,7 +81,7 @@ export default function MyReferralsPage() {
 
   async function generateCode() {
     if (!session?.user?.phone) {
-      alert('Phone number required')
+      toast.error('Phone number required')
       return
     }
 
@@ -120,7 +121,7 @@ export default function MyReferralsPage() {
   function shareLink() {
     if (!referralCode) return
     const link = `${window.location.origin}/r/${referralCode}`
-    const message = `🎁 Join me on Imboni Serve and get 1,000 RWF! Use my referral code: ${referralCode}\n\n${link}\n\nOrder from amazing restaurants and we both earn rewards!`
+    const message = `🎁 Join me on Imboni Serve and get 1,000 RWF! Use my referral code: ${referralCode}\n\n${link}\n\nOrder from amazing hospitality businesses and we both earn rewards!`
 
     if (navigator.share) {
       navigator.share({

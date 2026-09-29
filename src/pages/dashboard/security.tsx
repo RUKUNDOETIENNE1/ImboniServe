@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import ConfirmModal from '@/components/ConfirmModal'
 import { ShieldCheck, Monitor, Clock, Trash2, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useTranslation } from '@/lib/i18n'
@@ -48,6 +49,7 @@ export default function SecurityPage() {
   const [events, setEvents] = useState<SecurityEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [revoking, setRevoking] = useState<string | null>(null)
+  const [showRevokeAllConfirm, setShowRevokeAllConfirm] = useState(false)
 
   const fetchData = async () => {
     setLoading(true)
@@ -88,7 +90,6 @@ export default function SecurityPage() {
   }
 
   const revokeAll = async () => {
-    if (!confirm(t('security.revoke_confirm'))) return
     setRevoking('all')
     try {
       const res = await fetch('/api/auth/sessions?all=true', { method: 'DELETE' })
@@ -101,6 +102,7 @@ export default function SecurityPage() {
       }
     } finally {
       setRevoking(null)
+      setShowRevokeAllConfirm(false)
     }
   }
 
@@ -151,7 +153,7 @@ export default function SecurityPage() {
             </div>
             {sessions.length > 1 && (
               <button
-                onClick={revokeAll}
+                onClick={() => setShowRevokeAllConfirm(true)}
                 disabled={revoking === 'all'}
                 className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
               >
@@ -273,6 +275,18 @@ export default function SecurityPage() {
           </ul>
         </div>
       </div>
+
+      {/* Revoke All Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showRevokeAllConfirm}
+        onClose={() => setShowRevokeAllConfirm(false)}
+        onConfirm={revokeAll}
+        title={t('security.revoke_all')}
+        message={t('security.revoke_confirm')}
+        confirmText={t('security.revoke_all')}
+        cancelText={t('common.cancel', 'Cancel')}
+        variant="danger"
+      />
     </DashboardLayout>
   )
 }

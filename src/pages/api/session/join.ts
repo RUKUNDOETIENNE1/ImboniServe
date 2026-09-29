@@ -5,12 +5,16 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
+import { validateQRSignature } from '@/lib/services/qr-token.service';
+import { getStaffBusinessId } from '@/lib/api/table-session-auth';
 
 interface JoinRequest {
   tableId: string;
   branchId: string;
   tempId: string;
   name?: string;
+  version?: string;
+  signature?: string;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -19,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { tableId, branchId, tempId, name } = req.body as JoinRequest;
+    const { tableId, branchId, tempId, name, version, signature } = req.body as JoinRequest;
 
     if (!tableId || !branchId || !tempId) {
       return res.status(400).json({ error: 'tableId, branchId, and tempId are required' });
@@ -33,6 +37,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!table) {
       return res.status(404).json({ error: 'Table not found' });
+    }
+
+    // Authorization: joining a table session requires either a valid QR
+    // signature for (branchId, tableId) — the physical-presence proof carried
+    // by the signed order URL — or a staff session of the table's business.
+    // QR "branchId" carries the businessId in this codebase.
+    const staffBusinessId = await getStaffBusinessId(req, res)
+    const hasValidQR = typeof signature === 'string' && typeof version === 'string'
+      ? validateQRSignature(branchId, tableId, version, signature)
+      : false
+
+    if (staffBusinessId !== table.businessId) {
+      if (!hasValidQR) {
+        return res.status(401).json({ error: 'Valid QR signature or staff session required' });
+      }
+      if (table.businessId !== branchId) {
+        return res.status(403).json({ error: 'Table does not belong to this business' });
+      }
     }
 
     // Auto-close stale sessions for this table (older than 6 hours)

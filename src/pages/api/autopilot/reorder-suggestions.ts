@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { requirePermission } from '@/lib/middleware/permission.middleware'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import { ReorderAutopilotService } from '@/lib/services/reorder-autopilot.service'
+import { prisma } from '@/lib/prisma'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -45,6 +46,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           )
         }
         return res.status(200).json({ message: 'Suggestion dismissed' })
+      }
+
+      if (action === 'generate-drafts') {
+        const business = await prisma.business.findUnique({
+          where: { id: ctx.businessId },
+          select: { taxRate: true }
+        })
+        const taxRate = business?.taxRate ?? 0 // 0 means no tax configured — business should configure their tax rate
+        const result = await ReorderAutopilotService.generateDraftPurchaseOrders(
+          ctx.businessId,
+          ctx.userId,
+          taxRate
+        )
+        return res.status(201).json(result)
       }
 
       return res.status(400).json({ error: 'Invalid action' })

@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import { AnalyticsInsightsService } from '@/lib/services/analytics-insights.service';
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).end();
 
   const session = await getServerSession(req, res, authOptions);
@@ -30,3 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Failed to generate insights' });
   }
 }
+
+// Apply commercial enforcement: Basic Reports require Starter plan or higher
+export default requiresFeature('hasBasicReports')(baseHandler)

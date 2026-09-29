@@ -5,8 +5,9 @@ import { prisma } from '@/lib/prisma'
 import { SecurityEventService } from '@/lib/services/security-event.service'
 import { resolveBusinessContext } from '@/lib/api/business-context'
 import bcrypt from 'bcryptjs'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const ctx = await resolveBusinessContext(req, res)
   if (!ctx) return
 
@@ -122,5 +123,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Staff Management requires Professional plan or higher
+const handler = requiresFeature('hasStaffManagement')(baseHandler)
 
 export default withRateLimit({ maxRequests: 20, windowMs: 60_000, keyPrefix: 'staff-mut' })(requirePermission('staff.manage')(handler))

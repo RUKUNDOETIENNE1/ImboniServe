@@ -14,8 +14,14 @@ export class NewsletterService {
   static async subscribe(params: {
     emailOrPhone: string
     sourcePage?: string
+    name?: string
+    email?: string
+    phone?: string
+    consentSource?: string
   }) {
     try {
+      const consentAt = new Date()
+
       // Check if already subscribed
       const existing = await prisma.newsletterSubscriber.findUnique({
         where: { emailOrPhone: params.emailOrPhone }
@@ -28,14 +34,31 @@ export class NewsletterService {
             where: { emailOrPhone: params.emailOrPhone },
             data: {
               isActive: true,
-              unsubscribedAt: null
+              unsubscribedAt: null,
+              consentAt,
+              consentSource: params.consentSource || existing.consentSource,
+              name: params.name || existing.name,
+              email: params.email || existing.email,
+              phone: params.phone || existing.phone,
             }
           })
           logger.info('Newsletter resubscribed', { emailOrPhone: params.emailOrPhone })
           return updated
         }
-        
-        // Already subscribed
+
+        // Already subscribed — update optional fields
+        if (params.name || params.email || params.phone) {
+          const updated = await prisma.newsletterSubscriber.update({
+            where: { emailOrPhone: params.emailOrPhone },
+            data: {
+              name: params.name || existing.name,
+              email: params.email || existing.email,
+              phone: params.phone || existing.phone,
+            }
+          })
+          return updated
+        }
+
         return existing
       }
 
@@ -44,7 +67,12 @@ export class NewsletterService {
         data: {
           emailOrPhone: params.emailOrPhone,
           sourcePage: params.sourcePage,
-          isActive: true
+          isActive: true,
+          name: params.name || null,
+          email: params.email || null,
+          phone: params.phone || null,
+          consentAt,
+          consentSource: params.consentSource || null,
         }
       })
 

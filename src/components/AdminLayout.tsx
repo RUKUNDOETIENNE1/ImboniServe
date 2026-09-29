@@ -5,7 +5,8 @@ import {
   LayoutDashboard, Users, Building2, Store, TrendingUp, 
   Settings, Bell, Search, ChevronDown, LogOut, Menu, X,
   DollarSign, FileText, UserCog, RefreshCw, Flag, UserCircle,
-  BarChart3, Wallet, Calendar, Mail
+  BarChart3, Wallet, Calendar, Mail, Users2, Tag, Rocket, Landmark, Radar,
+  Crown, Activity, Megaphone, Network, Heart, Brain
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import Image from 'next/image'
@@ -14,6 +15,7 @@ import { useTranslation } from '@/lib/i18n'
 
 interface AdminLayoutProps {
   children: ReactNode
+  title?: string
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -24,14 +26,27 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navigation = [
+    { name: 'CEO Command Center', href: '/admin/executive/ceo', icon: Crown },
+    { name: 'CFO Command Center', href: '/admin/executive/cfo', icon: Landmark },
+    { name: 'COO Command Center', href: '/admin/executive/coo', icon: Activity },
+    { name: 'CMO Command Center', href: '/admin/executive/cmo', icon: Megaphone },
+    { name: 'Partnership Command Center', href: '/admin/executive/partnership-director', icon: Network },
+    { name: 'Customer Success Center', href: '/admin/executive/customer-success-director', icon: Heart },
+    { name: 'Executive Intelligence', href: '/admin/executive/executive-intelligence', icon: Brain },
     { name: 'Overview', href: '/admin', icon: LayoutDashboard },
-    { name: 'Restaurants', href: '/admin/restaurants', icon: Building2 },
+    { name: 'Businesses', href: '/admin/restaurants', icon: Building2 },
     { name: 'Sales Pipeline', href: '/admin/sales-pipeline', icon: TrendingUp },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Contacts', href: '/admin/contacts', icon: UserCircle },
     { name: 'Marketplace', href: '/admin/marketplace', icon: Store },
     { name: 'Subscriptions', href: '/admin/subscriptions', icon: DollarSign },
     { name: 'Affiliates', href: '/admin/affiliates', icon: UserCog },
+    { name: 'Founder Partners', href: '/admin/founder-partners', icon: Users2 },
+    { name: 'Partnership Applications', href: '/admin/partnership-applications', icon: FileText },
+    { name: 'Growth Workspace', href: '/admin/founder-partners', icon: Rocket },
+    { name: 'Revenue Operations', href: '/admin/revenue-operations', icon: Landmark },
+    { name: 'Operations Intelligence', href: '/admin/operations-intelligence', icon: Radar },
+    { name: 'Founder Codes', href: '/admin/founder-codes', icon: Tag },
     { name: 'Payout Control', href: '/admin/payout-control', icon: Wallet },
     { name: 'Revenue Analytics', href: '/admin/revenue-analytics', icon: BarChart3 },
     { name: 'Demo Leads', href: '/admin/leads', icon: Calendar },
@@ -40,6 +55,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Reports', href: '/admin/reports', icon: FileText },
     { name: 'Reconciliation', href: '/admin/reconciliation', icon: RefreshCw },
     { name: 'Feature Flags', href: '/admin/feature-flags', icon: Flag },
+    { name: 'Editorial Dashboard', href: '/admin/content', icon: FileText },
+    { name: 'Editorial New Article', href: '/admin/content/new', icon: FileText },
+    { name: 'Editorial Topics', href: '/admin/content/topics', icon: Tag },
+    { name: 'Editorial Tags', href: '/admin/content/tags', icon: Tag },
+    { name: 'Editorial Media', href: '/admin/content/media', icon: FileText },
   ]
 
   const isActive = (href: string) => {
@@ -59,15 +79,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="h-full bg-white border-r border-slate-200/60 flex flex-col">
           {/* Logo */}
           <div className="p-6 border-b border-slate-200/60">
-            <div className="flex items-center gap-3">
-              <Image 
-                src="/imgs/logo1.png" 
-                alt="Imboni Serve" 
-                width={160}
-                height={40}
-                className="h-10 w-auto max-h-10"
-                priority
-              />
+            <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'gap-0'}`} data-testid="admin-sidebar-branding">
+              {sidebarOpen ? (
+                <Image
+                  src="/imgs/imboni-serve-logo-2.png"
+                  alt="Imboni Serve"
+                  width={120}
+                  height={50}
+                  className="h-10 w-auto"
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/imgs/favicon-2.png"
+                  alt="Imboni Serve"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10"
+                  priority
+                />
+              )}
               {sidebarOpen && (
                 <div>
                   <h2 className="font-bold text-imboni-blue text-lg">Imboni AI</h2>
@@ -128,7 +159,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-imboni-blue hover:bg-blue-50 transition-all text-sm"
               >
                 <LayoutDashboard className="w-5 h-5" />
-                <span className="font-medium">Restaurant View</span>
+                <span className="font-medium">Business View</span>
               </button>
             </div>
           )}
@@ -149,6 +180,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="absolute -right-3 top-20 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all"
+            aria-label="Toggle sidebar"
           >
             <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${sidebarOpen ? 'rotate-90' : '-rotate-90'}`} />
           </button>
@@ -162,9 +194,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white">
             <div className="h-full flex flex-col">
               {/* Mobile Header */}
-              <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
+              <div className="p-6 border-b border-slate-200/60 flex items-center justify-between" data-testid="admin-mobile-header">
                 <div className="flex items-center gap-3">
-                  <Image src="/imgs/logo1.png" alt="Imboni Serve" width={160} height={40} className="h-10 w-auto max-h-10" />
+                  <Image src="/imgs/imboni-serve-logo-2.png" alt="Imboni Serve" width={120} height={50} className="h-10 w-auto" />
                   <div>
                     <h2 className="font-bold text-imboni-blue text-lg">Imboni AI</h2>
                     <p className="text-xs text-slate-500">Admin Panel</p>
@@ -221,7 +253,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-imboni-blue hover:bg-blue-50 transition-all text-sm"
                 >
                   <LayoutDashboard className="w-5 h-5" />
-                  <span className="font-medium">Restaurant View</span>
+                  <span className="font-medium">Business View</span>
                 </button>
               </div>
 
@@ -244,7 +276,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
         {/* Top Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-30">
-          <div className="px-6 py-4">
+          <div className="px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
@@ -257,7 +289,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input 
                     type="text" 
-                    placeholder="Search restaurants, users..." 
+                    placeholder="Search businesses, users..." 
                     className="pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 w-80"
                   />
                 </div>
@@ -292,7 +324,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-4 sm:p-6">
           {children}
         </main>
       </div>

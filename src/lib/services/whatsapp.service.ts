@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger'
+import { maskPhone } from '@/lib/utils/phone'
 
 /**
  * WhatsApp Notification Service
@@ -13,17 +14,25 @@ interface WhatsAppMessage {
 }
 
 export class WhatsAppService {
-  private static apiUrl = process.env.WHATSAPP_API_URL || ''
-  private static apiKey = process.env.WHATSAPP_API_KEY || ''
-  private static fromNumber = process.env.WHATSAPP_FROM_NUMBER || ''
+  private static getCredentials() {
+    return {
+      apiUrl: process.env.WHATSAPP_API_URL || '',
+      apiKey: process.env.WHATSAPP_API_KEY || '',
+      fromNumber: process.env.WHATSAPP_FROM_NUMBER || '',
+    }
+  }
 
   /**
    * Send WhatsApp message
    */
   static async sendMessage(params: WhatsAppMessage): Promise<{ success: boolean; error?: string }> {
-    if (!this.apiUrl || !this.apiKey) {
-      logger.warn('WhatsApp not configured - message not sent', { to: params.to })
-      return { success: true } // Don't block operations
+    const { apiUrl, apiKey, fromNumber } = this.getCredentials()
+    if (!apiUrl || !apiKey) {
+      // Truthful failure: the message is NOT sent. Callers that treat WhatsApp
+      // as optional should not block on success:false — but they must not be
+      // told the message was delivered.
+      logger.warn('WhatsApp not configured - message not sent', { to: maskPhone(params.to) })
+      return { success: false, error: 'WHATSAPP_NOT_CONFIGURED' }
     }
 
     try {
@@ -31,7 +40,7 @@ export class WhatsAppService {
       const phone = params.to.startsWith('+') ? params.to : `+${params.to}`
 
       const payload = {
-        from: this.fromNumber,
+        from: fromNumber,
         to: phone,
         body: params.body,
         ...(params.templateName && {
@@ -51,25 +60,25 @@ export class WhatsAppService {
         })
       }
 
-      const response = await fetch(this.apiUrl, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify(payload)
       })
 
       if (response.ok) {
-        logger.info('WhatsApp message sent', { to: phone })
+        logger.info('WhatsApp message sent', { to: maskPhone(phone) })
         return { success: true }
       } else {
         const error = await response.text()
-        logger.error('WhatsApp send failed', { error, to: phone })
+        logger.error('WhatsApp send failed', { error, to: maskPhone(phone) })
         return { success: false, error }
       }
     } catch (error: any) {
-      logger.error('WhatsApp exception', { error: error.message, to: params.to })
+      logger.error('WhatsApp exception', { error: error.message, to: maskPhone(params.to) })
       return { success: false, error: error.message }
     }
   }
@@ -180,20 +189,63 @@ export class WhatsAppService {
   }
 
   /**
-   * Opt-in/opt-out management (placeholder)
+   * Opt-in/opt-out management
+   * Stores preferences in WhatsAppMessage metadata via a special OPT_OUT type record
    */
   static async updatePreferences(phone: string, optIn: boolean): Promise<{ success: boolean }> {
-    // TODO: Store preferences in database
-    logger.info('WhatsApp preferences updated', { phone, optIn })
-    return { success: true }
+    try {
+      const { prisma } = await import('@/lib/prisma')
+      // Find existing opt-out record for this phone
+      const existing = await prisma.whatsAppMessage.findFirst({
+        where: { fromNumber: phone, type: 'PREFERENCE_UPDATE' },
+      })
+
+      if (existing) {
+        await prisma.whatsAppMessage.update({
+          where: { id: existing.id },
+          data: { message: optIn ? 'OPT_IN' : 'OPT_OUT' },
+        })
+      } else {
+        await prisma.whatsAppMessage.create({
+          data: {
+            fromNumber: phone,
+            toNumber: 'system',
+            message: optIn ? 'OPT_IN' : 'OPT_OUT',
+            type: 'PREFERENCE_UPDATE',
+            direction: 'INBOUND',
+            status: 'PROCESSED',
+            processed: true,
+            businessId: 'system',
+          },
+        })
+      }
+
+      logger.info('WhatsApp preferences updated', { phone: maskPhone(phone), optIn })
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to update WhatsApp preferences', { error, phone: maskPhone(phone) })
+      return { success: false }
+    }
   }
 
   /**
    * Check if user has opted in for WhatsApp notifications
    */
   static async hasOptedIn(phone: string): Promise<boolean> {
-    // TODO: Check database for opt-in status
-    // For now, assume all users are opted in
-    return true
+    try {
+      const { prisma } = await import('@/lib/prisma')
+      const pref = await prisma.whatsAppMessage.findFirst({
+        where: { fromNumber: phone, type: 'PREFERENCE_UPDATE' },
+        orderBy: { createdAt: 'desc' },
+      })
+
+      if (!pref) return true // Default: opted in (no explicit opt-out recorded)
+      return pref.message === 'OPT_IN'
+    } catch (error) {
+      // Fail closed: on lookup error, do NOT treat the recipient as opted-in.
+      // An unsafe opt-out state must never appear opted-in.
+      logger.error('Failed to check WhatsApp opt-in status', { error, phone: maskPhone(phone) })
+      return false
+    }
   }
 }

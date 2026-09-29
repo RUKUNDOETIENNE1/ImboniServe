@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const user = session?.user as any
   const { id } = req.query
@@ -26,7 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'PATCH') {
-      const { name, description, priceCents, costCents, category, isAvailable, isSpecial } = req.body || {}
+      // NOTE: `isSpecial` is intentionally not accepted — MenuItem has no such
+      // column (writing it crashes Prisma). The dashboard "specials" toggle is
+      // a known non-functional UI feature pending a schema decision.
+      const { name, description, priceCents, costCents, category, isAvailable } = req.body || {}
 
       const data: any = {}
       if (typeof name === 'string') data.name = name
@@ -35,7 +39,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (priceCents != null) data.priceCents = Number(priceCents)
       if (costCents != null) data.costCents = Number(costCents)
       if (typeof isAvailable === 'boolean') data.isAvailable = isAvailable
-      if (typeof isSpecial === 'boolean') data.isSpecial = isSpecial
 
       if (Object.keys(data).length === 0) {
         return res.status(400).json({ error: 'No valid fields to update' })
@@ -51,7 +54,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           priceCents: true,
           category: true,
           isAvailable: true,
-          isSpecial: true,
         },
       })
 
@@ -64,3 +66,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+// Apply commercial enforcement: Menu requires Starter plan or higher
+export default requiresFeature('hasMenu')(baseHandler)

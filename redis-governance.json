@@ -1,0 +1,6400 @@
+{
+  "discoveryDate": "2026-06-22T05:19:13.335Z",
+  "redis": {
+    "urlConfigured": true,
+    "isTLS": true,
+    "certificateValidation": "enabled",
+    "provider": "upstash"
+  },
+  "queues": [
+    {
+      "name": "die_extract_dlq",
+      "file": "C:/Dev/ImboniResto/src/lib/die/queue/queues.ts",
+      "hasWorker": false,
+      "hasDeadLetterQueue": false,
+      "retryPolicy": {
+        "attempts": 3
+      },
+      "hasAlerting": false
+    },
+    {
+      "name": "die_intelligence_dlq",
+      "file": "C:/Dev/ImboniResto/src/lib/die/queue/queues.ts",
+      "hasWorker": false,
+      "hasDeadLetterQueue": false,
+      "retryPolicy": {
+        "attempts": 3
+      },
+      "hasAlerting": false
+    }
+  ],
+  "workers": [
+    {
+      "file": "C:/Dev/ImboniResto/src/components/AchievementBadges.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/AdminLayout.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/AISupplierRecommendations.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/BookDemoModal.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/BrandAssistantWidget.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/BusinessRevenueScanner.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/BusinessScanProgressTracker.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/CallWaiterButton.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/checkout/DigitalPaymentSelector.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/checkout/FeeDisplay.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ConfirmModal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/CookieConsentBanner.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/CurrencyDisplay.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/CurrencyRatesWidget.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/CurrencySelector.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/dashboard/DashboardQRButton.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/dashboard/LiveMetricsTicker.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/DashboardLayout.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/DateTimeDisplay.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/DIEAnomalyChart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/DIETrendChart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/DIEVolumeChart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/DocumentLifecycle.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/DocumentTimeline.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/ReconciliationChart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/die/StatusBadge.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/DishExplanationModal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ErrorBoundary.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/FeatureGate.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/FormModal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/InstallAppButton.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/InstallOmniboxHint.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LanguageSwitcher.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/layout/TopbarQuickActions.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LiveClock.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LiveOrderSummary.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LiveWeatherClock.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LocaleSettings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/LocationAutocomplete.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ManualPaymentConfirmation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/menu/MenuBuilder.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/menu/MenuImportWizard.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/MenuItemDetailModal.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/MoMoPaymentFlow.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/NewsletterSignup.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/OfflineIndicator.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/order/OTPVerification.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/order/UpsellRecommendations.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/OrderFeedback.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/OrderPaymentStatus.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/OrderStatusTracker.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PaymentConfirmation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PaymentFeedback.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PaymentFlow.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PaymentMethods.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PaymentMethodSelector.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PerformanceMonitor.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PreferencesSettings.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PrioritizedActions.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ProfitCalculator.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PublicLayout.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PublicSupportWidget.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/PWAInstallPrompt.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/qr/QRCodePopover.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/RecentlyViewedSuppliers.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ReorderAutopilot.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/RestaurantSupplier.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SalesChart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SeatSelectionModal.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SimpleReport.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SocialShare.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SplitBillProgress.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SupplierMap.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SupportChatWidget.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SupportWidget.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/SWUpdateToast.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/TableManagementModal.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/TapAndLeaveButton.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/templates/TemplatesGallery.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/TipSuggestionModal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/Toast.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/alert.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/button.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/Card.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/EmptyState.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/label.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/LoadingSkeleton.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/radio-group.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/switch.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/ui/Toast.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/UpgradePrompt.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/UsageDashboard.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/USSDMenu.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/VideoPlayer.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/WaiterCallsPanel.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/components/WhatsAppBot.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/config/pricing.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/contexts/CartContext.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/contexts/LocaleContext.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useDiningSession.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useFeatureFlag.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useMenuTranslation.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useOffline.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/usePWAInstall.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useRealtimeMetrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/hooks/useTheme.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/ab-testing/client.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/ab-testing/server.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/achievements.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/action-priority.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/ai/openai-insight.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/ai-prompts.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/analytics/adoption-tracker.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/analytics/pwa-telemetry.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/analytics-tracker.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/api/business-context.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/api/response-helpers.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/consent.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/cron/autopilot-features.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/cron.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/currency/exchange-rates.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/ai-business-assistant.engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/analytics-types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/analytics-utils.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/cost-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/executive-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/operational-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/procurement-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/product-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/analytics/supplier-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/arbitration/intelligence-arbitrator.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/assistant/ceo-prioritization.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/assistant/context-cache.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/assistant/executive-evolution.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/assistant/realtime-narrator.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/assistant/reasoning-to-language.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/audit/truth-audit-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/campaigns/campaigns.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/campaigns/campaigns.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/campaigns/campaigns.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/conversion/adapter.base.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/conversion/contracts.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/conversion/event-router.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/conversion/plugin-template.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/conversion/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/delivery/delivery.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/delivery/delivery.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/delivery/delivery.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/dining-slips/slips.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/dining-slips/slips.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/dining-slips/slips.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/events/events.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/events/events.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/events/events.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/hotel-rooms/hotel-rooms.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/hotel-rooms/hotel-rooms.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/inventory/inventory.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/inventory/inventory.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/inventory/inventory.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/kds/kds.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/kds/kds.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/kds/kds.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/loyalty/loyalty.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/loyalty/loyalty.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/loyalty/loyalty.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/menu-management/menu.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/menu-management/menu.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/procurement/procurement.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/procurement/procurement.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/procurement/procurement.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/reservations/reservations.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/reservations/reservations.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/reservations/reservations.plugin.sample.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/reservations/reservations.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/room-service/room-service.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/room-service/room-service.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/shadow/shadow-bindings.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/shadow/shadow-observability.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/stations/stations.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/stations/stations.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/suppliers/suppliers.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/suppliers/suppliers.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/suppliers/suppliers.shadow.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/table-management/table.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/table-management/table.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/waiter-calls/waiter-calls.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-as-plugin/waiter-calls/waiter-calls.contract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/business-intelligence/reasoning-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/adapters/console-adapter.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/adapters/email-adapter.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/adapters/slack-adapter.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/adapters/webhook-adapter.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/alert-delivery.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/alerts/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/ecosystem-monitor.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/scheduler.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/snapshot-collector.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/background/trend-analyzer.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/control-plane-intelligence.adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/control-plane-snapshot.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/control-plane.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/plugin-ecosystem-health.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/control-plane/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/convergence/convergence-engine.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/convergence/drift-logger.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/ceo-priority-validator.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/evaluation-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/intelligence-scorecard.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/narrative-validator.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/prediction-validator.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/evaluation/trust-calibration-engine.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/finance/finance-intelligence.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/governance-engine.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/governance-guard.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/governance-state.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/repositories/governance-repository.interface.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/repositories/memory-governance-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/governance/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/baseline-comparison.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/baseline-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/confidence-calibration.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/correlation-engine.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/insight-suppression.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/insights-facade.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/intelligence-snapshot.builder.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/plugin-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/stability-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/system-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/trend-utils.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/trust-score.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/intelligence-core/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/kernel/score-engine.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/kernel/semantic-dictionary.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/kernel/threshold-engine.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/kernel/unified-intelligence-kernel.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/marketplace/intelligence/marketplace-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/marketplace/intelligence/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/meta/meta-arbitration-validator.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/alias-bootstrap.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/intelligence-worker.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker-start.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/orchestrator/worker.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/adapters/governance-persistence-adapter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/factory.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/ianomaly-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/iaudit-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/icontrol-plane-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/igovernance-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/ilifecycle-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/prisma/anomaly.prisma-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/prisma/audit.prisma-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/prisma/control-plane.prisma-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/prisma/governance.prisma-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/persistence/repositories/prisma/lifecycle.prisma-repository.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/built-in/die-core.plugins.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/built-in/qr-menu.plugin.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-context.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-events.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-executor.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-hooks.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-manifest.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-registry.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/core/plugin-types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/marketplace/plugin-marketplace.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/marketplace/registry.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/marketplace/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/runtime/cache.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/runtime/event-bus.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/runtime/plugin-platform.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/runtime/plugin-runner.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/plugins/runtime/trigger-resolver.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/provider/azure.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/provider/gateway.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/provider/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/provider/openai.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/queue/queues.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/reality/reality-alignment-engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/document-anomaly.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/document-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/document-lifecycle.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/document-replay.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/procurement-reconciliation.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/product-matching.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/supplier-matching.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/system-consistency.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/services/system-repair.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/unified-intelligence/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/die/unified-intelligence/unified-intelligence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/env-validator.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/env.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/i18n/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/i18n/translations.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/i18n/useTranslation.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/i18n.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/logger.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/auth.middleware.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/cronAuth.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/error-handler.middleware.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/pagination.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/permission.middleware.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/rateLimit.redis.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/rateLimit.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/requestId.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/webhookAuth.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/withRateLimit.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/middleware/withSubscriptionCheck.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/monitoring/performance-monitor.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.client.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/monitoring/sentry.server.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/monitoring/workflow-tracker.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/networkDetection.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/observability/logger.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/observability/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/offlineCache.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/offlineStorage.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/payments/providers/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/payments/providers/intouch.provider.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/payments/providers/irembopay.provider.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/payments/subscription.engine.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/payments/types.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/permissions/staff.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/plan-entitlements.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/pricing/ebm-formatter.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/pricing/fee-calculator.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/pricing/fee-config.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/prisma.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/pusher-server.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/qr/render.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/realtime.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/sales-pipeline/status.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/scan-cache.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/sentry.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/server/consent.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/admin.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/affiliate.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/ai-credit.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/ai-supplier-recommendation.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/alert-delivery.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/analytics-insights.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/analytics.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/audit-log.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/auth-otp.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/billing-ledger.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/branch.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/business-approval.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/business-invite.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/business-payout.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/cms.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/commission.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/contact-organization.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/contact-relationship.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/contact-segment.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/contact.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/cost-anomaly.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/currency-conversion.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/currency-exchange.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/currency.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/custom-domain.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/customer.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/demo-request.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/digital-tipping.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/dining-credit.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/dining-session-slip.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/discovery-subscription.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/discovery.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/email.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/expo-finalization.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/feature-flag.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/fraud-detection.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/goods-received-note.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/idempotency.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/insight.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/intouch.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/inventory.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/invoice-number.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/irembopay.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/kitchen-dispatch.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/ledger-integrity.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/loyalty.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketer-attribution.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketer-commission.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketer-payout.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketer-risk.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketer-wallet.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/marketplace.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/menu-ai.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/menu-import.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/momo.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/mtn-momo.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/newsletter.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/notification.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/optimization-memory.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/order-mutation.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/order-normalization.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/otp.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/outbox.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/outlet.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/payment-ledger-events.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/payment-metrics.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/payment.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/payments-ops.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/payout-auto-approval.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/platform-fee.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/printer.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/professional-marketer.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/profit.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/promotion.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/purchase-order.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/qr-code.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/qr-generator.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/qr-order.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/qr-token.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/receipt-generator.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/reconciliation.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/referral-tracking-tier.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/referral.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/reorder-autopilot.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/report.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/reservation-reminder.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/reservation.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/revenue-alert.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/revenue-analytics.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/revenue-event.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/revenue-export.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/revenue-notification.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/role-session.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/routing.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/sales.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/seat-detection.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/seat-placement.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/seat-qr.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/security-event.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/site-builder-subscription.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/site-builder.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/slip-pdf-generator.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/smart-dining-slip.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/smart-menu-builder.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/smart-reorder.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/split-payment-whatsapp.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/split-payment.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/state-machine.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/station-load.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/storage.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/supplier-payout.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/sync-confidence.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/table-invite.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/table.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/tap-leave-finalization.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/tax.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/ticket-event.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/translation.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/trial-eligibility.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/vendor-settlement.service.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-cloud.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp-order.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/services/whatsapp.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/sessionManager.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/testing/stress-test.service.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/userPreferences.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/utils/currency.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/utils/recentlyViewed.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/utils/timezone.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/validations/inventory.schema.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/validations/public-api.validation.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/validations/sales.schema.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/validations/user.schema.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/lib/whatsapp/campaign-scheduler.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/middleware.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/404.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/500.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/affiliates.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/ai-monitoring.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/contacts.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/feature-flags.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/fee-settings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/finance/revenue.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/finance/vendors.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/leads.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/marketplace.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/newsletter.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/payments/operations.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/payments/webhook/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/payout-control.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/platform-fees.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/reconciliation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/reports.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/restaurants.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/revenue-analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/sales-pipeline/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/sales-pipeline.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/subscriptions.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/trial-eligibility/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/admin/users.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/affiliate/dashboard.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/affiliate/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/affiliate/program.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/assign.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/events.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/serve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/tests/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/tests/[id]/winner.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ab-testing/tests/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/addons/ai-credits/purchase.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/addons/discovery/purchase.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/addons/site-builder/purchase.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/affiliates/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/affiliates/payout/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/affiliates/[id]/suspend.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/ai-monitoring.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/analytics/funnel.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/analytics/leaderboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/analytics/revenue-source.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/analytics/time-series.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/audit-logs/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/business-approvals/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/business-approvals/[id]/approve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/business-approvals/[id]/reject.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/contacts/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/contacts/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/disposable-email-domains/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/disposable-email-domains/seed.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/disposable-email-domains/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/export/events.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/export/marketers.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/feature-flags.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/fee-config.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/finance/ledger/validate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/finance/revenue.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/finance/vendor-balances.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/growth/demo-requests.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/growth/newsletter.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/growth/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/marketers/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/marketers/[id]/suspend.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/marketplace/orders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/marketplace/products.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/marketplace-metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/overview.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/health.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/alerts/dispatch.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/alerts.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/events.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/webhook/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payments/ops/webhooks.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payout/queue.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payout/[id]/approve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/payout/[id]/reject.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/platform-fees.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/queue/dlq.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/queue/health.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/queue/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/reconciliation.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/restaurants.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/revenue/alerts.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/revenue/events.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/sales-pipeline/alerts.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/sales-pipeline/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/sales-pipeline/[id]/activity.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/sales-pipeline/[id].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/subscriptions.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/trial-eligibility/aggregates.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/trial-eligibility/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/admin/users.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/affiliate/dashboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/affiliate/payout.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ai/brand-assistant.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ai/cost-anomalies.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/ai/reorder.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/dashboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/insights.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/instruction-insights.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/menu-performance.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/payments.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/peak-hours.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/pwa.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/qr.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/analytics/track.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/forgot-password.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/pre-login.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/reset-password.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/security-events.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/sessions.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/signup.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/verify-mfa-otp.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/auth/[...nextauth].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/autopilot/reorder-suggestions.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/billing/events.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/billing/invoice/[id]/pdf.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/billing/invoice/[id].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/billing/payments.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/billing/subscription.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/branches/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/current.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/payout-summary.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/profile.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/scan-history.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/scan.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business/[id]/settings.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business-invite/generate.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/business-invite/stats.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/campaigns/[id]/send.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/campaigns.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/checkout/tap-and-leave/status/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/checkout/tap-and-leave/webhook.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/checkout/tap-and-leave.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/analytics.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/media/upload.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/media/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/notifications/settings.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/posts/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/posts/[id]/approve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/posts/[id]/submit.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cms/posts/[id].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/bulk-import.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/search.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/[id]/activities.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/contacts/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/crm/customers.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/addon-renewals.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/invite-maintenance.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/monthly-usage-reset.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/reconciliation.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/reservation-reminders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/subscription-reminders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/tap-leave-reconcile.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/cron/tap-leave-sweep.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/currency/convert.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/currency/default.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/currency/rates.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/custom-domains/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/custom-domains/[id]/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/custom-domains/[id]/verify.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/customer-referrals/generate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/customer-referrals/track.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/customers/[id]/favorites.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/customers/[id]/orders.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/dashboard/live-metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/dashboard/recent-transactions.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/dashboard/sales-chart.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/dashboard/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/dev/bootstrap-tap-leave.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/costs.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/executive.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/operations.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/procurement.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/products.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/analytics/suppliers.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/anomalies/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/anomalies/[id]/acknowledge.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/anomalies/[id]/dismiss.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/anomalies/[id]/resolve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/assistant/executive.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/assistant/overview.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/background-status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/ecosystem-health.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/health.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/overview.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/plugins.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/control-plane/trends.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/apply.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/approve.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/entity-links.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/reject.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/documents/[id]/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/events/stream.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/arbitration.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/convergence.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/correlations.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/evaluation.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/finance.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/insights.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/meta-arbitration.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/overview.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/plugins.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/reality-alignment.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/reliability.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/trends.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/truth-audit.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/intelligence/unified.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/marketplace/intelligence/overview.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/marketplace/intelligence/plugin.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/marketplace/intelligence/rankings.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/consistency.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/failed-jobs.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/health.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/queues.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/repair.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/replay.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/operations/stuck-documents.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/overview/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/plugins/marketplace/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/plugins/marketplace/[id]/disable.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/plugins/marketplace/[id]/enable.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/plugins/marketplace/[id]/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/plugins/marketplace/[id]/install.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/reconciliation/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/die/upload.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discover/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discover/nearby.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discover/profile.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discover/[slug].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discovery/access.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/discovery/upgrade.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/features/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/feed/engage.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/feed/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/feedback/order.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/feedback/payment/list.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/feedback/payment.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/fees/[type].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/grn/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/growth/demo-request.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/growth/newsletter-subscribe.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/growth/newsletter-unsubscribe.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/health/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/health/ready.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/hotel/rooms.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/insights/generate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/insights/history.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/alert-settings.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/alerts/[id]/dismiss.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/alerts.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/updates.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/inventory/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/invoices/[id]/download.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/kitchen/messages.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/kitchen/order/[id]/ready.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/kitchen/order/[id]/start.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/kitchen/orders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/kitchen/update-status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/loyalty/balance.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/loyalty/issue.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/businesses.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/commissions.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/dashboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/export/businesses.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/export/commissions.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/export/payouts.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/payout/history.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/payout/request.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/qr-code.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketer/register.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/orders/create.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/orders/details.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/orders/list.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/orders/pay.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/orders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/payment/[id].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/payments.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/products.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/receipt/[id]/pdf.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/receipt/[id].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/recommendations.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/supplier/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/marketplace/suppliers/nearest.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/me/permissions.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu/ask.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu/recommendations.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu-builder/candidates.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu-builder/extract.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu-builder/import.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/menu-items/[id]/translations.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/optimization/actions/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/optimization/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/optimization/outcomes/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/optimization/recommendations/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/optimization/recommendations/[id]/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/orders/calculate-fee.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/orders/unified.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/orders/[id]/add-items.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/orders/[id]/confirm-payment.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/orders/[id]/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/outlets/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/outlets/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/intouch/initiate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/intouch/status/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/intouch/webhook.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/irembo/create-invoice.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/irembo/initiate-momo.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/irembo/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/irembo/webhook.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/momo/initiate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/momo/status/[transactionId].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/monitor/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/mtn-momo/callback.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/payments/refunds.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/pilot/metrics.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/plugins/qr-menu/[menuId].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/plugins/[...slug].ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/pre-order/schedule.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/profit/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/promotions/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/menu.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/confirm.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/draft.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/link.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/messages.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/slots.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/order/token.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/otp/request.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/otp/send.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/public/otp/verify.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/purchase-orders/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/purchase-orders/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/q/[token].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/qr/designs/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/qr/designs/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/qr/generate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/qr/templates/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/qr/templates.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/r/[code].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/realtime/auth.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/realtime/emit.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/referrals/dashboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/referrals/leaderboard.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reports/daily.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reports/monthly.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reports/send-now.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reports/weekly.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reservation/[id]/confirm.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reservations/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/cancel.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id]/deposit/initiate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/reservations/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/sales/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/sales/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/available.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/lock.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/session/release.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/session/validate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/[id]/activate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/[id]/deactivate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/[id]/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/seats/[id]/qr.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/close.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/generate-invite.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/initialize.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/join.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/slip/[sessionId].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/summary.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/update-participant.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/session/validate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/settings/notifications.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/settings/whatsapp.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/site-builder/access.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/site-builder/ai/generate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/site-builder/config.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/site-builder/publish.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/site-builder/templates.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/smart-dining-slips/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/smart-dining-slips/template.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/smart-dining-slips/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/split-payment/[id]/progress.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/staff/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/staff/performance.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/staff/roles/index.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/staff/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/initialize.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/list.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/manage.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/orders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/snapshot.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/station/update-item-status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/subscriptions/initiate-payment.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/subscriptions/verify-payment.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier/orders/[id]/deliver.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier/orders/[id]/status.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier/orders.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier/products.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier-payouts/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/supplier-payouts/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/canned-replies/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/canned-replies.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/conversations/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/conversations/[id]/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/conversations/[id]/mark-read.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/conversations/[id]/messages.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/public-inquiry.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/support/upload.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/sync/batch.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/sync.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/list.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/lookup.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/[id]/seats/generate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/[id]/seats/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tables/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tax/configure.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tips/record-session.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tips/record.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tips/suggest/session/[sessionId].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/tips/suggestion.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/track/business-view.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/transactions/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/translate.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/usage/stats.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/user/preferences.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/utils/fetch-image-dataurl.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/waiter-calls/index.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/waiter-calls/[id].ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/weather/current.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/addons/payment-success.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/intouch.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/irembopay.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/voice-order.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/twilio/whatsapp.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/api/webhooks/whatsapp.ts",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/billing/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/business/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/cookies.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/ab-testing.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/admin/feature-flags.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/advanced-reporting.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/ai.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/analytics/instruction-insights.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/analytics/menu-performance.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/analytics/payments.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/analytics/peak-hours.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/auto-reorder.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/branches.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/campaigns.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/cms/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/cms/new.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/cms/settings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/cms/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/contacts/import.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/contacts/new.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/contacts.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/crm.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/currency-settings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/customer-feedback.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/customers/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/diagnostics.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/anomalies.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/control-plane.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/marketplace/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/operations.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/overview.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/plugins/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/plugins/[...slug].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/reconciliation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/die/review/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/feedback/payments.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/hotel.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/inventory-alerts.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/inventory.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/invite.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/kds.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/kitchen.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/loyalty.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/marketer.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/menu/dynamic-edit.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/menu/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/menu-builder.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/my-referrals.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/notifications.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/optimization.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/orders/unified.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/outlets.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/payment-settings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/payments/monitor.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/payout-summary.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/pilot-observer.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/profile.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/promotions.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/qr-analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/qr-builder.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/recipe-management.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/referrals.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/reports.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/reservations.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/sales/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/sales/new.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/security.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/settings.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/site-builder.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/smart-dining-slips.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/staff-performance.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/staff.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/stations.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/supplier-portal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/support/canned-replies.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/support/inbox.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/tables/[id]/seats.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/tables.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/tablet-ordering.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/templates.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/test-minimal.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/transactions.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/dashboard/video-analytics.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/discover/feed.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/discover/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/discover/map.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/discover/[slug].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/explore-businesses.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/faq.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/forgot-password.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/login.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/order/checkout.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/order/confirmation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/order/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/plugins/qr-menu/[menuId].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/pre-order/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/pricing.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/privacy.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/q/[token].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/refer/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/reservation/confirm/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/reset-password.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/robots.txt.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/service-terms.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/signup.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/sitemap.xml.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/cart.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/checkout.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/index.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/order-confirmation.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/orders.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/payment/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/payments.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/store/supplier/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/deliveries.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/index.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/login.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/orders.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/payments.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/supplier/products.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/t/[id].tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/terms.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/test-swc.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/unsubscribe.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/_app.tsx",
+      "queues": [],
+      "hasErrorHandling": true,
+      "hasLogging": true
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/_document.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/pages/_error.tsx",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/styles/tokens.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/types/global.d.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/types/next-auth.d.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/utils/datetimeRW.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/utils/rwandaUtils.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    },
+    {
+      "file": "C:/Dev/ImboniResto/src/utils/taglines.ts",
+      "queues": [],
+      "hasErrorHandling": false,
+      "hasLogging": false
+    }
+  ],
+  "summary": {
+    "totalQueues": 2,
+    "totalWorkers": 1059,
+    "queuesWithWorkers": 0,
+    "queuesWithDLQ": 0,
+    "queuesWithRetry": 2,
+    "queuesWithAlerting": 0
+  },
+  "securityFindings": {
+    "tlsEnabled": true,
+    "certificateValidationEnabled": true,
+    "rejectUnauthorized": true
+  }
+}

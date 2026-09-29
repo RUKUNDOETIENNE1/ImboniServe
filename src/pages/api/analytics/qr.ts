@@ -2,8 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { prisma } from '@/lib/prisma'
+import { requiresFeature } from '@/lib/middleware/withFeatureCheck'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function baseHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -60,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const uniqueVisitors = new Set(sales.map(s => s.customerId).filter(Boolean)).size
     const completedSales = sales.filter(s => s.status === 'COMPLETED' || s.status === 'PAID')
     const conversionRate = totalScans > 0 ? (completedSales.length / totalScans) * 100 : 0
-    const totalRevenue = completedSales.reduce((sum, s) => sum + (s.totalCents || 0), 0) / 100
+    const totalRevenue = completedSales.reduce((sum, s) => sum + (s.totalAmountCents || 0), 0) / 100
     const avgOrderValue = completedSales.length > 0 ? totalRevenue / completedSales.length : 0
 
     // Top performing QR codes (by table)
@@ -73,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       existing.scans++
       if (sale.status === 'COMPLETED' || sale.status === 'PAID') {
         existing.orders++
-        existing.revenue += (sale.totalCents || 0) / 100
+        existing.revenue += (sale.totalAmountCents || 0) / 100
       }
       tableStats.set(key, existing)
     })
@@ -122,3 +123,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Failed to fetch QR analytics' })
   }
 }
+
+// Apply commercial enforcement: QR Analytics require Business plan or higher
+export default requiresFeature('hasQRAnalytics')(baseHandler)

@@ -29,7 +29,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         taxRate: true,
         currency: true,
         splitPaymentConvenienceFeeEnabled: true,
-        splitPaymentConvenienceFeePercent: true
+        splitPaymentConvenienceFeePercent: true,
+        enableQRInVenue: true,
+        enableQRRemote: true
       }
     });
 
@@ -66,7 +68,9 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
       taxRate,
       currency,
       splitPaymentConvenienceFeeEnabled,
-      splitPaymentConvenienceFeePercent
+      splitPaymentConvenienceFeePercent,
+      enableQRInVenue,
+      enableQRRemote
     } = req.body;
 
     // Validate inputs
@@ -83,6 +87,14 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'Convenience fee must be between 0 and 5%' });
     }
 
+    if (enableQRInVenue !== undefined && typeof enableQRInVenue !== 'boolean') {
+      return res.status(400).json({ error: 'enableQRInVenue must be a boolean' });
+    }
+
+    if (enableQRRemote !== undefined && typeof enableQRRemote !== 'boolean') {
+      return res.status(400).json({ error: 'enableQRRemote must be a boolean' });
+    }
+
     const updatedBusiness = await prisma.business.update({
       where: { id: sessionBusinessId },
       data: {
@@ -90,7 +102,9 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
         ...(taxRate !== undefined && { taxRate }),
         ...(currency && { currency }),
         ...(splitPaymentConvenienceFeeEnabled !== undefined && { splitPaymentConvenienceFeeEnabled }),
-        ...(splitPaymentConvenienceFeePercent !== undefined && { splitPaymentConvenienceFeePercent })
+        ...(splitPaymentConvenienceFeePercent !== undefined && { splitPaymentConvenienceFeePercent }),
+        ...(enableQRInVenue !== undefined && { enableQRInVenue }),
+        ...(enableQRRemote !== undefined && { enableQRRemote })
       },
       select: {
         id: true,
@@ -98,9 +112,26 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
         taxRate: true,
         currency: true,
         splitPaymentConvenienceFeeEnabled: true,
-        splitPaymentConvenienceFeePercent: true
+        splitPaymentConvenienceFeePercent: true,
+        enableQRInVenue: true,
+        enableQRRemote: true
       }
     });
+
+    // GPV-D009 FIX: Sync TaxConfiguration.isInclusive with business.taxMode
+    // When a business owner changes their tax mode in settings, update the
+    // corresponding TaxConfiguration records to prevent isInclusive vs taxMode mismatch.
+    if (taxMode) {
+      try {
+        await prisma.taxConfiguration.updateMany({
+          where: { businessId: sessionBusinessId, taxType: 'VAT' },
+          data: { isInclusive: taxMode === 'INCLUSIVE' }
+        });
+      } catch (syncError) {
+        // Tax config sync failure should not block settings update
+        console.error('[Settings] TaxConfiguration sync failed:', syncError);
+      }
+    }
 
     return res.status(200).json(updatedBusiness);
   } catch (error) {

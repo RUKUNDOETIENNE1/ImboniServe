@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Sparkles
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 type RecommendationStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'DISMISSED' | 'FAILED'
 type RecommendationPriority = 'HIGH' | 'MEDIUM' | 'LOW'
@@ -100,12 +101,13 @@ export default function OptimizationHubPage() {
       if (res.ok) {
         loadData()
         setSelectedRec(null)
+        toast.success('Status updated')
       } else {
-        alert('Failed to update status')
+        toast.error('Failed to update status')
       }
     } catch (error) {
       console.error('Failed to update status:', error)
-      alert('Failed to update status')
+      toast.error('Failed to update status')
     }
   }
 

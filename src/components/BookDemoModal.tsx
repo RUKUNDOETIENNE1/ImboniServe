@@ -124,7 +124,7 @@ export default function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue focus:border-transparent"
-                placeholder={t('growth.business_placeholder', 'My Restaurant')}
+                placeholder={t('growth.business_placeholder', 'My Business')}
               />
             </div>
 

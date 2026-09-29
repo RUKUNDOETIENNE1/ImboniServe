@@ -33,7 +33,7 @@ export class TaxService {
     const taxes = await this.getActiveTaxes(businessId)
     
     if (taxes.length === 0) {
-      const defaultVAT = 18.0
+      const defaultVAT = 0 // 0 means no tax configured — business should configure their tax rate
       const vatCents = Math.round((subtotalCents * defaultVAT) / (100 + defaultVAT))
       return {
         subtotalCents,
@@ -119,7 +119,7 @@ export class TaxService {
       ],
     }
 
-    const countryTaxes = configs[countryCode] || configs['RW']
+    const countryTaxes = configs[countryCode] || [] // No fallback to Rwanda config — return empty if country not found
 
     for (const tax of countryTaxes) {
       await prisma.taxConfiguration.upsert({

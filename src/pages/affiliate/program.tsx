@@ -16,12 +16,38 @@ import {
 export default function AffiliateProgramPage() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [experience, setExperience] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleApply(e: React.FormEvent) {
     e.preventDefault()
-    // TODO: Implement application submission
-    setSubmitted(true)
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/affiliate/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, experience }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to submit application. Please try again.')
+        setSubmitting(false)
+        return
+      }
+
+      setSubmitted(true)
+    } catch {
+      setError('Network error. Please check your connection and try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -37,7 +63,7 @@ export default function AffiliateProgramPage() {
               B2B Affiliate Program
             </h1>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Become a partner and earn <strong>15% recurring commissions for 12 months</strong> by bringing restaurants to Imboni Serve.
+              Become a partner and earn <strong>15% recurring commissions for 12 months</strong> by bringing hospitality businesses to Imboni Serve.
             </p>
           </div>
 
@@ -48,7 +74,7 @@ export default function AffiliateProgramPage() {
               <div>
                 <h3 className="text-xl font-bold text-amber-900 mb-2">For Professional Marketers Only</h3>
                 <p className="text-amber-800 mb-3">
-                  This program is designed for influencers, marketers, and business consultants who can bring qualified restaurant clients to our platform.
+                  This program is designed for influencers, marketers, and business consultants who can bring qualified hospitality business clients to our platform.
                 </p>
                 <p className="text-sm text-amber-700">
                   <strong>Looking for customer referrals?</strong> If you're a customer wanting to refer friends, check out our <a href="/refer" className="underline font-semibold">Customer Referral Program</a> (1,000 RWF per friend).
@@ -85,15 +111,15 @@ export default function AffiliateProgramPage() {
               <h3 className="font-bold text-slate-800 mb-3">Example Earnings:</h3>
               <div className="space-y-2 text-sm text-slate-700">
                 <div className="flex justify-between">
-                  <span>1 restaurant on Growth plan (50,000 RWF/month):</span>
+                  <span>1 business on Professional plan (50,000 RWF/month):</span>
                   <span className="font-semibold text-green-600">7,500 RWF/month × 12 = 90,000 RWF</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>5 restaurants on Growth plan:</span>
+                  <span>5 businesses on Professional plan:</span>
                   <span className="font-semibold text-green-600">450,000 RWF total</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>10 restaurants on Growth plan:</span>
+                  <span>10 businesses on Professional plan:</span>
                   <span className="font-semibold text-green-700">900,000 RWF total</span>
                 </div>
               </div>
@@ -133,9 +159,9 @@ export default function AffiliateProgramPage() {
                   <span className="text-xl font-bold text-white">3</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 mb-1">Refer Restaurants</h3>
+                  <h3 className="font-bold text-slate-800 mb-1">Refer Hospitality Businesses</h3>
                   <p className="text-sm text-slate-600">
-                    Share your affiliate link with restaurant owners. They sign up using your code.
+                    Share your affiliate link with hospitality business owners. They sign up using your code.
                   </p>
                 </div>
               </div>
@@ -147,7 +173,7 @@ export default function AffiliateProgramPage() {
                 <div>
                   <h3 className="font-bold text-slate-800 mb-1">They Qualify</h3>
                   <p className="text-sm text-slate-600">
-                    Restaurant must generate <strong>30 Smart Dining Slips within 14 days</strong> to prove active usage.
+                    Business must generate <strong>30 Smart Dining Slips within 14 days</strong> to prove active usage.
                   </p>
                 </div>
               </div>
@@ -184,7 +210,7 @@ export default function AffiliateProgramPage() {
                 <div>
                   <h4 className="font-semibold text-slate-800 mb-1">Network Access</h4>
                   <p className="text-sm text-slate-600">
-                    Ability to reach restaurant owners, managers, or hospitality businesses
+                    Ability to reach hospitality business owners, managers, or decision-makers
                   </p>
                 </div>
               </div>
@@ -283,6 +309,35 @@ export default function AffiliateProgramPage() {
                     placeholder="john@example.com"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
+                    placeholder="+250 7XX XXX XXX"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Marketing Experience
+                  </label>
+                  <textarea
+                    value={experience}
+                    onChange={(e) => setExperience(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-imboni-blue/20 focus:border-imboni-blue"
+                    placeholder="Briefly describe your marketing experience and network..."
+                  />
+                </div>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
                 <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
                   <p className="mb-2">
                     <strong>Next steps:</strong> After submitting, our team will review your application and contact you within 48 hours with:
@@ -296,9 +351,10 @@ export default function AffiliateProgramPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-imboni-blue to-blue-600 text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-200 transition-all"
+                  disabled={submitting}
+                  className="w-full bg-gradient-to-r from-imboni-blue to-blue-600 text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Submit Application
+                  {submitting ? 'Submitting...' : 'Submit Application'}
                 </button>
               </form>
             </div>

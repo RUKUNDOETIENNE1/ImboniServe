@@ -1,21 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import type { GetServerSideProps } from 'next'
 import AdminLayout from '@/components/AdminLayout'
 import CurrencyDisplay from '@/components/CurrencyDisplay'
 import { useTranslation } from '@/lib/i18n'
 import { useToast } from '@/components/Toast'
 import { 
-  DollarSign, 
   AlertTriangle, 
   CheckCircle2, 
   XCircle, 
   Clock, 
-  TrendingUp,
   Users,
   Activity,
   Shield,
-  Eye,
   Download
 } from 'lucide-react'
 
@@ -37,6 +35,17 @@ interface PayoutQueueItem {
       flags: string[]
     }
   }
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { getServerSession } = await import('next-auth/next')
+  const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
+  const session = await getServerSession(ctx.req as any, ctx.res as any, authOptions)
+  const roles = (session?.user as any)?.roles || []
+  if (!session?.user || !roles.includes('ADMIN')) {
+    return { redirect: { destination: '/dashboard', permanent: false } }
+  }
+  return { props: {} }
 }
 
 interface Alert {
@@ -87,7 +96,7 @@ export default function PayoutControl() {
     }
     if (status === 'authenticated') {
       const userRoles = (session?.user as any)?.roles || []
-      if (!userRoles.includes('ADMIN') && !userRoles.includes('OWNER')) {
+      if (!userRoles.includes('ADMIN')) {
         router.push('/dashboard')
         return
       }
@@ -278,7 +287,7 @@ export default function PayoutControl() {
               </div>
               <div className="text-2xl font-bold text-slate-900">{stats.pendingPayouts}</div>
               <div className="text-xs text-slate-500 mt-1">
-                <CurrencyDisplay amount={stats.pendingAmount} />
+                <CurrencyDisplay amount={stats.pendingAmount} inCents />
               </div>
             </div>
 
@@ -386,7 +395,7 @@ export default function PayoutControl() {
                             <div className="text-xs text-slate-500">{payout.marketer.email}</div>
                           </td>
                           <td className="py-3 pr-4 font-semibold text-slate-900">
-                            <CurrencyDisplay amount={payout.amountCents} />
+                            <CurrencyDisplay amount={payout.amountCents} inCents />
                           </td>
                           <td className="py-3 pr-4 text-slate-600">{payout.method.replace(/_/g, ' ')}</td>
                           <td className="py-3 pr-4">

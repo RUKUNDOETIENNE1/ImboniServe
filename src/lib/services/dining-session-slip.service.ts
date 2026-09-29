@@ -45,7 +45,7 @@ export class DiningSessionSlipService {
         businessId: input.businessId,
         tableId: input.tableId,
         taxMode: input.taxMode || 'EXCLUSIVE',
-        taxRate: input.taxRate || 18.0,
+        taxRate: input.taxRate ?? 0, // 0 means no tax configured — business should configure their tax rate
         status: 'active',
         sessionStartedAt: new Date(),
       },

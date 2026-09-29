@@ -129,21 +129,19 @@ export function enforceWordLimit<T extends Record<string, any>>(
       : text;
   };
 
-  const result = { ...data };
+  const result: Record<string, any> = { ...data };
 
   Object.keys(result).forEach(key => {
     const value = result[key];
-    
+
     if (typeof value === 'string') {
       result[key] = truncate(value);
     } else if (Array.isArray(value)) {
-      result[key] = value.map(item => 
-        typeof item === 'string' ? truncate(item) : item
-      );
+      result[key] = value.map(item => typeof item === 'string' ? truncate(item) : item);
     }
   });
 
-  return result;
+  return result as T;
 }
 
 /**

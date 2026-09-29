@@ -28,9 +28,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     `order-`,
     `private-kitchen-${businessId}`,
     `private-support-inbox-${businessId}`,
+    `private-station-`, // Phase 1: Station-specific channels
   ]
 
   let isAllowed = allowedChannelPrefixes.some(p => channel_name?.startsWith(p)) || roles.includes('ADMIN')
+
+  // Phase 1: Validate station channel access
+  if (!isAllowed && typeof channel_name === 'string' && channel_name.startsWith('private-station-')) {
+    const stationId = channel_name.replace('private-station-', '')
+    try {
+      const { prisma } = await import('@/lib/prisma')
+      const station = await prisma.station.findUnique({
+        where: { id: stationId },
+        select: { businessId: true, isActive: true },
+      })
+      if (station && station.businessId === businessId && station.isActive) {
+        isAllowed = true
+      }
+    } catch {}
+  }
 
   if (!isAllowed && typeof channel_name === 'string' && channel_name.startsWith('private-support-')) {
     const convId = channel_name.replace('private-support-', '')
