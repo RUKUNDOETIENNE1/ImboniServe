@@ -3,10 +3,12 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "./dist",
-    "rootDir": "./src/lib",
-    "baseUrl": "./src/lib",
+    "rootDir": "./src",
+    "baseUrl": "./src",
     "paths": {
-      "@/lib/*": ["./*"]
+      "@/lib/*": ["lib/*"],
+      "@/utils/*": ["utils/*"],
+      "@/config/*": ["config/*"]
     },
     "module": "CommonJS",
     "moduleResolution": "node",
