@@ -29,6 +29,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 
-# dist/die/orchestrator/worker-start.js  (rootDir=src/lib strips src/lib/ prefix)
+# dist/lib/die/orchestrator/worker-start.js  (rootDir=src emits under dist/lib/)
 # This starts BOTH extraction and intelligence workers in a single process
-CMD ["node", "dist/die/orchestrator/worker-start.js"]
+CMD ["node", "dist/lib/die/orchestrator/worker-start.js"]

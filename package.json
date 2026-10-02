@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_SWC_NATIVE_PATCH=1 next dev",
     "build": "prisma generate && cross-env NODE_OPTIONS=--max-old-space-size=8192 NEXT_TELEMETRY_DISABLED=1 next build",
-    "build:worker": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && node -e \"const fs=require('fs');const path=require('path');const src=path.join('dist','lib');const dst='dist';if(fs.existsSync(src)){for(const n of fs.readdirSync(src)){fs.cpSync(path.join(src,n),path.join(dst,n),{recursive:true,force:true});}}\"",
+    "build:worker": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "build:local": "prisma generate && cross-env BUILD_PROFILE=local NODE_OPTIONS=--max-old-space-size=8192 NEXT_TELEMETRY_DISABLED=1 next build",
     "build:ci": "prisma generate && cross-env BUILD_PROFILE=ci NODE_OPTIONS=--max-old-space-size=12288 NEXT_TELEMETRY_DISABLED=1 next build",
     "start": "next start",
