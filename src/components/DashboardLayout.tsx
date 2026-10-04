@@ -103,7 +103,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // === OPERATIONS (5 items) ===
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, i18nKey: 'dashboard.nav.dashboard', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 1 },
     { name: 'Orders', href: '/dashboard/orders/unified', icon: ShoppingCart, i18nKey: 'dashboard.nav.orders', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 2 },
-    { name: 'Kitchen', href: '/dashboard/kitchen', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.kitchen', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'CHEF', 'KITCHEN_STAFF', 'SUPERVISOR'] },
+    { name: 'Sales', href: '/dashboard/sales', icon: DollarSign, i18nKey: 'dashboard.nav.sales', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 2.5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'CASHIER', 'WAITER', 'SUPERVISOR'] },
+    { name: 'Kitchen', href: '/dashboard/kitchen', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.kitchen', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'KITCHEN_MANAGER', 'CHEF', 'KITCHEN_STAFF', 'SUPERVISOR'] },
+    { name: 'Stations', href: '/dashboard/stations', icon: Store, i18nKey: 'dashboard.nav.stations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 3.5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'] },
     { name: 'Tables', href: '/dashboard/tables', icon: Home, i18nKey: 'dashboard.nav.tables', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 4, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK'] },
     { name: 'Reservations', href: '/dashboard/reservations', icon: Calendar, i18nKey: 'dashboard.nav.reservations', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'FRONT_DESK', 'SUPERVISOR'] },
     { name: 'Waiter', href: '/dashboard/waiter', icon: UtensilsCrossed, i18nKey: 'dashboard.nav.waiter', v1Visible: true, v1Section: 'OPERATIONS', v1Order: 6, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'WAITER', 'SUPERVISOR', 'FRONT_DESK'] },

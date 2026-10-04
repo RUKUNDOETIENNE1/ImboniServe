@@ -95,12 +95,28 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'enableQRRemote must be a boolean' });
     }
 
+    // business.currency is the operating currency — only currencies enabled
+    // for transactions may be assigned. Display-only currencies and arbitrary
+    // strings are rejected rather than silently corrupting the ledger.
+    let normalizedCurrency: string | undefined;
+    if (currency !== undefined) {
+      const code = String(currency).trim().toUpperCase();
+      const supported = await prisma.supportedCurrency.findUnique({
+        where: { code },
+        select: { isActive: true, transactionEnabled: true }
+      });
+      if (!supported || !supported.isActive || !supported.transactionEnabled) {
+        return res.status(400).json({ error: `Unsupported business currency: ${String(currency)}` });
+      }
+      normalizedCurrency = code;
+    }
+
     const updatedBusiness = await prisma.business.update({
       where: { id: sessionBusinessId },
       data: {
         ...(taxMode && { taxMode }),
         ...(taxRate !== undefined && { taxRate }),
-        ...(currency && { currency }),
+        ...(normalizedCurrency && { currency: normalizedCurrency }),
         ...(splitPaymentConvenienceFeeEnabled !== undefined && { splitPaymentConvenienceFeeEnabled }),
         ...(splitPaymentConvenienceFeePercent !== undefined && { splitPaymentConvenienceFeePercent }),
         ...(enableQRInVenue !== undefined && { enableQRInVenue }),

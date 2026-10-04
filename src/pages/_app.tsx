@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app'
 import dynamic from 'next/dynamic'
 import { ToastProvider } from '@/components/Toast'
+import { ToastProvider as UIToastProvider } from '@/components/ui/Toast'
 import { LocaleProvider } from '@/contexts/LocaleContext'
 import { CartProvider } from '@/contexts/CartContext'
 import { useEffect } from 'react'
@@ -84,13 +85,15 @@ function MyApp({ Component, pageProps, initialLocale }: ExtendedAppProps) {
       </Head>
       <LocaleProvider>
         <ToastProvider>
-          <CartProvider>
-            <div className={inter.className}>
-              <Component {...pageProps} />
-              <InstallOmniboxHint />
-              <SWUpdateToast />
-            </div>
-          </CartProvider>
+          <UIToastProvider>
+            <CartProvider>
+              <div className={inter.className}>
+                <Component {...pageProps} />
+                <InstallOmniboxHint />
+                <SWUpdateToast />
+              </div>
+            </CartProvider>
+          </UIToastProvider>
         </ToastProvider>
       </LocaleProvider>
     </SessionProviderNoSSR>

@@ -33,30 +33,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const user = await prisma.user.findUnique({
     where: { email: userEmail },
-    select: { id: true, business: { select: { id: true } } },
+    select: { id: true },
   })
   if (!user) {
     return res.status(404).json({ error: 'User not found' })
   }
 
+  // User display preference only. business.currency is the operating
+  // currency and is managed exclusively through business settings.
   await prisma.user.update({
     where: { id: user.id },
     data: { preferredCurrency: requestedCode },
   })
-
-  if (user.business?.id) {
-    await prisma.business.update({
-      where: { id: user.business.id },
-      data: { currency: requestedCode },
-    })
-  }
 
   return res.status(200).json({
     success: true,
     defaultCurrency: requestedCode,
     persisted: {
       userPreferredCurrency: true,
-      businessCurrency: Boolean(user.business?.id),
     },
   })
 }

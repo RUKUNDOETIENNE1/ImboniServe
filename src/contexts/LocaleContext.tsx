@@ -93,25 +93,21 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
     initializeLocaleSettings();
   }, [session, status]);
 
-  // Persist changes to Business settings
+  // Persist changes to the user's display preference — never business.currency.
+  // business.currency is the operating currency managed via business settings.
   const setCurrency = async (newCurrency: string) => {
     setCurrencyState(newCurrency);
     localStorage.setItem('imboni_currency', newCurrency);
 
-    // If user is logged in, update Business currency
     if (session?.user) {
       try {
-        const businessRes = await fetch('/api/business/current');
-        if (businessRes.ok) {
-          const businessData = await businessRes.json();
-          await fetch(`/api/business/${businessData.id}/settings`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currency: newCurrency })
-          });
-        }
+        await fetch('/api/currency/default', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: newCurrency })
+        });
       } catch (error) {
-        console.error('Failed to update currency in business settings:', error);
+        console.error('Failed to update preferred currency:', error);
       }
     }
   };
