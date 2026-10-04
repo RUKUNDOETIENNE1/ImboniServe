@@ -521,7 +521,7 @@ export default function Dashboard() {
                 <span className="text-sm font-medium">{t('dashboard.reports', 'Reports')}</span>
               </a>
               <a 
-                href="/whatsapp-setup" 
+                href="/dashboard/settings?tab=whatsapp" 
                 className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-imboni-gold to-yellow-500 text-white rounded-xl hover:shadow-lg hover:shadow-yellow-200 transition-all"
               >
                 <Smartphone className="w-6 h-6 mb-2" />

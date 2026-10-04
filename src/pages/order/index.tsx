@@ -35,7 +35,9 @@ type CartItem = {
 export default function OrderPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const { currency } = useCurrency();
+  const { currency: localeCurrency } = useCurrency();
+  const [businessCurrency, setBusinessCurrency] = useState<string | null>(null);
+  const currency = businessCurrency || localeCurrency;
   const { branchId, tableId, seatId, outletId, version, signature, mode, postId } = router.query as Record<string, string | undefined>;
 
   const [loading, setLoading] = useState(true);
@@ -211,6 +213,7 @@ export default function OrderPage() {
         throw new Error(data?.error || 'Failed to load menu');
       }
       const menuData = await m.json();
+      if (menuData.currency) setBusinessCurrency(menuData.currency);
       const rawMenu: MenuItem[] = menuData.menu || [];
       // Establish stable visitor id for A/B assignment
       try {
@@ -640,7 +643,7 @@ export default function OrderPage() {
   }
 
   function formatRwf(cents: number) {
-    // Deprecated: kept for compatibility; use <CurrencyDisplay inCents /> instead
+    // Deprecated: kept for compatibility; use <CurrencyDisplay currencyOverride={currency} inCents /> instead
     return `${Math.round(cents).toLocaleString()} ${currency}`;
   }
 
@@ -655,15 +658,15 @@ export default function OrderPage() {
               <div key={ci.menuItemId} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <div>
                   <div style={{ fontWeight: 600 }}>{ci.name}</div>
-                  <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay amount={ci.priceCents} inCents /></div>
+                  <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay currencyOverride={currency} amount={ci.priceCents} inCents /></div>
                 </div>
-                <div style={{ fontWeight: 700 }}><CurrencyDisplay amount={ci.priceCents * ci.quantity} inCents /></div>
+                <div style={{ fontWeight: 700 }}><CurrencyDisplay currencyOverride={currency} amount={ci.priceCents * ci.quantity} inCents /></div>
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: '2px solid #e5e7eb', fontSize: 18, fontWeight: 700 }}>
             <div>Total</div>
-            <div><CurrencyDisplay amount={cartTotalCents} inCents /></div>
+            <div><CurrencyDisplay currencyOverride={currency} amount={cartTotalCents} inCents /></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 20 }}>
             <button
@@ -951,7 +954,7 @@ export default function OrderPage() {
 
                         {/* Price & Actions */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                          <div style={{ fontWeight: 600 }}><CurrencyDisplay amount={item.priceCents} inCents /></div>
+                          <div style={{ fontWeight: 600 }}><CurrencyDisplay currencyOverride={currency} amount={item.priceCents} inCents /></div>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button
                               onClick={() => {
@@ -1015,7 +1018,7 @@ export default function OrderPage() {
                       <div key={ci.menuItemId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontWeight: 600 }}>{ci.name}</div>
-                          <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay amount={ci.priceCents} inCents /></div>
+                          <div style={{ color: '#6b7280', fontSize: 13 }}>{ci.quantity} × <CurrencyDisplay currencyOverride={currency} amount={ci.priceCents} inCents /></div>
                         </div>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                           <button onClick={() => decFromCart(ci.menuItemId)}>-</button>
@@ -1027,7 +1030,7 @@ export default function OrderPage() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, borderTop: '1px solid #e5e7eb', paddingTop: 8 }}>
                       <div>Total</div>
-                      <div style={{ fontWeight: 700 }}><CurrencyDisplay amount={cartTotalCents} inCents /></div>
+                      <div style={{ fontWeight: 700 }}><CurrencyDisplay currencyOverride={currency} amount={cartTotalCents} inCents /></div>
                     </div>
                   </div>
 

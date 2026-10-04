@@ -20,13 +20,13 @@ import {
 const heroCapabilities = [
   {
     icon: <DollarSign className="w-8 h-8" />,
-    title: 'CFO Dashboard',
-    desc: 'Financial health, revenue intelligence, and subscription metrics with AI-generated narratives and correlation analysis. Cached for sub‑1s load times.',
+    title: 'Financial Reports & Close Day',
+    desc: 'Daily, weekly, and monthly revenue reports plus an end-of-day Z-Report, so every sale, payout, and payment reconciles.',
   },
   {
     icon: <TrendingUp className="w-8 h-8" />,
-    title: 'CEO Dashboard',
-    desc: 'Business health across revenue, customers, operations, and hospitality data. Aggregated from multiple intelligence services. Auto‑refreshes every 5 minutes.',
+    title: 'Live Business Dashboard',
+    desc: 'Live sales, orders, tables, peak hours, and QR performance for your business in one view.',
   },
 ]
 

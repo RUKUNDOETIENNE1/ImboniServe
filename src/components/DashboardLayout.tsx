@@ -130,9 +130,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Menu Performance', href: '/dashboard/analytics/menu-performance', icon: BarChart2, i18nKey: 'dashboard.nav.menuPerformance', v1Visible: true, v1Section: 'REPORTS', v1Order: 3 },
     { name: 'Peak Hours', href: '/dashboard/analytics/peak-hours', icon: Clock, i18nKey: 'dashboard.nav.peakHours', v1Visible: true, v1Section: 'REPORTS', v1Order: 4 },
     { name: 'Payment Analytics', href: '/dashboard/analytics/payments', icon: DollarSign, i18nKey: 'dashboard.nav.paymentAnalytics', v1Visible: true, v1Section: 'REPORTS', v1Order: 5 },
+    { name: 'Smart Dining Slips', href: '/dashboard/smart-dining-slips', icon: Receipt, i18nKey: 'dashboard.nav.smartDiningSlips', v1Visible: true, v1Section: 'REPORTS', v1Order: 6, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'CASHIER', 'SUPERVISOR'] },
 
     // === TEAM (1 item) ===
     { name: 'Staff', href: '/dashboard/staff', icon: Users, i18nKey: 'dashboard.nav.staff', v1Visible: true, v1Section: 'TEAM', v1Order: 1 },
+    { name: 'Staff Performance', href: '/dashboard/staff-performance', icon: TrendingUp, i18nKey: 'dashboard.nav.staffPerformance', v1Visible: true, v1Section: 'TEAM', v1Order: 2, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'] },
 
     // === FINANCIAL (3 items) ===
     { name: 'Transactions', href: '/dashboard/transactions', icon: FileText, i18nKey: 'dashboard.nav.transactions', v1Visible: true, v1Section: 'FINANCIAL', v1Order: 1 },
@@ -145,6 +147,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Security', href: '/dashboard/security', icon: ShieldCheck, i18nKey: 'dashboard.nav.security', v1Visible: true, v1Section: 'SETTINGS', v1Order: 3 },
 
     // === GROWTH (3 items) ===
+    { name: 'CRM', href: '/dashboard/crm', icon: Users, i18nKey: 'dashboard.nav.crm', v1Visible: true, v1Section: 'GROWTH', v1Order: 0.5, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
     { name: 'Invite & Earn', href: '/dashboard/invite', icon: Gift, i18nKey: 'dashboard.nav.invite', v1Visible: true, v1Section: 'GROWTH', v1Order: 1, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
     { name: 'Referral Leaderboard', href: '/dashboard/referrals', icon: Trophy, i18nKey: 'dashboard.nav.referrals', v1Visible: true, v1Section: 'GROWTH', v1Order: 2, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
     { name: 'Promotions', href: '/dashboard/promotions', icon: Tag, i18nKey: 'dashboard.nav.promotions', v1Visible: true, v1Section: 'GROWTH', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER'] },
@@ -163,7 +166,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Hotel', href: '/dashboard/hotel', icon: Hotel, i18nKey: 'dashboard.nav.hotel', featureFlag: 'hotel_mode' },
     { name: 'Branches', href: '/dashboard/branches', icon: MapPin, i18nKey: 'dashboard.nav.branches', featureFlag: 'multi_branch' },
     { name: 'Outlets', href: '/dashboard/outlets', icon: Store, i18nKey: 'dashboard.nav.outlets', featureFlag: 'multi_branch' },
-    { name: 'CRM', href: '/dashboard/crm', icon: Users, i18nKey: 'dashboard.nav.crm', featureFlag: 'crm_v1' },
     { name: 'Contacts', href: '/dashboard/contacts', icon: UserCircle, i18nKey: 'dashboard.nav.contacts', featureFlag: 'crm_v1' },
     { name: 'CMS', href: '/dashboard/cms', icon: FileText, i18nKey: 'dashboard.nav.cms', featureFlag: 'cms_v1' },
     { name: 'Video Analytics', href: '/dashboard/video-analytics', icon: Video, i18nKey: 'dashboard.nav.videoAnalytics', featureFlag: 'cms_v1' },

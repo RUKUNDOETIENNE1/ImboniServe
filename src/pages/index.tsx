@@ -985,13 +985,13 @@ export default function HomePage() {
                     <DollarSign className="w-7 h-7" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
-                    {t('homepage.why_trust.cfo_title', 'CFO Dashboard')}
+                    {t('homepage.why_trust.cfo_title', 'Financial Reports & Close Day')}
                   </h3>
                   <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
-                    {t('homepage.why_trust.cfo_desc', 'Financial health, revenue intelligence, subscription metrics — with AI-generated narratives and correlation analysis. Cached for sub-1s load times.')}
+                    {t('homepage.why_trust.cfo_desc', 'Daily, weekly, and monthly revenue reports plus an end-of-day Z-Report, so every sale, payout, and payment reconciles.')}
                   </p>
-                  <Link href="/dashboard/cfo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
-                    {t('homepage.why_trust.cfo_cta', 'View CFO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  <Link href="/dashboard/reports" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.cfo_cta', 'Open Reports')} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="bg-gradient-to-br from-imboni-orange/5 to-orange-50 rounded-2xl p-8 border border-slate-100">
@@ -999,13 +999,13 @@ export default function HomePage() {
                     <TrendingUp className="w-7 h-7" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3" suppressHydrationWarning>
-                    {t('homepage.why_trust.ceo_title', 'CEO Dashboard')}
+                    {t('homepage.why_trust.ceo_title', 'Live Business Dashboard')}
                   </h3>
                   <p className="text-gray-600 leading-relaxed mb-4" suppressHydrationWarning>
-                    {t('homepage.why_trust.ceo_desc', 'Business health, revenue, customers, operations, and hospitality data — aggregated from multiple intelligence services. Auto-refreshing every 5 minutes.')}
+                    {t('homepage.why_trust.ceo_desc', 'Live sales, orders, tables, peak hours, and QR performance for your business in one view.')}
                   </p>
-                  <Link href="/dashboard/ceo" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
-                    {t('homepage.why_trust.ceo_cta', 'View CEO Dashboard')} <ArrowRight className="w-4 h-4" />
+                  <Link href="/dashboard" className="text-imboni-blue font-medium text-sm hover:text-imboni-orange transition inline-flex items-center gap-1">
+                    {t('homepage.why_trust.ceo_cta', 'Open Dashboard')} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

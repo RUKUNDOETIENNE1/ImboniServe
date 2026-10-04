@@ -23,6 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         address: true,
         city: true,
         phone: true,
+        currency: true,
         enableQRInVenue: true,
         enableQRRemote: true
       }
@@ -74,6 +75,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       address: business.address,
       city: business.city,
       phone: business.phone,
+      currency: business.currency,
       menu: menuItems
     });
   } catch (error) {

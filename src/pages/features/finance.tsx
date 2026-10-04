@@ -13,14 +13,14 @@ import {
 
 const heroCapability = {
   icon: <DollarSign className="w-8 h-8" />,
-  title: 'CFO Dashboard',
-  desc: 'Financial health, revenue intelligence, and subscription metrics with AI-generated narratives and correlation analysis. Cached for sub‑1s load times.',
+  title: 'Financial Reports & Close Day',
+  desc: 'Daily, weekly, and monthly revenue reports plus an end-of-day Z-Report, so every sale, payout, and payment reconciles.',
 }
 
 const featuredCapability = {
   icon: <TrendingUp className="w-8 h-8" />,
-  title: 'CEO Dashboard',
-  desc: 'Business health across revenue, customers, operations, and hospitality data. Aggregated from multiple intelligence services. Auto‑refreshes every 5 minutes.',
+  title: 'Live Business Dashboard',
+  desc: 'Live sales, orders, tables, peak hours, and QR performance for your business in one view.',
 }
 
 const standardCapabilities = [
@@ -35,7 +35,7 @@ export default function FinanceFeaturesPage() {
   return (
     <PublicLayout
       title={t('features_finance.title_page', 'Finance Features — Imboni Serve')}
-      metaDescription={t('features_finance.meta_description', 'Track payments, payouts, and financial health with CFO/CEO dashboards, real-time monitors, and clear reconciliation.')}
+      metaDescription={t('features_finance.meta_description', 'Track payments, payouts, and financial health with daily reports, real-time monitors, and clear reconciliation.')}
     >
       <Head>
         <meta name="robots" content="index,follow" />
@@ -51,7 +51,7 @@ export default function FinanceFeaturesPage() {
               {t('features_finance.badge', 'Finance')}
             </div>
             <h1 className="text-4xl font-bold text-imboni-blue mb-4" suppressHydrationWarning>{t('features_finance.h1', 'Every Franc Tracked')}</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>{t('features_finance.subheading', 'From mobile money to CFO intelligence — your money, fully visible.')}</p>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" suppressHydrationWarning>{t('features_finance.subheading', 'From payments to daily close-out — your money, fully visible.')}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 mb-8">
