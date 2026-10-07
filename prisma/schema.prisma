@@ -1912,6 +1912,11 @@ model BusinessProfile {
   priceRange     String?
   openingHours   Json?
   isPublished    Boolean          @default(false)
+  // Digital Business Experience — public 3D interactive layer.
+  // Disabled by default; owner publishes from the dashboard.
+  experienceEnabled Boolean         @default(false)
+  // Optional per-area overrides: { areas: { [hotspotId]: { enabled, label, description } } }
+  experienceConfig  Json?
   seoTitle       String?
   seoDescription String?
   viewCount      Int              @default(0)

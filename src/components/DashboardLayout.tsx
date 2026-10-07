@@ -123,6 +123,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // === QR & DIGITAL (2 items) ===
     { name: 'QR Builder', href: '/dashboard/qr-builder', icon: QrCode, i18nKey: 'dashboard.nav.qrBuilder', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 1 },
     { name: 'QR Analytics', href: '/dashboard/qr-analytics', icon: QrCode, i18nKey: 'dashboard.nav.qrAnalytics', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 2 },
+    { name: 'Digital Experience', href: '/dashboard/experience', icon: Sparkles, i18nKey: 'dashboard.nav.digitalExperience', v1Visible: true, v1Section: 'QR_DIGITAL', v1Order: 3, rolesAllowed: ['OWNER', 'ADMIN', 'MANAGER', 'SUPERVISOR'] },
 
     // === REPORTS (5 items) ===
     { name: 'Reports', href: '/dashboard/reports', icon: TrendingUp, i18nKey: 'dashboard.nav.reports', v1Visible: true, v1Section: 'REPORTS', v1Order: 1 },

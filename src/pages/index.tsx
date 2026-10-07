@@ -144,6 +144,42 @@ const heroSlides = [
     image: '/imgs/ideogr 2.jpg'
   },
   {
+    key: 'interactive',
+    title: 'Your Business',
+    highlight: 'Now Interactive',
+    subtitle: 'Explore. Order. Reserve. Connect.',
+    description: 'Turn your restaurant, café, bar or hotel into a digital experience customers can explore directly from their phones.',
+    image: '/imgs/01-interactive-business-hero.png',
+    ctas: {
+      primary: { label: 'Explore 3D Demo', href: '/experience' },
+      secondary: { label: 'See How It Works', href: '/#how-it-works' },
+    }
+  },
+  {
+    key: 'menu-ocr',
+    title: 'Your Paper Menu',
+    highlight: 'Digital in Seconds',
+    subtitle: 'AI Menu Digitization',
+    description: 'Take a photo of your existing menu. Imboni AI extracts the items, prices and categories and turns them into a digital menu.',
+    image: '/imgs/03-menu-ocr-reference.png',
+    ctas: {
+      primary: { label: 'Try Menu Scanner', href: '/dashboard/menu-builder' },
+      secondary: { label: 'See How It Works', href: '/#how-it-works' },
+    }
+  },
+  {
+    key: 'inventory-ocr',
+    title: 'Inventory',
+    highlight: 'Just Scan It',
+    subtitle: 'AI-Powered Stock Capture',
+    description: 'Capture invoices, stock sheets and product lists. Imboni AI extracts inventory information and helps keep your stock records up to date.',
+    image: '/imgs/04-inventory-ocr-reference.png',
+    ctas: {
+      primary: { label: 'Scan Inventory', href: '/dashboard/die' },
+      secondary: { label: 'See How It Works', href: '/#how-it-works' },
+    }
+  },
+  {
     key: 'whatsapp',
     title: 'Order through WhatsApp.',
     highlight: 'Serve through ImboniServe.',
@@ -394,6 +430,22 @@ export default function HomePage() {
                   <p className="text-sm text-white/80 mb-8" suppressHydrationWarning>
                     {t('homepage.hero.rt_os', 'Live view of sales, tables, and customer activity. See issues as they happen and respond faster.')}
                   </p>
+                  {'ctas' in slide && slide.ctas && (
+                    <div className="flex flex-wrap justify-center gap-4">
+                      <Link
+                        href={slide.ctas.primary.href}
+                        className="bg-imboni-orange text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-accent-dark hover:scale-105 transition-all shadow-lg shadow-orange-900/30 flex items-center gap-2"
+                      >
+                        {t(`homepage.hero.slides.${s.key}.cta_primary`, slide.ctas.primary.label)} <ArrowRight className="w-4 h-4" />
+                      </Link>
+                      <Link
+                        href={slide.ctas.secondary.href}
+                        className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-white/20 hover:scale-105 transition-all"
+                      >
+                        {t(`homepage.hero.slides.${s.key}.cta_secondary`, slide.ctas.secondary.label)}
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -412,7 +464,7 @@ export default function HomePage() {
               />
             ))}
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className={`flex flex-wrap justify-center gap-4 ${'ctas' in heroSlides[currentSlide] && heroSlides[currentSlide].ctas ? 'hidden' : ''}`}>
             <Link
               href="/signup"
               className="bg-imboni-orange text-white px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-accent-dark hover:scale-105 transition-all shadow-lg shadow-orange-900/30 flex items-center gap-2"

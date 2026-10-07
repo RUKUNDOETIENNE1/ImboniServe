@@ -8,6 +8,10 @@ const VALID_EVENT_TYPES = [
   'CTA_CLICK',
   'NEWSLETTER_SIGNUP',
   'DEMO_REQUEST',
+  // Interactive business experience (3D demo)
+  'EXPERIENCE_OPENED',
+  'HOTSPOT_CLICKED',
+  'EXPERIENCE_ACTION_CLICKED',
 ]
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
